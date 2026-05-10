@@ -1,0 +1,1068 @@
+/* SARSA-on-ANYmal — capstone visualization.
+   Tokens are kept compatible with the sibling anymal-mdp viz so the visual
+   identity carries forward. New tokens added for the SARSA components and the
+   Q-table heatmap ramp. */
+
+:root,
+:root[data-theme="light"] {
+  --bg: #f9f7f1;
+  --ink: #1a1a1a;
+  --ink-secondary: #6b6b6b;
+  --rule: #d8d4ca;
+  --card-bg: #ffffff;
+
+  /* Categorical palette inherited from sibling viz — re-used so the student
+     associates each hue with the viz that introduced it. */
+  --entity-anymal: #b8323a;     /* red — agent / MDP frame */
+  --entity-ghost:  #7a5c8c;     /* purple — Bellman recursion (Spooky House) */
+  --entity-star:   #c08a3e;     /* amber — Robbins-Monro update (Darts) */
+  --casino-blue:   #2f6cb1;     /* blue — ε-greedy on Q (Casino) */
+
+  /* Cell tones */
+  --cell-bg:    #f3efe6;
+  --cell-rule:  #e3ddd0;
+
+  /* Component aliases (the four pieces of the SARSA update). Same hues
+     as above; renamed so scene-1 KaTeX colour-coding reads pedagogically. */
+  --comp-mdp:      var(--entity-anymal);  /* (s, a) — the MDP frame */
+  --comp-eps:      var(--casino-blue);    /* ε-greedy / Q(s,a) estimate */
+  --comp-bellman:  var(--entity-ghost);   /* r + γ Q(s', a') target */
+  --comp-rm:       var(--entity-star);    /* α · (target − Q) update */
+
+  /* Q-heatmap ramp — single hue (sequential teal). 8 bins from low to high.
+     Chosen specifically NOT to clash with the four categorical hues above. */
+  --q-bin-0: #f0ece4;
+  --q-bin-1: #d9e3df;
+  --q-bin-2: #bdd0ca;
+  --q-bin-3: #97b8b1;
+  --q-bin-4: #6e9c95;
+  --q-bin-5: #4a807a;
+  --q-bin-6: #2c5d59;
+  --q-bin-7: #14403e;
+
+  --q-flash: #f0c674;     /* warm flash on Q-update animation */
+  --q-text:  #1a1a1a;
+  --q-text-light: #f9f7f1;
+
+  /* Action arrows */
+  --arrow-commanded: #2f6cb1;
+  --arrow-executed:  #b8323a;
+
+  /* Recap card emphasis */
+  --recap-muted: #8a8579;
+}
+
+:root[data-theme="dark"] {
+  --bg: #181612;
+  --ink: #ece7d9;
+  --ink-secondary: #8a8579;
+  --rule: #383530;
+  --card-bg: #211e19;
+
+  --entity-anymal: #d77078;
+  --entity-ghost:  #b394cb;
+  --entity-star:   #d6a766;
+  --casino-blue:   #6ea3dc;
+
+  --cell-bg:    #211e19;
+  --cell-rule:  #2f2c26;
+
+  --comp-mdp:      var(--entity-anymal);
+  --comp-eps:      var(--casino-blue);
+  --comp-bellman:  var(--entity-ghost);
+  --comp-rm:       var(--entity-star);
+
+  /* Inverted lightness — bin-0 is darkest (low Q), bin-7 is brightest (high Q).
+     Reads correctly against a warm dark background. */
+  --q-bin-0: #2a2622;
+  --q-bin-1: #353330;
+  --q-bin-2: #3e4a48;
+  --q-bin-3: #4a625e;
+  --q-bin-4: #5a8079;
+  --q-bin-5: #6f9f97;
+  --q-bin-6: #8ec0b6;
+  --q-bin-7: #b6e0d6;
+
+  --q-flash: #f0c674;
+  --q-text: #ece7d9;
+  --q-text-light: #181612;
+
+  --arrow-commanded: #6ea3dc;
+  --arrow-executed:  #d77078;
+
+  --recap-muted: #6b6760;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------------------
+   Topbar
+   --------------------------------------------------------------------------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.topbar .brand { font-weight: 600; }
+.topbar .scene-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 0 24px;
+}
+.topbar .right-cluster { display: flex; gap: 8px; align-items: center; }
+.theme-toggle, .pager-btn {
+  background: transparent;
+  color: var(--ink-secondary);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.theme-toggle:hover, .pager-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-secondary);
+}
+.pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------------
+   Stage / scene engine
+   --------------------------------------------------------------------------- */
+
+.stage {
+  position: relative;
+  max-width: 1200px;
+  margin: 16px auto 32px;
+  padding: 0 24px;
+  min-height: calc(100vh - 130px);
+}
+.scene {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  left: 0;
+  right: 0;
+}
+
+.dot-pager { display: flex; gap: 6px; align-items: center; }
+.dot-pager .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--rule); border: none; padding: 0; cursor: pointer;
+}
+.dot-pager .dot.active { background: var(--ink); }
+.dot-pager .dot:hover { background: var(--ink-secondary); }
+
+/* ---------------------------------------------------------------------------
+   Hero
+   --------------------------------------------------------------------------- */
+
+.hero h1 {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 28px;
+  margin: 0 0 6px;
+  letter-spacing: -0.005em;
+}
+.hero .subtitle {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-secondary);
+  margin: 0 0 18px;
+}
+.hero .lede {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 16.5px;
+  line-height: 1.55;
+  margin: 0 0 14px;
+  max-width: 60ch;
+}
+
+/* ---------------------------------------------------------------------------
+   Cards
+   --------------------------------------------------------------------------- */
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 10px 14px;
+}
+
+/* ---------------------------------------------------------------------------
+   Captions / formula blocks / footnote
+   --------------------------------------------------------------------------- */
+
+.caption {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-secondary);
+  margin: 8px 4px 0;
+  min-height: 1.55em;
+}
+.footnote {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  border-top: 1px solid var(--rule);
+  padding-top: 8px;
+  margin-top: 14px;
+  text-align: right;
+  font-style: italic;
+}
+.footnote kbd {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0 4px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-style: normal;
+}
+
+.formula-block {
+  margin: 10px 0;
+  text-align: center;
+}
+.formula-block .katex { color: var(--ink); }
+
+/* ---------------------------------------------------------------------------
+   Controls (sliders, buttons)
+   --------------------------------------------------------------------------- */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  padding: 8px 4px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin-top: 10px;
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.control-group label { white-space: nowrap; }
+/* Labels containing Greek lowercase letters need to opt out of uppercase. */
+.control-group.greek label,
+.control-group label.greek,
+.control-group.greek button,
+.control-group .greek-text {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: "SF Mono", Menlo, monospace;
+}
+.control-group input[type="range"] {
+  accent-color: var(--casino-blue);
+  height: 4px;
+  width: 130px;
+}
+.control-group output, .control-group .control-value {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  min-width: 36px;
+  text-align: right;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.control-group select, .control-group button {
+  background: var(--card-bg);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.control-group button:hover, .control-group select:hover {
+  border-color: var(--ink-secondary);
+}
+.control-group button.primary {
+  background: var(--casino-blue);
+  color: white;
+  border-color: var(--casino-blue);
+}
+.control-group button.primary:hover { filter: brightness(1.06); }
+.control-group button:disabled { opacity: 0.4; cursor: not-allowed; }
+.control-group button.toggle.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Generic two-column layout
+   --------------------------------------------------------------------------- */
+
+.two-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  gap: 24px;
+  align-items: start;
+  margin-top: 14px;
+}
+.col-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.col-label {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Grid (entity sprites — same shapes as anymal-mdp)
+   --------------------------------------------------------------------------- */
+
+.grid-host {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  aspect-ratio: var(--grid-aspect, 7 / 3);
+  background: var(--cell-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  user-select: none;
+}
+/* Cell annotations — start (label "S") and goal (label "★") cells.
+   Used by scenes 2-4 to annotate the static landmarks. */
+.grid-cell.start-cell::before {
+  content: "S";
+  position: absolute;
+  top: 4px; left: 6px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  font-family: "SF Mono", Menlo, monospace;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.grid-cell.goal-cell::before {
+  content: "★";
+  position: absolute;
+  top: 4px; right: 6px;
+  font-size: 11px;
+  color: var(--entity-star);
+  pointer-events: none;
+  opacity: 0.45;
+}
+.grid-cell { position: relative; }
+.grid-cell.cell-highlight {
+  outline: 2px solid var(--q-flash);
+  outline-offset: -2px;
+  z-index: 2;
+}
+
+/* Ghost-occupancy heatmap underlay. Each cell's `--ghost-occ` is set via
+   JS to a probability in [0, 1]; we render that as a soft red tint. */
+.grid-ghost-occ { z-index: 0; }
+.grid-ghost-occ.hidden { display: none !important; }
+.grid-occ-cell {
+  background: rgba(184, 50, 58, calc(var(--ghost-occ, 0) * 0.32));
+  transition: background 200ms ease-out;
+}
+:root[data-theme="dark"] .grid-occ-cell {
+  background: rgba(215, 112, 120, calc(var(--ghost-occ, 0) * 0.28));
+}
+.grid-cells { z-index: 1; position: relative; }
+.grid-entities { z-index: 3; }
+.grid-overlay { z-index: 4; }
+.grid-cells {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: repeat(var(--rows), 1fr);
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 0;
+}
+.grid-cell {
+  border-right: 1px solid var(--cell-rule);
+  border-bottom: 1px solid var(--cell-rule);
+}
+.grid-cell.last-col { border-right: none; }
+.grid-cell.last-row { border-bottom: none; }
+
+.grid-entities {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.entity {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--cell-w, 0px);
+  height: var(--cell-h, 0px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 160ms cubic-bezier(.2,.7,.2,1);
+  transform: translate(var(--tx, 0px), var(--ty, 0px));
+}
+.entity svg {
+  width: 72%;
+  height: 72%;
+  display: block;
+}
+.entity-anymal svg { color: var(--entity-anymal); }
+.entity-ghost  svg { color: var(--entity-ghost); }
+.entity-star   svg { color: var(--entity-star); }
+
+.entity.flash::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  color: var(--entity-anymal);
+  opacity: 0;
+  animation: entity-flash 360ms ease-out;
+}
+@keyframes entity-flash {
+  0%   { opacity: 0; transform: scale(0.6); }
+  40%  { opacity: 0.7; }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+/* ---------------------------------------------------------------------------
+   Action arrow widget
+   --------------------------------------------------------------------------- */
+
+.action-arrows {
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
+  grid-template-rows: repeat(3, 36px);
+  gap: 4px;
+  justify-content: center;
+}
+.action-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-size: 18px;
+  color: var(--ink-secondary);
+  background: var(--card-bg);
+  transition: background 160ms ease-out, color 160ms ease-out, border-color 160ms ease-out;
+}
+.action-arrow.commanded {
+  background: var(--arrow-commanded);
+  color: var(--bg);
+  border-color: var(--arrow-commanded);
+}
+.action-arrow.up    { grid-column: 2; grid-row: 1; }
+.action-arrow.left  { grid-column: 1; grid-row: 2; }
+.action-arrow.right { grid-column: 3; grid-row: 2; }
+.action-arrow.down  { grid-column: 2; grid-row: 3; }
+.action-arrow.center { grid-column: 2; grid-row: 2; visibility: hidden; }
+
+/* ---------------------------------------------------------------------------
+   Q-table heatmap (value view, scene 2/3/4)
+   --------------------------------------------------------------------------- */
+
+.qtable-host {
+  display: grid;
+  grid-template-rows: repeat(var(--rows, 4), 1fr);
+  grid-template-columns: repeat(var(--cols, 7), 1fr);
+  gap: 2px;
+  width: 100%;
+  aspect-ratio: var(--cols, 7) / var(--rows, 4);
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 2px;
+}
+.qcell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--cell-bg);
+  font-family: "SF Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--q-text);
+  line-height: 1;
+  padding: 2px;
+  transition: background 160ms ease-out;
+  min-height: 0;
+  overflow: hidden;
+}
+.qcell-val { font-size: 11px; line-height: 1.1; }
+.qcell-arrow {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+.qcell.q-bin-0 { background: var(--q-bin-0); }
+.qcell.q-bin-1 { background: var(--q-bin-1); }
+.qcell.q-bin-2 { background: var(--q-bin-2); }
+.qcell.q-bin-3 { background: var(--q-bin-3); }
+.qcell.q-bin-4 { background: var(--q-bin-4); }
+.qcell.q-bin-5 { background: var(--q-bin-5); color: var(--q-text-light); }
+.qcell.q-bin-6 { background: var(--q-bin-6); color: var(--q-text-light); }
+.qcell.q-bin-7 { background: var(--q-bin-7); color: var(--q-text-light); }
+.qcell.qcell-flash {
+  animation: q-flash 700ms ease-out;
+}
+.qcell.qcell-highlight {
+  outline: 2px solid var(--q-flash);
+  outline-offset: -2px;
+  z-index: 1;
+}
+@keyframes q-flash {
+  0%   { box-shadow: inset 0 0 0 3px var(--q-flash); }
+  100% { box-shadow: inset 0 0 0 0px var(--q-flash); }
+}
+
+/* Per-action panel layout */
+.qtable-peraction {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.qpanel { display: flex; flex-direction: column; gap: 4px; }
+.qpanel-hdr {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-secondary);
+}
+.qpanel-arrow {
+  font-style: normal;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.qpanel-grid {
+  display: grid;
+  grid-template-rows: repeat(var(--rows, 4), 1fr);
+  grid-template-columns: repeat(var(--cols, 7), 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px;
+  aspect-ratio: var(--cols, 7) / var(--rows, 4);
+}
+.qcell-mini {
+  font-size: 10px;
+  padding: 1px;
+}
+.qcell-mini .qcell-val { font-size: 9px; }
+
+/* ---------------------------------------------------------------------------
+   Learning curve
+   --------------------------------------------------------------------------- */
+
+.learning-curve {
+  width: 100%;
+  font-family: "SF Mono", Menlo, monospace;
+}
+.learning-curve .lc-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.learning-curve .lc-raw {
+  fill: none;
+  stroke: var(--ink-secondary);
+  stroke-width: 0.8;
+  opacity: 0.4;
+}
+.learning-curve .lc-smooth {
+  fill: none;
+  stroke: var(--casino-blue);
+  stroke-width: 1.6;
+}
+.learning-curve .lc-cursor {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  opacity: 0.6;
+}
+.learning-curve .lc-cursor-marker {
+  fill: var(--entity-star);
+  stroke: var(--ink);
+  stroke-width: 0.8;
+}
+.learning-curve .lc-grid {
+  stroke: var(--rule);
+  stroke-width: 0.5;
+  stroke-dasharray: 2 3;
+}
+.learning-curve .lc-tick-label,
+.learning-curve .lc-axis-label {
+  fill: var(--ink-secondary);
+  font-size: 10px;
+}
+.learning-curve .lc-axis-label {
+  font-style: italic;
+  font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------------
+   Component-color spans (used in scene 1 KaTeX colour-coding & inline)
+   --------------------------------------------------------------------------- */
+
+.comp-mdp     { color: var(--comp-mdp); }
+.comp-eps     { color: var(--comp-eps); }
+.comp-bellman { color: var(--comp-bellman); }
+.comp-rm      { color: var(--comp-rm); }
+
+/* ---------------------------------------------------------------------------
+   Recap / component card (scenes 0, 5)
+   --------------------------------------------------------------------------- */
+
+.component-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+.component-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 14px 10px 12px;
+}
+.component-card .comp-icon {
+  width: 48px; height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.component-card .comp-icon svg { width: 100%; height: 100%; }
+.component-card.comp-card-mdp     .comp-icon svg { color: var(--comp-mdp); }
+.component-card.comp-card-eps     .comp-icon svg { color: var(--comp-eps); }
+.component-card.comp-card-bellman .comp-icon svg { color: var(--comp-bellman); }
+.component-card.comp-card-rm      .comp-icon svg { color: var(--comp-rm); }
+.component-card .comp-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink);
+}
+.component-card .comp-from {
+  font-size: 10px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.component-card .comp-caption {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  line-height: 1.4;
+}
+
+/* ---------------------------------------------------------------------------
+   HUD — state-tuple readout (scene 2)
+   --------------------------------------------------------------------------- */
+
+.hud {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 13px;
+}
+.hud .hud-row {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.hud .hud-row:last-child { border-bottom: none; }
+.hud .hud-label {
+  color: var(--ink-secondary);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+.hud .hud-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Numerical Q-table — the centerpiece view (scenes 2/3/4)
+   --------------------------------------------------------------------------- */
+
+.qtable-numeric {
+  width: 100%;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11.5px;
+}
+.qtable-numeric-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+}
+.qtable-numeric-table th,
+.qtable-numeric-table td {
+  padding: 3px 7px;
+  border-bottom: 1px solid var(--cell-rule);
+  text-align: right;
+}
+.qtable-numeric-table thead th {
+  background: var(--cell-bg);
+  color: var(--ink-secondary);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+}
+.qtable-numeric-table .qtn-state-hdr,
+.qtable-numeric-table .qtn-state {
+  text-align: left;
+  color: var(--ink-secondary);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  width: 56px;
+  white-space: nowrap;
+}
+.qtable-numeric-table .qtn-action-hdr {
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 600;
+  width: calc((100% - 56px) / 4);
+}
+.qtable-numeric-table tbody tr:last-child td { border-bottom: none; }
+.qtable-numeric-table .qtn-cell {
+  color: var(--q-text);
+  transition: background 240ms ease-out;
+}
+.qtable-numeric-table .qtn-terminal {
+  text-align: center;
+  color: var(--ink-secondary);
+  font-style: italic;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.qtable-numeric-table .qtn-row-highlight td {
+  background: var(--card-bg);
+  outline: 1.5px solid var(--q-flash);
+  outline-offset: -1px;
+}
+.qtable-numeric-table .qtn-cell.qtn-flash {
+  animation: qtn-flash 380ms ease-out;
+}
+@keyframes qtn-flash {
+  0%   { box-shadow: inset 0 0 0 3px var(--q-flash); }
+  100% { box-shadow: inset 0 0 0 0px var(--q-flash); }
+}
+.qtable-numeric-table .qtn-cell.q-bin-0 { background: color-mix(in srgb, var(--q-bin-0) 35%, transparent); }
+.qtable-numeric-table .qtn-cell.q-bin-1 { background: color-mix(in srgb, var(--q-bin-1) 40%, transparent); }
+.qtable-numeric-table .qtn-cell.q-bin-2 { background: color-mix(in srgb, var(--q-bin-2) 45%, transparent); }
+.qtable-numeric-table .qtn-cell.q-bin-3 { background: color-mix(in srgb, var(--q-bin-3) 50%, transparent); }
+.qtable-numeric-table .qtn-cell.q-bin-4 { background: color-mix(in srgb, var(--q-bin-4) 55%, transparent); color: var(--q-text); }
+.qtable-numeric-table .qtn-cell.q-bin-5 { background: color-mix(in srgb, var(--q-bin-5) 60%, transparent); color: var(--q-text-light); }
+.qtable-numeric-table .qtn-cell.q-bin-6 { background: color-mix(in srgb, var(--q-bin-6) 70%, transparent); color: var(--q-text-light); }
+.qtable-numeric-table .qtn-cell.q-bin-7 { background: color-mix(in srgb, var(--q-bin-7) 80%, transparent); color: var(--q-text-light); }
+
+/* When the table panel sits in a side-rail container, allow it to scroll */
+.qtable-rail {
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--card-bg);
+}
+.qtable-rail .qtable-numeric-table { border: none; border-radius: 0; }
+
+/* ---------------------------------------------------------------------------
+   Tuple overlay (scene 2)
+   --------------------------------------------------------------------------- */
+
+.tuple-chip {
+  position: absolute;
+  background: var(--card-bg);
+  border: 1px solid var(--ink-secondary);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11.5px;
+  color: var(--ink);
+  z-index: 5;
+  pointer-events: none;
+  box-shadow: 0 4px 14px -8px rgba(0,0,0,0.25);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+.tuple-chip.show { opacity: 1; }
+.tuple-chip.tuple-arith {
+  font-size: 11px;
+  background: var(--bg);
+  border-color: var(--rule);
+  color: var(--ink);
+}
+/* Goal celebration chip */
+.celebrate-chip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 6;
+  font-family: "SF Mono", Menlo, monospace;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--entity-star);
+  opacity: 0;
+  animation: celebrate-rise 1100ms ease-out forwards;
+}
+@keyframes celebrate-rise {
+  0%   { opacity: 0; transform: translateY(0px) scale(0.8); }
+  20%  { opacity: 1; transform: translateY(-8px) scale(1.0); }
+  90%  { opacity: 1; transform: translateY(-32px) scale(1.0); }
+  100% { opacity: 0; transform: translateY(-44px) scale(1.0); }
+}
+
+/* ---------------------------------------------------------------------------
+   Scrubber (scene 3)
+   --------------------------------------------------------------------------- */
+
+.scrubber {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  font-size: 12px;
+  color: var(--ink-secondary);
+}
+.scrubber input[type="range"] {
+  flex: 1 1 auto;
+  accent-color: var(--casino-blue);
+  height: 4px;
+}
+.scrubber .scr-label {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+}
+.scrubber .scr-snapshots {
+  display: flex;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--ink-secondary);
+}
+.scrubber .scr-snapshots .scr-snap {
+  cursor: pointer;
+  padding: 1px 5px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+.scrubber .scr-snapshots .scr-snap.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   View toggle (scene 3, 4)
+   --------------------------------------------------------------------------- */
+
+.view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--card-bg);
+}
+.view-toggle button {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 11px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.view-toggle button.active {
+  background: var(--ink);
+  color: var(--bg);
+}
+.view-toggle button:not(.active):hover {
+  background: var(--cell-bg);
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Bar chart (scene 4 click-cell payoff)
+   --------------------------------------------------------------------------- */
+
+.q-bars {
+  display: grid;
+  grid-template-columns: 36px 1fr 56px;
+  gap: 6px;
+  align-items: center;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11.5px;
+}
+.q-bars .qb-arrow { font-size: 14px; color: var(--ink); text-align: center; }
+.q-bars .qb-track {
+  position: relative;
+  height: 12px;
+  background: var(--cell-bg);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.q-bars .qb-fill {
+  position: absolute;
+  top: 0; height: 100%;
+  background: var(--q-bin-5);
+}
+.q-bars .qb-fill.negative { background: var(--entity-anymal); }
+.q-bars .qb-val {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Recap-card icon row (scenes 0, 5) — small SVG icon styles
+   --------------------------------------------------------------------------- */
+
+.component-card .comp-symbol {
+  font-size: 13px;
+  color: var(--ink);
+}
+.scene0-teaser, .scene5-teaser {
+  margin-top: 18px;
+}
+.scene0-teaser-caption, .scene5-teaser-caption {
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Two-column scene layout used by scenes 2/3/4
+   --------------------------------------------------------------------------- */
+
+.s2-layout, .s3-layout, .s4-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+  gap: 22px;
+  margin-top: 8px;
+  align-items: start;
+}
+.s2-grid-host, .s3-grid-host, .s4-grid-host {
+  width: 100%;
+  max-width: 600px;
+}
+.s2-rail, .s3-rail, .s4-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Tutorial caption above the grid in scene 2 */
+.tutorial-caption {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+  margin: 0 0 8px;
+  max-width: 60ch;
+}
+.tutorial-caption strong {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* Status banner (scene 2 — terminal/respawn announcement) */
+.status-banner {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13.5px;
+  padding: 6px 10px;
+  border-left: 2px solid var(--entity-star);
+  background: var(--card-bg);
+  color: var(--ink);
+  border-radius: 0 3px 3px 0;
+  margin: 6px 0;
+  min-height: 1.2em;
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+.status-banner.show { opacity: 1; }
+.status-banner.collision { border-color: var(--entity-anymal); }
+.status-banner.goal { border-color: var(--entity-star); }

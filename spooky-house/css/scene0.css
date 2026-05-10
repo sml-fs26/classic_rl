@@ -1,0 +1,79 @@
+/* Scene 0 — Many states, one value each.
+   Hero block + a 5×5 reward grid annotated with reward numbers and a
+   ghost-density visual. No interaction. */
+
+.s0-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.s0-hero { max-width: 60ch; margin: 6px 0 18px; }
+
+.s0-grid-row {
+  display: grid;
+  grid-template-columns: minmax(0, 480px) minmax(320px, 540px);
+  gap: 36px;
+  align-items: start;
+  justify-content: start;
+}
+
+.s0-grid-host { width: 100%; max-width: 480px; min-width: 0; }
+
+.s0-grid-row code {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12.5px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
+.s0-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.s0-side h2 {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 17px;
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+.s0-side p { margin: 0; }
+.s0-side .muted { color: var(--ink-secondary); font-style: italic; font-size: 14px; }
+
+.s0-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 13.5px;
+  counter-reset: s0-rule;
+}
+.s0-rules li {
+  display: block;
+  position: relative;
+  padding-left: 28px;
+  color: var(--ink);
+}
+.s0-rules li::before {
+  counter-increment: s0-rule;
+  content: counter(s0-rule);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  width: 18px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-secondary);
+  text-align: right;
+}

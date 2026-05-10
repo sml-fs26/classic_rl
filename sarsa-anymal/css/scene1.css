@@ -1,0 +1,93 @@
+/* Scene 1 — the SARSA update with colour-coded pieces. */
+
+.scene1-wrap { padding-top: 12px; }
+
+.s1-equation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 6px;
+  margin: 28px 0 18px;
+  padding: 18px 16px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  background: var(--card-bg);
+  font-size: 18px;
+  line-height: 1.6;
+}
+.s1-equation .katex { font-size: 22px; }
+.s1-piece .katex { font-weight: 500; }
+.s1-glue {
+  color: var(--ink-secondary);
+}
+.s1-glue .katex { color: var(--ink-secondary); }
+
+.s1-eps-callout {
+  text-align: center;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-secondary);
+  margin: 6px auto 28px;
+  max-width: 60ch;
+}
+.s1-eps-callout .comp-eps { font-style: normal; font-weight: 500; }
+.s1-eps-label { letter-spacing: 0.01em; }
+
+/* The components table. */
+.s1-components-table {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) minmax(220px, 2fr) minmax(120px, 0.8fr);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin: 18px auto 6px;
+  max-width: 720px;
+}
+.s1-tbl-row {
+  display: contents;
+}
+.s1-tbl-cell {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--cell-rule);
+  font-size: 14px;
+  align-self: center;
+}
+.s1-tbl-row.s1-tbl-hdr .s1-tbl-cell {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  border-bottom: 1px solid var(--rule);
+}
+.s1-tbl-row:last-child .s1-tbl-cell { border-bottom: none; }
+.s1-tbl-piece .katex { font-size: 15px; }
+.s1-tbl-role { color: var(--ink); font-style: italic; font-family: "Iowan Old Style", Palatino, Georgia, serif; }
+.s1-tbl-from { color: var(--ink-secondary); font-size: 13px; letter-spacing: 0.02em; }
+
+/* Make sure colour from the .comp-* class flows into KaTeX SVG/text. KaTeX
+   renders most rules as `currentColor`, so styling the wrapping span is enough. */
+.s1-piece.comp-mdp     { color: var(--comp-mdp); }
+.s1-piece.comp-rm      { color: var(--comp-rm); }
+.s1-piece.comp-bellman { color: var(--comp-bellman); }
+.s1-piece.comp-eps     { color: var(--comp-eps); }
+.s1-piece.comp-mdp     .katex { color: var(--comp-mdp); }
+.s1-piece.comp-rm      .katex { color: var(--comp-rm); }
+.s1-piece.comp-bellman .katex { color: var(--comp-bellman); }
+.s1-piece.comp-eps     .katex { color: var(--comp-eps); }
+.s1-tbl-piece.comp-mdp     { color: var(--comp-mdp); }
+.s1-tbl-piece.comp-rm      { color: var(--comp-rm); }
+.s1-tbl-piece.comp-bellman { color: var(--comp-bellman); }
+.s1-tbl-piece.comp-eps     { color: var(--comp-eps); }
+.s1-tbl-piece.comp-mdp     .katex { color: var(--comp-mdp); }
+.s1-tbl-piece.comp-rm      .katex { color: var(--comp-rm); }
+.s1-tbl-piece.comp-bellman .katex { color: var(--comp-bellman); }
+.s1-tbl-piece.comp-eps     .katex { color: var(--comp-eps); }
+
+.s1-cap {
+  text-align: center;
+  margin-top: 18px;
+  max-width: 60ch;
+  margin-left: auto;
+  margin-right: auto;
+}

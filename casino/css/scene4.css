@@ -1,0 +1,39 @@
+/* Scene 4 — ε-greedy. */
+
+.s4-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.s4-tgrp .control-value { min-width: 80px; }
+
+.s4-badge-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 4px 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 12px;
+  color: var(--ink-secondary);
+}
+
+.s4-badge-label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.s4-hud-strip {
+  display: flex;
+  gap: 24px;
+  align-items: baseline;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-secondary);
+  margin: 4px 4px 0;
+}
+.s4-hud-cell { white-space: nowrap; }
+
+.s4-wrap .formula-block { margin: 6px 0 4px; }
+.s4-wrap .formula-block .katex { font-size: 1em; }

@@ -1,0 +1,101 @@
+/* Scene 1 — Pick a path. */
+
+.s1-wrap { max-width: 1080px; margin: 0 auto; }
+
+.s1-row {
+  display: grid;
+  grid-template-columns: minmax(0, 480px) minmax(280px, 540px);
+  gap: 36px;
+  align-items: start;
+  justify-content: start;
+  margin-top: 12px;
+}
+
+.s1-grid-host { width: 100%; max-width: 480px; min-width: 0; }
+
+.s1-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.s1-side h2 {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 17px;
+  margin: 0;
+}
+
+.s1-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.s1-score-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+
+.s1-step-list {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12.5px;
+  color: var(--ink);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 8px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.s1-step-list .step-item {
+  display: grid;
+  grid-template-columns: 32px 1fr 56px;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 0;
+}
+.s1-step-list .step-item.head {
+  color: var(--ink-secondary);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+  margin-bottom: 2px;
+}
+
+.s1-banner {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  color: var(--ink);
+}
+.s1-banner .banner-score {
+  font-family: "SF Mono", Menlo, monospace;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--ink);
+}
+
+.s1-side .footnote { text-align: left; border: none; padding: 0; margin: 0; }
+
+/* Path overlay tint — translucent red on visited cells. */
+.s1-grid-host .grid-cell.path-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--path-trace);
+  opacity: 0.13;
+  pointer-events: none;
+}

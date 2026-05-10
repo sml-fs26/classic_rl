@@ -1,0 +1,682 @@
+/* Editorial palette + scene-engine shell, matched to sibling viz so the
+   lecture's visual identity carries across the curriculum. */
+
+:root,
+:root[data-theme="light"] {
+  --bg: #f9f7f1;
+  --ink: #1a1a1a;
+  --ink-secondary: #6b6b6b;
+  --rule: #d8d4ca;
+  --card-bg: #ffffff;
+
+  /* Spooky House palette — keeps anymal-mdp's MDP-tuple categoricals so
+     curriculum continuity holds, but the ramp colour is the spooky purple
+     family the audit calls out as a clean "this cell is more rewarding"
+     channel.
+
+     Reward magnitude (1..9) drives a per-cell tone via .reward-N. The ramp
+     is light → mid-purple in light mode (low contrast headroom for the
+     V-value overlay), darker → deep-violet in dark mode. */
+  --entity-anymal: #b8323a;     /* red — the agent */
+  --entity-ghost:  #7a5c8c;     /* purple — environment / spookiness */
+  --entity-star:   #c08a3e;     /* amber — reward */
+  --entity-door:   #4a8b6b;     /* green — goal */
+
+  --policy-arrow:  #2f6cb1;     /* blue — derived policy */
+  --policy-tied:   #8a8579;     /* muted — tied cells */
+  --path-trace:    #b8323a;     /* red — optimal path overlay */
+  --path-greedy:   #c08a3e;     /* amber — greedy-local path */
+
+  /* Cell base tones (non-reward backgrounds). */
+  --cell-bg:    #f3efe6;
+  --cell-rule:  #e3ddd0;
+
+  /* Reward-intensity ramp, 9 stops on a warm purple gradient. The lightest
+     stops are deliberately near the cream background so the reward number /
+     V-value reads cleanly. */
+  --reward-1: #f5f1f7;
+  --reward-2: #ede4f1;
+  --reward-3: #e3d4ec;
+  --reward-4: #d6c0e3;
+  --reward-5: #c5a8d6;
+  --reward-6: #b18dc7;
+  --reward-7: #9a72b3;
+  --reward-8: #7c5599;
+  --reward-9: #5a3978;
+
+  /* Text colour on top of high-reward cells. */
+  --reward-ink-light: #1a1a1a;
+  --reward-ink-dark:  #f5f1f7;
+}
+
+:root[data-theme="dark"] {
+  --bg: #181612;
+  --ink: #ece7d9;
+  --ink-secondary: #8a8579;
+  --rule: #383530;
+  --card-bg: #211e19;
+
+  --entity-anymal: #d77078;
+  --entity-ghost:  #b394cb;
+  --entity-star:   #d6a766;
+  --entity-door:   #7ab392;
+
+  --policy-arrow:  #6ea3dc;
+  --policy-tied:   #6b6760;
+  --path-trace:    #d77078;
+  --path-greedy:   #d6a766;
+
+  --cell-bg:    #211e19;
+  --cell-rule:  #2f2c26;
+
+  /* Dark-mode purple ramp: dark base → mid-violet. The endpoint is
+     deliberately not too light so the cream-reward-ink doesn't strain the
+     student's eyes in a dim study environment. */
+  --reward-1: #221d22;
+  --reward-2: #2a2230;
+  --reward-3: #322640;
+  --reward-4: #3d2a52;
+  --reward-5: #4a2f66;
+  --reward-6: #59377a;
+  --reward-7: #6c428f;
+  --reward-8: #804faa;
+  --reward-9: #9460c0;
+
+  --reward-ink-light: #181612;
+  --reward-ink-dark:  #f5f1f7;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------------------
+   Topbar
+   --------------------------------------------------------------------------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+
+.topbar .brand { font-weight: 600; }
+.topbar .scene-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.topbar .right-cluster { display: flex; gap: 8px; align-items: center; }
+
+.theme-toggle, .pager-btn {
+  background: transparent;
+  color: var(--ink-secondary);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.theme-toggle:hover, .pager-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-secondary);
+}
+.pager-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
+   Stage / scene engine
+   --------------------------------------------------------------------------- */
+
+.stage {
+  position: relative;
+  max-width: 1200px;
+  margin: 16px auto 32px;
+  padding: 0 24px;
+  min-height: calc(100vh - 130px);
+}
+
+.scene {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  left: 0;
+  right: 0;
+}
+
+/* Dot pager in the topbar */
+.dot-pager {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.dot-pager .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rule);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.dot-pager .dot.active { background: var(--ink); }
+.dot-pager .dot:hover { background: var(--ink-secondary); }
+
+/* ---------------------------------------------------------------------------
+   Hero block
+   --------------------------------------------------------------------------- */
+
+.hero h1 {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 28px;
+  margin: 0 0 6px;
+  letter-spacing: -0.005em;
+}
+
+.hero .subtitle {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-secondary);
+  margin: 0 0 18px;
+}
+
+.hero .lede {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 16.5px;
+  line-height: 1.55;
+  margin: 0 0 14px;
+  max-width: 60ch;
+}
+
+/* ---------------------------------------------------------------------------
+   Cards
+   --------------------------------------------------------------------------- */
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 10px 14px;
+}
+
+/* ---------------------------------------------------------------------------
+   Controls
+   --------------------------------------------------------------------------- */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  padding: 8px 4px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin-top: 10px;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+
+.control-group label { white-space: nowrap; }
+
+.control-group input[type="range"] {
+  accent-color: var(--policy-arrow);
+  height: 4px;
+  width: 160px;
+}
+
+.control-group output, .control-group .control-value {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  min-width: 40px;
+  text-align: right;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.control-group select, .control-group button {
+  background: var(--card-bg);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.control-group button:hover, .control-group select:hover {
+  border-color: var(--ink-secondary);
+}
+.control-group button.primary {
+  background: var(--policy-arrow);
+  color: white;
+  border-color: var(--policy-arrow);
+}
+.control-group button.primary:hover { filter: brightness(1.06); }
+.control-group button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------------
+   Captions / footnotes / formula blocks
+   --------------------------------------------------------------------------- */
+
+.caption {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-secondary);
+  margin: 8px 4px 0;
+  min-height: 1.55em;
+}
+
+.footnote {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  border-top: 1px solid var(--rule);
+  padding-top: 8px;
+  margin-top: 14px;
+  text-align: right;
+  font-style: italic;
+}
+.footnote kbd {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0 4px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-style: normal;
+}
+
+.formula-block {
+  margin: 10px 0;
+  text-align: center;
+}
+.formula-block .katex { color: var(--ink); }
+
+/* ---------------------------------------------------------------------------
+   Generic two-column scene layout (grid | hud)
+   --------------------------------------------------------------------------- */
+
+.two-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 24px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.col-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col-label {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Grid host + cells
+   --------------------------------------------------------------------------- */
+
+.grid-host {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  aspect-ratio: var(--grid-aspect, 1 / 1);
+  background: var(--cell-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.grid-cells {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: repeat(var(--rows), 1fr);
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 0;
+}
+.grid-cell {
+  position: relative;
+  border-right: 1px solid var(--cell-rule);
+  border-bottom: 1px solid var(--cell-rule);
+  background: var(--cell-bg);
+  overflow: hidden;
+  transition: background-color 200ms ease-out, outline-color 160ms ease-out;
+}
+.grid-cell.last-col { border-right: none; }
+.grid-cell.last-row { border-bottom: none; }
+
+/* Reward-intensity tones — one class per spookiness 1..9. The CSS variables
+   are theme-aware; switching theme reapplies the colour automatically. */
+.grid-cell.reward-1 { background: var(--reward-1); }
+.grid-cell.reward-2 { background: var(--reward-2); }
+.grid-cell.reward-3 { background: var(--reward-3); }
+.grid-cell.reward-4 { background: var(--reward-4); }
+.grid-cell.reward-5 { background: var(--reward-5); }
+.grid-cell.reward-6 { background: var(--reward-6); }
+.grid-cell.reward-7 { background: var(--reward-7); }
+.grid-cell.reward-8 { background: var(--reward-8); }
+.grid-cell.reward-9 { background: var(--reward-9); }
+
+/* The reward number lives in the top-left corner — small, tabular. The
+   surrounding cells get a faint translucent backdrop so the number stays
+   legible across the ramp. */
+.cell-reward {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: rgba(255,255,255,0.6);
+  padding: 0 4px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+:root[data-theme="dark"] .cell-reward {
+  background: rgba(0,0,0,0.4);
+  color: var(--ink);
+}
+
+/* On dark cells in light mode (reward-7..9) the small reward badge can fight
+   the dark background — give it a stronger contrast there. The text colour
+   stays var(--ink) which is dark in light mode (good) but in dark mode
+   needs to be the inverse so it reads on the bright pill. */
+.grid-cell.reward-7 .cell-reward,
+.grid-cell.reward-8 .cell-reward,
+.grid-cell.reward-9 .cell-reward {
+  background: rgba(255,255,255,0.92);
+  color: #1a1a1a;
+}
+:root[data-theme="dark"] .grid-cell.reward-7 .cell-reward,
+:root[data-theme="dark"] .grid-cell.reward-8 .cell-reward,
+:root[data-theme="dark"] .grid-cell.reward-9 .cell-reward {
+  background: rgba(0,0,0,0.65);
+  color: var(--ink);
+}
+
+/* Ghost-density visual: 1..9 small ghost silhouettes stacked low in the
+   cell. Purely a second visual channel — the reward number is the truth. */
+.cell-ghosts {
+  position: absolute;
+  inset: 22% 10% 10% 10%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1px;
+  pointer-events: none;
+  color: var(--entity-ghost);
+  opacity: 0.55;
+}
+.cell-ghost {
+  width: 18%;
+  display: inline-flex;
+}
+.cell-ghost svg { width: 100%; height: auto; display: block; fill: currentColor; }
+
+/* V-value: large monospace number, centred. Hidden until set via .has-v. */
+.cell-v {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "SF Mono", Menlo, monospace;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms ease-out;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.55);
+}
+:root[data-theme="dark"] .cell-v {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.65);
+}
+.grid-cell.has-v .cell-v { opacity: 1; }
+
+/* Per-cell tiny explanation slot (scene 3 only). */
+.cell-explain {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 9px;
+  color: var(--ink);
+  background: rgba(255,255,255,0.85);
+  padding: 1px 3px;
+  border-radius: 2px;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+:root[data-theme="dark"] .cell-explain {
+  background: rgba(0,0,0,0.55);
+  color: var(--ink);
+}
+.grid-cell.has-explain .cell-explain { opacity: 1; }
+
+/* Highlight states for sweep cursor and path traces.
+   No z-index here — the grid-entities layer must remain above cells. The
+   outline alone is enough to read at a glance. */
+.grid-cell.sweep-cursor {
+  outline: 2px solid var(--policy-arrow);
+  outline-offset: -2px;
+}
+.grid-cell.path-cell {
+  outline: 2px solid var(--path-trace);
+  outline-offset: -2px;
+}
+.grid-cell.greedy-cell {
+  outline: 2px dashed var(--path-greedy);
+  outline-offset: -2px;
+}
+.grid-cell.start-cell::before {
+  content: "start";
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.grid-cell.goal-cell::before {
+  content: "exit";
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+
+/* ---------------------------------------------------------------------------
+   Entities (anymal sprite + door)
+   --------------------------------------------------------------------------- */
+
+.grid-entities {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.entity {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--cell-w, 0px);
+  height: var(--cell-h, 0px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 200ms cubic-bezier(.2,.7,.2,1);
+  transform: translate(var(--tx, 0px), var(--ty, 0px));
+}
+.entity svg {
+  width: 70%;
+  height: 70%;
+  display: block;
+}
+.entity-anymal svg { color: var(--entity-anymal); }
+.entity-ghost  svg { color: var(--entity-ghost); }
+.entity-star   svg { color: var(--entity-star); }
+.entity-door   svg { color: var(--entity-door); }
+
+.entity.flash::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  color: var(--entity-anymal);
+  opacity: 0;
+  animation: entity-flash 360ms ease-out;
+}
+@keyframes entity-flash {
+  0%   { opacity: 0; transform: scale(0.6); }
+  40%  { opacity: 0.7; }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+/* ---------------------------------------------------------------------------
+   SVG overlay — policy arrows, path traces
+   --------------------------------------------------------------------------- */
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.policy-arrow {
+  color: var(--policy-arrow);
+}
+.policy-arrow.tied {
+  color: var(--policy-tied);
+}
+
+.path-trace {
+  color: var(--path-trace);
+}
+.path-trace.greedy {
+  color: var(--path-greedy);
+}
+
+/* ---------------------------------------------------------------------------
+   HUD — running readout
+   --------------------------------------------------------------------------- */
+
+.hud {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 13px;
+}
+.hud .hud-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.hud .hud-row:last-child { border-bottom: none; }
+.hud .hud-label {
+  color: var(--ink-secondary);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+.hud .hud-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.hud .hud-row.flash .hud-value {
+  background: var(--entity-star);
+  color: var(--bg);
+  padding: 1px 4px;
+  border-radius: 2px;
+  transition: background 360ms ease-out, color 360ms ease-out;
+}
+
+/* Score chip — emphasised running total. */
+.score-chip {
+  display: inline-block;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  padding: 4px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--card-bg);
+}

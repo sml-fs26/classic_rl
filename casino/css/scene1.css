@@ -1,0 +1,8 @@
+/* Scene 1 — pull a lever. */
+
+.s1-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.s1-wrap .formula-block .katex { font-size: 1.05em; }

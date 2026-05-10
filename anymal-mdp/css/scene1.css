@@ -1,0 +1,56 @@
+/* Scene 1 — the state.
+
+   Layout: hero on top, two-col below (grid | HUD). Per-scene tweaks only;
+   shared scene styles live in css/style.css. */
+
+.scene1-wrap { padding: 4px 0 0; }
+
+.scene1-right { gap: 14px; }
+
+.scene1-summary {
+  display: flex;
+  gap: 24px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+}
+.scene1-summary-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.scene1-summary .hud-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.scene1-summary .hud-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.scene1-banner {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--card-bg);
+  border-color: var(--entity-anymal);
+  margin-top: 8px;
+}
+
+/* Caption with embedded keycaps */
+.scene1-wrap .caption kbd {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0 4px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-style: normal;
+  margin: 0 1px;
+}

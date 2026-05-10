@@ -1,0 +1,14 @@
+/* Scene 2 — one step. */
+
+.scene2-wrap { padding-top: 12px; }
+.s2-hero { margin-bottom: 8px; }
+.s2-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.s2-grid-host { max-width: 600px; }
+.s2-sliders { gap: 16px; }
+
+.tuple-tuple .t-glue { color: var(--ink-secondary); padding: 0 1px; }
+.tuple-tuple { letter-spacing: 0.01em; }

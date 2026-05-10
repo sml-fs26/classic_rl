@@ -1,0 +1,85 @@
+/* Scene 6 — Recap. */
+
+.s6-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.s6-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.s6-card {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 16px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.s6-card .card-symbol {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 22px;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1;
+}
+.s6-card .card-symbol .katex { font-size: 1.3em; }
+
+.s6-card .card-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.s6-card .card-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: left;
+  margin: 0;
+}
+
+.s6-card .card-body code {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+.s6-foreshadow {
+  margin-top: 36px;
+  padding: 24px 28px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--card-bg);
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.s6-foreshadow .label {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  display: block;
+  margin-bottom: 8px;
+}
+.s6-foreshadow strong {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  color: var(--ink);
+}

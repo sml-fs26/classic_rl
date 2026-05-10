@@ -1,0 +1,64 @@
+/* Scene 3 — stochasticity.
+
+   Per-scene tweaks. Shared scene styles (grid, HUD, controls) live in
+   css/style.css. The two-arrow overlay uses CSS variables so theme-switch
+   recolors automatically — no inline colors in the SVG. */
+
+.scene3-wrap { padding: 4px 0 0; }
+
+.scene3-right { gap: 14px; }
+
+.scene3-controls { padding: 8px 6px; }
+
+/* Banner shown at terminal */
+.scene3-banner {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--card-bg);
+  border-color: var(--entity-anymal);
+  margin-top: 8px;
+}
+
+/* Caption with embedded keycaps (mirrors scene1) */
+.scene3-wrap .caption kbd {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0 4px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-style: normal;
+  margin: 0 1px;
+}
+
+/* SVG arrow overlay drawn on top of the grid entities. */
+.scene3-arrow-svg {
+  display: block;
+  overflow: visible;
+}
+
+.scene3-arrow-svg .arrow-commanded {
+  stroke: var(--arrow-commanded);
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.scene3-arrow-svg .arrow-executed {
+  stroke: var(--arrow-executed);
+  stroke-width: 3;
+  stroke-dasharray: 6 4;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.scene3-arrow-svg .scene3-marker-commanded { fill: var(--arrow-commanded); }
+.scene3-arrow-svg .scene3-marker-executed  { fill: var(--arrow-executed); }
+
+/* HUD value alignment for action glyphs */
+.scene3-hud .hud-value {
+  font-variant-numeric: tabular-nums;
+}

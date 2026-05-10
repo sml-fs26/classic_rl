@@ -1,0 +1,91 @@
+/* Scene 4 — Reading the policy. */
+
+.s4-wrap { max-width: 1080px; margin: 0 auto; }
+
+.s4-row {
+  display: grid;
+  grid-template-columns: minmax(0, 540px) minmax(280px, 480px);
+  gap: 36px;
+  align-items: start;
+  justify-content: start;
+  margin-top: 12px;
+}
+
+.s4-grid-host { width: 100%; max-width: 540px; min-width: 0; }
+
+.s4-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 14px;
+}
+
+.s4-side h2 {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 17px;
+  margin: 0;
+}
+
+.s4-policy-formula { margin: 4px 0 8px; }
+
+.s4-explain {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: var(--ink);
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  min-height: 44px;
+}
+.s4-explain .arith-empty {
+  color: var(--ink-secondary);
+  font-style: italic;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 13px;
+}
+
+.s4-score-line {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+.s4-score-line .label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.s4-score-line .value {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.s4-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Visited cell tint while ANYmal walks. */
+.s4-grid-host .grid-cell.path-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--path-trace);
+  opacity: 0.13;
+  pointer-events: none;
+}
+
+/* Click-explained cell: subtle blue border. */
+.s4-grid-host .grid-cell.click-explained {
+  outline: 2px solid var(--policy-arrow);
+  outline-offset: -2px;
+}

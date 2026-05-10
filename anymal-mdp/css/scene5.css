@@ -1,0 +1,147 @@
+/* Scene 5 — recap of ⟨S, A, P, R, γ⟩.
+
+   Five cards in a row, each anchoring one tuple element. The γ card is
+   muted and labelled "next viz". Below: one serif italic line. */
+
+.s5-wrap {
+  margin: 32px auto 0;
+  max-width: 1100px;
+  padding: 0 8px;
+}
+
+.s5-recap {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin: 0 0 28px;
+}
+
+.s5-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 14px 18px;
+  text-align: center;
+  min-height: 220px;
+}
+
+.s5-sym {
+  font-size: 32px;
+  line-height: 1;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.s5-sym .katex { font-size: 32px; color: var(--ink); }
+
+.s5-name {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.s5-caption {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-secondary);
+  margin-bottom: 6px;
+}
+
+/* Thumbnail row — hint at where this tuple element lived earlier. */
+.s5-thumb {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+}
+
+/* Sprite-bearing thumbnails (S, R) — square box with the inline SVG. */
+.s5-thumb-cell {
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--cell-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.s5-thumb-cell svg {
+  width: 70%;
+  height: 70%;
+  display: block;
+}
+.s5-thumb-cell.entity-anymal svg { color: var(--entity-anymal); }
+.s5-thumb-cell.entity-star   svg { color: var(--entity-star); }
+
+/* A — a compact 3x3 of arrow tiles, matching scenes 2/3. Smaller than the
+   live widget so it fits inside the card. */
+.s5-thumb-arrows {
+  grid-template-columns: repeat(3, 22px);
+  grid-template-rows: repeat(3, 22px);
+  gap: 3px;
+}
+.s5-thumb-arrows .action-arrow {
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+/* P — superimpose a solid commanded arrow and a dashed executed arrow. */
+.s5-thumb-stack {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+.s5-thumb-solid,
+.s5-thumb-dashed {
+  position: absolute;
+  inset: 0;
+  width: 56px;
+  height: 56px;
+  font-size: 22px;
+  border-radius: 4px;
+}
+.s5-thumb-dashed {
+  /* Offset slightly so both arrows are visible together. */
+  transform: translate(6px, 6px);
+  background: transparent;
+}
+
+/* The muted γ card — dimmed text, no thumbnail. */
+.s5-card-muted {
+  opacity: 0.85;
+}
+.s5-card-muted .s5-sym,
+.s5-card-muted .s5-sym .katex,
+.s5-card-muted .s5-name,
+.s5-card-muted .s5-caption {
+  color: var(--recap-muted);
+}
+
+.s5-badge {
+  margin-top: auto;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--recap-muted);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: transparent;
+}
+
+.s5-closing {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  text-align: center;
+  margin: 24px 0 0;
+}

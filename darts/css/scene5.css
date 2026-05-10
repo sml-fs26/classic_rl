@@ -1,0 +1,68 @@
+/* Scene 5 — recap. */
+
+.s5-wrap {
+  max-width: 880px;
+  margin: 24px auto 0;
+}
+
+.s5-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 18px 0 22px;
+}
+
+.s5-card {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.s5-card-muted {
+  background: transparent;
+  border-style: dashed;
+  color: var(--recap-muted);
+}
+.s5-card-label {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.s5-card-body {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.s5-card-muted .s5-card-body {
+  color: var(--recap-muted);
+  font-style: italic;
+}
+
+.s5-bridge {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 16px;
+  line-height: 1.65;
+  margin: 18px 0 18px;
+  max-width: 60ch;
+}
+.s5-bridge strong {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink);
+}
+.s5-bridge em {
+  font-style: italic;
+  color: var(--ink-secondary);
+}
+
+.s5-formula { margin: 18px 0 0; }
+.s5-formula-cap {
+  text-align: center;
+  margin: 4px 0 0;
+}

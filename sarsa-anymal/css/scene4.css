@@ -1,0 +1,59 @@
+/* Scene 4 — the policy emerges. */
+
+.scene4-wrap { padding-top: 12px; }
+.s4-hero { margin-bottom: 8px; }
+
+.s4-ctrl-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 10px;
+}
+
+.s4-grid-host { max-width: 600px; }
+.s4-cap { margin-top: 8px; max-width: 60ch; }
+
+/* Argmax arrows on the grid (visible in heatmap mode only) */
+.s4-arrow {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-shadow:
+    0 0 2px var(--bg),
+    0 0 2px var(--bg);
+}
+
+.s4-bars {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+.q-bars-empty {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  color: var(--ink-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+.s4-empty {
+  margin-top: 24px;
+}
+.s4-empty code {
+  font-family: "SF Mono", Menlo, monospace;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 12px;
+}
+.s4-qhost { max-height: calc(60vh); }

@@ -1,0 +1,25 @@
+/* Scene 0 — five unknown machines.
+
+   Hero block + machine row + promise. The machine row is the workhorse and
+   styled in style.css; this file adds a couple of scene-only refinements. */
+
+.s0-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.s0-promise {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink-secondary);
+  margin: 14px 0 8px;
+  text-align: center;
+}
+
+/* The static `?` screen reads as the strongest visual element on the card —
+   bold dot the eye lands on. */
+.s0-wrap .machine-card .slot-screen {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}

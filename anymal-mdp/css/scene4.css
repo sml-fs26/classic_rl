@@ -1,0 +1,80 @@
+/* Scene 4 — the reward.
+
+   Per-scene tweaks. Shared scene styles (grid, HUD, ledger, controls) live
+   in css/style.css. The reward chips below the grid are static reference
+   labels — not inputs. */
+
+.scene4-wrap { padding: 4px 0 0; }
+
+.scene4-right { gap: 14px; }
+
+/* Banner shown at terminal */
+.scene4-banner {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--card-bg);
+  border-color: var(--entity-anymal);
+  margin-top: 8px;
+}
+
+/* Caption with embedded keycaps (mirrors scene1 / scene3) */
+.scene4-wrap .caption kbd {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0 4px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-style: normal;
+  margin: 0 1px;
+}
+
+/* Reward legend chips — read-only reference */
+.scene4-legend {
+  padding: 8px 6px;
+  gap: 18px;
+}
+
+.scene4-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.scene4-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-secondary);
+  display: inline-block;
+}
+.scene4-chip-dot.pos { background: var(--entity-star); }
+.scene4-chip-dot.neg { background: var(--entity-anymal); }
+
+.scene4-chip-label { color: var(--ink); }
+
+/* HUD value alignment */
+.scene4-hud .hud-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ledger — let the sticky header sit on the card background, not the
+   page background, so it matches the right column visually. */
+.scene4-ledger {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  margin-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.scene4-ledger .ledger-row.head {
+  background: var(--card-bg);
+}

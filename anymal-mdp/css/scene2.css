@@ -1,0 +1,105 @@
+/* Scene 2 — the action.
+
+   Layout: hero on top, two-col below (grid | action widget + last-action HUD),
+   then a horizontal scrolling action-trace strip. Per-scene tweaks only;
+   shared scene styles live in css/style.css. */
+
+.scene2-wrap { padding: 4px 0 0; }
+
+.scene2-right {
+  gap: 14px;
+  align-items: stretch;
+}
+
+.scene2-right .action-arrows {
+  margin: 4px auto;
+}
+
+.scene2-hud { margin-top: 4px; }
+
+.scene2-hud .hud-row {
+  border-bottom: none;
+  padding: 4px 0;
+}
+.scene2-hud .hud-value {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.scene2-last-symbol {
+  font-size: 18px;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+.scene2-last-name {
+  font-family: "SF Mono", Menlo, monospace;
+  color: var(--ink-secondary);
+  font-size: 12px;
+}
+
+.scene2-banner {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--card-bg);
+  border-color: var(--entity-anymal);
+  margin-top: 8px;
+}
+
+/* Action trace strip — sits below the two-col area */
+.scene2-trace-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rule);
+}
+.scene2-trace-label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  flex: 0 0 auto;
+}
+.action-trace {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 2px 0;
+  min-height: 30px;
+  scroll-behavior: smooth;
+}
+.action-trace::-webkit-scrollbar { height: 4px; }
+.action-trace::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+
+.action-trace-item {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+
+/* Caption with embedded keycaps (mirror scene 1's style) */
+.scene2-wrap .caption kbd {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0 4px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-style: normal;
+  margin: 0 1px;
+}

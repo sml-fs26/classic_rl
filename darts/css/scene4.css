@@ -1,0 +1,52 @@
+/* Scene 4 — α trade-off (the chart-heavy scene). */
+
+.s4-wrap { margin-top: 8px; }
+
+.s4-truth-host,
+.s4-belief-host { margin: 6px 0; }
+
+.s4-legend { margin: 8px 0 4px; }
+
+.s4-chart-host { margin: 8px 0 4px; }
+
+.s4-cond {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--card-bg);
+  padding: 10px 14px;
+  margin: 12px 0 4px;
+  max-width: 640px;
+}
+.s4-cond-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-secondary);
+}
+.s4-cond-row {
+  display: flex;
+  gap: 18px;
+  align-items: baseline;
+  font-size: 16px;
+}
+.s4-cond-sep {
+  color: var(--ink-secondary);
+  font-weight: 600;
+  font-size: 14px;
+}
+.s4-cond-caption {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  margin-top: 4px;
+}
+
+.s4-controls { margin-top: 12px; }
+.s4-controls .control-group output { min-width: 50px; }
+
+.s4-foot { margin-top: 14px; }

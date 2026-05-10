@@ -1,0 +1,17 @@
+/* Scene 3 — RM update + α slider. */
+
+.s3-wrap { margin-top: 8px; }
+
+.s3-truth-host,
+.s3-belief-host { margin: 8px 0; }
+
+.s3-formula { margin: 16px 0 8px; }
+
+.s3-dyn {
+  min-height: 2em;
+  margin: 4px 0;
+}
+
+.s3-controls { margin-top: 12px; }
+
+.s3-foot { margin-top: 18px; }

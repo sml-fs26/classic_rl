@@ -1,0 +1,43 @@
+/* Scene 1 — manual throwing. */
+
+.s1-wrap {
+  margin-top: 8px;
+}
+
+.s1-intro {
+  margin: 0 0 10px;
+}
+
+.s1-cols {
+  align-items: start;
+}
+
+.s1-track-host {
+  margin-bottom: 12px;
+}
+
+.s1-controls {
+  margin-top: 4px;
+}
+.s1-controls .control-group { gap: 6px; }
+.s1-controls button {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  min-width: 44px;
+}
+
+.s1-hud { margin-top: 0; }
+
+.s1-hist-title {
+  margin-top: 8px;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-secondary);
+}
+
+.s1-foot {
+  margin-top: 24px;
+  text-align: left;
+}
+.s1-foot .kbd { margin: 0 2px; }

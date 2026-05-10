@@ -1,0 +1,28 @@
+/* Scene 3 — episodes accumulate. */
+
+.scene3-wrap { padding-top: 12px; }
+.s3-hero { margin-bottom: 8px; }
+
+.s3-ctrl-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 10px;
+}
+
+.s3-grid-host { max-width: 600px; }
+.s3-curve { margin-top: 8px; max-width: 600px; }
+.s3-cap { margin-top: 6px; max-width: 60ch; }
+.s3-empty { margin-top: 24px; }
+.s3-empty code {
+  font-family: "SF Mono", Menlo, monospace;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 12px;
+}
+.s3-qhost { max-height: calc(100vh - 240px); }

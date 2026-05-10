@@ -1,0 +1,137 @@
+/* Scene 5 — Adding γ. */
+
+.s5-wrap { max-width: 1080px; margin: 0 auto; }
+
+.s5-row {
+  display: grid;
+  grid-template-columns: minmax(0, 540px) minmax(280px, 480px);
+  gap: 36px;
+  align-items: start;
+  justify-content: start;
+  margin-top: 12px;
+}
+
+.s5-grid-host { width: 100%; max-width: 540px; min-width: 0; }
+
+.s5-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-size: 14px;
+}
+
+.s5-side h2 {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 17px;
+  margin: 0;
+}
+
+.s5-formula { margin: 4px 0 8px; }
+
+.s5-gamma-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.s5-gamma-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.s5-gamma-row label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.s5-gamma-row input[type="range"] {
+  flex: 1 1 200px;
+  width: 100%;
+  max-width: 280px;
+}
+.s5-gamma-row .gamma-readout {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  min-width: 64px;
+  text-align: right;
+}
+
+.s5-gamma-presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.s5-gamma-presets button {
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--card-bg);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.s5-gamma-presets button.active {
+  background: var(--policy-arrow);
+  color: white;
+  border-color: var(--policy-arrow);
+}
+.s5-gamma-presets button:hover { border-color: var(--ink-secondary); }
+.s5-gamma-presets button.active:hover { filter: brightness(1.06); border-color: var(--policy-arrow); }
+
+.s5-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+.s5-comparison .label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.s5-comparison .value {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.s5-flip-card {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.s5-flip-card .flip-marker {
+  font-style: normal;
+  font-family: "SF Mono", Menlo, monospace;
+  font-weight: 600;
+  color: var(--path-trace);
+}
+
+/* Highlight the optimal path cells in scene 5. */
+.s5-grid-host .grid-cell.path-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--path-trace);
+  opacity: 0.10;
+  pointer-events: none;
+}

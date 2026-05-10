@@ -1,0 +1,87 @@
+/* Scene 5 — recap. Five cards + forward pointer + α=0.95 aside. */
+
+.scene5-wrap { padding-top: 12px; }
+.s5-hero { margin-bottom: 18px; }
+
+.s5-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin: 18px 0;
+}
+.s5-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-top-width: 3px;
+  border-radius: 4px;
+  padding: 14px 10px 12px;
+  gap: 6px;
+  min-height: 160px;
+}
+.s5-card.s5-card-mdp     { border-top-color: var(--comp-mdp); }
+.s5-card.s5-card-bellman { border-top-color: var(--comp-bellman); }
+.s5-card.s5-card-rm      { border-top-color: var(--comp-rm); }
+.s5-card.s5-card-eps     { border-top-color: var(--comp-eps); }
+
+.s5-glyph {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.s5-glyph.comp-mdp     .katex { color: var(--comp-mdp); }
+.s5-glyph.comp-bellman .katex { color: var(--comp-bellman); }
+.s5-glyph.comp-rm      .katex { color: var(--comp-rm); }
+.s5-glyph.comp-eps     .katex { color: var(--comp-eps); }
+.s5-glyph .katex { font-size: 16px; }
+
+.s5-card-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink);
+}
+.s5-card-body {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.s5-forward {
+  margin: 24px 0 12px;
+  padding: 18px 0 6px;
+  border-top: 1px solid var(--rule);
+}
+.s5-forward h2 {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+.s5-forward-body {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 15px;
+  color: var(--ink-secondary);
+  margin: 0;
+  line-height: 1.55;
+  max-width: 70ch;
+}
+
+.s5-aside {
+  margin-top: 18px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--recap-muted);
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  line-height: 1.55;
+  max-width: 70ch;
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+}
+.s5-aside .comp-rm { font-style: normal; font-weight: 500; }

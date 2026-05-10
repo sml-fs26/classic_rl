@@ -1,0 +1,64 @@
+/* Scene 0 — title screen.
+   Single column, max-width restrained, generous vertical rhythm. */
+
+.s0-wrap {
+  max-width: 760px;
+  margin: 32px auto 0;
+  padding: 0 8px;
+}
+
+.s0-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 36px;
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+
+.s0-track-host {
+  margin: 24px 0 12px;
+}
+
+.s0-lede {
+  margin: 18px 0 22px;
+}
+
+.s0-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 22px;
+  max-width: 60ch;
+}
+.s0-rule {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 14px;
+  align-items: baseline;
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--rule);
+}
+.s0-rule:last-child { border-bottom: none; }
+.s0-rule-num {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.s0-rule-body {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 15.5px;
+  color: var(--ink);
+}
+
+.s0-formula {
+  margin: 18px 0 4px;
+}
+
+.s0-note {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+  margin: 18px 0 0;
+}
