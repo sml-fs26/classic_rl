@@ -89,7 +89,8 @@
     const promise = document.createElement('p');
     promise.className = 's0-promise';
     promise.textContent =
-      'You play ' + horz.autoplay + ' rounds. Each round, pick one machine and pull.';
+      'Each round, pick one machine and pull. The autoplay scenes settle the ' +
+      'lesson over ' + horz.autoplay + ' rounds; before that, play freely.';
     wrap.appendChild(promise);
 
     /* Footnote — keyboard hints */

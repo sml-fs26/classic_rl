@@ -1,6 +1,10 @@
 /* Click-step scene engine for the Casino (ε-greedy) viz.
 
-   7 scenes, 0-indexed throughout (hash, array, builders).
+   5 scenes, 0-indexed throughout (hash, array, builders). The original
+   "Pull a lever" (scene 1) and "Explore or exploit?" (scene 2) were merged
+   into the current scene 1; the original "Greedy fails" (scene 3) was
+   dropped. Keys preserved so deep links survive — gaps in the deck are
+   fine, the scene engine handles non-contiguous keys.
 
    Pattern lifted from the course-viz skill (kmeans-deepdive).
    Each scene file at js/scenes/sceneN.js registers
@@ -11,9 +15,7 @@
 (function () {
   const SCENES = [
     { key: 'scene0', title: 'Five unknown machines' },
-    { key: 'scene1', title: 'Pull a lever' },
-    { key: 'scene2', title: 'Explore or exploit?' },
-    { key: 'scene3', title: 'Greedy fails' },
+    { key: 'scene1', title: 'Explore or exploit?' },
     { key: 'scene4', title: 'ε-greedy' },
     { key: 'scene5', title: 'The trade-off' },
     { key: 'scene6', title: 'Recap' },

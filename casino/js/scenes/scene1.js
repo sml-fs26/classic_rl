@@ -1,13 +1,15 @@
-/* Scene 1 — pull a lever.
+/* Scene 1 — Explore or exploit?
 
-   The student is the policy. Click any card or press 1..5 to pull. Reward
-   animates: gold chip rises on a win, grey puff on a loss. Empirical mean
-   updates live. The HUD shows round, total reward, and the manual goal
-   (30 pulls) — but no regret yet. The whole point is for the student to
-   *feel* the uncertainty before any algorithm is named.
+   Merged from the original scenes 1 (manual play) and 2 (policy buttons) —
+   they were structurally near-identical and the dilemma frames better as
+   one scene. The student can pull manually (click a card or press 1..5)
+   or invoke the two named policies via the EXPLORE / EXPLOIT buttons (or
+   E / X). The two policy formulas anchor the language; both choices are
+   visibly wrong sometimes, which is the dilemma scene 4 (ε-greedy)
+   resolves.
 
    Step engine: ArrowLeft rewinds, ArrowRight replays; at head, ArrowRight
-   advances to scene 2. */
+   advances scene. */
 (function () {
   if (!window.scenes) window.scenes = {};
 
@@ -16,7 +18,6 @@
 
   window.scenes.scene1 = function (root) {
     const cfg  = window.DATA && window.DATA.bandit;
-    const horz = window.DATA && window.DATA.horizons;
     const SEED = window.DATA && window.DATA.seeds && window.DATA.seeds.manual;
 
     root.innerHTML = '';
@@ -29,9 +30,8 @@
     const hero = document.createElement('div');
     hero.className = 'hero';
     hero.innerHTML =
-      '<h1>Pull a lever.</h1>' +
-      '<p class="subtitle">Click a card or press <kbd>1</kbd>–<kbd>5</kbd>. ' +
-      'After ' + horz.manualGoal + ' pulls, ask yourself: which one is best?</p>';
+      '<h1>Explore or exploit?</h1>' +
+      '<p class="subtitle">Pick yourself, or let a policy pick. Both algorithmic choices alone are wrong sometimes.</p>';
     wrap.appendChild(hero);
 
     /* Two-column layout */
@@ -39,7 +39,7 @@
     cols.className = 'two-col';
     wrap.appendChild(cols);
 
-    /* Left: machine row + caption */
+    /* Left: machine row + policy buttons + caption */
     const leftCol = document.createElement('div');
     leftCol.className = 'col-stack';
     cols.appendChild(leftCol);
@@ -47,113 +47,166 @@
     const rowHost = document.createElement('div');
     leftCol.appendChild(rowHost);
 
+    const actions = document.createElement('div');
+    actions.className = 's2-actions';
+    leftCol.appendChild(actions);
+
+    const exploreBtn = document.createElement('button');
+    exploreBtn.type = 'button';
+    exploreBtn.className = 's2-policy-btn explore';
+    exploreBtn.textContent = 'Explore';
+    actions.appendChild(exploreBtn);
+
+    const exploitBtn = document.createElement('button');
+    exploitBtn.type = 'button';
+    exploitBtn.className = 's2-policy-btn exploit';
+    exploitBtn.textContent = 'Exploit';
+    actions.appendChild(exploitBtn);
+
     const caption = document.createElement('p');
     caption.className = 'caption';
+    caption.innerHTML =
+      'Click any card or press <kbd>1</kbd>–<kbd>5</kbd> to pull manually. ' +
+      'Or use <kbd>EXPLORE</kbd> / <kbd>EXPLOIT</kbd> (or <kbd>E</kbd> / <kbd>X</kbd>) to invoke a named policy.';
     leftCol.appendChild(caption);
 
-    /* Right: HUD with round, total reward, goal */
+    /* Right: two policy formulas + HUD */
     const rightCol = document.createElement('div');
     rightCol.className = 'col-stack';
     cols.appendChild(rightCol);
 
-    const empiricalFormula = Katex.display(window.DATA.tex.empirical);
-    rightCol.appendChild(empiricalFormula);
+    const exploreFormula = document.createElement('div');
+    exploreFormula.className = 's2-policy-block';
+    const exploreLabel = document.createElement('div');
+    exploreLabel.className = 's2-policy-label';
+    exploreLabel.textContent = 'Explore';
+    exploreFormula.appendChild(exploreLabel);
+    exploreFormula.appendChild(Katex.display(window.DATA.tex.explore));
+    rightCol.appendChild(exploreFormula);
+
+    const exploitFormula = document.createElement('div');
+    exploitFormula.className = 's2-policy-block';
+    const exploitLabel = document.createElement('div');
+    exploitLabel.className = 's2-policy-label';
+    exploitLabel.textContent = 'Exploit';
+    exploitFormula.appendChild(exploitLabel);
+    exploitFormula.appendChild(Katex.display(window.DATA.tex.exploit));
+    rightCol.appendChild(exploitFormula);
 
     const hud = document.createElement('div');
     hud.className = 'hud';
     rightCol.appendChild(hud);
-
     const hudRows = makeHud(hud, [
-      { key: 'round',  label: 'round' },
-      { key: 'total',  label: 'total reward' },
-      { key: 'goal',   label: 'goal' },
+      { key: 'round',   label: 'round' },
+      { key: 'total',   label: 'total reward' },
+      { key: 'manual',  label: 'manual picks' },
+      { key: 'explore', label: 'explore picks' },
+      { key: 'exploit', label: 'exploit picks' },
     ]);
 
-    /* ---------- Bandit + History ---------- */
-    let rng = Bandit.makeRng(SEED);
-    let bandit = Bandit.create(cfg.probs, rng);
+    /* ---------- Bandit + History ----------
+       Two RNG streams so manual pulls don't perturb the policy stream.
+       banditRng → Bernoulli reward sampling (consumed every pull).
+       policyRng → uniform-random / tie-break (consumed only on explore
+                   or exploit invocations). */
+    let banditRng = Bandit.makeRng(SEED);
+    let policyRng = Bandit.makeRng(SEED ^ 0x55555555);
+    let bandit = Bandit.create(cfg.probs, banditRng);
     const history = History.create();
     let active = false;
 
-    /* Mount machine row */
     const row = MachineRow.mount(rowHost, {
       K: cfg.K,
       armNames: cfg.armNames,
     });
     row.setClickable((arm) => {
       if (!active) return;
-      performPull(arm);
+      performPull('manual', arm);
     });
 
-    function setCaption() {
-      const left = horz.manualGoal - bandit.round();
-      if (left > 0) {
-        caption.innerHTML =
-          'Pull ' + left + ' more time' + (left === 1 ? '' : 's') +
-          '. Notice how your idea of which machine is best changes as you watch the screens.';
+    function performPull(mode, manualArm) {
+      let arm;
+      if (mode === 'manual') {
+        arm = manualArm;
+      } else if (mode === 'explore') {
+        arm = Policies.uniformRandom(policyRng, cfg.K);
       } else {
-        caption.innerHTML =
-          'Press <kbd>&rarr;</kbd> to continue. ' +
-          'You can keep pulling — the lesson does not depend on the count.';
+        arm = Policies.argMaxEmpirical(bandit, policyRng);
       }
+      const reward = bandit.pull(arm);
+      history.push({ arm, reward, mode, t: bandit.round() });
+      row.update(bandit);
+      row.flash(arm, reward === 1 ? 'win' : 'loss');
+      row.setLastChosen(arm);
+      renderHud();
     }
 
     function renderHud() {
-      hudRows.round.textContent = bandit.round() + ' / ' + horz.manualGoal;
+      hudRows.round.textContent = String(bandit.round());
       hudRows.total.textContent = String(bandit.totalReward());
-      const left = Math.max(0, horz.manualGoal - bandit.round());
-      hudRows.goal.textContent = (left === 0)
-        ? 'reached'
-        : (left + ' pull' + (left === 1 ? '' : 's') + ' to go');
-    }
-
-    function performPull(arm) {
-      const reward = bandit.pull(arm);
-      history.push({ arm, reward, t: bandit.round() });
-      row.update(bandit);
-      row.flash(arm, reward === 1 ? 'win' : 'loss');
-      renderHud();
-      setCaption();
+      let nManual = 0, nExplore = 0, nExploit = 0;
+      const list = history.list();
+      for (const r of list) {
+        if (r.mode === 'manual') nManual++;
+        else if (r.mode === 'explore') nExplore++;
+        else nExploit++;
+      }
+      hudRows.manual.textContent  = String(nManual);
+      hudRows.explore.textContent = String(nExplore);
+      hudRows.exploit.textContent = String(nExploit);
     }
 
     /* ---------- Reset + replay ---------- */
     function rebuildToCursor(targetCursor) {
-      rng = Bandit.makeRng(SEED);
-      bandit = Bandit.create(cfg.probs, rng);
+      banditRng = Bandit.makeRng(SEED);
+      policyRng = Bandit.makeRng(SEED ^ 0x55555555);
+      bandit = Bandit.create(cfg.probs, banditRng);
       for (let i = 0; i < targetCursor; i++) {
         const rec = history.get(i);
         if (!rec) break;
-        bandit.pull(rec.arm);   /* deterministic — same seed reproduces reward */
+        let arm;
+        if (rec.mode === 'manual')        arm = rec.arm;
+        else if (rec.mode === 'explore')  arm = Policies.uniformRandom(policyRng, cfg.K);
+        else                              arm = Policies.argMaxEmpirical(bandit, policyRng);
+        bandit.pull(arm);
       }
       row.update(bandit);
       row.clearLastChosen();
       renderHud();
-      setCaption();
     }
 
     function replayForwardOne() {
       const idx = history.cursor();
       const rec = history.get(idx);
       if (!rec) return false;
-      const reward = bandit.pull(rec.arm);
+      let arm;
+      if (rec.mode === 'manual')        arm = rec.arm;
+      else if (rec.mode === 'explore')  arm = Policies.uniformRandom(policyRng, cfg.K);
+      else                              arm = Policies.argMaxEmpirical(bandit, policyRng);
+      const reward = bandit.pull(arm);
       history.stepForward();
       row.update(bandit);
-      row.flash(rec.arm, reward === 1 ? 'win' : 'loss');
+      row.flash(arm, reward === 1 ? 'win' : 'loss');
+      row.setLastChosen(arm);
       renderHud();
-      setCaption();
       return true;
     }
 
-    /* ---------- Keyboard ---------- */
+    /* ---------- Listeners ---------- */
+    exploreBtn.addEventListener('click', () => { if (active) performPull('explore'); });
+    exploitBtn.addEventListener('click', () => { if (active) performPull('exploit'); });
+
     function onKey(e) {
       if (!active) return;
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === 'e' || e.key === 'E') { e.preventDefault(); performPull('explore'); return; }
+      if (e.key === 'x' || e.key === 'X') { e.preventDefault(); performPull('exploit'); return; }
       const arm = KEYMAP[e.key];
       if (arm == null) return;
       if (arm >= cfg.K) return;
       e.preventDefault();
-      performPull(arm);
+      performPull('manual', arm);
     }
     window.addEventListener('keydown', onKey);
 
@@ -187,8 +240,6 @@
     };
   };
 
-  /* Helper — build a HUD with the given rows; returns a map of key -> .hud-value
-     element so the scene can update individual fields without re-rendering. */
   function makeHud(host, specs) {
     const out = {};
     for (const spec of specs) {
