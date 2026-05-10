@@ -75,12 +75,27 @@
       return out;
     }
 
-    /* Cumulative regret at the current round:
+    /* Realised cumulative regret at the current round:
          R(t) = t * mu_star  -  sum_{tau<=t} r_tau
-       where mu_star is the largest true probability. The viz captures the
-       per-step regret increment by feeding (arm, reward) into this method. */
+       where mu_star is the largest true probability. Note this can DROP
+       on a single trajectory whenever a pull pays out — Bernoulli rewards
+       give increments of (mu_star - 1) ≈ -0.2 on a win. Useful when you
+       want honest per-realisation noise on the chart. */
     function cumulativeRegret() {
       return round * optimal - totalReward;
+    }
+
+    /* Cumulative pseudo-regret at the current round:
+         R̄(t) = sum_a pulls[a] * (mu_star - probs[a])
+       Each term is >= 0, so this is monotone non-decreasing in t — the
+       version you want when the audience expects "regret can only grow".
+       Equivalent to sum_{tau<=t} (mu_star - mu(a_tau)) where mu(a_tau)
+       is the TRUE mean of the chosen arm at step tau (not the realised
+       reward r_tau). */
+    function cumulativePseudoRegret() {
+      let r = 0;
+      for (let i = 0; i < K; i++) r += pulls[i] * (optimal - probs[i]);
+      return r;
     }
 
     function reset() {
@@ -116,6 +131,7 @@
       totalReward() { return totalReward; },
       round()      { return round; },
       cumulativeRegret,
+      cumulativePseudoRegret,
       reset,
       snapshot,
     };

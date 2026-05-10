@@ -163,7 +163,7 @@
       for (let t = 0; t < T; t++) {
         const decision = policy(b, t);
         b.pull(decision.arm);
-        pts.push({ x: b.round(), y: b.cumulativeRegret() });
+        pts.push({ x: b.round(), y: b.cumulativePseudoRegret() });
       }
       return pts;
     }
@@ -179,7 +179,7 @@
 
     const row = MachineRow.mount(rowHost, { K: cfg.K, armNames: cfg.armNames });
 
-    const chart = Chart.mount({ host: chartHost, T, yMax: 5, label: 'cumulative regret  R(t) = t · μ* − Σ rτ' });
+    const chart = Chart.mount({ host: chartHost, T, yMax: 5, label: 'cumulative pseudo-regret  R̄(t) = Σ (μ* − μ(aτ))' });
     chart.setTrace('greedy', greedyTrace, 'regret-series-greedy');
 
     function rebuild() {
@@ -205,7 +205,7 @@
       const decision = policy(bandit);
       const reward = bandit.pull(decision.arm);
       historyEps.push({ arm: decision.arm, reward, mode: decision.mode, eps, t: bandit.round() });
-      regretPoints.push({ x: bandit.round(), y: bandit.cumulativeRegret() });
+      regretPoints.push({ x: bandit.round(), y: bandit.cumulativePseudoRegret() });
       row.update(bandit);
       row.flash(decision.arm, reward === 1 ? 'win' : 'loss');
       row.setLastChosen(decision.arm);
@@ -218,18 +218,18 @@
 
     function onTick(t) {
       tCounter.textContent = t + ' / ' + T;
-      hudEpsRegret.textContent = 'ε-greedy regret: ' + bandit.cumulativeRegret().toFixed(2);
+      hudEpsRegret.textContent = 'ε-greedy regret: ' + bandit.cumulativePseudoRegret().toFixed(2);
       updateButtons();
     }
 
     function onPause() { updateButtons(); }
     function onComplete() {
       const greedyFinal = greedyTrace[T].y;
-      const epsFinal    = bandit.cumulativeRegret();
+      const epsFinal    = bandit.cumulativePseudoRegret();
       caption.textContent =
-        'Done. Greedy ended with R(T) = ' + greedyFinal.toFixed(2) +
+        'Done. Greedy ended with R̄(T) = ' + greedyFinal.toFixed(2) +
         '. ε-greedy with ε = ' + currentEps.toFixed(2) +
-        ' ended with R(T) = ' + epsFinal.toFixed(2) +
+        ' ended with R̄(T) = ' + epsFinal.toFixed(2) +
         '. Try other ε on Reset.';
       updateButtons();
     }
