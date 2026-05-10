@@ -626,4 +626,4 @@ Step 4 — the agent actually looking at the screenshot — is what makes the re
 
 9. **Pick the right iteration scale.** Targeted edits (single concept across ≤3 files): do directly, no agent. Cross-cutting additions across many scenes (e.g. add a visual layer everywhere pertinent): one focused agent with a per-scene plan, never full fan-out — the existing logic must not break. Major redesigns or new scenes: dispatch as Phase-1 agents per the parallel fan-out section. Wrong scale wastes either the agent's context or your own.
 
-10. Don't commit. Hand back to the user for review.
+10. Commit and push after verification.
