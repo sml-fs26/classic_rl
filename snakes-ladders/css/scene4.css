@@ -1,0 +1,25 @@
+/* Scene 4 — SARSA training playback. */
+.scene4-board { max-width: 480px; margin: 0; width: 100%; }
+.scene4-wrap .vi-stat-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.scene4-wrap .vi-stat-row:last-child { border-bottom: none; }
+.scene4-wrap .vi-stat-row .vi-k {
+  font-family: -apple-system, "Inter", sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.scene4-wrap .vi-stat-row .vi-v {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.scene4-curve { padding: 4px 0; }

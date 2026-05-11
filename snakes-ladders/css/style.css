@@ -1,0 +1,762 @@
+/* Snakes & Ladders — curriculum-closing integrative review.
+   Inherits theme tokens from the rest of the SML reinforcement-learning
+   curriculum so the colour identity carries: ANYmal-red for the MDP frame,
+   Casino-blue for ε-greedy, Spooky-purple for Bellman, Darts-amber for the
+   Robbins-Monro update. Adds Snakes & Ladders specific tokens for the board
+   layout, snake/ladder SVG paths, and the three die-pill colors. */
+
+:root,
+:root[data-theme="light"] {
+  --bg: #f9f7f1;
+  --ink: #1a1a1a;
+  --ink-secondary: #6b6b6b;
+  --rule: #d8d4ca;
+  --card-bg: #ffffff;
+
+  /* Categorical palette — inherited from sibling viz. */
+  --entity-anymal: #b8323a;     /* red — agent / MDP frame */
+  --entity-ghost:  #7a5c8c;     /* purple — Bellman recursion (Spooky House) */
+  --entity-star:   #c08a3e;     /* amber — Robbins-Monro (Darts) */
+  --casino-blue:   #2f6cb1;     /* blue — ε-greedy on Q (Casino) */
+  --entity-door:   #4a8b6b;     /* green — goal / ladder */
+
+  /* Board-specific */
+  --board-bg:       #f3efe6;
+  --board-rule:     #c8c2b3;
+  --cell-bg-light:  #f6f1e3;
+  --cell-bg-dark:   #e6dcc6;
+  --cell-text:      #6b6b6b;
+
+  --snake-body:     #b8323a;
+  --snake-head:     #8c2129;
+  --snake-tail:     #8c2129;
+
+  --ladder-rail:    #4a8b6b;
+  --ladder-rung:    #6ba18b;
+  --ladder-end:     #2d5e47;
+
+  --token-body:     #b8323a;
+  --token-ring:     #f9f7f1;
+  --token-shadow:   rgba(184, 50, 58, 0.30);
+
+  /* Three dice — distinct hues. d4 = green-safe, d6 = blue-mid, d8 = amber-bold. */
+  --die-d4-bg:      #4a8b6b;
+  --die-d4-fg:      #ffffff;
+  --die-d6-bg:      #2f6cb1;
+  --die-d6-fg:      #ffffff;
+  --die-d8-bg:      #c08a3e;
+  --die-d8-fg:      #ffffff;
+
+  /* V-value heatmap (8 bins) — sequential cool→warm. */
+  --v-bin-0: #efe9d8;
+  --v-bin-1: #e2d8c4;
+  --v-bin-2: #d8cab1;
+  --v-bin-3: #d3bb98;
+  --v-bin-4: #cea97e;
+  --v-bin-5: #c9956b;
+  --v-bin-6: #b8794f;
+  --v-bin-7: #9c5a3a;
+  --v-text-light:   #ffffff;
+
+  --q-flash: #f0c674;
+}
+
+:root[data-theme="dark"] {
+  --bg: #181612;
+  --ink: #ece7d9;
+  --ink-secondary: #8a8579;
+  --rule: #383530;
+  --card-bg: #211e19;
+
+  --entity-anymal: #d77078;
+  --entity-ghost:  #b394cb;
+  --entity-star:   #d6a766;
+  --casino-blue:   #6ea3dc;
+  --entity-door:   #7ab392;
+
+  --board-bg:       #211e19;
+  --board-rule:     #3a352e;
+  --cell-bg-light:  #28241f;
+  --cell-bg-dark:   #1d1a16;
+  --cell-text:      #8a8579;
+
+  --snake-body:     #d77078;
+  --snake-head:     #ee9097;
+  --snake-tail:     #ee9097;
+
+  --ladder-rail:    #7ab392;
+  --ladder-rung:    #95caa9;
+  --ladder-end:     #b8d8c5;
+
+  --token-body:     #d77078;
+  --token-ring:     #211e19;
+  --token-shadow:   rgba(215, 112, 120, 0.45);
+
+  --die-d4-bg:      #7ab392;
+  --die-d4-fg:      #181612;
+  --die-d6-bg:      #6ea3dc;
+  --die-d6-fg:      #181612;
+  --die-d8-bg:      #d6a766;
+  --die-d8-fg:      #181612;
+
+  --v-bin-0: #2a2622;
+  --v-bin-1: #3a322a;
+  --v-bin-2: #4e4032;
+  --v-bin-3: #634d3a;
+  --v-bin-4: #7a5d44;
+  --v-bin-5: #946f4f;
+  --v-bin-6: #b18258;
+  --v-bin-7: #d49a68;
+  --v-text-light:   #181612;
+
+  --q-flash: #f0c674;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.topbar .brand { font-weight: 600; }
+.topbar .scene-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 0 24px;
+}
+.topbar .right-cluster { display: flex; gap: 8px; align-items: center; }
+.theme-toggle, .pager-btn {
+  background: transparent;
+  color: var(--ink-secondary);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.theme-toggle:hover, .pager-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-secondary);
+}
+.pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- Stage / scene engine ---------- */
+.stage {
+  position: relative;
+  max-width: 1200px;
+  margin: 16px auto 32px;
+  padding: 0 24px;
+  min-height: calc(100vh - 130px);
+}
+.scene {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  left: 0;
+  right: 0;
+}
+
+.dot-pager { display: flex; gap: 6px; align-items: center; }
+.dot-pager .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--rule); border: none; padding: 0; cursor: pointer;
+}
+.dot-pager .dot.active { background: var(--ink); }
+.dot-pager .dot:hover { background: var(--ink-secondary); }
+
+/* ---------- Hero ---------- */
+.hero h1 {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-weight: 500;
+  font-size: 28px;
+  margin: 0 0 6px;
+  letter-spacing: -0.005em;
+}
+.hero .subtitle {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-secondary);
+  margin: 0 0 18px;
+}
+.hero .lede {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 16.5px;
+  line-height: 1.55;
+  margin: 0 0 14px;
+  max-width: 60ch;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 10px 14px;
+}
+
+/* ---------- Captions / formula blocks ---------- */
+.caption {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-secondary);
+  margin: 8px 4px 0;
+  min-height: 1.55em;
+  max-width: 70ch;
+}
+.formula-block {
+  margin: 10px 0;
+  text-align: center;
+}
+.formula-block .katex { color: var(--ink); }
+
+/* ---------- Controls ---------- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  padding: 8px 4px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin-top: 10px;
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.control-group.greek label, .control-group .greek-text {
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: "SF Mono", Menlo, monospace;
+}
+.control-group input[type="range"] {
+  accent-color: var(--casino-blue);
+  height: 4px;
+  width: 150px;
+}
+.control-group output, .control-group .control-value {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  min-width: 36px;
+  text-align: right;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.control-group select, .control-group button {
+  background: var(--card-bg);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.control-group button:hover, .control-group select:hover {
+  border-color: var(--ink-secondary);
+}
+.control-group button.primary {
+  background: var(--casino-blue);
+  color: white;
+  border-color: var(--casino-blue);
+}
+.control-group button.primary:hover { filter: brightness(1.06); }
+.control-group button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* =====================================================================
+   The board
+   ===================================================================== */
+
+.board-host {
+  display: block;
+  width: 100%;
+  /* Cap height so the board doesn't push controls below the laptop fold.
+     The board is square (aspect-ratio 1/1) so capping max-width caps height. */
+  max-width: 480px;
+  max-height: 480px;
+  margin: 0 auto;
+}
+.board-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--board-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.board-cells {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: repeat(10, 1fr);
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0;
+  z-index: 1;
+}
+.board-cell {
+  position: relative;
+  border-right: 1px solid var(--board-rule);
+  border-bottom: 1px solid var(--board-rule);
+  background: var(--cell-bg-light);
+  transition: background 200ms ease-out;
+}
+
+.board-cell .cell-number {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--cell-text);
+  letter-spacing: 0;
+  opacity: 0.75;
+  pointer-events: none;
+}
+.board-cell .cell-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  pointer-events: none;
+}
+.board-cell .cell-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  pointer-events: none;
+}
+.board-cell.v-bin-0 { background: var(--v-bin-0); }
+.board-cell.v-bin-1 { background: var(--v-bin-1); }
+.board-cell.v-bin-2 { background: var(--v-bin-2); }
+.board-cell.v-bin-3 { background: var(--v-bin-3); }
+.board-cell.v-bin-4 { background: var(--v-bin-4); }
+.board-cell.v-bin-5 { background: var(--v-bin-5); }
+.board-cell.v-bin-6 { background: var(--v-bin-6); }
+.board-cell.v-bin-7 { background: var(--v-bin-7); }
+.board-cell.v-bin-5 .cell-text,
+.board-cell.v-bin-6 .cell-text,
+.board-cell.v-bin-7 .cell-text { color: var(--v-text-light); }
+.board-cell.v-bin-5 .cell-number,
+.board-cell.v-bin-6 .cell-number,
+.board-cell.v-bin-7 .cell-number { color: var(--v-text-light); opacity: 0.7; }
+
+.board-cell.selected {
+  outline: 2px solid var(--casino-blue);
+  outline-offset: -2px;
+  z-index: 2;
+}
+.board-cell.cell-flash {
+  animation: cell-flash 700ms ease-out;
+}
+@keyframes cell-flash {
+  0%   { box-shadow: inset 0 0 0 3px var(--q-flash); }
+  100% { box-shadow: inset 0 0 0 0px var(--q-flash); }
+}
+
+.board-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Snakes */
+.snake-body {
+  fill: none;
+  stroke: var(--snake-body);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+.snake-head {
+  fill: var(--snake-head);
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+.snake-tail {
+  fill: var(--snake-tail);
+  opacity: 0.65;
+}
+
+/* Ladders */
+.ladder-rail {
+  stroke: var(--ladder-rail);
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0.92;
+}
+.ladder-rung {
+  stroke: var(--ladder-rung);
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+.ladder-end {
+  fill: var(--ladder-end);
+  opacity: 0.85;
+}
+
+/* Token */
+.token-group { pointer-events: none; }
+.token-ring {
+  fill: var(--token-ring);
+  stroke: var(--token-body);
+  stroke-width: 3;
+  filter: drop-shadow(0 2px 4px var(--token-shadow));
+}
+.token-body { fill: var(--token-body); }
+
+/* Die pills */
+.die-pill {
+  display: inline-block;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+  letter-spacing: 0;
+  line-height: 1.1;
+}
+.die-pill.die-d4 { background: var(--die-d4-bg); color: var(--die-d4-fg); }
+.die-pill.die-d6 { background: var(--die-d6-bg); color: var(--die-d6-fg); }
+.die-pill.die-d8 { background: var(--die-d8-bg); color: var(--die-d8-fg); }
+
+/* Big die buttons (scene 1) */
+.die-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.die-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 18px;
+  background: var(--card-bg);
+  color: var(--ink);
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 100ms ease-out, border-color 100ms ease-out, background 100ms ease-out;
+  min-width: 78px;
+  text-align: center;
+}
+.die-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.die-btn.die-d4 { border-color: var(--die-d4-bg); }
+.die-btn.die-d4:hover:not(:disabled) { background: var(--die-d4-bg); color: var(--die-d4-fg); }
+.die-btn.die-d6 { border-color: var(--die-d6-bg); }
+.die-btn.die-d6:hover:not(:disabled) { background: var(--die-d6-bg); color: var(--die-d6-fg); }
+.die-btn.die-d8 { border-color: var(--die-d8-bg); }
+.die-btn.die-d8:hover:not(:disabled) { background: var(--die-d8-bg); color: var(--die-d8-fg); }
+.die-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.die-btn .die-label {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.die-btn .die-sub {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+.die-btn .die-rolled {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--entity-star);
+  min-height: 24px;
+}
+.die-btn.rolled {
+  animation: die-roll 400ms cubic-bezier(.4, 0, .2, 1);
+}
+@keyframes die-roll {
+  0%   { transform: rotate(0deg) scale(1); }
+  40%  { transform: rotate(-12deg) scale(1.06); }
+  80%  { transform: rotate(8deg) scale(1.03); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+/* HUD strip (scene 1) */
+.hud-strip {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.hud-strip .hud-item { display: flex; flex-direction: column; gap: 2px; }
+.hud-strip .hud-label {
+  font-family: -apple-system, "Inter", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.hud-strip .hud-val {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+/* Two-column scene layouts */
+.s-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 24px;
+  align-items: start;
+  margin-top: 8px;
+}
+.s-left { min-width: 0; }
+.s-rail { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.rail-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  margin: 0 0 4px;
+}
+
+/* Q-bar panel (scene 4 click-cell payoff) */
+.qbar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  min-height: 168px;
+}
+.qbar-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 500;
+}
+.qbar-sub {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: var(--ink-secondary);
+  min-height: 1.1em;
+}
+.qbar-bars { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.qbar-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 60px;
+  gap: 8px;
+  align-items: center;
+  padding: 2px 0;
+}
+.qbar-row.argmax {
+  background: rgba(192, 138, 62, 0.12);
+  border-radius: 3px;
+  padding: 2px 6px;
+}
+.qbar-die { display: flex; justify-content: center; }
+.qbar-track {
+  position: relative;
+  height: 14px;
+  background: var(--cell-bg-light);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.qbar-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: var(--casino-blue);
+  transition: width 200ms ease-out;
+}
+.qbar-fill.die-d4 { background: var(--die-d4-bg); }
+.qbar-fill.die-d6 { background: var(--die-d6-bg); }
+.qbar-fill.die-d8 { background: var(--die-d8-bg); }
+.qbar-fill.negative { opacity: 0.65; }
+.qbar-val {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  text-align: right;
+}
+
+/* Learning curve */
+.learning-curve { width: 100%; font-family: "SF Mono", Menlo, monospace; }
+.learning-curve .lc-svg { width: 100%; height: auto; display: block; }
+.learning-curve .lc-raw { fill: none; stroke: var(--ink-secondary); stroke-width: 0.8; opacity: 0.4; }
+.learning-curve .lc-smooth { fill: none; stroke: var(--casino-blue); stroke-width: 1.6; }
+.learning-curve .lc-cursor { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
+.learning-curve .lc-cursor-marker { fill: var(--entity-star); stroke: var(--ink); stroke-width: 0.8; }
+.learning-curve .lc-grid { stroke: var(--rule); stroke-width: 0.5; stroke-dasharray: 2 3; }
+.learning-curve .lc-tick-label, .learning-curve .lc-axis-label { fill: var(--ink-secondary); font-size: 10px; }
+.learning-curve .lc-axis-label { font-style: italic; font-size: 11px; }
+
+/* Scrubber */
+.scrubber {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  font-size: 12px;
+  color: var(--ink-secondary);
+}
+.scrubber input[type="range"] {
+  flex: 1 1 auto;
+  accent-color: var(--casino-blue);
+  height: 4px;
+}
+.scrubber .scr-label {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  min-width: 96px;
+}
+.scrubber .scr-snapshots {
+  display: flex;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--ink-secondary);
+}
+.scrubber .scr-snapshots .scr-snap {
+  cursor: pointer;
+  padding: 1px 5px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.scrubber .scr-snapshots .scr-snap.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+/* Footnote */
+.footnote {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  border-top: 1px solid var(--rule);
+  padding-top: 8px;
+  margin-top: 14px;
+  text-align: right;
+  font-style: italic;
+}
+.footnote kbd {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0 4px;
+  background: var(--card-bg);
+  color: var(--ink);
+  font-style: normal;
+}
+
+/* Component-color spans for inline KaTeX */
+.comp-mdp     { color: var(--entity-anymal); }
+.comp-eps     { color: var(--casino-blue); }
+.comp-bellman { color: var(--entity-ghost); }
+.comp-rm      { color: var(--entity-star); }
+.comp-door    { color: var(--entity-door); }
+
+/* Mix caption strip (scenes 3, 4) */
+.policy-mix-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  color: var(--ink);
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.policy-mix-strip .pm-label {
+  font-family: -apple-system, "Inter", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.policy-mix-strip .pm-die {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

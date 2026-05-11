@@ -1,0 +1,64 @@
+/* Scene 5 — recap row of 5 cards. */
+.scene5-wrap { display: flex; flex-direction: column; gap: 12px; }
+.recap-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+@media (max-width: 960px) {
+  .recap-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.recap-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 14px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--recap-hue);
+  border-radius: 4px;
+  min-height: 220px;
+}
+.recap-from {
+  font-family: -apple-system, "Inter", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--recap-hue);
+  font-weight: 600;
+}
+.recap-title {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink);
+}
+.recap-symbol {
+  font-size: 13px;
+  padding: 6px 0;
+}
+.recap-symbol .katex { color: var(--ink); }
+.recap-caption {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+  line-height: 1.4;
+  flex: 1 1 auto;
+}
+.recap-anchor {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 10.5px;
+  color: var(--recap-hue);
+  letter-spacing: 0.02em;
+  border-top: 1px solid var(--rule);
+  padding-top: 6px;
+  margin-top: 4px;
+}
+.scene5-closer {
+  text-align: center;
+  max-width: 70ch;
+  margin: 24px auto 8px;
+}

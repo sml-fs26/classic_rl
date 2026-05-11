@@ -1,0 +1,63 @@
+/* Scene 0 — title card + board preview + MDP mapping table. */
+
+.scene0-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  gap: 28px;
+  margin-top: 12px;
+  align-items: start;
+}
+.scene0-board { max-width: 460px; }
+
+.mapping-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 14px 16px;
+}
+.mapping-title {
+  text-align: center;
+  margin-bottom: 6px;
+  font-size: 18px;
+  color: var(--ink);
+}
+.mapping-row {
+  display: grid;
+  grid-template-columns: 28px 80px 1fr;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.mapping-row:last-child { border-bottom: none; }
+.mapping-sym {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: center;
+}
+.mapping-name {
+  font-family: -apple-system, "Inter", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.mapping-desc {
+  font-family: "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.mapping-desc .mono {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 12.5px;
+  background: var(--cell-bg-light);
+  padding: 0 4px;
+  border-radius: 2px;
+}
+.scene0-closer { text-align: center; margin: 18px auto 8px; max-width: 64ch; }
