@@ -1,0 +1,26 @@
+/* Scene 4 — SARSA layout. */
+.sc4-params {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.sc4-params .poke-menu-row {
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 4px 10px;
+  box-shadow: inset -2px -2px 0 0 #BBB6A2;
+  color: var(--ink-on-box);
+}
+.sc4-params .poke-menu-row .val { color: var(--ink-on-box); }
+.sc4-q {
+  margin-top: 10px;
+  max-width: 720px;
+}
+.sc4-lc-wrap {
+  margin-top: 12px;
+  max-width: 720px;
+}
+.sc4-lc-header {
+  margin-bottom: 6px;
+}

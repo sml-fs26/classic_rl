@@ -1,0 +1,21 @@
+/* Scene 3 — γ slider + grid. */
+.sc3-gamma {
+  justify-content: center;
+}
+.sc3-gamma-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--hue-ghost);
+}
+.sc3-grid-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+.sc3-mix {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.sc3-mix-val.zero {
+  opacity: 0.35;
+}

@@ -1,0 +1,881 @@
+/* Pokemon battle — viz #7 of the SML reinforcement-learning curriculum.
+   Second integrative review.  Same lesson as Snakes & Ladders, retold on a
+   Gen-1 Pokemon Red/Blue battle screen.  The editorial cream/serif palette of
+   the rest of the curriculum is deliberately overridden here per the user's
+   request; the SKILL §10 anticipates this exit.  The cross-viz hue identities
+   (anymal-red, casino-blue, ghost-purple, star-amber, door-green) are kept as
+   per-component accent tokens so the scene-5 recap can still cite them. */
+
+/* ---------- Press Start 2P ---------- */
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('../assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+  font-display: block;  /* pixel font: do NOT flash fallback serif first */
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ---------- Tokens ---------- */
+:root,
+:root[data-theme="light"] {
+  /* Battle screen — Day */
+  --sky-top:        #9CC8E8;
+  --sky-bottom:     #C0DEF0;
+  --grass:          #5BA85B;
+  --grass-rim:      #3A8A3A;
+
+  /* Page chrome */
+  --bg:             #E8E0CC;     /* warm grey-cream, NES "shell" */
+  --bg-strong:      #F8F4E4;     /* lighter, for dialog boxes */
+  --ink:            #181818;
+  --ink-secondary:  #585858;
+  --rule:           #181818;     /* hard black for Pokemon borders */
+  --card-bg:        #FFFFFF;
+  --inner-highlight:#404040;     /* the secondary inner border line */
+  --pikachu-yellow: #F8D028;
+  --pikachu-cheek:  #E84828;
+  --charmander-orange:#F58030;
+  --hp-green:       #48C848;
+  --hp-yellow:      #E8C828;
+  --hp-red:         #E84828;
+  --damage-text:    #F8F8F8;
+  --damage-stroke:  #181818;
+  --ink-on-box:     #181818;     /* ink on Pokemon-white boxes (always dark) */
+
+  /* Cross-viz hue identities (kept for scene-5 recap chips) */
+  --hue-anymal:  #B8323A;     /* red — MDP */
+  --hue-casino:  #2F6CB1;     /* blue — ε-greedy */
+  --hue-ghost:   #7A5C8C;     /* purple — Bellman */
+  --hue-star:    #C08A3E;     /* amber — Robbins-Monro */
+  --hue-door:    #4A8B6B;     /* green — SARSA */
+  --hue-snakes:  #C8902C;     /* gold — Snakes & Ladders sibling */
+}
+
+:root[data-theme="dark"] {
+  /* Battle screen — Night */
+  --sky-top:        #1A2548;
+  --sky-bottom:     #2A3A6E;
+  --grass:          #2A5A2A;
+  --grass-rim:      #1B3E1B;
+
+  --bg:             #1B1A18;
+  --bg-strong:      #FFFFFF;     /* dialog box stays Pokemon white at night */
+  --ink:            #E8E4D8;     /* page-level ink (against dark bg) */
+  --ink-on-box:     #181818;     /* ink on Pokemon-white boxes (always dark) */
+  --ink-secondary:  #989488;
+  --rule:           #181818;
+  --card-bg:        #FFFFFF;
+  --inner-highlight:#404040;
+  --pikachu-yellow: #F8D028;
+  --pikachu-cheek:  #E84828;
+  --charmander-orange:#F58030;
+  --hp-green:       #48C848;
+  --hp-yellow:      #E8C828;
+  --hp-red:         #E84828;
+  --damage-text:    #F8F8F8;
+  --damage-stroke:  #181818;
+
+  --hue-anymal:  #D77078;
+  --hue-casino:  #6EA3DC;
+  --hue-ghost:   #B394CB;
+  --hue-star:    #D6A766;
+  --hue-door:    #7AB392;
+  --hue-snakes:  #E6B158;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Press Start 2P', "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  -webkit-font-smoothing: none;  /* keep pixel font crisp */
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg);
+  border-bottom: 4px solid var(--rule);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.topbar .brand {
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink);
+  font-size: 9px;
+}
+.topbar .scene-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 0 20px;
+}
+.topbar .right-cluster { display: flex; gap: 6px; align-items: center; }
+
+.theme-toggle, .pager-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  padding: 5px 8px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 #BBB6A2;
+}
+.theme-toggle:hover, .pager-btn:hover {
+  background: var(--pikachu-yellow);
+}
+.pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.dot-pager { display: flex; gap: 4px; align-items: center; }
+.dot-pager .dot {
+  width: 10px; height: 10px;
+  background: var(--ink-secondary);
+  border: 2px solid var(--rule);
+  padding: 0;
+  cursor: pointer;
+}
+:root[data-theme="dark"] .dot-pager .dot { border-color: var(--bg-strong); }
+.dot-pager .dot.active { background: var(--pikachu-yellow); }
+.dot-pager .dot:hover { background: var(--pikachu-cheek); }
+
+/* ---------- Stage / scene engine ---------- */
+.stage {
+  position: relative;
+  max-width: 1100px;
+  margin: 16px auto 32px;
+  padding: 0 20px;
+  min-height: calc(100vh - 130px);
+}
+.scene {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  left: 0;
+  right: 0;
+}
+
+/* ---------- Pokemon dialog box ----------
+   The iconic look: thick black outer border + thin inner-highlight rectangle.
+   We render the inner highlight with stacked inset box-shadows. */
+.poke-box {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 16px;
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  position: relative;
+}
+.poke-box.tight { padding: 10px 12px; font-size: 10px; }
+
+.poke-box .triangle {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid var(--ink);
+  animation: blink 0.9s steps(2, end) infinite;
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ---------- Headings ---------- */
+.poke-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 38px;
+  color: var(--pikachu-yellow);
+  text-shadow:
+    2px 0 0 var(--ink),
+    -2px 0 0 var(--ink),
+    0 2px 0 var(--ink),
+    0 -2px 0 var(--ink),
+    2px 2px 0 var(--ink),
+    -2px -2px 0 var(--ink),
+    -2px 2px 0 var(--ink),
+    2px -2px 0 var(--ink),
+    4px 4px 0 var(--charmander-orange);
+  margin: 0 0 18px;
+  letter-spacing: 6px;
+}
+.poke-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+.poke-section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.poke-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin: 8px 4px 0;
+  max-width: 76ch;
+}
+
+/* ---------- Pokemon sprite ----------
+   Hard rule: image-rendering: pixelated must apply on both the <img> tag and
+   any wrapper that scales. */
+.poke-sprite {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+  display: block;
+}
+.poke-sprite.shake {
+  animation: poke-shake 320ms steps(1, end);
+}
+@keyframes poke-shake {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-6px, 0); }
+  25%  { transform: translate(6px, 0); }
+  40%  { transform: translate(-5px, 0); }
+  55%  { transform: translate(5px, 0); }
+  70%  { transform: translate(-3px, 0); }
+  85%  { transform: translate(3px, 0); }
+  100% { transform: translate(0, 0); }
+}
+.poke-sprite.faint {
+  animation: poke-faint 600ms ease-in forwards;
+}
+@keyframes poke-faint {
+  0%   { transform: translateY(0); opacity: 1; filter: brightness(1); }
+  100% { transform: translateY(48px); opacity: 0; filter: brightness(0); }
+}
+
+/* ---------- Battle stage ---------- */
+.battle-stage {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 5 / 3;
+  margin: 0 auto;
+  background:
+    linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 65%, var(--grass) 65%, var(--grass) 100%);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  overflow: hidden;
+  font-family: 'Press Start 2P', monospace;
+}
+.battle-stage .grass-rim {
+  position: absolute;
+  left: 0; right: 0;
+  top: 65%;
+  height: 4px;
+  background: var(--grass-rim);
+}
+.battle-stage .platform {
+  position: absolute;
+  width: 38%;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--grass-rim);
+  opacity: 0.65;
+}
+.battle-stage .platform.player   { left: 6%;  bottom: 14%; }
+.battle-stage .platform.opponent { right: 6%; top: 35%;    }
+
+.battle-stage .sprite-host {
+  position: absolute;
+}
+.battle-stage .sprite-host.player {
+  left: 10%;
+  bottom: 16%;
+  width: 30%;
+}
+.battle-stage .sprite-host.opponent {
+  right: 10%;
+  top: 12%;
+  width: 22%;
+}
+.battle-stage .sprite-host img {
+  width: 100%;
+  height: auto;
+  /* feet rest on platform: the platform is at the host's bottom */
+  transform: translateY(0);
+}
+
+/* Stars for night sky */
+.battle-stage.night::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 35% 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 12%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 60% 22%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 78% 8%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 38% 32%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 90% 30%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 8% 25%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 48% 8%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 72% 38%, #fff 1px, transparent 1px);
+  pointer-events: none;
+}
+
+/* HP box — sits floating over the battle */
+.hp-box {
+  position: absolute;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 6px 10px 6px 12px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  min-width: 160px;
+}
+.hp-box.player   { right: 4%; bottom: 6%;   }
+.hp-box.opponent { left:  4%; top: 6%;      }
+
+.hp-box .row1 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+.hp-box .name { color: var(--ink-on-box); }
+.hp-box .lvl { color: var(--ink-on-box); }
+
+.hp-bar-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.hp-bar-row .hp-label {
+  font-size: 8px;
+  color: var(--pikachu-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+}
+.hp-bar-track {
+  flex: 1 1 auto;
+  height: 8px;
+  background: #585858;
+  border: 2px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.hp-bar-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: var(--hp-green);
+  width: 100%;
+  transition: width 600ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
+}
+.hp-bar-fill.mid { background: var(--hp-yellow); }
+.hp-bar-fill.low { background: var(--hp-red); }
+
+.hp-box .row3 {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+
+/* Damage flash number */
+.damage-flash {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  color: var(--damage-text);
+  -webkit-text-stroke: 2px var(--damage-stroke);
+  text-stroke: 2px var(--damage-stroke);
+  pointer-events: none;
+  animation: dmg-rise 700ms ease-out forwards;
+}
+@keyframes dmg-rise {
+  0%   { transform: translateY(8px); opacity: 0; }
+  20%  { transform: translateY(0);   opacity: 1; }
+  80%  { transform: translateY(-24px); opacity: 1; }
+  100% { transform: translateY(-32px); opacity: 0; }
+}
+
+/* ---------- Move menu (scene 1) ---------- */
+.move-menu {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px 12px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+}
+.move-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: transparent;
+  border: 0;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 10px;
+  color: var(--ink-on-box);
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  text-transform: uppercase;
+}
+.move-btn::before {
+  content: '\25B6 ';
+  visibility: hidden;
+  color: var(--ink-on-box);
+}
+.move-btn:hover::before, .move-btn:focus::before, .move-btn.selected::before {
+  visibility: visible;
+}
+.move-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.move-btn:disabled::before { visibility: hidden; }
+.move-btn .move-sub {
+  font-size: 8px;
+  color: #585858;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  display: flex;
+  gap: 8px;
+}
+.move-btn .type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 4px;
+  border: 1px solid var(--rule);
+  font-size: 7px;
+  text-transform: uppercase;
+}
+.type-pill.electric { background: #F8D028; color: #181818; }
+.type-pill.normal   { background: #C8C0B0; color: #181818; }
+.type-pill.steel    { background: #B0B0C0; color: #181818; }
+.type-pill.fire     { background: #F58030; color: #181818; }
+
+/* ---------- Pokemon-styled "menu option" rows (for sliders / params) ---------- */
+.poke-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink);
+}
+.poke-menu-row::before {
+  content: '\25B6';
+  color: var(--pikachu-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+  margin-right: 4px;
+}
+.poke-menu-row input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 140px;
+  height: 8px;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.poke-menu-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  margin-top: 0;
+  cursor: pointer;
+}
+.poke-menu-row input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  cursor: pointer;
+}
+.poke-menu-row output, .poke-menu-row .val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  min-width: 56px;
+  color: var(--ink);
+}
+.poke-menu-row button {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 4px 8px;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 #BBB6A2;
+}
+.poke-menu-row button:hover { background: var(--pikachu-yellow); }
+.poke-menu-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- KaTeX wrapper ---------- */
+.poke-formula {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 10px 14px;
+  margin: 10px auto;
+  display: inline-block;
+  font-family: "KaTeX_Main", "Iowan Old Style", Georgia, serif;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.poke-formula .katex { color: var(--ink-on-box); font-size: 16px; }
+
+/* ---------- Scenes layout helpers ---------- */
+.scene-pad {
+  padding: 12px 4px 24px;
+}
+.scene-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.scene-row.center { justify-content: center; }
+.scene-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ---------- Cross-viz hue chip ---------- */
+.hue-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.hue-chip.hue-anymal { background: var(--hue-anymal); color: #fff; }
+.hue-chip.hue-casino { background: var(--hue-casino); color: #fff; }
+.hue-chip.hue-ghost  { background: var(--hue-ghost);  color: #fff; }
+.hue-chip.hue-star   { background: var(--hue-star);   color: #181818; }
+.hue-chip.hue-door   { background: var(--hue-door);   color: #fff; }
+.hue-chip.hue-snakes { background: var(--hue-snakes); color: #181818; }
+.hue-chip.hue-poke   { background: var(--pikachu-yellow); color: #181818; }
+
+/* ---------- 3x3 state grid for VI / γ scenes ---------- */
+.state-grid {
+  display: grid;
+  grid-template-columns: 56px repeat(3, 1fr);
+  grid-template-rows: 28px repeat(3, 1fr);
+  gap: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  max-width: 460px;
+}
+.state-grid .axis-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+.state-grid .axis-label.col {
+  letter-spacing: 0.5px;
+}
+.state-grid .axis-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-secondary);
+  font-size: 7px;
+  text-align: center;
+  line-height: 1.3;
+}
+.state-grid .row-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--ink);
+  letter-spacing: 0.5px;
+}
+.state-grid .state-cell {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 78px;
+  position: relative;
+  box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight);
+  color: var(--ink-on-box);
+}
+.state-cell .v-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--ink-on-box);
+}
+.state-cell .v-move {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--charmander-orange);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.state-cell.flash {
+  animation: cell-flash 700ms ease-out;
+}
+@keyframes cell-flash {
+  0%   { background: var(--pikachu-yellow); }
+  100% { background: var(--bg-strong); }
+}
+
+/* ---------- Q-table render (scene 4) ---------- */
+.qtable-host {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px 12px;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  overflow-x: auto;
+}
+.qtable-host table { border-collapse: collapse; }
+.qtable-host th, .qtable-host td {
+  padding: 3px 6px;
+  border: 1px solid var(--inner-highlight);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+}
+.qtable-host th {
+  background: var(--pikachu-yellow);
+  color: #181818;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 7px;
+}
+.qtable-host td.state-head {
+  text-align: left;
+  background: #ECE5C8;
+  font-size: 7px;
+  text-transform: uppercase;
+  min-width: 88px;
+}
+.qtable-host td.argmax {
+  background: #FFF1AE;
+  font-weight: 700;
+}
+.qtable-host td.flash {
+  animation: qcell-flash 700ms ease-out;
+}
+@keyframes qcell-flash {
+  0%   { box-shadow: inset 0 0 0 2px var(--pikachu-yellow); background: #FFF1AE; }
+  100% { box-shadow: inset 0 0 0 0 var(--pikachu-yellow); }
+}
+
+/* ---------- Learning curve (scene 4) ---------- */
+.learning-curve {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.learning-curve .lc-svg { width: 100%; height: auto; display: block; }
+.learning-curve .lc-raw { fill: none; stroke: #888; stroke-width: 0.8; opacity: 0.5; }
+.learning-curve .lc-smooth { fill: none; stroke: var(--charmander-orange); stroke-width: 1.6; }
+.learning-curve .lc-cursor { stroke: var(--ink-on-box); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
+.learning-curve .lc-cursor-marker { fill: var(--pikachu-yellow); stroke: var(--ink-on-box); stroke-width: 0.8; }
+.learning-curve .lc-grid { stroke: var(--inner-highlight); stroke-width: 0.5; stroke-dasharray: 2 3; opacity: 0.4; }
+.learning-curve .lc-tick-label, .learning-curve .lc-axis-label {
+  fill: var(--ink-on-box);
+  font-size: 7px;
+  font-family: 'Press Start 2P', monospace;
+}
+.learning-curve .lc-axis-label { font-size: 8px; }
+
+/* ---------- Scrubber ---------- */
+.scrubber {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  flex-wrap: wrap;
+}
+.scrubber input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1 1 auto;
+  min-width: 120px;
+  height: 8px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  margin: 0;
+}
+.scrubber input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+}
+.scrubber input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+}
+.scrubber .scr-label {
+  min-width: 110px;
+  font-size: 9px;
+}
+.scrubber .scr-snapshots { display: flex; gap: 4px; flex-wrap: wrap; }
+.scrubber .scr-snap {
+  cursor: pointer;
+  padding: 2px 5px;
+  border: 2px solid var(--rule);
+  background: #ECE5C8;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+}
+.scrubber .scr-snap.active {
+  background: var(--pikachu-yellow);
+}
+
+/* ---------- HUD strip (scene 1) ---------- */
+.hud-strip {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  flex-wrap: wrap;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  color: var(--ink-on-box);
+}
+.hud-strip .hud-item { display: flex; flex-direction: column; gap: 2px; }
+.hud-strip .hud-label {
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #585858;
+}
+.hud-strip .hud-val {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+  font-size: 11px;
+}
+
+/* ---------- Footnote ---------- */
+.footnote {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 6px;
+  margin-top: 14px;
+  text-align: right;
+}
+.footnote kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  border: 1px solid var(--rule);
+  padding: 0 4px;
+  background: var(--bg-strong);
+  color: var(--ink);
+}
+
+/* ---------- Component colour spans ---------- */
+.comp-mdp     { color: var(--hue-anymal); }
+.comp-eps     { color: var(--hue-casino); }
+.comp-bellman { color: var(--hue-ghost); }
+.comp-rm      { color: var(--hue-star); }
+.comp-door    { color: var(--hue-door); }
+.comp-poke    { color: var(--pikachu-yellow); -webkit-text-stroke: 0.5px var(--ink); }
+
+/* MDP-frame overlay (scene 0) */
+.mdp-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #181818;
+}
+.mdp-overlay .mdp-tag {
+  position: absolute;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  padding: 3px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 2px 2px 0 0 var(--ink);
+  pointer-events: auto;
+}
