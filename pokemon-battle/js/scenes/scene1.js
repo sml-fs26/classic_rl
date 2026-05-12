@@ -72,13 +72,7 @@
       const btn = document.createElement('button');
       btn.className = 'move-btn';
       btn.type = 'button';
-      btn.innerHTML =
-        m.name +
-        '<span class="move-sub">' +
-          '<span class="type-pill ' + m.type + '">' + window.Moves.typeIconSvg(m.type) + ' ' + m.type + '</span>' +
-          '<span>PWR ' + m.power + '</span>' +
-          '<span>ACC ' + Math.round(m.accuracy * 100) + '%</span>' +
-        '</span>';
+      btn.innerHTML = m.name + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
       btn.addEventListener('click', () => onMove(m.id));
       menuHost.appendChild(btn);
       moveBtns[m.id] = btn;

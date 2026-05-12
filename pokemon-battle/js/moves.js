@@ -1,25 +1,25 @@
 /* Pokemon move definitions — the action space of Pikachu's MDP.
  *
- * Four moves chosen to span the risk axis: a low-power-always-hits move, a
- * reliable workhorse, a medium-risk move, and a glass-cannon move. The
- * pedagogy: ε-greedy SARSA must learn which power/accuracy trade-off pays out
- * given (your HP, opp HP). Charmander's only move (Ember) is opponent-only
- * and not exposed to the agent.
+ * IMPORTANT: the displayed `power` field is decorative — chosen for Pokemon-
+ * canon recognisability — and is NOT what drives damage in the discrete MDP.
+ * The actual damage is a per-move bucket-drop distribution defined in
+ * `battle.js` (HIT_DAMAGE_DIST). `accuracy` IS real and used as the hit prob.
  *
- *   id           power  acc   type      note
- *   quick_attack  40    1.00  normal    priority (first regardless of speed)
- *   thunderbolt   90    1.00  electric  reliable workhorse
- *   iron_tail     75    0.75  steel     medium-risk
- *   thunder      110    0.70  electric  high risk / high reward
+ *   id           power  acc   ON HIT: bucket-drop distribution (in battle.js)
+ *   quick_attack  55   1.00   Δ0 55% / Δ1 45%   — E[Δ|hit] = 0.45
+ *   thunderbolt   80   1.00   Δ1 50% / Δ2 50%   — E[Δ|hit] = 1.50
+ *   iron_tail    100   0.85   Δ1 70% / Δ2 30%   — E[Δ|hit] = 1.30 (E[Δ] = 1.11)
+ *   thunder      150   0.55   Δ2 50% / Δ3 50%   — E[Δ|hit] = 2.50 (E[Δ] = 1.38)
  *
  * Opponent move (Charmander):
- *   ember         40    1.00  fire      always hits Pikachu for ~40 dmg
- */
+ *   ember         80   1.00   Δ0 20% / Δ1 55% / Δ2 25%  (~0.55 buckets/turn)
+ *
+ * The discrepancy between PWR and bucket-drop is intentional: the on-screen
+ * PWR/ACC strip preserves the Gen-1 Pokemon vibe, and a second line
+ * ("ON HIT: Δ1 70% · Δ2 30%") surfaces what the MDP actually does so
+ * students can reason about the algorithm without being misled by flavour
+ * numbers. See `moveSubHtml()` below. */
 (function () {
-  /* Move powers + accuracies are mirrored in precompute/build-datasets.js. The
-     tuning is set so that one Thunderbolt-hit crosses an HP bucket (~28 dmg)
-     and one Thunder-hit can cross two buckets (~52 dmg), so the high-variance
-     Thunder is interesting at low γ but reckless at high γ. */
   const MOVES = [
     { id: 'quick_attack', name: 'QUICK ATTACK', power: 55,  accuracy: 1.00, type: 'normal'   },
     { id: 'thunderbolt',  name: 'THUNDERBOLT',  power: 80,  accuracy: 1.00, type: 'electric' },
@@ -58,5 +58,43 @@
     return '';
   }
 
-  window.Moves = { MOVES, MOVE_IDS, MOVE_BY_ID, OPP_MOVE, typeIconSvg };
+  /* Format the actual bucket-drop distribution for display on the move button.
+     Reads `window.Battle.HIT_DAMAGE_DIST` lazily (Battle loads after Moves in
+     index.html). Returns "DROPS 1 (50%) / 2 (50%)" — or with an "ON HIT:"
+     prefix when accuracy < 100% to flag that the distribution is conditional
+     on the move landing.
+
+     Pure ASCII so every character stays inside Press Start 2P's glyph set
+     (Δ falls back to the system font and looks misaligned).
+
+     This line tells the truth about the MDP. The PWR/ACC strip above is the
+     Pokemon-canon flavour; this one is what the agent actually faces. */
+  function dropPatternStr(moveId) {
+    const dist = window.Battle && window.Battle.HIT_DAMAGE_DIST && window.Battle.HIT_DAMAGE_DIST[moveId];
+    if (!dist || !dist.length) return '';
+    const move = MOVE_BY_ID[moveId];
+    const prefix = (move && move.accuracy < 1) ? 'ON HIT: ' : '';
+    const parts = dist.map(([d, p]) => d + ' (' + Math.round(p * 100) + '%)');
+    return prefix + 'DROPS ' + parts.join(' / ');
+  }
+
+  /* Render the full inner-HTML of a move button. Two rows under the name:
+       row 1 (.move-stats): type-pill · PWR · ACC      — Pokemon-canon flavour
+       row 2 (.move-drop):  DROPS X (P%) / Y (Q%)      — MDP truth
+     Both scene 1 (live battle) and the tutorial's step-4 demo call this so
+     any change propagates to both without drift. */
+  function moveSubHtml(moveId) {
+    const m = MOVE_BY_ID[moveId];
+    if (!m) return '';
+    return (
+      '<span class="move-stats">' +
+        '<span class="type-pill ' + m.type + '">' + typeIconSvg(m.type) + ' ' + m.type + '</span>' +
+        '<span>PWR ' + m.power + '</span>' +
+        '<span>ACC ' + Math.round(m.accuracy * 100) + '%</span>' +
+      '</span>' +
+      '<span class="move-drop">' + dropPatternStr(moveId) + '</span>'
+    );
+  }
+
+  window.Moves = { MOVES, MOVE_IDS, MOVE_BY_ID, OPP_MOVE, typeIconSvg, dropPatternStr, moveSubHtml };
 })();

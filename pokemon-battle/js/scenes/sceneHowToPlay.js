@@ -40,8 +40,9 @@
     {
       title: 'Pick a move',
       dialog:
-        "Each turn, pick one of four moves.  PWR is the power.  " +
-        "ACC is the chance the move lands.  Stronger usually means riskier.",
+        "ACC is the real hit chance.  PWR is classic Pokemon flavour — " +
+        "the line below shows what each move actually does: how many HP " +
+        "buckets it drops.",
       render: renderStepMoves,
     },
     {
@@ -259,15 +260,7 @@
       btn.className = 'move-btn';
       btn.type = 'button';
       btn.disabled = true;
-      btn.innerHTML =
-        m.name +
-        '<span class="move-sub">' +
-          '<span class="type-pill ' + m.type + '">' +
-            window.Moves.typeIconSvg(m.type) + ' ' + m.type +
-          '</span>' +
-          '<span>PWR ' + m.power + '</span>' +
-          '<span>ACC ' + Math.round(m.accuracy * 100) + '%</span>' +
-        '</span>';
+      btn.innerHTML = m.name + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
       menu.appendChild(btn);
     }
     host.appendChild(menu);
@@ -275,8 +268,8 @@
     const note = document.createElement('div');
     note.className = 'tut-footnote';
     note.innerHTML =
-      'THUNDER has the highest PWR (150) but the worst ACC (55%) — a gamble.<br>' +
-      'THUNDERBOLT is the reliable workhorse (PWR 80, ACC 100%).';
+      'THUNDERBOLT reliably drops 1-2 buckets every turn — the workhorse.<br>' +
+      'THUNDER drops 2-3 when it hits, but only 55% of the time — a gamble worth taking when the opponent is already low.';
     host.appendChild(note);
   }
 

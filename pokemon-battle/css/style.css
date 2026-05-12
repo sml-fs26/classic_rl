@@ -498,8 +498,21 @@ html, body {
   letter-spacing: 0.5px;
   text-transform: none;
   display: flex;
-  gap: 8px;
+  flex-direction: column;     /* two rows: .move-stats then .move-drop */
+  gap: 3px;
 }
+.move-btn .move-stats {
+  display: flex;
+  flex-wrap: wrap;            /* type-pill + PWR + ACC may wrap on narrow viewports */
+  gap: 2px 8px;
+  align-items: center;
+}
+.move-btn .move-drop {
+  font-size: 8px;
+  color: var(--pikachu-cheek);
+  letter-spacing: 0.5px;
+}
+.move-btn:disabled .move-drop { color: #888; }
 .move-btn .type-pill {
   display: inline-flex;
   align-items: center;
