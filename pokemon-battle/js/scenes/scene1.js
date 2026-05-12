@@ -139,7 +139,7 @@
       const stageRect = stage.getBoundingClientRect();
       const el = document.createElement('div');
       el.className = 'damage-flash';
-      el.textContent = '-' + delta + ' LV';
+      el.textContent = '-' + delta + ' HP';
       el.style.left = (rect.left - stageRect.left + rect.width / 2 - 18) + 'px';
       el.style.top  = (rect.top  - stageRect.top  + 8) + 'px';
       if (color) el.style.color = color;

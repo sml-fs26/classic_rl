@@ -105,13 +105,11 @@
         r.innerHTML =
           '<span class="q-mark"></span>' +
           '<span class="q-label">' + shortMoveLabel(aid) + '</span>' +
-          '<span class="q-bar-track"><span class="q-bar-fill"></span></span>' +
           '<span class="q-val">—</span>';
         bars.appendChild(r);
         barNodes[a] = {
           row: r,
           mark: r.querySelector('.q-mark'),
-          fill: r.querySelector('.q-bar-fill'),
           val: r.querySelector('.q-val'),
         };
       }
@@ -166,21 +164,18 @@
         const base = s * A;
 
         let allZero = true;
-        let m = -Infinity, k = 0, lo = Infinity;
+        let m = -Infinity, k = 0;
         for (let a = 0; a < A; a++) {
           const v = Q[base + a];
           if (Math.abs(v) > 1e-9) allZero = false;
           if (v > m) { m = v; k = a; }
-          if (v < lo) lo = v;
         }
-        const span = Math.max(1e-6, m - lo);
 
         if (allZero) {
           node.cell.classList.add('unvisited');
           for (let a = 0; a < A; a++) {
             const bar = node.bars[a];
             bar.val.textContent = '—';
-            bar.fill.style.width = '0%';
             bar.row.classList.remove('argmax');
             bar.mark.textContent = '';
           }
@@ -190,8 +185,6 @@
             const bar = node.bars[a];
             const v = Q[base + a];
             bar.val.textContent = (v >= 0 ? '+' : '') + v.toFixed(2);
-            const w = ((v - lo) / span) * 100;
-            bar.fill.style.width = w.toFixed(1) + '%';
             const isArgmax = a === k;
             bar.row.classList.toggle('argmax', isArgmax);
             bar.mark.textContent = isArgmax ? '▶' : '';
@@ -254,7 +247,6 @@
         node.cell.classList.remove('argmax-flip');
         for (let a = 0; a < A; a++) {
           node.bars[a].val.textContent = '—';
-          node.bars[a].fill.style.width = '0%';
           node.bars[a].row.classList.remove('argmax');
           node.bars[a].mark.textContent = '';
         }

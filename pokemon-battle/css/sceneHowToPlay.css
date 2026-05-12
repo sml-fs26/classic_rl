@@ -125,31 +125,180 @@
 .tut-callout.c-pikahp  { right: 4%; bottom: 4%; }
 .tut-callout.c-charmhp { left: 4%;  top: 4%; }
 
-/* ---------- Step 2 — HP buckets row ---------- */
-.tut-hp-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-  padding: 18px 8px;
+/* ---------- Step 2 — HP buckets (animated demo + comic strip) ---------- */
+.tut-hp-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 22px 18px 18px;
   border: 4px solid var(--rule);
   background: var(--bg-strong);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
 }
-.tut-hp-cell { text-align: center; }
-.tut-hp-label {
+
+/* Live animated demo at the top. */
+.tut-hp-anim {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.tut-hp-anim-title {
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+}
+.tut-hp-anim-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 16px 14px;
+  background: var(--bg);
+  border: 3px solid var(--ink);
+  min-width: 480px;
+}
+.tut-hp-anim-sprite {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transition: opacity 320ms, filter 320ms, transform 320ms;
+}
+.tut-hp-anim-sprite.fainted {
+  opacity: 0.35;
+  filter: grayscale(0.7);
+  transform: rotate(-25deg);
+}
+.tut-hp-anim-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 280px;
+}
+.tut-hp-anim-track {
+  width: 280px;
+  height: 22px;
+  background: rgba(0,0,0,0.16);
+  border: 3px solid var(--ink);
+  box-sizing: border-box;
+  position: relative;
+}
+.tut-hp-anim-fill {
+  height: 100%;
+  width: 100%;
+  background: #48C848;
+  transition: width 500ms ease-out, background 200ms;
+}
+.tut-hp-anim-fill.b1 { background: #88D848; }
+.tut-hp-anim-fill.b2 { background: #E8C828; }
+.tut-hp-anim-fill.b3 { background: #E89028; }
+.tut-hp-anim-fill.b4 { background: #E84828; }
+.tut-hp-anim-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
   color: var(--ink-on-box);
-  margin-bottom: 8px;
+}
+
+@keyframes tut-hp-dmg-rise {
+  0%   { opacity: 0; transform: translate(-50%, 20px); }
+  20%  { opacity: 1; transform: translate(-50%, 4px); }
+  100% { opacity: 0; transform: translate(-50%, -56px); }
+}
+.tut-hp-anim-dmg {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translate(-50%, 20px);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  color: var(--pikachu-cheek, #C62828);
+  pointer-events: none;
+  animation: tut-hp-dmg-rise 1.05s ease-out forwards;
+  text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF, 2px -2px 0 #FFF, -2px 2px 0 #FFF;
+}
+
+/* Comic-strip reference below. */
+.tut-hp-strip {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 4px;
+  padding: 8px 0 4px;
+}
+.tut-hp-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px 8px;
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  min-width: 92px;
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.10);
+}
+.tut-hp-panel-sprite {
+  width: 44px;
+  height: 44px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transition: opacity 200ms, filter 200ms, transform 200ms;
+}
+.tut-hp-panel.fainted .tut-hp-panel-sprite {
+  opacity: 0.35;
+  filter: grayscale(0.7);
+  transform: rotate(-25deg);
+}
+.tut-hp-panel-track {
+  width: 76px;
+  height: 8px;
+  background: rgba(0,0,0,0.16);
+  border: 2px solid var(--ink);
+  box-sizing: border-box;
+}
+.tut-hp-panel-fill {
+  height: 100%;
+  background: #48C848;
+}
+.tut-hp-panel-fill.b1 { background: #88D848; }
+.tut-hp-panel-fill.b2 { background: #E8C828; }
+.tut-hp-panel-fill.b3 { background: #E89028; }
+.tut-hp-panel-fill.b4 { background: #E84828; }
+.tut-hp-panel-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+}
+.tut-hp-panel.fainted .tut-hp-panel-label {
+  color: var(--hp-red, #C62828);
+}
+.tut-hp-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 2px;
+  font-family: 'Press Start 2P', monospace;
+}
+.tut-hp-arrow-dmg {
+  font-size: 7px;
+  color: var(--pikachu-cheek, #C62828);
   letter-spacing: 0.04em;
 }
-/* Show only the bar inside each cell — HPBar emits a full .hp-box but we
-   hid the .row1 + .row3 inline.  Trim the box chrome too so the bars sit
-   cleanly in the row. */
-.tut-hp-row .hp-box {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
+.tut-hp-arrow-line {
+  font-size: 18px;
+  color: var(--ink-secondary);
+  line-height: 1;
 }
 
 /* ---------- Step 3 — move buttons ---------- */

@@ -58,9 +58,9 @@
 .q-cell.unvisited { opacity: 0.62; }
 
 .q-thumb-sprite { width: 26px; height: 26px; }
-.q-bar-row { grid-template-columns: 8px 28px 1fr 30px; gap: 3px; font-size: 6px; }
-.q-label   { font-size: 6px; }
-.q-val     { font-size: 6px; }
+.q-bar-row { grid-template-columns: 9px 36px 1fr; gap: 4px; font-size: 7px; }
+.q-label   { font-size: 7px; }
+.q-val     { font-size: 7px; }
 .q-thumb   { gap: 4px; padding-bottom: 3px; }
 .q-thumb-hp-bg { height: 4px; }
 .q-thumb-hp-fill         { background: #48C848; }
@@ -113,34 +113,26 @@
   transition: width 200ms;
 }
 
-.q-bars { display: flex; flex-direction: column; gap: 3px; }
+.q-bars { display: flex; flex-direction: column; gap: 2px; }
 .q-bar-row {
   display: grid;
-  grid-template-columns: 9px 32px 1fr 32px;
+  grid-template-columns: 9px 36px 1fr;
   gap: 4px;
   align-items: center;
   font-size: 7px;
+  padding: 1px 3px;
+  border-radius: 1px;
 }
-.q-mark { width: 9px; text-align: center; color: var(--accent, #F8D028); font-weight: bold; }
+.q-mark { width: 9px; text-align: center; color: var(--pikachu-cheek, #C62828); font-weight: bold; }
 .q-label { font-size: 7px; letter-spacing: 0.04em; }
-.q-bar-track {
-  height: 6px;
-  background: rgba(0,0,0,0.16);
-  border: 1px solid var(--ink, #000);
-  box-sizing: border-box;
-  position: relative;
+.q-val { font-size: 8px; text-align: right; font-variant-numeric: tabular-nums; }
+.q-bar-row.argmax {
+  background: rgba(248, 208, 40, 0.32);
+  box-shadow: inset 0 0 0 1px var(--accent, #F8D028);
 }
-.q-bar-fill {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 0%;
-  background: #B0B0B0;
-  transition: width 220ms;
-}
-.q-bar-row.argmax .q-bar-fill { background: var(--accent, #F8D028); }
-.q-val { font-size: 7px; text-align: right; font-variant-numeric: tabular-nums; }
 .q-bar-row.argmax .q-val,
 .q-bar-row.argmax .q-label { font-weight: bold; }
+.q-bar-row.argmax .q-val { color: var(--ink-on-box, #000); }
 
 /* Argmax-flip flash. */
 @keyframes q-argmax-flip {
@@ -236,11 +228,14 @@
 .q-cell.heat-neutral     { background: var(--bg-strong); }
 .q-cell.heat-neg-mid     { background: #F8C8C0; }
 .q-cell.heat-neg-strong  { background: #E84828; color: #FFFFFF; }
-.q-cell.heat-pos-strong .q-bar-track,
-.q-cell.heat-neg-strong .q-bar-track,
 .q-cell.heat-pos-strong .q-thumb-hp-bg,
 .q-cell.heat-neg-strong .q-thumb-hp-bg {
   background: rgba(0,0,0,0.32);
+}
+.q-cell.heat-pos-strong .q-bar-row.argmax,
+.q-cell.heat-neg-strong .q-bar-row.argmax {
+  background: rgba(255,255,255,0.32);
+  box-shadow: inset 0 0 0 1px #FFFFFF;
 }
 
 /* Just-updated cell pulse — yellow box-shadow ring that decays. */
@@ -484,6 +479,17 @@
   margin-top: 4px;
   font-size: 8px !important;
 }
+
+/* Staggered fade-in for each Bellman row after a +1 STEP click. The
+   per-row animation-delay is set inline from JS so the title appears
+   immediately and the calculation unfolds line by line below it. */
+@keyframes sc4-sd-row-reveal {
+  0%   { opacity: 0; transform: translateY(-3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.sc4-sd-row-anim {
+  animation: sc4-sd-row-reveal 260ms ease-out backwards;
+}
 .sc4-step-detail .comp-mdp     { color: var(--hue-anymal); }
 .sc4-step-detail .comp-rm      { color: var(--hue-star);   }
 .sc4-step-detail .comp-bellman { color: var(--hue-ghost);  }
@@ -496,7 +502,6 @@
   background: rgba(255,255,255,0.06);
 }
 :root[data-theme="dark"] .q-thumb-hp-bg,
-:root[data-theme="dark"] .q-bar-track,
 :root[data-theme="dark"] .q-freq-track {
   background: rgba(255,255,255,0.10);
 }

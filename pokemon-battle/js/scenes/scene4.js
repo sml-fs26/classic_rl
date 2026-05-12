@@ -75,7 +75,8 @@
     host.innerHTML = html;
   }
 
-  function renderStepDetail(host, u, alpha, gamma) {
+  function renderStepDetail(host, u, alpha, gamma, opts) {
+    const animate = !!(opts && opts.animate);
     if (!u) {
       host.innerHTML =
         '<div class="sc4-sd-title">LAST UPDATE</div>' +
@@ -112,6 +113,18 @@
         '<div class="sc4-sd-row sc4-sd-bottom"><span>Q(s, a) after = Q + α·δ</span><span class="comp-mdp">' +
           fmtSigned(u.qBefore) + ' + ' + alpha.toFixed(2) + '·' + fmtSigned(u.delta) + ' = <b>' + fmtSigned(u.qAfter) + '</b></span></div>' +
       '</div>';
+
+    if (animate) {
+      /* Fade rows in one at a time so the Bellman computation unfolds rather
+         than landing all at once. Title is already on screen — first row
+         starts at 0 ms, subsequent rows step by ~120 ms. */
+      const rows = host.querySelectorAll('.sc4-sd-row, .sc4-sd-sep');
+      const stepMs = 110;
+      rows.forEach((r, i) => {
+        r.style.animationDelay = (i * stepMs) + 'ms';
+        r.classList.add('sc4-sd-row-anim');
+      });
+    }
   }
 
   window.scenes.scene4 = function (root) {
@@ -352,7 +365,7 @@
     function doSteps(n) {
       for (let i = 0; i < n; i++) doStep();
       qtbl.update(Q);
-      refreshPanels();
+      refreshPanels({ animateStepDetail: n === 1 });
       pulseUpdatedCell(lastUpdate.sIdx);
       narrator.say(narrationFor(n, lastUpdate), { instant: true });
     }
@@ -366,9 +379,10 @@
       setTimeout(() => node.classList.remove('just-updated'), 1400);
     }
 
-    function refreshPanels() {
+    function refreshPanels(opts) {
+      const o = opts || {};
       renderBattleNow(battleNowHost, s, { aIdx, exploring: aExplore }, epState);
-      renderStepDetail(stepDetailHost, lastUpdate, alpha, gamma);
+      renderStepDetail(stepDetailHost, lastUpdate, alpha, gamma, { animate: !!o.animateStepDetail });
       document.getElementById('sc4-step-count').textContent = String(stepCount);
       document.getElementById('sc4-ep-count').textContent   = String(episodeCount);
       document.getElementById('sc4-turn-count').textContent = String(turnsThisEp);

@@ -114,6 +114,10 @@
 
     function renderStep(c) {
       cursor = c;
+      /* Any prior step's animation loop must be stopped before its DOM is
+         torn down — the HP-bucket demo registers a setInterval that would
+         keep firing into an empty demoHost otherwise. */
+      stopHpAnimation();
       counter.textContent = 'STEP ' + (c + 1) + ' / ' + STEPS_DATA.length;
       header.textContent = STEPS_DATA[c].title.toUpperCase();
       demoHost.innerHTML = '';
@@ -125,11 +129,19 @@
         c === STEPS_DATA.length - 1 ? 'GO TO BATTLE →' : 'SKIP TUTORIAL →';
     }
 
-    renderStep(0);
+    /* Optional `#…&tut=N` hash flag jumps straight to internal step N — used
+       for headless screenshots and deep-linking. */
+    function readInitialStep() {
+      const m = (window.location.hash || '').match(/[#&?]tut=(\d+)/);
+      if (!m) return 0;
+      const n = parseInt(m[1], 10);
+      return (Number.isFinite(n) && n >= 0 && n < STEPS_DATA.length) ? n : 0;
+    }
+    renderStep(readInitialStep());
 
     return {
-      onEnter() { renderStep(0); },
-      onLeave() { /* dialog timers are local; no cleanup needed */ },
+      onEnter() { renderStep(readInitialStep()); },
+      onLeave() { stopHpAnimation(); },
       onNextKey() {
         if (cursor < STEPS_DATA.length - 1) {
           renderStep(cursor + 1);
@@ -205,49 +217,125 @@
     stage.appendChild(callouts);
   }
 
-  function renderStepHpBuckets(host) {
-    /* A row of five mini HP bars, each at a different bucket level, labeled. */
-    const wrap = document.createElement('div');
-    wrap.className = 'tut-hp-row';
+  /* Step 3 — HP has five buckets.
+     Two layers: (1) a live demo at the top with Charmander taking damage in a
+     loop (the bar drains, a "−1 HP" damage flash floats up, the sprite
+     faints, the demo resets); (2) below it, a comic-strip reference showing
+     all six stages — FULL → HIGH → MID → LOW → CRITICAL → FAINTED — with
+     "−1 HP" arrows between panels, so the student sees the whole ladder at
+     once. */
+  const HP_STAGES = [
+    { label: 'FULL',     pct: 100, cls: '' },
+    { label: 'HIGH',     pct: 80,  cls: 'b1' },
+    { label: 'MID',      pct: 60,  cls: 'b2' },
+    { label: 'LOW',      pct: 40,  cls: 'b3' },
+    { label: 'CRITICAL', pct: 20,  cls: 'b4' },
+  ];
+  let hpAnimTimer = null;
+  function stopHpAnimation() {
+    if (hpAnimTimer) { clearInterval(hpAnimTimer); hpAnimTimer = null; }
+  }
+  function spawnHpDamage(host, text, color) {
+    const el = document.createElement('div');
+    el.className = 'tut-hp-anim-dmg';
+    el.textContent = text;
+    if (color) el.style.color = color;
+    host.appendChild(el);
+    setTimeout(() => { try { host.removeChild(el); } catch (e) {} }, 1100);
+  }
+  function startHpAnimation() {
+    stopHpAnimation();
+    let i = 1;     // start at HIGH so the first tick visibly drains from FULL
+    function tick() {
+      const fill   = document.getElementById('tut-hp-anim-fill');
+      const label  = document.getElementById('tut-hp-anim-label');
+      const sprite = document.getElementById('tut-hp-anim-img');
+      const stage  = document.getElementById('tut-hp-anim-stage');
+      if (!fill || !label || !sprite || !stage) { stopHpAnimation(); return; }
 
-    const buckets = [
-      { name: 'FULL',     idx: 0, color: 'green'   },
-      { name: 'HIGH',     idx: 1, color: 'green'   },
-      { name: 'MID',      idx: 2, color: 'yellow'  },
-      { name: 'LOW',      idx: 3, color: 'red'     },
-      { name: 'CRITICAL', idx: 4, color: 'red'     },
-    ];
-
-    for (const b of buckets) {
-      const cell = document.createElement('div');
-      cell.className = 'tut-hp-cell';
-      const label = document.createElement('div');
-      label.className = 'tut-hp-label';
-      label.textContent = b.name;
-      cell.appendChild(label);
-
-      const hpHost = document.createElement('div');
-      cell.appendChild(hpHost);
-      const hp = window.HPBar.mount(hpHost, {
-        name: '', side: 'player', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
-      });
-      hp.set(b.idx);
-      /* Hide the name + level row — we only want the bar itself for the lesson. */
-      const row1 = hpHost.querySelector('.row1');
-      if (row1) row1.style.display = 'none';
-      const row3 = hpHost.querySelector('.row3');
-      if (row3) row3.style.display = 'none';
-
-      wrap.appendChild(cell);
+      if (i < HP_STAGES.length) {
+        const b = HP_STAGES[i];
+        fill.style.width = b.pct + '%';
+        fill.className = 'tut-hp-anim-fill ' + b.cls;
+        label.textContent = b.label;
+        sprite.classList.remove('fainted');
+        spawnHpDamage(stage, '−1 HP');
+      } else if (i === HP_STAGES.length) {
+        fill.style.width = '0%';
+        fill.className = 'tut-hp-anim-fill b4';
+        label.textContent = 'FAINTED!';
+        sprite.classList.add('fainted');
+        spawnHpDamage(stage, 'FAINT!', '#962a1a');
+      } else {
+        /* Reset to FULL for the next loop. */
+        fill.style.width = '100%';
+        fill.className = 'tut-hp-anim-fill';
+        label.textContent = 'FULL';
+        sprite.classList.remove('fainted');
+        i = 0;
+      }
+      i++;
     }
+    hpAnimTimer = setInterval(tick, 1300);
+  }
 
-    host.appendChild(wrap);
+  function renderStepHpBuckets(host) {
+    const wrap = document.createElement('div');
+    wrap.className = 'tut-hp-demo';
+
+    /* Live animated demo */
+    const anim = document.createElement('div');
+    anim.className = 'tut-hp-anim';
+    anim.innerHTML =
+      '<div class="tut-hp-anim-title">WATCH CHARMANDER TAKE A HIT</div>' +
+      '<div class="tut-hp-anim-stage" id="tut-hp-anim-stage">' +
+        '<img id="tut-hp-anim-img" src="assets/charmander-front.png" class="poke-sprite tut-hp-anim-sprite" alt="Charmander">' +
+        '<div class="tut-hp-anim-bar">' +
+          '<div class="tut-hp-anim-track">' +
+            '<div class="tut-hp-anim-fill" id="tut-hp-anim-fill" style="width:100%"></div>' +
+          '</div>' +
+          '<div class="tut-hp-anim-label" id="tut-hp-anim-label">FULL</div>' +
+        '</div>' +
+      '</div>';
+    wrap.appendChild(anim);
+
+    /* Comic-strip reference: all six stages at once with damage arrows. */
+    const strip = document.createElement('div');
+    strip.className = 'tut-hp-strip';
+    const allStages = HP_STAGES.concat([{ label: 'FAINTED!', pct: 0, cls: 'b4', fainted: true }]);
+    for (let i = 0; i < allStages.length; i++) {
+      const s = allStages[i];
+      const panel = document.createElement('div');
+      panel.className = 'tut-hp-panel' + (s.fainted ? ' fainted' : '');
+      panel.innerHTML =
+        '<img class="poke-sprite tut-hp-panel-sprite" src="assets/charmander-front.png" alt="">' +
+        '<div class="tut-hp-panel-track">' +
+          '<div class="tut-hp-panel-fill ' + s.cls + '" style="width:' + s.pct + '%"></div>' +
+        '</div>' +
+        '<div class="tut-hp-panel-label">' + s.label + '</div>';
+      strip.appendChild(panel);
+      if (i < allStages.length - 1) {
+        const arrow = document.createElement('div');
+        arrow.className = 'tut-hp-arrow';
+        arrow.innerHTML =
+          '<div class="tut-hp-arrow-dmg">−1 HP</div>' +
+          '<div class="tut-hp-arrow-line">→</div>';
+        strip.appendChild(arrow);
+      }
+    }
+    wrap.appendChild(strip);
 
     const footnote = document.createElement('div');
     footnote.className = 'tut-footnote';
-    footnote.textContent =
-      'Each attack drops the bar by 0 to 3 buckets.  Stronger moves drop more.';
-    host.appendChild(footnote);
+    footnote.innerHTML =
+      'Each attack drops the bar by <b>0 to 3</b> buckets.  Past CRITICAL, the POKEMON faints.  ' +
+      'Stronger moves drop more — THUNDER can land a 3-bucket hit in one go.';
+    wrap.appendChild(footnote);
+
+    host.appendChild(wrap);
+
+    /* Kick off the looping damage animation. */
+    startHpAnimation();
   }
 
   function renderStepMoves(host) {
