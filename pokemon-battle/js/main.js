@@ -15,7 +15,6 @@
     { key: 'sceneHowToPlay', title: 'Tutorial — how to play' },
     { key: 'scene1',         title: 'A wild CHARMANDER appeared!' },
     { key: 'scene2', title: 'Value iteration' },
-    { key: 'scene3', title: 'γ as patience' },
     { key: 'scene4', title: 'SARSA learns it' },
     { key: 'sceneEps', title: 'ε-greedy at one state' },
     { key: 'scene5', title: "You've trained PIKACHU." },

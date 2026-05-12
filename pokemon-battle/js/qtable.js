@@ -265,8 +265,55 @@
       }
     }
 
+    /* Heatmap colour: max-Q over the four moves → one of six classes that
+       paint the cell background (see .q-cell.heat-* in style.css). Called
+       from update() per cell. */
+    function heatClassFor(maxQ, allZero) {
+      if (allZero) return 'heat-zero';
+      if (maxQ >= 5)   return 'heat-pos-strong';
+      if (maxQ >= 1.5) return 'heat-pos-mid';
+      if (maxQ <= -5)  return 'heat-neg-strong';
+      if (maxQ <= -1.5) return 'heat-neg-mid';
+      return 'heat-neutral';
+    }
+    const ALL_HEAT_CLASSES = ['heat-zero', 'heat-pos-strong', 'heat-pos-mid', 'heat-neutral', 'heat-neg-mid', 'heat-neg-strong'];
+
+    /* Wire click handlers on every cell — a single registered callback
+       receives the state index when clicked, plus the cell DOM node. */
+    let cellClickCb = null;
+    for (let s = 0; s < N; s++) {
+      const node = cellNodes[s];
+      node.cell.classList.add('clickable');
+      node.cell.dataset.state = String(s);
+      node.cell.addEventListener('click', () => {
+        if (cellClickCb) cellClickCb(s, node.cell);
+      });
+    }
+    function setOnCellClick(cb) { cellClickCb = cb; }
+    function getCellNode(s) { return cellNodes[s] ? cellNodes[s].cell : null; }
+
+    /* Wrap the original `update` so each call also applies the heatmap. */
+    const baseUpdate = update;
+    function updateWithHeat(Q, opts) {
+      baseUpdate(Q, opts);
+      for (let s = 0; s < N; s++) {
+        const node = cellNodes[s];
+        const base = s * A;
+        let m = -Infinity;
+        let allZero = true;
+        for (let a = 0; a < A; a++) {
+          const v = Q[base + a];
+          if (Math.abs(v) > 1e-9) allZero = false;
+          if (v > m) m = v;
+        }
+        const cls = heatClassFor(m, allZero);
+        for (const c of ALL_HEAT_CLASSES) node.cell.classList.remove(c);
+        node.cell.classList.add(cls);
+      }
+    }
+
     reset();
-    return { update, reset, host };
+    return { update: updateWithHeat, reset, host, setOnCellClick, getCellNode };
   }
 
   function moveFrequencies(Q) {

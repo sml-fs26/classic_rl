@@ -332,3 +332,207 @@
 }
 :root[data-theme="dark"] .q-delta.pos { color: #82E085; }
 :root[data-theme="dark"] .q-delta.neg { color: #FF7B7B; }
+
+/* ---------- Pedagogy redesign: narrator, formula, inspector, heatmap ---------- */
+
+/* Narrator dialog above the grid (poke-box styling applied by Dialog.mount). */
+.sc4-narrator { margin: 0 0 10px; }
+
+/* SARSA formula card. The formula itself + a legend mapping each chunk
+   back to the prior viz that contributed it. */
+.sc4-formula-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+}
+.sc4-formula {
+  font-size: 12px;
+  text-align: center;
+  padding: 6px 0 10px;
+  letter-spacing: 0.5px;
+}
+.sc4-formula .comp-mdp     { color: var(--hue-anymal); }
+.sc4-formula .comp-rm      { color: var(--hue-star);   }
+.sc4-formula .comp-bellman { color: var(--hue-ghost);  }
+.sc4-formula .comp-eps     { color: var(--hue-casino); }
+.sc4-formula-legend {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  font-size: 7.5px;
+  color: var(--ink-on-box);
+  padding-top: 8px;
+  border-top: 2px solid var(--inner-highlight);
+}
+.sc4-formula-legend .legend-chip {
+  padding: 3px 6px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  font-size: 7.5px;
+  white-space: nowrap;
+}
+.sc4-formula-legend .legend-chip.comp-mdp     { color: var(--hue-anymal); }
+.sc4-formula-legend .legend-chip.comp-rm      { color: var(--hue-star);   }
+.sc4-formula-legend .legend-chip.comp-bellman { color: var(--hue-ghost);  }
+.sc4-formula-legend .legend-chip.comp-eps     { color: var(--hue-casino); }
+.sc4-formula-legend > span:nth-child(even) {
+  align-self: center;
+  font-size: 7.5px;
+  line-height: 1.6;
+}
+
+/* Two-column row: Q-table left, inspector right. */
+.sc4-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  margin-bottom: 14px;
+  align-items: start;
+}
+
+/* Q-cell heatmap — six classes painted on the cell background based on
+   max-Q across the four moves. Same scale as scene 2's V heatmap. */
+.q-cell.heat-zero        { background: var(--bg-strong); }
+.q-cell.heat-pos-strong  { background: #5BA85B; color: #FFFFFF; }
+.q-cell.heat-pos-mid     { background: #C8E8C8; }
+.q-cell.heat-neutral     { background: var(--bg-strong); }
+.q-cell.heat-neg-mid     { background: #F8C8C0; }
+.q-cell.heat-neg-strong  { background: #E84828; color: #FFFFFF; }
+
+/* On a strongly coloured cell, the bar-track + thumb-hp-bg need a darker
+   tint so they're still visible against the saturated background. */
+.q-cell.heat-pos-strong .q-bar-track,
+.q-cell.heat-neg-strong .q-bar-track,
+.q-cell.heat-pos-strong .q-thumb-hp-bg,
+.q-cell.heat-neg-strong .q-thumb-hp-bg {
+  background: rgba(0,0,0,0.32);
+}
+
+/* Click affordance + selected state. */
+.q-cell.clickable {
+  cursor: pointer;
+  transition: transform 80ms ease-out, opacity 200ms;
+}
+.q-cell.clickable:hover { transform: scale(1.02); z-index: 1; }
+.q-cell.selected {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: -3px;
+  z-index: 2;
+}
+
+/* ----- Inspector panel ----- */
+.sc4-inspector {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  color: var(--ink-on-box);
+  line-height: 1.5;
+  max-height: 720px;
+  overflow-y: auto;
+}
+.sc4-inspector .sc4-ins-placeholder {
+  color: var(--ink-secondary);
+  text-align: center;
+  padding: 28px 8px;
+  line-height: 1.7;
+  font-size: 8.5px;
+}
+.sc4-inspector .sc4-ins-state {
+  font-size: 10px;
+  color: var(--ink-on-box);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+.sc4-inspector .sc4-ins-meta {
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+.sc4-inspector .sc4-ins-block-title {
+  font-size: 8px;
+  font-weight: bold;
+  color: var(--ink-on-box);
+  margin: 12px 0 6px;
+  padding-top: 8px;
+  border-top: 2px solid var(--rule);
+  letter-spacing: 0.5px;
+}
+.sc4-inspector .sc4-ins-block-title:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+.sc4-inspector .sc4-ins-moves,
+.sc4-inspector .sc4-ins-deltas {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sc4-inspector .sc4-ins-move {
+  display: grid;
+  grid-template-columns: 1fr auto 64px;
+  gap: 6px;
+  align-items: center;
+  padding: 5px 7px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  font-size: 8px;
+}
+.sc4-inspector .sc4-ins-move.argmax {
+  background: rgba(72, 200, 72, 0.18);
+  border-color: var(--hp-green);
+}
+.sc4-inspector .sc4-ins-move-name { font-size: 7.5px; }
+.sc4-inspector .sc4-ins-move-q { font-size: 10px; color: var(--ink-on-box); justify-self: end; }
+.sc4-inspector .sc4-ins-arg { font-size: 7px; color: #2A6A2A; }
+
+.sc4-inspector .sc4-ins-delta-row {
+  display: grid;
+  grid-template-columns: 70px 60px 60px 50px;
+  gap: 4px;
+  align-items: center;
+  padding: 3px 5px;
+  font-size: 7.5px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+}
+.sc4-inspector .sc4-ins-delta-row.pos { background: rgba(72, 200, 72, 0.10); }
+.sc4-inspector .sc4-ins-delta-row.neg { background: rgba(232, 72, 40, 0.10); }
+.sc4-inspector .sc4-ins-prev { color: var(--ink-secondary); }
+.sc4-inspector .sc4-ins-curr { color: var(--ink-on-box); font-weight: bold; }
+.sc4-inspector .sc4-ins-delta-val { font-weight: bold; }
+.sc4-inspector .sc4-ins-delta-row.pos .sc4-ins-delta-val { color: #2A6A2A; }
+.sc4-inspector .sc4-ins-delta-row.neg .sc4-ins-delta-val { color: #962a1a; }
+.sc4-inspector .sc4-ins-delta-row.zero .sc4-ins-delta-val { color: var(--ink-secondary); }
+
+.sc4-inspector .sc4-ins-vi-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 6px;
+  font-size: 8px;
+  border-bottom: 1px dashed var(--inner-highlight);
+}
+.sc4-inspector .sc4-ins-vi-row:last-of-type { border-bottom: none; }
+.sc4-inspector .sc4-ins-num { color: var(--pikachu-cheek); font-size: 10px; }
+.sc4-inspector .sc4-ins-vi-match {
+  margin-top: 8px;
+  padding: 6px 8px;
+  font-size: 8px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+.sc4-inspector .sc4-ins-vi-match.good { background: rgba(72, 200, 72, 0.18); color: #2A6A2A; }
+.sc4-inspector .sc4-ins-vi-match.bad  { background: rgba(232, 72, 40, 0.18); color: #962a1a; }
+.sc4-inspector .sc4-ins-empty {
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  line-height: 1.7;
+}
