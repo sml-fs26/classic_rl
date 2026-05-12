@@ -1,4 +1,5 @@
-/* Scene 4 — SARSA layout. */
+/* Scene 4 — SARSA layout (Q-grid redesign). */
+
 .sc4-params {
   display: flex;
   gap: 14px;
@@ -13,14 +14,291 @@
   color: var(--ink-on-box);
 }
 .sc4-params .poke-menu-row .val { color: var(--ink-on-box); }
+
 .sc4-q {
   margin-top: 10px;
-  max-width: 720px;
+  max-width: 880px;
 }
+
 .sc4-lc-wrap {
-  margin-top: 12px;
-  max-width: 720px;
+  margin-top: 14px;
+  max-width: 880px;
 }
 .sc4-lc-header {
   margin-bottom: 6px;
 }
+
+/* ----- 3×3 state grid ----- */
+
+.qtable-host {
+  display: block;
+}
+
+.q-col-heads {
+  display: grid;
+  grid-template-columns: 70px repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary, #6b6b6b);
+}
+.q-corner-head {
+  font-size: 7px;
+  color: var(--ink-secondary, #6b6b6b);
+  align-self: end;
+  padding-bottom: 2px;
+}
+.q-col-head {
+  text-align: center;
+  align-self: end;
+  padding-bottom: 2px;
+}
+
+.q-grid {
+  display: grid;
+  grid-template-columns: 70px repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  gap: 10px;
+}
+
+.q-row-head {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary, #6b6b6b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  writing-mode: horizontal-tb;
+}
+
+.q-cell {
+  position: relative;
+  background: var(--bg-strong, #F8F8F8);
+  border: 3px solid var(--ink, #000);
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18);
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box, #000);
+  overflow: hidden;
+  transition: opacity 200ms;
+}
+
+.q-cell.unvisited {
+  opacity: 0.62;
+}
+
+/* Battle thumbnail at the top of each cell. */
+.q-thumb {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  align-items: end;
+  padding-bottom: 5px;
+  border-bottom: 2px solid rgba(0,0,0,0.16);
+}
+.q-thumb-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.q-thumb-sprite {
+  width: 34px;
+  height: 34px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.q-thumb-hp-bg {
+  width: 100%;
+  height: 5px;
+  background: rgba(0,0,0,0.16);
+  border: 1px solid var(--ink, #000);
+  box-sizing: border-box;
+}
+.q-thumb-hp-fill {
+  height: 100%;
+  background: #48C848;       /* green = full */
+  transition: width 200ms;
+}
+.q-thumb-hp-fill.mid { background: #E8C828; }   /* yellow = mid */
+.q-thumb-hp-fill.low { background: #E84828; }   /* red = low */
+
+/* Q-bars block. */
+.q-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.q-bar-row {
+  display: grid;
+  grid-template-columns: 9px 32px 1fr 32px;
+  gap: 4px;
+  align-items: center;
+  font-size: 7px;
+}
+.q-mark {
+  width: 9px;
+  text-align: center;
+  color: var(--accent, #F8D028);
+  font-weight: bold;
+}
+.q-label {
+  font-size: 7px;
+  letter-spacing: 0.04em;
+}
+.q-bar-track {
+  height: 6px;
+  background: rgba(0,0,0,0.16);
+  border: 1px solid var(--ink, #000);
+  box-sizing: border-box;
+  position: relative;
+}
+.q-bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0%;
+  background: #B0B0B0;
+  transition: width 220ms;
+}
+.q-bar-row.argmax .q-bar-fill {
+  background: var(--accent, #F8D028);
+}
+.q-val {
+  font-size: 7px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.q-bar-row.argmax .q-val,
+.q-bar-row.argmax .q-label {
+  font-weight: bold;
+}
+
+/* Cell flash when argmax move flips. */
+@keyframes q-argmax-flip {
+  0%   { box-shadow: 0 0 0 3px var(--accent, #F8D028), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+  100% { box-shadow: 0 0 0 0 transparent, inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+}
+.q-cell.argmax-flip {
+  animation: q-argmax-flip 1.0s ease-out;
+}
+
+/* Floating delta indicators (scrubbing forward in time). */
+@keyframes q-delta-rise {
+  0%   { opacity: 0; transform: translateY(2px); }
+  18%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-22px); }
+}
+.q-delta {
+  position: absolute;
+  right: 5px;
+  top: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  pointer-events: none;
+  animation: q-delta-rise 1.2s ease-out forwards;
+  text-shadow: 1px 1px 0 #FFF, -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF;
+  z-index: 5;
+  letter-spacing: 0.02em;
+}
+.q-delta.pos { color: #2E7D32; }
+.q-delta.neg { color: #C62828; }
+.q-delta.awake { color: #B7791F; }
+
+/* ----- Move-frequency strip ----- */
+.q-freq-strip {
+  margin-top: 14px;
+  background: var(--bg-strong, #F8F8F8);
+  border: 3px solid var(--ink, #000);
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18);
+  padding: 8px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box, #000);
+}
+.q-freq-title {
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.q-freq-row {
+  display: grid;
+  grid-template-columns: 48px 1fr 24px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 7px;
+}
+.q-freq-label {
+  letter-spacing: 0.04em;
+}
+.q-freq-track {
+  height: 10px;
+  background: rgba(0,0,0,0.16);
+  border: 1px solid var(--ink, #000);
+  position: relative;
+  box-sizing: border-box;
+}
+.q-freq-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0%;
+  background: var(--accent, #F8D028);
+  transition: width 240ms;
+}
+.q-freq-val {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----- Legend below the strip ----- */
+.q-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary, #6b6b6b);
+}
+.q-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.q-legend-bar {
+  display: inline-block;
+  width: 24px;
+  height: 7px;
+  border: 1px solid var(--ink, #000);
+  background: #B0B0B0;
+  box-sizing: border-box;
+}
+.q-legend-bar.argmax {
+  background: var(--accent, #F8D028);
+}
+
+/* ----- Dark theme overrides ----- */
+:root[data-theme="dark"] .q-cell,
+:root[data-theme="dark"] .q-freq-strip {
+  background: rgba(255,255,255,0.06);
+}
+:root[data-theme="dark"] .q-thumb-hp-bg,
+:root[data-theme="dark"] .q-bar-track,
+:root[data-theme="dark"] .q-freq-track {
+  background: rgba(255,255,255,0.10);
+}
+:root[data-theme="dark"] .q-delta {
+  text-shadow: 1px 1px 0 #1a1a1a, -1px -1px 0 #1a1a1a, 1px -1px 0 #1a1a1a, -1px 1px 0 #1a1a1a;
+}
+:root[data-theme="dark"] .q-delta.pos { color: #82E085; }
+:root[data-theme="dark"] .q-delta.neg { color: #FF7B7B; }

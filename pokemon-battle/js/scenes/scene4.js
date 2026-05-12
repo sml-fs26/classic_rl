@@ -77,18 +77,12 @@
     const lc = window.LearningCurve.mount(lcHost, { window: 100 });
     lc.setData(rewardSeries);
 
-    /* SARSA formula card. */
-    const fcard = document.createElement('div');
-    fcard.className = 'poke-formula';
-    window.Katex.render(window.DATA.tex.sarsa, fcard, true);
-    root.appendChild(fcard);
-
     const caption = document.createElement('div');
     caption.className = 'poke-caption';
     caption.innerHTML =
-      'Same algorithm as the cliff-walk and Snakes &amp; Ladders. ' +
-      'No Bellman shortcut — Pikachu just samples battles and pulls Q toward (r + γ·Q(s′, a′)). ' +
-      'The yellow flash marks cells whose value moved between this snapshot and the previous one.';
+      'Each cell is a state (your HP × opp HP). The four bars per cell are Q-values per move — bar length is relative within the cell, ▶ marks the argmax (the move PIKACHU would pick if greedy). ' +
+      'As you scrub training forward, floating ±deltas rise from cells whose argmax-Q moved; the cell border flashes if the argmax move itself flipped. ' +
+      'Some cells stay "—" forever — those are states the agent never reached starting from full/full.';
     root.appendChild(caption);
 
     /* ---------- State ---------- */
