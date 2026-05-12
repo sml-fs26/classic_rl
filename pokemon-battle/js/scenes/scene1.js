@@ -108,6 +108,20 @@
     let totalReward = 0;
     let busy = false;
     let rng = window.Battle.makeRng(20260512);
+    /* `episode` is the cancellation token for the async turn cascade. Reset
+       bumps it, and every `await` re-checks; an in-flight turn aborts
+       cleanly if the user hits RESTART mid-attack. */
+    let episode = 0;
+
+    /* Async helpers — let the cascade wait for *actual* completion instead
+       of guessing with fixed timeouts. */
+    function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+    function dialogSay(line) {
+      return new Promise(resolve => {
+        dialog.say(line);
+        dialog.onDone(resolve);
+      });
+    }
 
     function bucketState() {
       if (state.terminal) return state.win ? 'WIN' : 'LOSS';
@@ -133,7 +147,18 @@
       setTimeout(() => { try { stage.removeChild(el); } catch (e) {} }, 720);
     }
 
-    function applyTurn(moveId) {
+    /* Classic Gen-1 turn cadence:
+         move-announce typewriter ▶ pause ▶ shake + damage flash ▶ HP drain
+         ▶ pause ▶ (if KO) faint message ▶ END
+                  ▶ (else)  opp move-announce ▶ pause ▶ shake + damage ▶ drain
+                            ▶ pause ▶ (if KO) faint ▶ END
+                                     ▶ (else) "What will PIKACHU do?" ▶ END
+       A full turn lands around 7 s, matching the rhythm of an actual
+       Game Boy battle. Each step `await`s the previous one so the typewriter
+       never gets clipped mid-character and the HP drain finishes before the
+       opponent attacks. */
+    async function applyTurn(moveId) {
+      const myEp = episode;
       const out = window.Battle.sample(state, moveId, rng);
       const log = out.log;
       const move = window.Moves.MOVE_BY_ID[moveId];
@@ -143,47 +168,66 @@
       const oppHostEl = stage.querySelector('.sprite-host.opponent');
       const playerHostEl = stage.querySelector('.sprite-host.player');
 
-      dialog.say('PIKACHU used ' + move.name + '!');
+      /* ---- Pikachu's turn ---- */
+      await dialogSay('PIKACHU used ' + move.name + '!');
+      if (episode !== myEp) return;
+      await wait(500);
+      if (episode !== myEp) return;
 
-      setTimeout(() => {
-        if (!log.hit1) {
-          dialog.say("PIKACHU's attack missed!");
-        } else {
-          oppSprite.shake();
-          showDamage(oppHostEl, log.oppDelta);
-          oppHp.drainTo(log.oppAfter);
-        }
-      }, 420);
+      if (!log.hit1) {
+        await dialogSay("PIKACHU's attack missed!");
+        if (episode !== myEp) return;
+        await wait(800);
+      } else {
+        oppSprite.shake();
+        showDamage(oppHostEl, log.oppDelta);
+        await wait(400);
+        if (episode !== myEp) return;
+        oppHp.drainTo(log.oppAfter);
+        await wait(1300);     /* HP-drain transition is 1100 ms + breathing room */
+      }
+      if (episode !== myEp) return;
 
-      setTimeout(() => {
-        if (log.oppAfter >= window.Battle.FAINTED) {
-          dialog.say('Wild CHARMANDER fainted!  PIKACHU wins.');
-          oppSprite.faint();
-          state = out.sNext;
-          finalizeTurn(out);
-          return;
-        }
-        dialog.say('Wild CHARMANDER used EMBER!');
-      }, 900);
-
-      setTimeout(() => {
-        if (log.oppAfter >= window.Battle.FAINTED) return;
-        playerSprite.shake();
-        showDamage(playerHostEl, log.yourDelta, '#FFD0A0');
-        playerHp.drainTo(log.yourAfter);
-      }, 1300);
-
-      setTimeout(() => {
-        if (log.oppAfter >= window.Battle.FAINTED) return;
-        if (log.yourAfter >= window.Battle.FAINTED) {
-          dialog.say('PIKACHU fainted!  You lost.');
-          playerSprite.faint();
-        } else {
-          dialog.say('What will PIKACHU do?');
-        }
+      /* ---- Charmander KO? ---- */
+      if (log.oppAfter >= window.Battle.FAINTED) {
+        oppSprite.faint();
+        await dialogSay('Wild CHARMANDER fainted!');
+        if (episode !== myEp) return;
+        await wait(700);
+        if (episode !== myEp) return;
+        await dialogSay('PIKACHU wins!');
         state = out.sNext;
         finalizeTurn(out);
-      }, 1700);
+        return;
+      }
+
+      /* ---- Opponent's turn ---- */
+      await dialogSay('Wild CHARMANDER used EMBER!');
+      if (episode !== myEp) return;
+      await wait(500);
+      if (episode !== myEp) return;
+      playerSprite.shake();
+      showDamage(playerHostEl, log.yourDelta, '#FFD0A0');
+      await wait(400);
+      if (episode !== myEp) return;
+      playerHp.drainTo(log.yourAfter);
+      await wait(1300);
+      if (episode !== myEp) return;
+
+      /* ---- Pikachu KO? ---- */
+      if (log.yourAfter >= window.Battle.FAINTED) {
+        playerSprite.faint();
+        await dialogSay('PIKACHU fainted!');
+        if (episode !== myEp) return;
+        await wait(700);
+        if (episode !== myEp) return;
+        await dialogSay('You lost!');
+      } else {
+        await dialogSay('What will PIKACHU do?');
+      }
+      if (episode !== myEp) return;
+      state = out.sNext;
+      finalizeTurn(out);
     }
 
     function finalizeTurn(out) {
@@ -200,8 +244,9 @@
       applyTurn(moveId);
     }
 
-    function resetBattle() {
-      busy = false;
+    async function resetBattle() {
+      episode++;                 /* cancels any in-flight applyTurn */
+      const myEp = episode;
       state = window.Battle.initialState();
       turn = 0;
       totalReward = 0;
@@ -214,10 +259,20 @@
       document.getElementById('sc1-last').textContent = '—';
       document.getElementById('sc1-rew').textContent = '0';
       document.getElementById('sc1-state').textContent = bucketState();
+      /* Disable move buttons during the intro cascade. The user can't act
+         until the third dialog ("What will PIKACHU do?") lands. */
+      setBusy(true);
+      await dialogSay('A wild CHARMANDER appeared!');
+      if (episode !== myEp) return;
+      await wait(800);
+      if (episode !== myEp) return;
+      await dialogSay('Go, PIKACHU!');
+      if (episode !== myEp) return;
+      await wait(800);
+      if (episode !== myEp) return;
+      await dialogSay('What will PIKACHU do?');
+      if (episode !== myEp) return;
       setBusy(false);
-      dialog.say('A wild CHARMANDER appeared!');
-      setTimeout(() => dialog.say('Go, PIKACHU!'), 1400);
-      setTimeout(() => dialog.say('What will PIKACHU do?'), 2600);
     }
 
     resetBattle();

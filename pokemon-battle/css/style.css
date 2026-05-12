@@ -404,7 +404,7 @@ html, body {
   top: 0; left: 0; bottom: 0;
   background: #48C848;     /* default = full */
   width: 100%;
-  transition: width 450ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
+  transition: width 1100ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
 }
 /* Discrete bucket fill — 5 buckets + fainted. Width snaps to 100/80/60/
    40/20/0%, color phases green → light-green → yellow → orange → red. */
