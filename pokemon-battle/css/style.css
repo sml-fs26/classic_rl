@@ -729,8 +729,60 @@ html, body {
   margin-bottom: 14px;
   align-items: start;
 }
-.sc2-grid-block { min-width: 0; }   /* let the grid shrink inside flex/grid */
-.sc2-ctrl       { margin-bottom: 10px; }
+.sc2-grid-block {
+  min-width: 0;                   /* let the grid shrink inside flex/grid */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sc2-ctrl { margin-bottom: 10px; }
+
+/* ---------- Axis sprite decorations (scenes 2, 3) ----------
+   Pikachu sits to the LEFT of the grid (rows vary your HP).
+   Charmander sits ABOVE the grid (columns vary opp HP).
+   Both are framed as Pokemon dialog boxes so they match the rest of the UI. */
+.vi-axis-top {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+.vi-axis-leftpad { width: 96px; flex-shrink: 0; }   /* matches the .side panel below */
+.vi-axis-row     { display: flex; align-items: stretch; gap: 6px; }
+.vi-axis-pokemon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  color: var(--ink-on-box);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  flex: 1;
+}
+.vi-axis-pokemon.side {
+  flex: 0 0 96px;
+  flex-direction: column;
+  padding: 8px 4px;
+  text-align: center;
+  gap: 6px;
+}
+.vi-axis-sprite {
+  width: 52px;
+  height: 52px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.vi-axis-pokemon.side .vi-axis-sprite { width: 56px; height: 56px; }
+.vi-axis-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  letter-spacing: 0.5px;
+  line-height: 1.55;
+}
 
 /* Extended grid: 64px row-label column + 5 state cells + 56px WIN strip;
    28px col-label row + 5 state rows + 32px LOSS strip. */

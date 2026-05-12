@@ -41,19 +41,42 @@
       '<output id="sc3-gamma-val">' + DEFAULT_GAMMA.toFixed(2) + '</output>';
     root.appendChild(sliderRow);
 
-    /* The NB × NB grid. */
+    /* The NB × NB grid with Pokemon axis sprites (same pattern as scene 2). */
     const gridWrap = document.createElement('div');
-    gridWrap.className = 'sc3-grid-wrap';
+    gridWrap.className = 'sc3-grid-wrap sc2-grid-block';
     root.appendChild(gridWrap);
+
+    /* Top axis: Charmander → columns vary opp HP. */
+    const axisTop = document.createElement('div');
+    axisTop.className = 'vi-axis-top';
+    axisTop.innerHTML =
+      '<div class="vi-axis-leftpad"></div>' +
+      '<div class="vi-axis-pokemon">' +
+        '<img src="assets/charmander-front.png" class="vi-axis-sprite" alt="">' +
+        '<div class="vi-axis-text">Wild CHARMANDER\'s HP &nbsp;→</div>' +
+      '</div>';
+    gridWrap.appendChild(axisTop);
+
+    /* Side: Pikachu → rows vary your HP. */
+    const axisRow = document.createElement('div');
+    axisRow.className = 'vi-axis-row';
+    gridWrap.appendChild(axisRow);
+
+    const axisSide = document.createElement('div');
+    axisSide.className = 'vi-axis-pokemon side';
+    axisSide.innerHTML =
+      '<img src="assets/pikachu-back.png" class="vi-axis-sprite" alt="">' +
+      '<div class="vi-axis-text">Your<br>PIKACHU\'s<br>HP &nbsp;↓</div>';
+    axisRow.appendChild(axisSide);
 
     const grid = document.createElement('div');
     grid.className = 'state-grid';
     grid.style.setProperty('--nb', String(NB));
-    gridWrap.appendChild(grid);
+    axisRow.appendChild(grid);
 
     const corner = document.createElement('div');
     corner.className = 'axis-corner';
-    corner.innerHTML = 'YOUR HP<br>vs OPP HP';
+    corner.innerHTML = '';
     grid.appendChild(corner);
     for (const b of BUCKETS) {
       const lbl = document.createElement('div');

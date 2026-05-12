@@ -120,20 +120,45 @@
     row.className = 'sc2-row';
     root.appendChild(row);
 
-    /* Left: grid block (CSS grid with terminal strips on right + bottom) */
+    /* Left: grid block (axis sprite decorations + CSS grid with terminal strips) */
     const gridBlock = document.createElement('div');
     gridBlock.className = 'sc2-grid-block';
     row.appendChild(gridBlock);
 
+    /* Top axis: Charmander sprite + "CHARMANDER HP →" header. Columns vary
+       opp HP, so Charmander sits over the grid. */
+    const axisTop = document.createElement('div');
+    axisTop.className = 'vi-axis-top';
+    axisTop.innerHTML =
+      '<div class="vi-axis-leftpad"></div>' +
+      '<div class="vi-axis-pokemon">' +
+        '<img src="assets/charmander-front.png" class="vi-axis-sprite" alt="">' +
+        '<div class="vi-axis-text">Wild CHARMANDER\'s HP &nbsp;→</div>' +
+      '</div>';
+    gridBlock.appendChild(axisTop);
+
+    /* Side: Pikachu sprite + "↓ PIKACHU HP" + the grid. Rows vary your HP,
+       so Pikachu sits to the left of the grid. */
+    const axisRow = document.createElement('div');
+    axisRow.className = 'vi-axis-row';
+    gridBlock.appendChild(axisRow);
+
+    const axisSide = document.createElement('div');
+    axisSide.className = 'vi-axis-pokemon side';
+    axisSide.innerHTML =
+      '<img src="assets/pikachu-back.png" class="vi-axis-sprite" alt="">' +
+      '<div class="vi-axis-text">Your<br>PIKACHU\'s<br>HP &nbsp;↓</div>';
+    axisRow.appendChild(axisSide);
+
     const grid = document.createElement('div');
     grid.className = 'state-grid sc2-state-grid';
     grid.style.setProperty('--nb', String(NB));
-    gridBlock.appendChild(grid);
+    axisRow.appendChild(grid);
 
     /* Row 1 of the grid: corner + 5 column labels + WIN header */
     const corner = document.createElement('div');
     corner.className = 'axis-corner';
-    corner.innerHTML = 'YOUR HP<br>vs OPP HP';
+    corner.innerHTML = '';                  /* sprite labels now live outside the grid */
     grid.appendChild(corner);
     for (const b of BUCKETS) {
       const lbl = document.createElement('div');
