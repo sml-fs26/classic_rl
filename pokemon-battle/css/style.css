@@ -393,7 +393,7 @@ html, body {
 }
 .hp-bar-track {
   flex: 1 1 auto;
-  height: 8px;
+  height: 9px;
   background: #585858;
   border: 2px solid var(--rule);
   position: relative;
@@ -402,12 +402,28 @@ html, body {
 .hp-bar-fill {
   position: absolute;
   top: 0; left: 0; bottom: 0;
-  background: var(--hp-green);
+  background: #48C848;     /* default = full */
   width: 100%;
-  transition: width 1100ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
+  transition: width 450ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
 }
-.hp-bar-fill.mid { background: var(--hp-yellow); }
-.hp-bar-fill.low { background: var(--hp-red); }
+/* Discrete bucket fill — 5 buckets + fainted. Width snaps to 100/80/60/
+   40/20/0%, color phases green → light-green → yellow → orange → red. */
+.hp-bar-fill[data-bucket="0"] { width: 100%; background: #48C848; }
+.hp-bar-fill[data-bucket="1"] { width: 80%;  background: #88D848; }
+.hp-bar-fill[data-bucket="2"] { width: 60%;  background: #E8C828; }
+.hp-bar-fill[data-bucket="3"] { width: 40%;  background: #E89028; }
+.hp-bar-fill[data-bucket="4"] { width: 20%;  background: #E84828; }
+.hp-bar-fill[data-bucket="5"] { width: 0%;   background: #E84828; }
+/* Tick marks at the bucket boundaries — makes the discretisation
+   readable even in a still screenshot. */
+.hp-bar-tick {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(0,0,0,0.45);
+  pointer-events: none;
+  z-index: 2;
+}
 
 .hp-box .row3 {
   margin-top: 4px;
@@ -608,16 +624,19 @@ html, body {
 .hue-chip.hue-snakes { background: var(--hue-snakes); color: #181818; }
 .hue-chip.hue-poke   { background: var(--pikachu-yellow); color: #181818; }
 
-/* ---------- 3x3 state grid for VI / γ scenes ---------- */
+/* ---------- N×N state grid for VI / γ scenes (NB = 5 for buckets) ----------
+   Rows use `auto` (not `1fr`) — the grid has no explicit container height, so
+   `1fr` would collapse to zero and let .state-cell's min-height fight the
+   track sizing. `auto` lets each row sit at its content height. */
 .state-grid {
   display: grid;
-  grid-template-columns: 56px repeat(3, 1fr);
-  grid-template-rows: 28px repeat(3, 1fr);
+  grid-template-columns: 64px repeat(var(--nb, 5), minmax(0, 1fr));
+  grid-template-rows: 28px repeat(var(--nb, 5), auto);
   gap: 4px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
+  font-size: 8px;
   color: var(--ink-on-box);
-  max-width: 460px;
+  max-width: 760px;
 }
 .state-grid .axis-label {
   display: flex;

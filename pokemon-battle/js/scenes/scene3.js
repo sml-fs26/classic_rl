@@ -1,31 +1,26 @@
 /* Scene 3 — γ as patience.
  *
- * Same 3×3 state grid as scene 2, but with a γ slider that snaps to the
- * 7 precomputed γ values.  Dragging it re-renders the converged V and the
- * optimal move per state.  An annotation strip below shows the policy mix
- * (move counts across the 9 states) at the current γ.
+ *   Same NB × NB state grid as scene 2, but with a γ slider that snaps to the
+ *   precomputed γ grid (typically 7 values from 0.30 → 0.99). Dragging it
+ *   re-renders the converged V and the optimal move per state. An annotation
+ *   strip below shows the policy mix at the current γ.
  *
- * The slider value-display reads "▶ γ: 0.90" — Pokemon menu style.
+ *   With the 5-bucket model the policy shift between low and high γ is much
+ *   more visible than in the old 3-bucket version — across ~6 cells move
+ *   between Thunder and Thunderbolt as γ moves from 0.30 to 0.99.
  */
 (function () {
   window.scenes = window.scenes || {};
 
-  const BUCKETS = ['full', 'mid', 'low'];
+  const BUCKETS = window.DATA.buckets;
+  const NB = BUCKETS.length;
+  const N = NB * NB;
   const GAMMA_GRID = window.DATA.params.gammaGrid.slice().sort((a, b) => a - b);
   const DEFAULT_GAMMA = window.DATA.params.gammaDefault;
 
   function moveShort(id) {
     return window.QTable && window.QTable.shortMoveLabel
       ? window.QTable.shortMoveLabel(id) : id;
-  }
-
-  function snapToGrid(value) {
-    let best = GAMMA_GRID[0], bestD = Infinity;
-    for (const g of GAMMA_GRID) {
-      const d = Math.abs(g - value);
-      if (d < bestD) { bestD = d; best = g; }
-    }
-    return best;
   }
 
   window.scenes.scene3 = function (root) {
@@ -46,14 +41,16 @@
       '<output id="sc3-gamma-val">' + DEFAULT_GAMMA.toFixed(2) + '</output>';
     root.appendChild(sliderRow);
 
-    /* The 3×3 grid. */
+    /* The NB × NB grid. */
     const gridWrap = document.createElement('div');
     gridWrap.className = 'sc3-grid-wrap';
     root.appendChild(gridWrap);
 
     const grid = document.createElement('div');
     grid.className = 'state-grid';
+    grid.style.setProperty('--nb', String(NB));
     gridWrap.appendChild(grid);
+
     const corner = document.createElement('div');
     corner.className = 'axis-corner';
     corner.innerHTML = 'YOUR HP<br>vs OPP HP';
@@ -65,12 +62,12 @@
       grid.appendChild(lbl);
     }
     const cellMap = {};
-    for (const y of BUCKETS) {
+    for (let y = 0; y < NB; y++) {
       const rl = document.createElement('div');
       rl.className = 'row-label';
-      rl.textContent = y.toUpperCase();
+      rl.textContent = BUCKETS[y].toUpperCase();
       grid.appendChild(rl);
-      for (const o of BUCKETS) {
+      for (let o = 0; o < NB; o++) {
         const c = document.createElement('div');
         c.className = 'state-cell';
         c.innerHTML = '<span class="v-val">0.00</span><span class="v-move">—</span>';
@@ -79,7 +76,6 @@
       }
     }
 
-    /* Policy-mix annotation strip. */
     const mix = document.createElement('div');
     mix.className = 'hud-strip sc3-mix';
     root.appendChild(mix);
@@ -87,18 +83,18 @@
     const caption = document.createElement('div');
     caption.className = 'poke-caption';
     caption.innerHTML =
-      "<span class=\"comp-bellman\">γ low (impatient)</span> values the kill right now — Thunder, even with its miss risk.  " +
-      "<span class=\"comp-bellman\">γ high (patient)</span> values reliable progress — Thunderbolt, slow but certain.  " +
-      "Watch the (MID, MID) cell: it crosses over between γ=0.50 and γ=0.70.";
+      "<span class=\"comp-bellman\">γ low (impatient)</span> values the kill right now — Thunder, even with its miss risk. " +
+      "<span class=\"comp-bellman\">γ high (patient)</span> values reliable progress — Thunderbolt, slow but certain. " +
+      "Watch the middle band of cells: across the γ sweep, several of them flip from Thunder to Thunderbolt.";
     root.appendChild(caption);
 
     function render(gamma) {
       const key = gamma.toFixed(2);
       const V = window.DATA.valueIteration.V[key];
       const policy = window.DATA.valueIteration.policy[key];
-      for (let i = 0; i < 9; i++) {
-        const yi = Math.floor(i / 3), oi = i % 3;
-        const cell = cellMap[BUCKETS[yi] + '|' + BUCKETS[oi]];
+      for (let i = 0; i < N; i++) {
+        const yi = Math.floor(i / NB), oi = i % NB;
+        const cell = cellMap[yi + '|' + oi];
         const valEl = cell.querySelector('.v-val');
         const moveEl = cell.querySelector('.v-move');
         const prev = valEl.textContent;
@@ -110,10 +106,9 @@
           cell.classList.add('flash');
         }
       }
-      /* Mix strip */
       const counts = {};
       for (const m of window.Moves.MOVE_IDS) counts[m] = 0;
-      for (let i = 0; i < 9; i++) counts[policy[i]] = (counts[policy[i]] || 0) + 1;
+      for (let i = 0; i < N; i++) counts[policy[i]] = (counts[policy[i]] || 0) + 1;
       mix.innerHTML = '<div class="hud-item"><div class="hud-label">POLICY MIX</div></div>' +
         window.Moves.MOVE_IDS.map(m => {
           const c = counts[m] || 0;
@@ -130,12 +125,10 @@
       render(g);
     });
 
-    /* Default. */
     render(DEFAULT_GAMMA);
 
     return {
       onEnter() {
-        /* Re-render in case data has been mutated by another scene. */
         const g = GAMMA_GRID[parseInt(slider.value, 10)];
         render(g);
       },

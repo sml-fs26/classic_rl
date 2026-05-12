@@ -36,11 +36,11 @@
 
 .q-col-heads {
   display: grid;
-  grid-template-columns: 70px repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: 70px repeat(var(--nb, 5), minmax(0, 1fr));
+  gap: 6px;
   margin-bottom: 4px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
+  font-size: 7px;
   letter-spacing: 0.04em;
   color: var(--ink-secondary, #6b6b6b);
 }
@@ -58,10 +58,40 @@
 
 .q-grid {
   display: grid;
-  grid-template-columns: 70px repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(3, auto);
-  gap: 10px;
+  grid-template-columns: 70px repeat(var(--nb, 5), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--nb, 5), auto);
+  gap: 6px;
 }
+
+/* Q-cell shrinks at 5×5 to fit on a 1280px viewport — tighter padding +
+   smaller fonts than the 3×3 default. */
+.q-cell {
+  padding: 4px 6px 6px;
+}
+.q-thumb-sprite {
+  width: 26px;
+  height: 26px;
+}
+.q-bar-row {
+  grid-template-columns: 8px 28px 1fr 30px;
+  gap: 3px;
+  font-size: 6px;
+}
+.q-label { font-size: 6px; }
+.q-val   { font-size: 6px; }
+.q-thumb {
+  gap: 4px;
+  padding-bottom: 3px;
+}
+.q-thumb-hp-bg {
+  height: 4px;
+}
+/* Add bucket-color HP fills for the thumbnails (5 levels). */
+.q-thumb-hp-fill         { background: #48C848; }
+.q-thumb-hp-fill.b1      { background: #88D848; }
+.q-thumb-hp-fill.b2      { background: #E8C828; }
+.q-thumb-hp-fill.b3      { background: #E89028; }
+.q-thumb-hp-fill.b4      { background: #E84828; }
 
 .q-row-head {
   font-family: 'Press Start 2P', monospace;

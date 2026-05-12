@@ -1,21 +1,30 @@
-/* Animated HP bar with the green→yellow→red color phases.
+/* Discrete 5-segment HP bar.
  *
- * Mounts into a Pokemon-styled HP box (.hp-box). Exposes:
- *   set(hp)         — instantly set HP (used at reset).
- *   drainTo(hp)     — smooth 600 ms transition to the new HP.
- *   refreshClass()  — re-apply mid/low color class for the current %.
+ *   The simulator is fully bucketed now (see js/battle.js header) — HP is one
+ *   of 5 levels {full, high, mid, low, critical}. The bar drains in 5 visible
+ *   segments instead of smoothly, with 4 tick marks at the bucket boundaries.
+ *   Each level has its own color tier (light-green → green → yellow → orange
+ *   → red), so even a still screenshot tells you which bucket the Pokemon is
+ *   in.
  *
- * The CSS does the actual color cross-fade via the .mid / .low class swap
- * + a 200 ms background transition. The width-bar transition is 600 ms. */
+ *   This is the visible piece of the "make state abstraction explicit" fix:
+ *   scene 1's bar and scene 4's mini-thumbnails both render this way, so the
+ *   transition from scene 1 to scene 4 no longer hides a coarse-grained
+ *   Q-table behind a smooth-looking battle. */
 (function () {
-  /* Mount an HP box at `host` for the given Pokemon. `opts.name` is the
-     display name; `opts.maxHp` is the bar's full value; `opts.side` is
-     'player' or 'opponent' (the box's screen position). */
+
   function mount(host, opts) {
-    const o = Object.assign({ name: 'PIKACHU', maxHp: 100, side: 'player', level: 5 }, opts || {});
+    const o = Object.assign({
+      name: 'PIKACHU',
+      side: 'player',
+      level: 5,
+      numBuckets: 5,
+    }, opts || {});
+
     host.className = 'hp-box ' + o.side;
     host.innerHTML = '';
 
+    /* Name + level row. */
     const row1 = document.createElement('div');
     row1.className = 'row1';
     row1.innerHTML =
@@ -23,53 +32,53 @@
       '<span class="lvl">:L' + o.level + '</span>';
     host.appendChild(row1);
 
+    /* HP bar — segmented track with tick marks. */
     const barRow = document.createElement('div');
     barRow.className = 'hp-bar-row';
     barRow.innerHTML = '<span class="hp-label">HP</span>';
     const track = document.createElement('div');
     track.className = 'hp-bar-track';
+
+    /* The fill — width snaps to bucket levels via .hp-bar-fill[data-bucket]. */
     const fill = document.createElement('div');
     fill.className = 'hp-bar-fill';
+    fill.dataset.bucket = '0';   /* 0 = full */
     track.appendChild(fill);
+
+    /* Tick marks at the boundaries between buckets (4 ticks for 5 buckets). */
+    for (let i = 1; i < o.numBuckets; i++) {
+      const tick = document.createElement('span');
+      tick.className = 'hp-bar-tick';
+      tick.style.left = (i * 100 / o.numBuckets).toFixed(2) + '%';
+      track.appendChild(tick);
+    }
+
     barRow.appendChild(track);
     host.appendChild(barRow);
 
-    const row3 = document.createElement('div');
-    row3.className = 'row3';
-    row3.innerHTML = '<span class="hp-num">' + o.maxHp + '/' + o.maxHp + '</span>';
-    /* Only the player box shows the HP number, per Gen-1 convention. */
-    if (o.side === 'player') host.appendChild(row3);
-
-    let cur = o.maxHp;
-    const maxHp = o.maxHp;
-
-    function pct() { return 100 * cur / maxHp; }
-
-    function refreshClass() {
-      const p = pct();
-      fill.classList.toggle('mid', p < 50 && p >= 20);
-      fill.classList.toggle('low', p < 20);
+    /* Bucket label row (replaces the old "100/100" HP number — that wasn't
+       meaningful in a bucketed world). Only shown on the player box, to
+       match Gen-1 layout. */
+    if (o.side === 'player') {
+      const row3 = document.createElement('div');
+      row3.className = 'row3';
+      row3.innerHTML = '<span class="hp-num" id="hp-bucket-label">FULL</span>';
+      host.appendChild(row3);
     }
 
-    function set(hp) {
-      cur = Math.max(0, Math.min(maxHp, hp));
-      fill.style.transition = 'none';
-      fill.style.width = pct() + '%';
-      refreshClass();
-      const num = host.querySelector('.hp-num');
-      if (num) num.textContent = cur + '/' + maxHp;
-      /* Force reflow then restore transition for next drain. */
-      void fill.offsetWidth;
-      fill.style.transition = '';
-    }
+    let cur = 0;     // bucket index 0..numBuckets (numBuckets = fainted)
+    const maxB = o.numBuckets;
+    const BUCKET_NAMES = ['FULL', 'HIGH', 'MID', 'LOW', 'CRITICAL', 'FAINTED'];
 
-    function drainTo(hp) {
-      cur = Math.max(0, Math.min(maxHp, hp));
-      fill.style.width = pct() + '%';
-      refreshClass();
-      const num = host.querySelector('.hp-num');
-      if (num) num.textContent = cur + '/' + maxHp;
+    function set(bucket) {
+      cur = Math.max(0, Math.min(maxB, bucket));
+      fill.dataset.bucket = String(cur);
+      const label = host.querySelector('.hp-num');
+      if (label) label.textContent = BUCKET_NAMES[cur] || 'FAINTED';
     }
+    /* Backwards-compat name used by scene 1's old call site. */
+    function drainTo(bucket) { set(bucket); }
+    function refreshClass() { /* no-op — CSS reads data-bucket. */ }
 
     return { set, drainTo, refreshClass, hp: () => cur };
   }

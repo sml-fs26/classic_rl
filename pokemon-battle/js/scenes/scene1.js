@@ -1,17 +1,16 @@
 /* Scene 1 — "A wild CHARMANDER appeared!" Click-to-attack battle.
  *
- * The classic Gen-1 fight, full-fidelity:
- *   1. Initial dialog: "A wild CHARMANDER appeared!" → "Go, PIKACHU!"
- *   2. 4-move menu fades in.
- *   3. Click a move → "PIKACHU used XYZ!" → Charmander shakes → damage flash →
- *      HP drains → opponent counter-attack (Ember) → Pikachu shakes → drains.
- *   4. Repeat until one Pokemon faints. Win or loss dialog. Reset button to
- *      replay.
- *
- * The simulator is in `js/battle.js` (scalar HP variant). HUD strip below
- * shows turn count, last-move outcome, total reward so far. */
+ *   5-bucket version. The simulator is fully discrete now — Battle.sample()
+ *   returns bucket-delta damage rather than continuous HP. Dialog text describes
+ *   the bucket transition ("CHARMANDER dropped to MID HP!") instead of a
+ *   numerical damage figure. HP bars are segmented (5 visible levels with
+ *   tick marks at the boundaries) so what scene 1 *shows* matches what
+ *   scenes 2–4 *reason about*.
+ */
 (function () {
   window.scenes = window.scenes || {};
+
+  const BUCKET_NAMES = ['FULL', 'HIGH', 'MID', 'LOW', 'CRITICAL', 'FAINTED'];
 
   window.scenes.scene1 = function (root) {
     root.classList.add('scene-pad');
@@ -47,10 +46,14 @@
     const playerHpHost = document.createElement('div');
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
-    const oppHp = window.HPBar.mount(oppHpHost,    { name: 'CHARMANDER', maxHp: window.Battle.CHARM_MAX_HP, side: 'opponent', level: 5 });
-    const playerHp = window.HPBar.mount(playerHpHost, { name: 'PIKACHU',  maxHp: window.Battle.PIKA_MAX_HP,  side: 'player',   level: 5 });
+    const oppHp = window.HPBar.mount(oppHpHost, {
+      name: 'CHARMANDER', side: 'opponent', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
+    });
+    const playerHp = window.HPBar.mount(playerHpHost, {
+      name: 'PIKACHU', side: 'player', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
+    });
 
-    /* Right column: dialog box + move menu + HUD */
+    /* Right column: dialog + move menu + HUD. */
     const rightCol = document.createElement('div');
     rightCol.className = 'sc1-right';
     row.appendChild(rightCol);
@@ -87,7 +90,7 @@
       <div class="hud-item"><div class="hud-label">TURN</div><div class="hud-val" id="sc1-turn">0</div></div>
       <div class="hud-item"><div class="hud-label">LAST</div><div class="hud-val" id="sc1-last">—</div></div>
       <div class="hud-item"><div class="hud-label">REWARD</div><div class="hud-val" id="sc1-rew">0</div></div>
-      <div class="hud-item"><div class="hud-label">STATE</div><div class="hud-val" id="sc1-state">full/full</div></div>
+      <div class="hud-item"><div class="hud-label">STATE</div><div class="hud-val" id="sc1-state">FULL/FULL</div></div>
     `;
     rightCol.appendChild(hud);
 
@@ -101,73 +104,43 @@
     caption.className = 'poke-caption';
     caption.textContent =
       'You are the policy. Each click is one action; the dice are the damage roll and the accuracy check. ' +
-      'The state is (your HP bucket, opp HP bucket) — three buckets each, nine combinations. ' +
-      'Don\'t try to find the best move yet. Just play.';
+      'The state is (your HP bucket, opp HP bucket) — five buckets each, twenty-five combinations. ' +
+      'HP is discretised: each move bumps the bar by 0, 1, 2, or 3 segments. The state the agent sees IS the state the world is in.';
     root.appendChild(caption);
 
     /* ---------- State ---------- */
-    let scalar = window.Battle.initialScalar();
+    let state = window.Battle.initialState();
     let turn = 0;
     let totalReward = 0;
     let busy = false;
-    let history = window.History.create();
-    let rng = window.Battle.makeRng(20260511);
-    /* `episode` is the cancellation token. Every async cascade captures the
-       current value at start and bails out before each side-effect if the
-       value no longer matches — so RESTART (which increments it) cleanly
-       aborts in-flight turn animations instead of leaving ghost dialogue. */
-    let episode = 0;
-
-    /* Tiny async helpers — let the per-turn cascade wait for *actual*
-       completion instead of guessing with fixed timeouts. */
-    function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
-    function dialogSay(line) {
-      return new Promise(resolve => {
-        dialog.say(line);
-        dialog.onDone(resolve);
-      });
-    }
+    let rng = window.Battle.makeRng(20260512);
 
     function bucketState() {
-      return scalar.terminal
-        ? (scalar.win ? 'WIN' : 'LOSS')
-        : window.Battle.hpToBucket(scalar.yourHp) + '/' + window.Battle.hpToBucket(scalar.oppHp);
+      if (state.terminal) return state.win ? 'WIN' : 'LOSS';
+      return BUCKET_NAMES[state.your] + '/' + BUCKET_NAMES[state.opp];
     }
 
     function setBusy(b) {
       busy = b;
-      for (const id in moveBtns) moveBtns[id].disabled = b || scalar.terminal;
+      for (const id in moveBtns) moveBtns[id].disabled = b || state.terminal;
     }
 
-    function showDamage(host, dmg, color) {
+    function showDamage(host, delta, color) {
+      if (delta <= 0) return;
       const rect = host.getBoundingClientRect();
       const stageRect = stage.getBoundingClientRect();
       const el = document.createElement('div');
       el.className = 'damage-flash';
-      el.textContent = '-' + dmg;
-      el.style.left = (rect.left - stageRect.left + rect.width / 2 - 10) + 'px';
+      el.textContent = '-' + delta + ' LV';
+      el.style.left = (rect.left - stageRect.left + rect.width / 2 - 18) + 'px';
       el.style.top  = (rect.top  - stageRect.top  + 8) + 'px';
       if (color) el.style.color = color;
       stage.appendChild(el);
       setTimeout(() => { try { stage.removeChild(el); } catch (e) {} }, 720);
     }
 
-    /* Classic Gen-1 turn cadence:
-         move-announce typewriter ▶ pause ▶ shake + damage flash ▶ HP drain
-         ▶ pause ▶ (if KO) faint message ▶ END
-                  ▶ (else)  opp move-announce ▶ pause ▶ shake + damage ▶ drain
-                            ▶ pause ▶ (if KO) faint ▶ END
-                                     ▶ (else) "What will PIKACHU do?" ▶ END
-       A full turn lands around 6 s, matching the rhythm of an actual
-       Game Boy battle. Each step `await`s the previous one so the
-       typewriter never gets clipped mid-character and the HP drain
-       finishes before the opponent attacks. */
-    async function applyTurn(moveId) {
-      const myEp = episode;
-      const out = window.Battle.sample(
-        { yourHp: scalar.yourHp, oppHp: scalar.oppHp },
-        moveId, rng
-      );
+    function applyTurn(moveId) {
+      const out = window.Battle.sample(state, moveId, rng);
       const log = out.log;
       const move = window.Moves.MOVE_BY_ID[moveId];
       turn++;
@@ -176,66 +149,47 @@
       const oppHostEl = stage.querySelector('.sprite-host.opponent');
       const playerHostEl = stage.querySelector('.sprite-host.player');
 
-      /* ---- Pikachu's turn ---- */
-      await dialogSay('PIKACHU used ' + move.name + '!');
-      if (episode !== myEp) return;
-      await wait(450);
-      if (episode !== myEp) return;
+      dialog.say('PIKACHU used ' + move.name + '!');
 
-      if (!log.hit1) {
-        await dialogSay("PIKACHU's attack missed!");
-        if (episode !== myEp) return;
-        await wait(700);
-      } else {
-        oppSprite.shake();
-        showDamage(oppHostEl, log.oppDmg);
-        await wait(350);
-        if (episode !== myEp) return;
-        oppHp.drainTo(log.oppHp1);
-        await wait(1300);            /* 1100 ms drain transition + 200 ms breath */
-      }
-      if (episode !== myEp) return;
+      setTimeout(() => {
+        if (!log.hit1) {
+          dialog.say("PIKACHU's attack missed!");
+        } else {
+          oppSprite.shake();
+          showDamage(oppHostEl, log.oppDelta);
+          oppHp.drainTo(log.oppAfter);
+        }
+      }, 420);
 
-      /* ---- Charmander KO? ---- */
-      if (log.oppHp1 <= 0) {
-        oppSprite.faint();
-        await dialogSay('Wild CHARMANDER fainted!');
-        if (episode !== myEp) return;
-        await wait(700);
-        if (episode !== myEp) return;
-        await dialogSay('PIKACHU wins!');
-        scalar = out.state;
+      setTimeout(() => {
+        if (log.oppAfter >= window.Battle.FAINTED) {
+          dialog.say('Wild CHARMANDER fainted!  PIKACHU wins.');
+          oppSprite.faint();
+          state = out.sNext;
+          finalizeTurn(out);
+          return;
+        }
+        dialog.say('Wild CHARMANDER used EMBER!');
+      }, 900);
+
+      setTimeout(() => {
+        if (log.oppAfter >= window.Battle.FAINTED) return;
+        playerSprite.shake();
+        showDamage(playerHostEl, log.yourDelta, '#FFD0A0');
+        playerHp.drainTo(log.yourAfter);
+      }, 1300);
+
+      setTimeout(() => {
+        if (log.oppAfter >= window.Battle.FAINTED) return;
+        if (log.yourAfter >= window.Battle.FAINTED) {
+          dialog.say('PIKACHU fainted!  You lost.');
+          playerSprite.faint();
+        } else {
+          dialog.say('What will PIKACHU do?');
+        }
+        state = out.sNext;
         finalizeTurn(out);
-        return;
-      }
-
-      /* ---- Opponent's turn ---- */
-      await dialogSay('Wild CHARMANDER used EMBER!');
-      if (episode !== myEp) return;
-      await wait(450);
-      if (episode !== myEp) return;
-      playerSprite.shake();
-      showDamage(playerHostEl, log.yourDmg, '#FFD0A0');
-      await wait(350);
-      if (episode !== myEp) return;
-      playerHp.drainTo(log.yourHp1);
-      await wait(1300);
-      if (episode !== myEp) return;
-
-      /* ---- Pikachu KO? ---- */
-      if (log.yourHp1 <= 0) {
-        playerSprite.faint();
-        await dialogSay('PIKACHU fainted!');
-        if (episode !== myEp) return;
-        await wait(700);
-        if (episode !== myEp) return;
-        await dialogSay('You lost!');
-      } else {
-        await dialogSay('What will PIKACHU do?');
-      }
-      if (episode !== myEp) return;
-      scalar = out.state;
-      finalizeTurn(out);
+      }, 1700);
     }
 
     function finalizeTurn(out) {
@@ -247,52 +201,36 @@
     }
 
     function onMove(moveId) {
-      if (busy || scalar.terminal) return;
+      if (busy || state.terminal) return;
       setBusy(true);
       applyTurn(moveId);
     }
 
-    async function resetBattle() {
-      episode++;                /* cancels any in-flight applyTurn */
-      const myEp = episode;
-      scalar = window.Battle.initialScalar();
+    function resetBattle() {
+      busy = false;
+      state = window.Battle.initialState();
       turn = 0;
       totalReward = 0;
-      rng = window.Battle.makeRng(20260511 + Math.floor(Math.random() * 100000));
+      rng = window.Battle.makeRng(20260512 + Math.floor(Math.random() * 100000));
       oppSprite.reset();
       playerSprite.reset();
-      oppHp.set(window.Battle.CHARM_MAX_HP);
-      playerHp.set(window.Battle.PIKA_MAX_HP);
+      oppHp.set(0);     // bucket 0 = full
+      playerHp.set(0);
       document.getElementById('sc1-turn').textContent = '0';
       document.getElementById('sc1-last').textContent = '—';
       document.getElementById('sc1-rew').textContent = '0';
       document.getElementById('sc1-state').textContent = bucketState();
-      /* Disable the move buttons during the intro cascade — the user can't
-         act until "What will PIKACHU do?" lands. */
-      setBusy(true);
-      await dialogSay('A wild CHARMANDER appeared!');
-      if (episode !== myEp) return;
-      await wait(800);
-      if (episode !== myEp) return;
-      await dialogSay('Go, PIKACHU!');
-      if (episode !== myEp) return;
-      await wait(800);
-      if (episode !== myEp) return;
-      await dialogSay('What will PIKACHU do?');
-      if (episode !== myEp) return;
       setBusy(false);
+      dialog.say('A wild CHARMANDER appeared!');
+      setTimeout(() => dialog.say('Go, PIKACHU!'), 1400);
+      setTimeout(() => dialog.say('What will PIKACHU do?'), 2600);
     }
 
-    /* Cold-entry. */
     resetBattle();
 
     return {
-      onEnter() {
-        /* No autorun: scene 1 is interactive by design. */
-      },
-      onLeave() {
-        busy = false;
-      },
+      onEnter() { /* No autorun. */ },
+      onLeave() { busy = false; },
     };
   };
 })();

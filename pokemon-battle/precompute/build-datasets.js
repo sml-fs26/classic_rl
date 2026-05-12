@@ -1,17 +1,20 @@
 /* Precompute value iteration + SARSA trajectories for the Pokemon battle.
  *
+ *   5×5 = 25 non-terminal states, 4 moves. Fully discrete bucketed simulator
+ *   (no continuous HP underneath — see js/battle.js header).
+ *
  *   Run with:  node precompute/build-datasets.js
  *
  *   - Seeded Mulberry32 RNG; pinned seed.
- *   - Value iteration at 7 γ grid points: [0.70, 0.80, 0.85, 0.90, 0.93, 0.96, 0.99].
- *     Cap iters at 100; record convergence history per γ. Tol 1e-4.
- *   - SARSA: 2000 episodes, α=0.15, ε=0.15, γ=0.90. Snapshots at
- *     [0, 1, 5, 25, 100, 500, 2000]. Full learning curve (rewards + win flag).
+ *   - Value iteration at 7 γ grid points: [0.30, 0.50, 0.70, 0.80, 0.90, 0.95, 0.99].
+ *     Cap iters at 200; record convergence history per γ. Tol 1e-4.
+ *   - SARSA: 5000 episodes, α=0.20, ε=0.15, γ=0.90. Snapshots at
+ *     [0, 1, 5, 25, 100, 500, 2000, 5000]. Full learning curve.
  *   - Invariants asserted in code:
- *       1) Value iteration converges (max-ΔV < 1e-3) within 30 iters at every γ.
- *       2) Optimal policy at γ=0.90 uses ≥ 2 different moves across 9 states.
- *       3) Optimal policy at γ=0.70 vs γ=0.99 differs in ≥ 3 states.
- *       4) SARSA mean reward (eps 1500-2000) − mean reward (eps 0-50) ≥ 5.
+ *       1) VI converges (max-ΔV < 1e-3) within 80 iters at every γ.
+ *       2) Optimal policy at γ=0.90 uses ≥ 2 different moves across the 25 states.
+ *       3) Optimal policy at γ=0.30 vs γ=0.99 differs in ≥ 3 states.
+ *       4) SARSA mean reward (eps last 500) − mean reward (eps 0–50) ≥ 5.
  *       5) SARSA win rate in last 500 episodes ≥ 0.85.
  *       6) SARSA-vs-VI agreement on visited states (≥5 visits) ≥ 0.70.
  *       7) Byte-identical regen given the pinned seed.
@@ -23,110 +26,89 @@ const path = require('path');
 
 /* ---------------- Pokemon battle MDP definition ---------------- */
 const MOVES = [
-  { id: 'quick_attack', name: 'QUICK ATTACK', power: 55,  accuracy: 1.00, type: 'normal'   },
-  { id: 'thunderbolt',  name: 'THUNDERBOLT',  power: 80,  accuracy: 1.00, type: 'electric' },
-  { id: 'iron_tail',    name: 'IRON TAIL',    power: 100, accuracy: 0.85, type: 'steel'    },
-  { id: 'thunder',      name: 'THUNDER',      power: 150, accuracy: 0.55, type: 'electric' },
+  { id: 'quick_attack', name: 'QUICK ATTACK', power: 40,  accuracy: 1.00, type: 'normal'   },
+  { id: 'thunderbolt',  name: 'THUNDERBOLT',  power: 90,  accuracy: 1.00, type: 'electric' },
+  { id: 'iron_tail',    name: 'IRON TAIL',    power: 75,  accuracy: 0.75, type: 'steel'    },
+  { id: 'thunder',      name: 'THUNDER',      power: 110, accuracy: 0.55, type: 'electric' },
 ];
 const MOVE_IDS = MOVES.map(m => m.id);
 const MOVE_BY_ID = {};
 for (const m of MOVES) MOVE_BY_ID[m.id] = m;
-const OPP_MOVE = { id: 'ember', name: 'EMBER', power: 80, accuracy: 1.00, type: 'fire' };
+const OPP_MOVE = { id: 'ember', name: 'EMBER', power: 40, accuracy: 1.00, type: 'fire' };
 
-const BUCKETS = ['full', 'mid', 'low'];
-const BUCKET_IDX = { full: 0, mid: 1, low: 2 };
+const NUM_BUCKETS = 5;
+const BUCKETS = ['full', 'high', 'mid', 'low', 'critical'];
+const BUCKET_IDX = { full: 0, high: 1, mid: 2, low: 3, critical: 4 };
+const FAINTED = NUM_BUCKETS;
+
+const HIT_DAMAGE_DIST = {
+  quick_attack: [[0, 0.55], [1, 0.45]],
+  thunderbolt:  [[1, 0.50], [2, 0.50]],
+  iron_tail:    [[1, 0.70], [2, 0.30]],
+  thunder:      [[2, 0.50], [3, 0.50]],
+};
+const EMBER_DIST = [[0, 0.20], [1, 0.55], [2, 0.25]];
+
 const NON_TERMINAL_STATES = [];
-for (const y of BUCKETS) for (const o of BUCKETS) NON_TERMINAL_STATES.push({ your: y, opp: o });
-const N = NON_TERMINAL_STATES.length;  // 9
+for (let y = 0; y < NUM_BUCKETS; y++) {
+  for (let o = 0; o < NUM_BUCKETS; o++) {
+    NON_TERMINAL_STATES.push({ your: y, opp: o, terminal: false });
+  }
+}
+const N = NON_TERMINAL_STATES.length;   // 25
 const A = MOVE_IDS.length;              // 4
 
-function hpToBucket(hp) {
-  if (hp <= 0) return 'fainted';
-  if (hp >= 60) return 'full';
-  if (hp >= 25) return 'mid';
-  return 'low';
-}
-function bucketToHp(b) {
-  if (b === 'fainted') return 0;
-  if (b === 'full') return 80;
-  if (b === 'mid')  return 45;
-  if (b === 'low')  return 18;
-  return 0;
-}
 function stateIndex(s) {
   if (!s || s.terminal) return -1;
-  return BUCKET_IDX[s.your] * 3 + BUCKET_IDX[s.opp];
-}
-function stateFromIndex(i) {
-  return { your: BUCKETS[Math.floor(i / 3)], opp: BUCKETS[i % 3], terminal: false };
+  return s.your * NUM_BUCKETS + s.opp;
 }
 
-function damageOutcomes(move) {
-  return [0.875, 0.925, 0.975].map(mul => ({
-    dmg: Math.max(1, Math.round(move.power * 0.35 * mul)),
-    p: 1 / 3,
-  }));
-}
-
-function successors(s, moveId) {
+/* ---------------- Successors ---------------- */
+function successors(state, moveId) {
+  if (state.terminal) return [{ sNext: state, p: 1, reward: 0 }];
   const move = MOVE_BY_ID[moveId];
-  const opp = OPP_MOVE;
-  if (s.terminal) return [{ sNext: s, p: 1, reward: 0 }];
-  const yourHp = bucketToHp(s.your);
-  const oppHp  = bucketToHp(s.opp);
-
-  const out = new Map();
   const pHit = move.accuracy;
   const pMiss = 1 - pHit;
 
-  function bucketKey(sNext) {
-    if (sNext.terminal) return sNext.win ? 'WIN' : 'LOSS';
-    return sNext.your + '|' + sNext.opp;
+  const out = new Map();
+  function key(sN) {
+    if (sN.terminal) return sN.win ? 'WIN' : 'LOSS';
+    return sN.your + '|' + sN.opp;
   }
-  function add(key, val) {
-    const cur = out.get(key);
-    if (!cur) out.set(key, val);
-    else cur.p += val.p;
+  function add(sN, p, reward) {
+    const k = key(sN);
+    const cur = out.get(k);
+    if (cur) cur.p += p;
+    else out.set(k, { sNext: sN, p, reward });
   }
 
   if (pHit > 0) {
-    for (const { dmg: oppDmg, p: pDmg } of damageOutcomes(move)) {
-      const oppHpNew = Math.max(0, oppHp - oppDmg);
-      if (oppHpNew <= 0) {
-        add('WIN', { sNext: { terminal: true, win: true }, p: pHit * pDmg, reward: 10 });
+    for (const [oppD, pO] of HIT_DAMAGE_DIST[moveId]) {
+      const oppNew = Math.min(FAINTED, state.opp + oppD);
+      if (oppNew >= FAINTED) {
+        add({ terminal: true, win: true }, pHit * pO, +10);
         continue;
       }
-      for (const { dmg: yourDmg, p: pDmg2 } of damageOutcomes(opp)) {
-        const yourHpNew = Math.max(0, yourHp - yourDmg);
-        let sNext;
-        if (yourHpNew <= 0) {
-          sNext = { terminal: true, lose: true };
+      for (const [yD, pY] of EMBER_DIST) {
+        const yNew = Math.min(FAINTED, state.your + yD);
+        if (yNew >= FAINTED) {
+          add({ terminal: true, lose: true }, pHit * pO * pY, -10);
         } else {
-          sNext = { your: hpToBucket(yourHpNew), opp: hpToBucket(oppHpNew), terminal: false };
+          add({ your: yNew, opp: oppNew, terminal: false }, pHit * pO * pY, -1);
         }
-        add(bucketKey(sNext), {
-          sNext, p: pHit * pDmg * pDmg2,
-          reward: yourHpNew <= 0 ? -10 : -1,
-        });
       }
     }
   }
   if (pMiss > 0) {
-    for (const { dmg: yourDmg, p: pDmg2 } of damageOutcomes(opp)) {
-      const yourHpNew = Math.max(0, yourHp - yourDmg);
-      let sNext;
-      if (yourHpNew <= 0) {
-        sNext = { terminal: true, lose: true };
+    for (const [yD, pY] of EMBER_DIST) {
+      const yNew = Math.min(FAINTED, state.your + yD);
+      if (yNew >= FAINTED) {
+        add({ terminal: true, lose: true }, pMiss * pY, -10);
       } else {
-        sNext = { your: hpToBucket(yourHpNew), opp: hpToBucket(oppHp), terminal: false };
+        add({ your: yNew, opp: state.opp, terminal: false }, pMiss * pY, -1);
       }
-      add(bucketKey(sNext), {
-        sNext, p: pMiss * pDmg2,
-        reward: yourHpNew <= 0 ? -10 : -1,
-      });
     }
   }
-
   return Array.from(out.values());
 }
 
@@ -214,48 +196,44 @@ function moveCounts(p) {
 
 /* ---------------- SARSA training ---------------- */
 const SARSA_CFG = {
-  alpha: 0.15,
+  alpha: 0.20,
   gamma: 0.90,
   epsilon: 0.15,
-  episodes: 2000,
+  episodes: 5000,
   maxTurns: 60,
-  seed: 20260511,
-  snapshotEpisodes: [0, 1, 5, 25, 100, 500, 2000],
+  seed: 20260512,
+  snapshotEpisodes: [0, 1, 5, 25, 100, 500, 2000, 5000],
 };
 
-function pickMul(rng) {
-  const r = rng();
-  if (r < 1/3) return 0.875;
-  if (r < 2/3) return 0.925;
-  return 0.975;
+function sampleDist(rng, dist) {
+  const u = rng();
+  let cum = 0;
+  for (const [d, p] of dist) {
+    cum += p;
+    if (u < cum) return d;
+  }
+  return dist[dist.length - 1][0];
 }
 
 function sampleStep(s, moveId, rng) {
-  /* Returns { sNext, reward, terminal, win, lose } for scalar-HP sample. */
   const move = MOVE_BY_ID[moveId];
-  const opp = OPP_MOVE;
-  let yourHp = bucketToHp(s.your);
-  let oppHp  = bucketToHp(s.opp);
+  let your = s.your;
+  let oppB = s.opp;
 
   const hit1 = rng() < move.accuracy;
   if (hit1) {
-    const mul = pickMul(rng);
-    const oppDmg = Math.max(1, Math.round(move.power * 0.35 * mul));
-    oppHp = Math.max(0, oppHp - oppDmg);
+    const oppD = sampleDist(rng, HIT_DAMAGE_DIST[moveId]);
+    oppB = Math.min(FAINTED, oppB + oppD);
   }
-  if (oppHp <= 0) {
+  if (oppB >= FAINTED) {
     return { sNext: { terminal: true, win: true }, reward: 10, terminal: true, win: true, lose: false };
   }
-  const mulO = pickMul(rng);
-  const yourDmg = Math.max(1, Math.round(opp.power * 0.50 * mulO));
-  yourHp = Math.max(0, yourHp - yourDmg);
-  if (yourHp <= 0) {
+  const yD = sampleDist(rng, EMBER_DIST);
+  your = Math.min(FAINTED, your + yD);
+  if (your >= FAINTED) {
     return { sNext: { terminal: true, lose: true }, reward: -10, terminal: true, win: false, lose: true };
   }
-  return {
-    sNext: { your: hpToBucket(yourHp), opp: hpToBucket(oppHp), terminal: false },
-    reward: -1, terminal: false, win: false, lose: false,
-  };
+  return { sNext: { your, opp: oppB, terminal: false }, reward: -1, terminal: false, win: false, lose: false };
 }
 
 function pickEpsGreedy(Q, sIdx, eps, rng) {
@@ -270,7 +248,7 @@ function pickEpsGreedy(Q, sIdx, eps, rng) {
 }
 
 function runEpisode(Q, alpha, gamma, eps, maxTurns, rng) {
-  let s = { your: 'full', opp: 'full', terminal: false };
+  let s = { your: 0, opp: 0, terminal: false };
   let sIdx = stateIndex(s);
   let a = pickEpsGreedy(Q, sIdx, eps, rng);
   let turns = 0, totalReward = 0;
@@ -350,8 +328,9 @@ function assertInvariant(name, ok, info) {
 function mean(arr) { return arr.reduce((s, v) => s + v, 0) / arr.length; }
 
 /* ---------------- Run ---------------- */
-console.log('Pokemon battle precompute');
-console.log('  9 states (your_HP × opp_HP buckets), 4 moves');
+console.log('Pokemon battle precompute — 5×5 bucket variant');
+console.log('  ' + N + ' states (your_HP × opp_HP), 4 moves');
+console.log('  Buckets: ' + BUCKETS.join(', '));
 console.log('  Moves:', MOVE_IDS.join(', '));
 console.log('  Opponent move: ember (40 pwr, 100% acc)');
 console.log('');
@@ -360,7 +339,7 @@ console.log('Phase 1 — Value iteration (7 γ grid points)');
 const GAMMA_GRID = [0.30, 0.50, 0.70, 0.80, 0.90, 0.95, 0.99];
 const GAMMA_DEFAULT = 0.90;
 const TOL = 1e-4;
-const MAX_ITERS = 100;
+const MAX_ITERS = 200;
 const VI_BY_GAMMA = {};
 const ITERS_BY_GAMMA = {};
 const POLICY_BY_GAMMA = {};
@@ -374,38 +353,34 @@ for (const g of GAMMA_GRID) {
   POLICY_BY_GAMMA[g] = policy;
   V_FINAL_BY_GAMMA[g] = Array.from(V);
   const mc = moveCounts(policy);
-  console.log('  γ=' + g.toFixed(2) + '  iters=' + String(iters).padStart(2) +
-              '  V[full|full]=' + V[stateIndex({your:'full', opp:'full'})].toFixed(2) +
+  console.log('  γ=' + g.toFixed(2) + '  iters=' + String(iters).padStart(3) +
+              '  V[full|full]=' + V[stateIndex({your:0, opp:0})].toFixed(2) +
               '  moves: ' + MOVE_IDS.map(m => m + ':' + mc[m]).join(' '));
 }
 
 for (const g of GAMMA_GRID) {
   const last = VI_BY_GAMMA[g][VI_BY_GAMMA[g].length - 1];
-  assertInvariant('VI converges at γ=' + g + ' within 30 iters (maxDelta=' + last.maxDelta.toExponential(2) + ')',
-    last.maxDelta < 1e-3 && last.iter <= 30, 'iters=' + last.iter);
+  assertInvariant('VI converges at γ=' + g + ' within 80 iters (maxDelta=' + last.maxDelta.toExponential(2) + ')',
+    last.maxDelta < 1e-3 && last.iter <= 80, 'iters=' + last.iter);
 }
 
 const used90 = movesUsed(POLICY_BY_GAMMA[GAMMA_DEFAULT]);
 assertInvariant('optimal policy at γ=0.90 uses ≥ 2 moves (got ' + used90 + ')', used90 >= 2);
 
-/* Pedagogical policy-shift: across the gamma grid the bucketised MDP shows
-   one state where Thunder vs Thunderbolt crosses over (mid|mid).  The plan's
-   "≥ 3 states" target assumed a finer-grained MDP; with 9 buckets the natural
-   shift is exactly 1 state (mid|mid), achieved at γ ≈ 0.6.  We document that
-   here and pin the invariant to ≥ 1. */
 const policyShift = policyDiff(POLICY_BY_GAMMA[GAMMA_GRID[0]], POLICY_BY_GAMMA[GAMMA_GRID[GAMMA_GRID.length - 1]]);
-assertInvariant('policy(γ=' + GAMMA_GRID[0] + ') differs from policy(γ=' + GAMMA_GRID[GAMMA_GRID.length - 1] + ') in ≥ 1 state (got ' + policyShift + ')',
-  policyShift >= 1);
+assertInvariant('policy(γ=' + GAMMA_GRID[0] + ') differs from policy(γ=' + GAMMA_GRID[GAMMA_GRID.length - 1] + ') in ≥ 3 states (got ' + policyShift + ')',
+  policyShift >= 3);
 
 console.log('');
 console.log('Phase 2 — SARSA training (' + SARSA_CFG.episodes + ' episodes, α=' + SARSA_CFG.alpha + ', ε=' + SARSA_CFG.epsilon + ')');
 const sarsa = trainSARSA(SARSA_CFG);
 const meanRewardEarly = mean(sarsa.rewardPerEpisode.slice(0, 50));
-const meanRewardLate  = mean(sarsa.rewardPerEpisode.slice(1500, 2000));
-const winRateLast500  = mean(sarsa.winFlag.slice(1500, 2000));
-console.log('  mean reward eps 0..50    = ' + meanRewardEarly.toFixed(2));
-console.log('  mean reward eps 1500..2000 = ' + meanRewardLate.toFixed(2));
-console.log('  reward gap (late - early) = ' + (meanRewardLate - meanRewardEarly).toFixed(2));
+const lateStart = Math.max(0, SARSA_CFG.episodes - 500);
+const meanRewardLate  = mean(sarsa.rewardPerEpisode.slice(lateStart));
+const winRateLast500  = mean(sarsa.winFlag.slice(lateStart));
+console.log('  mean reward eps 0..50      = ' + meanRewardEarly.toFixed(2));
+console.log('  mean reward eps ' + lateStart + '..' + SARSA_CFG.episodes + ' = ' + meanRewardLate.toFixed(2));
+console.log('  reward gap (late - early)  = ' + (meanRewardLate - meanRewardEarly).toFixed(2));
 console.log('  win rate last 500 episodes = ' + (100 * winRateLast500).toFixed(1) + '%');
 
 assertInvariant('SARSA reward gap (late − early) ≥ 5 (got ' + (meanRewardLate - meanRewardEarly).toFixed(2) + ')',
@@ -413,7 +388,6 @@ assertInvariant('SARSA reward gap (late − early) ≥ 5 (got ' + (meanRewardLat
 assertInvariant('SARSA win rate last 500 episodes ≥ 0.85 (got ' + winRateLast500.toFixed(3) + ')',
   winRateLast500 >= 0.85);
 
-/* SARSA-vs-VI agreement on visited states. */
 const sarsaPolicy = sarsaArgmaxPolicy(sarsa.Q);
 const viPolicy = POLICY_BY_GAMMA[GAMMA_DEFAULT];
 let agreed = 0, total = 0;
@@ -474,7 +448,7 @@ const sarsaPayload = {
 
 const stats = {
   iters: ITERS_BY_GAMMA,
-  policyShift_070_to_099: policyShift,
+  policyShift_first_to_last: policyShift,
   movesUsed_gamma090: used90,
   policyMix_gamma090: moveCounts(POLICY_BY_GAMMA[GAMMA_DEFAULT]),
 };
@@ -498,8 +472,9 @@ const fileContent = "/* Pokemon-battle integrative review — static configurati
 "    moves: " + JSON.stringify(MOVES) + ",\n" +
 "    oppMove: " + JSON.stringify(OPP_MOVE) + ",\n" +
 "\n" +
-"    /* Bucket scheme. */\n" +
-"    buckets: ['full', 'mid', 'low'],\n" +
+"    /* Bucket scheme (5 buckets per Pokemon). */\n" +
+"    buckets: " + JSON.stringify(BUCKETS) + ",\n" +
+"    numBuckets: " + NUM_BUCKETS + ",\n" +
 "    nonTerminalStates: " + JSON.stringify(NON_TERMINAL_STATES) + ",\n" +
 "\n" +
 "    params: {\n" +
@@ -557,7 +532,7 @@ console.log('Summary:');
 console.log('  iters per γ:', JSON.stringify(ITERS_BY_GAMMA));
 console.log('  movesUsed(γ=0.90):       ' + used90);
 console.log('  policyMix(γ=0.90):       ' + JSON.stringify(moveCounts(POLICY_BY_GAMMA[GAMMA_DEFAULT])));
-console.log('  policyShift(0.70→0.99):  ' + policyShift);
+console.log('  policyShift(' + GAMMA_GRID[0] + '→' + GAMMA_GRID[GAMMA_GRID.length - 1] + '):  ' + policyShift);
 console.log('  reward early → late:     ' + meanRewardEarly.toFixed(2) + ' → ' + meanRewardLate.toFixed(2));
 console.log('  win rate last 500:       ' + (100 * winRateLast500).toFixed(1) + '%');
 console.log('  SARSA-vs-VI agreement:   ' + agreed + '/' + total +
