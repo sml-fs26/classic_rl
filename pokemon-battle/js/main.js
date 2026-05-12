@@ -1,6 +1,9 @@
 /* Click-step scene engine for the Pokemon battle integrative review.
 
-   6 scenes, 0-indexed. Lifted from snakes-ladders/js/main.js.
+   7 scenes, 0-indexed. Lifted from snakes-ladders/js/main.js.
+   Scene 1 is the optional "How to play" tutorial; the battle, value
+   iteration, γ slider, SARSA, and recap sit at indices 2-6 (keys
+   scene1-scene5 kept stable for deep-link survival).
    Each scene file at js/scenes/sceneN.js registers
      window.scenes.sceneN = function(root) { return { onEnter?, onLeave?, onNextKey?, onPrevKey? }; };
    onNextKey / onPrevKey return true to consume the keystroke (advance internal
@@ -8,8 +11,9 @@
    the driver advance the scene. */
 (function () {
   const SCENES = [
-    { key: 'scene0', title: 'POKEMON' },
-    { key: 'scene1', title: 'A wild CHARMANDER appeared!' },
+    { key: 'scene0',         title: 'POKEMON' },
+    { key: 'sceneHowToPlay', title: 'Tutorial — how to play' },
+    { key: 'scene1',         title: 'A wild CHARMANDER appeared!' },
     { key: 'scene2', title: 'Value iteration' },
     { key: 'scene3', title: 'γ as patience' },
     { key: 'scene4', title: 'SARSA learns it' },

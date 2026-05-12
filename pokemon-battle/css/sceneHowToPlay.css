@@ -1,0 +1,250 @@
+/* Tutorial / "how to play" — slots into the deck at index 1.
+   Reuses the battle-screen CSS (battle-stage, sprite-host, hp-box, move-btn)
+   so the tutorial *looks* identical to scene 1, then layers callouts and
+   panel decorations on top. */
+
+.tutorial-scene { padding-top: 4px; }
+
+.tutorial-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0 10px;
+}
+
+.tutorial-step-counter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 6px 10px;
+  box-shadow: inset -2px -2px 0 0 #BBB6A2;
+}
+
+.tutorial-skip-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-on-box);
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  padding: 6px 10px;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 #B89020;
+}
+.tutorial-skip-btn:hover { background: var(--charmander-orange); color: #FFF; }
+.tutorial-skip-btn:active { box-shadow: inset 2px 2px 0 0 #B89020; }
+
+.tutorial-section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  margin: 0 0 12px;
+}
+
+.tutorial-demo {
+  min-height: 320px;
+  margin-bottom: 14px;
+}
+
+.tutorial-dialog {
+  /* poke-box styles applied by Dialog.mount() */
+}
+
+.tutorial-nav-hint {
+  margin-top: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: right;
+  letter-spacing: 0.04em;
+}
+.tutorial-nav-hint kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 2px 5px;
+  color: var(--ink);
+  margin: 0 2px;
+}
+
+/* ---------- Step 0 — welcome ---------- */
+.tut-welcome {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 28px;
+  align-items: center;
+  padding: 24px 16px;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+}
+.tut-welcome-sprite { display: flex; justify-content: center; }
+.tut-big-sprite {
+  width: 192px; height: 192px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.tut-welcome-line.big {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  margin-bottom: 14px;
+  letter-spacing: 0.04em;
+}
+.tut-welcome-line.small {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-secondary);
+}
+
+/* ---------- Step 1 — battle screen with callouts ---------- */
+.tut-stage { position: relative; }
+.tut-callouts { position: absolute; inset: 0; pointer-events: none; }
+.tut-callout {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+  padding: 5px 8px;
+  border: 2px solid var(--rule);
+  box-shadow: 2px 2px 0 0 var(--rule);
+  white-space: nowrap;
+}
+.tut-callout.c-pika    { left: 4%;  bottom: 18%; }
+.tut-callout.c-charm   { right: 4%; top: 22%; }
+.tut-callout.c-pikahp  { right: 4%; bottom: 4%; }
+.tut-callout.c-charmhp { left: 4%;  top: 4%; }
+
+/* ---------- Step 2 — HP buckets row ---------- */
+.tut-hp-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  padding: 18px 8px;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+}
+.tut-hp-cell { text-align: center; }
+.tut-hp-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+}
+/* Show only the bar inside each cell — HPBar emits a full .hp-box but we
+   hid the .row1 + .row3 inline.  Trim the box chrome too so the bars sit
+   cleanly in the row. */
+.tut-hp-row .hp-box {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* ---------- Step 3 — move buttons ---------- */
+.tut-move-menu {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.tut-move-menu .move-btn {
+  cursor: default;
+  opacity: 0.95;
+}
+
+/* ---------- Step 4 — turn flow ---------- */
+.tut-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+}
+.tut-turn-row {
+  display: grid;
+  grid-template-columns: 36px 140px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 8px 6px;
+  border-bottom: 1px dashed var(--ink-secondary);
+}
+.tut-turn-row:last-child { border-bottom: none; }
+.tut-turn-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  color: var(--pikachu-cheek);
+  text-align: center;
+}
+.tut-turn-who {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+}
+.tut-turn-action {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+}
+
+/* ---------- Step 5 — win / lose panels ---------- */
+.tut-winlose {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.tut-winlose-cell {
+  padding: 18px 14px;
+  text-align: center;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+}
+.tut-winlose-cell.win  { box-shadow: inset 0 0 0 3px var(--hp-green); }
+.tut-winlose-cell.loss { box-shadow: inset 0 0 0 3px var(--hp-red); }
+.tut-mini-sprite {
+  width: 96px; height: 96px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.tut-mini-sprite.faint { opacity: 0.35; filter: grayscale(0.6); }
+.tut-winlose-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  margin: 12px 0 6px;
+  letter-spacing: 0.04em;
+}
+.tut-winlose-reward {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--pikachu-cheek);
+  margin-bottom: 6px;
+}
+.tut-winlose-cell.win .tut-winlose-reward { color: var(--hp-green); }
+.tut-winlose-detail {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+}
+
+.tut-footnote {
+  margin-top: 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  padding: 0 4px;
+}
