@@ -30,6 +30,7 @@
       </div>
       <button class="sc0-start" type="button">&#9654; PRESS START</button>
       <div class="sc0-credits">SML &middot; ETH ZURICH &middot; CLASSIC RL #7</div>
+      <div class="sc0-credits sc0-credits-by">BY CARLOS COTRINI</div>
     `;
     root.appendChild(titleWrap);
 

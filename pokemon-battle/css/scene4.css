@@ -1,34 +1,11 @@
-/* Scene 4 — SARSA layout (Q-grid redesign). */
-
-.sc4-params {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-.sc4-params .poke-menu-row {
-  background: var(--bg-strong);
-  border: 2px solid var(--rule);
-  padding: 4px 10px;
-  box-shadow: inset -2px -2px 0 0 #BBB6A2;
-  color: var(--ink-on-box);
-}
-.sc4-params .poke-menu-row .val { color: var(--ink-on-box); }
+/* Scene 4 — step-by-step SARSA layout. */
 
 .sc4-q {
   margin-top: 10px;
   max-width: 880px;
 }
 
-.sc4-lc-wrap {
-  margin-top: 14px;
-  max-width: 880px;
-}
-.sc4-lc-header {
-  margin-bottom: 6px;
-}
-
-/* ----- 3×3 state grid ----- */
+/* ----- 5×5 Q-grid styling (shared with the qtable.js render) ----- */
 
 .qtable-host {
   display: block;
@@ -63,30 +40,29 @@
   gap: 6px;
 }
 
-/* Q-cell shrinks at 5×5 to fit on a 1280px viewport — tighter padding +
-   smaller fonts than the 3×3 default. */
 .q-cell {
+  position: relative;
+  background: var(--bg-strong, #F8F8F8);
+  border: 3px solid var(--ink, #000);
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18);
   padding: 4px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box, #000);
+  overflow: hidden;
+  transition: opacity 200ms;
 }
-.q-thumb-sprite {
-  width: 26px;
-  height: 26px;
-}
-.q-bar-row {
-  grid-template-columns: 8px 28px 1fr 30px;
-  gap: 3px;
-  font-size: 6px;
-}
-.q-label { font-size: 6px; }
-.q-val   { font-size: 6px; }
-.q-thumb {
-  gap: 4px;
-  padding-bottom: 3px;
-}
-.q-thumb-hp-bg {
-  height: 4px;
-}
-/* Add bucket-color HP fills for the thumbnails (5 levels). */
+.q-cell.unvisited { opacity: 0.62; }
+
+.q-thumb-sprite { width: 26px; height: 26px; }
+.q-bar-row { grid-template-columns: 8px 28px 1fr 30px; gap: 3px; font-size: 6px; }
+.q-label   { font-size: 6px; }
+.q-val     { font-size: 6px; }
+.q-thumb   { gap: 4px; padding-bottom: 3px; }
+.q-thumb-hp-bg { height: 4px; }
 .q-thumb-hp-fill         { background: #48C848; }
 .q-thumb-hp-fill.b1      { background: #88D848; }
 .q-thumb-hp-fill.b2      { background: #E8C828; }
@@ -102,30 +78,8 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  writing-mode: horizontal-tb;
 }
 
-.q-cell {
-  position: relative;
-  background: var(--bg-strong, #F8F8F8);
-  border: 3px solid var(--ink, #000);
-  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18);
-  padding: 6px 8px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--ink-on-box, #000);
-  overflow: hidden;
-  transition: opacity 200ms;
-}
-
-.q-cell.unvisited {
-  opacity: 0.62;
-}
-
-/* Battle thumbnail at the top of each cell. */
 .q-thumb {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -155,18 +109,11 @@
 }
 .q-thumb-hp-fill {
   height: 100%;
-  background: #48C848;       /* green = full */
+  background: #48C848;
   transition: width 200ms;
 }
-.q-thumb-hp-fill.mid { background: #E8C828; }   /* yellow = mid */
-.q-thumb-hp-fill.low { background: #E84828; }   /* red = low */
 
-/* Q-bars block. */
-.q-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+.q-bars { display: flex; flex-direction: column; gap: 3px; }
 .q-bar-row {
   display: grid;
   grid-template-columns: 9px 32px 1fr 32px;
@@ -174,16 +121,8 @@
   align-items: center;
   font-size: 7px;
 }
-.q-mark {
-  width: 9px;
-  text-align: center;
-  color: var(--accent, #F8D028);
-  font-weight: bold;
-}
-.q-label {
-  font-size: 7px;
-  letter-spacing: 0.04em;
-}
+.q-mark { width: 9px; text-align: center; color: var(--accent, #F8D028); font-weight: bold; }
+.q-label { font-size: 7px; letter-spacing: 0.04em; }
 .q-bar-track {
   height: 6px;
   background: rgba(0,0,0,0.16);
@@ -198,29 +137,19 @@
   background: #B0B0B0;
   transition: width 220ms;
 }
-.q-bar-row.argmax .q-bar-fill {
-  background: var(--accent, #F8D028);
-}
-.q-val {
-  font-size: 7px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
+.q-bar-row.argmax .q-bar-fill { background: var(--accent, #F8D028); }
+.q-val { font-size: 7px; text-align: right; font-variant-numeric: tabular-nums; }
 .q-bar-row.argmax .q-val,
-.q-bar-row.argmax .q-label {
-  font-weight: bold;
-}
+.q-bar-row.argmax .q-label { font-weight: bold; }
 
-/* Cell flash when argmax move flips. */
+/* Argmax-flip flash. */
 @keyframes q-argmax-flip {
   0%   { box-shadow: 0 0 0 3px var(--accent, #F8D028), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
   100% { box-shadow: 0 0 0 0 transparent, inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
 }
-.q-cell.argmax-flip {
-  animation: q-argmax-flip 1.0s ease-out;
-}
+.q-cell.argmax-flip { animation: q-argmax-flip 1.0s ease-out; }
 
-/* Floating delta indicators (scrubbing forward in time). */
+/* Floating delta indicators (per-step change). */
 @keyframes q-delta-rise {
   0%   { opacity: 0; transform: translateY(2px); }
   18%  { opacity: 1; }
@@ -242,7 +171,7 @@
 .q-delta.neg { color: #C62828; }
 .q-delta.awake { color: #B7791F; }
 
-/* ----- Move-frequency strip ----- */
+/* Argmax-distribution strip below the grid. */
 .q-freq-strip {
   margin-top: 14px;
   background: var(--bg-strong, #F8F8F8);
@@ -253,12 +182,7 @@
   font-size: 8px;
   color: var(--ink-on-box, #000);
 }
-.q-freq-title {
-  font-size: 8px;
-  letter-spacing: 0.05em;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
+.q-freq-title { font-size: 8px; letter-spacing: 0.05em; margin-bottom: 8px; text-transform: uppercase; }
 .q-freq-row {
   display: grid;
   grid-template-columns: 48px 1fr 24px;
@@ -267,9 +191,7 @@
   margin-bottom: 4px;
   font-size: 7px;
 }
-.q-freq-label {
-  letter-spacing: 0.04em;
-}
+.q-freq-label { letter-spacing: 0.04em; }
 .q-freq-track {
   height: 10px;
   background: rgba(0,0,0,0.16);
@@ -284,12 +206,8 @@
   background: var(--accent, #F8D028);
   transition: width 240ms;
 }
-.q-freq-val {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
+.q-freq-val { text-align: right; font-variant-numeric: tabular-nums; }
 
-/* ----- Legend below the strip ----- */
 .q-legend {
   display: flex;
   flex-wrap: wrap;
@@ -300,11 +218,7 @@
   letter-spacing: 0.04em;
   color: var(--ink-secondary, #6b6b6b);
 }
-.q-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
+.q-legend-item { display: inline-flex; align-items: center; gap: 5px; }
 .q-legend-bar {
   display: inline-block;
   width: 24px;
@@ -313,33 +227,63 @@
   background: #B0B0B0;
   box-sizing: border-box;
 }
-.q-legend-bar.argmax {
-  background: var(--accent, #F8D028);
+.q-legend-bar.argmax { background: var(--accent, #F8D028); }
+
+/* Q-cell heatmap (max-Q over the four moves → coloured cell background). */
+.q-cell.heat-zero        { background: var(--bg-strong); }
+.q-cell.heat-pos-strong  { background: #5BA85B; color: #FFFFFF; }
+.q-cell.heat-pos-mid     { background: #C8E8C8; }
+.q-cell.heat-neutral     { background: var(--bg-strong); }
+.q-cell.heat-neg-mid     { background: #F8C8C0; }
+.q-cell.heat-neg-strong  { background: #E84828; color: #FFFFFF; }
+.q-cell.heat-pos-strong .q-bar-track,
+.q-cell.heat-neg-strong .q-bar-track,
+.q-cell.heat-pos-strong .q-thumb-hp-bg,
+.q-cell.heat-neg-strong .q-thumb-hp-bg {
+  background: rgba(0,0,0,0.32);
 }
 
-/* ----- Dark theme overrides ----- */
-:root[data-theme="dark"] .q-cell,
-:root[data-theme="dark"] .q-freq-strip {
-  background: rgba(255,255,255,0.06);
+/* Just-updated cell pulse — yellow box-shadow ring that decays. */
+@keyframes sc4-just-updated-pulse {
+  0%   { box-shadow: 0 0 0 5px var(--pikachu-yellow, #F8D028),
+                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
+                     2px 2px 0 0 rgba(0,0,0,0.18); }
+  100% { box-shadow: 0 0 0 0 transparent,
+                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
+                     2px 2px 0 0 rgba(0,0,0,0.18); }
 }
-:root[data-theme="dark"] .q-thumb-hp-bg,
-:root[data-theme="dark"] .q-bar-track,
-:root[data-theme="dark"] .q-freq-track {
-  background: rgba(255,255,255,0.10);
+.q-cell.just-updated {
+  animation: sc4-just-updated-pulse 1.4s ease-out;
+  z-index: 3;
 }
-:root[data-theme="dark"] .q-delta {
-  text-shadow: 1px 1px 0 #1a1a1a, -1px -1px 0 #1a1a1a, 1px -1px 0 #1a1a1a, -1px 1px 0 #1a1a1a;
-}
-:root[data-theme="dark"] .q-delta.pos { color: #82E085; }
-:root[data-theme="dark"] .q-delta.neg { color: #FF7B7B; }
 
-/* ---------- Pedagogy redesign: narrator, formula, inspector, heatmap ---------- */
+/* ---------- Narrator + algo box + formula card ---------- */
 
-/* Narrator dialog above the grid (poke-box styling applied by Dialog.mount). */
 .sc4-narrator { margin: 0 0 10px; }
 
-/* SARSA formula card. The formula itself + a legend mapping each chunk
-   back to the prior viz that contributed it. */
+.sc4-algo {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  margin-bottom: 10px;
+}
+.sc4-algo-title {
+  font-size: 9px;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.sc4-algo-list {
+  padding-left: 22px;
+  margin: 0;
+  line-height: 1.9;
+  font-size: 8px;
+}
+.sc4-algo-list li { margin-bottom: 3px; }
+.sc4-algo .comp-mdp     { color: var(--hue-anymal); }
+.sc4-algo .comp-rm      { color: var(--hue-star);   }
+.sc4-algo .comp-bellman { color: var(--hue-ghost);  }
+.sc4-algo .comp-eps     { color: var(--hue-casino); }
+
 .sc4-formula-card {
   background: var(--bg-strong);
   border: 4px solid var(--rule);
@@ -388,151 +332,176 @@
   line-height: 1.6;
 }
 
-/* Two-column row: Q-table left, inspector right. */
-.sc4-row {
+/* ---------- Step controls + status counter ---------- */
+
+.sc4-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.sc4-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.sc4-controls .poke-btn { min-width: 60px; }
+.sc4-controls .sc4-reset {
+  margin-left: 8px;
+  border-color: var(--hue-anymal, #C62828);
+  color: var(--hue-anymal, #C62828);
+}
+
+.sc4-step-status {
+  display: flex;
+  gap: 18px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+  flex-wrap: wrap;
+}
+.sc4-step-status b { font-weight: bold; color: var(--ink-on-box); }
+
+/* ---------- Battle-now + step-detail split row ---------- */
+
+.sc4-split-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 16px;
+  grid-template-columns: 340px 1fr;
+  gap: 14px;
   margin-bottom: 14px;
   align-items: start;
 }
 
-/* Q-cell heatmap — six classes painted on the cell background based on
-   max-Q across the four moves. Same scale as scene 2's V heatmap. */
-.q-cell.heat-zero        { background: var(--bg-strong); }
-.q-cell.heat-pos-strong  { background: #5BA85B; color: #FFFFFF; }
-.q-cell.heat-pos-mid     { background: #C8E8C8; }
-.q-cell.heat-neutral     { background: var(--bg-strong); }
-.q-cell.heat-neg-mid     { background: #F8C8C0; }
-.q-cell.heat-neg-strong  { background: #E84828; color: #FFFFFF; }
-
-/* On a strongly coloured cell, the bar-track + thumb-hp-bg need a darker
-   tint so they're still visible against the saturated background. */
-.q-cell.heat-pos-strong .q-bar-track,
-.q-cell.heat-neg-strong .q-bar-track,
-.q-cell.heat-pos-strong .q-thumb-hp-bg,
-.q-cell.heat-neg-strong .q-thumb-hp-bg {
-  background: rgba(0,0,0,0.32);
-}
-
-/* Click affordance + selected state. */
-.q-cell.clickable {
-  cursor: pointer;
-  transition: transform 80ms ease-out, opacity 200ms;
-}
-.q-cell.clickable:hover { transform: scale(1.02); z-index: 1; }
-.q-cell.selected {
-  outline: 3px solid var(--pikachu-yellow);
-  outline-offset: -3px;
-  z-index: 2;
-}
-
-/* ----- Inspector panel ----- */
-.sc4-inspector {
+/* Battle-now panel */
+.sc4-battle-now {
   font-family: 'Press Start 2P', monospace;
-  font-size: 8.5px;
-  color: var(--ink-on-box);
-  line-height: 1.5;
-  max-height: 720px;
-  overflow-y: auto;
-}
-.sc4-inspector .sc4-ins-placeholder {
-  color: var(--ink-secondary);
-  text-align: center;
-  padding: 28px 8px;
-  line-height: 1.7;
-  font-size: 8.5px;
-}
-.sc4-inspector .sc4-ins-state {
-  font-size: 10px;
-  color: var(--ink-on-box);
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
-}
-.sc4-inspector .sc4-ins-meta {
-  font-size: 7.5px;
-  color: var(--ink-secondary);
-  margin-bottom: 12px;
-  line-height: 1.7;
-}
-.sc4-inspector .sc4-ins-block-title {
   font-size: 8px;
-  font-weight: bold;
   color: var(--ink-on-box);
-  margin: 12px 0 6px;
-  padding-top: 8px;
-  border-top: 2px solid var(--rule);
+}
+.sc4-bn-title {
+  font-size: 10px;
+  margin-bottom: 10px;
   letter-spacing: 0.5px;
 }
-.sc4-inspector .sc4-ins-block-title:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
-
-.sc4-inspector .sc4-ins-moves,
-.sc4-inspector .sc4-ins-deltas {
+.sc4-bn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: end;
+}
+.sc4-bn-side {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-.sc4-inspector .sc4-ins-move {
-  display: grid;
-  grid-template-columns: 1fr auto 64px;
-  gap: 6px;
   align-items: center;
-  padding: 5px 7px;
-  border: 2px solid var(--rule);
-  background: var(--bg);
+  gap: 5px;
+}
+.sc4-bn-sprite {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.sc4-bn-hp {
+  width: 100%;
+  height: 8px;
+  background: rgba(0,0,0,0.16);
+  border: 2px solid var(--ink, #000);
+  box-sizing: border-box;
+  position: relative;
+}
+.sc4-bn-hp-fill {
+  height: 100%;
+  background: #48C848;
+  transition: width 200ms;
+}
+.sc4-bn-hp-fill.b1 { background: #88D848; }
+.sc4-bn-hp-fill.b2 { background: #E8C828; }
+.sc4-bn-hp-fill.b3 { background: #E89028; }
+.sc4-bn-hp-fill.b4 { background: #E84828; }
+.sc4-bn-label { font-size: 7.5px; letter-spacing: 0.04em; text-align: center; }
+.sc4-bn-next {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px solid var(--rule);
   font-size: 8px;
-}
-.sc4-inspector .sc4-ins-move.argmax {
-  background: rgba(72, 200, 72, 0.18);
-  border-color: var(--hp-green);
-}
-.sc4-inspector .sc4-ins-move-name { font-size: 7.5px; }
-.sc4-inspector .sc4-ins-move-q { font-size: 10px; color: var(--ink-on-box); justify-self: end; }
-.sc4-inspector .sc4-ins-arg { font-size: 7px; color: #2A6A2A; }
-
-.sc4-inspector .sc4-ins-delta-row {
-  display: grid;
-  grid-template-columns: 70px 60px 60px 50px;
-  gap: 4px;
-  align-items: center;
-  padding: 3px 5px;
-  font-size: 7.5px;
-  background: var(--bg);
-  border: 1px solid var(--rule);
-}
-.sc4-inspector .sc4-ins-delta-row.pos { background: rgba(72, 200, 72, 0.10); }
-.sc4-inspector .sc4-ins-delta-row.neg { background: rgba(232, 72, 40, 0.10); }
-.sc4-inspector .sc4-ins-prev { color: var(--ink-secondary); }
-.sc4-inspector .sc4-ins-curr { color: var(--ink-on-box); font-weight: bold; }
-.sc4-inspector .sc4-ins-delta-val { font-weight: bold; }
-.sc4-inspector .sc4-ins-delta-row.pos .sc4-ins-delta-val { color: #2A6A2A; }
-.sc4-inspector .sc4-ins-delta-row.neg .sc4-ins-delta-val { color: #962a1a; }
-.sc4-inspector .sc4-ins-delta-row.zero .sc4-ins-delta-val { color: var(--ink-secondary); }
-
-.sc4-inspector .sc4-ins-vi-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 6px;
-  font-size: 8px;
-  border-bottom: 1px dashed var(--inner-highlight);
-}
-.sc4-inspector .sc4-ins-vi-row:last-of-type { border-bottom: none; }
-.sc4-inspector .sc4-ins-num { color: var(--pikachu-cheek); font-size: 10px; }
-.sc4-inspector .sc4-ins-vi-match {
-  margin-top: 8px;
-  padding: 6px 8px;
-  font-size: 8px;
-  text-align: center;
-  letter-spacing: 0.5px;
-}
-.sc4-inspector .sc4-ins-vi-match.good { background: rgba(72, 200, 72, 0.18); color: #2A6A2A; }
-.sc4-inspector .sc4-ins-vi-match.bad  { background: rgba(232, 72, 40, 0.18); color: #962a1a; }
-.sc4-inspector .sc4-ins-empty {
-  padding: 12px 8px;
-  text-align: center;
-  font-size: 8px;
-  color: var(--ink-secondary);
-  background: var(--bg);
-  border: 2px solid var(--rule);
   line-height: 1.7;
 }
+.sc4-bn-pick {
+  font-size: 7px;
+  margin-left: 6px;
+}
+.sc4-battle-now .comp-mdp { color: var(--hue-anymal); }
+.sc4-battle-now .comp-eps { color: var(--hue-casino); }
+
+/* Step-detail panel */
+.sc4-step-detail {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+.sc4-sd-title {
+  font-size: 10px;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+.sc4-sd-empty {
+  padding: 24px 8px;
+  text-align: center;
+  color: var(--ink-secondary);
+  font-size: 8px;
+  line-height: 1.8;
+}
+.sc4-sd-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+  font-size: 8px;
+}
+.sc4-sd-row > span:first-child {
+  color: var(--ink-secondary);
+  flex-shrink: 0;
+}
+.sc4-sd-row > span:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.sc4-sd-pick {
+  font-size: 7px;
+  margin-left: 6px;
+  color: var(--hue-casino);
+  letter-spacing: 0.04em;
+}
+.sc4-sd-sep {
+  height: 2px;
+  background: var(--rule);
+  margin: 8px 0;
+}
+.sc4-sd-calc .sc4-sd-row { font-size: 7.5px; }
+.sc4-sd-bottom {
+  border-top: 1px solid var(--rule);
+  padding-top: 6px !important;
+  margin-top: 4px;
+  font-size: 8px !important;
+}
+.sc4-step-detail .comp-mdp     { color: var(--hue-anymal); }
+.sc4-step-detail .comp-rm      { color: var(--hue-star);   }
+.sc4-step-detail .comp-bellman { color: var(--hue-ghost);  }
+.sc4-step-detail .comp-eps     { color: var(--hue-casino); }
+.sc4-step-detail b { font-weight: bold; }
+
+/* ----- Dark theme ----- */
+:root[data-theme="dark"] .q-cell,
+:root[data-theme="dark"] .q-freq-strip {
+  background: rgba(255,255,255,0.06);
+}
+:root[data-theme="dark"] .q-thumb-hp-bg,
+:root[data-theme="dark"] .q-bar-track,
+:root[data-theme="dark"] .q-freq-track {
+  background: rgba(255,255,255,0.10);
+}
+:root[data-theme="dark"] .q-delta {
+  text-shadow: 1px 1px 0 #1a1a1a, -1px -1px 0 #1a1a1a, 1px -1px 0 #1a1a1a, -1px 1px 0 #1a1a1a;
+}
+:root[data-theme="dark"] .q-delta.pos { color: #82E085; }
+:root[data-theme="dark"] .q-delta.neg { color: #FF7B7B; }

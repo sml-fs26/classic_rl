@@ -65,6 +65,10 @@
   letter-spacing: 1px;
   margin-top: 24px;
 }
+.sc0-credits.sc0-credits-by {
+  margin-top: 6px;
+  color: var(--pikachu-cheek, #C62828);
+}
 
 /* MDP overlay phase */
 .sc0-mdp-wrap {

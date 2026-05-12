@@ -1,328 +1,427 @@
-/* Scene 4 — SARSA learns it. REDESIGNED for pedagogy.
+/* Scene 4 — SARSA, one step at a time.
  *
- *   Same precomputed Q-snapshots as before (episodes 0,1,5,25,100,500,2000),
- *   same Q-table render via QTable.mount, same learning curve below.  What's
- *   new:
+ *   The earlier draft fast-forwarded through precomputed snapshots; this one
+ *   runs a live SARSA agent in the page and exposes the loop step by step.
+ *   The pedagogical script we follow on screen:
  *
- *   A. A narrator dialog box above the grid that defines "episode = one
- *      battle" and tells the story per snapshot ("PIKACHU just played its
- *      first battle, a few cells got their first updates", ...).
- *   B. The SARSA update rule rendered above the grid in a Pokemon-styled
- *      formula card.  Each chunk is colour-coded back to its prior-viz
- *      origin (ANYmal-red for Q(s,a), Darts-amber for α, Spooky-purple for
- *      the TD target r+γQ(s',a'), Casino-blue for the ε-greedy a' selection).
- *   C. A click-cell inspector panel on the right of the Q-table.  Click any
- *      state -> see its four Q-values at THIS snapshot, the per-move deltas
- *      since the previous snapshot, total visit count across training, and
- *      a cross-reference to scene 2's converged V at the same state.  The
- *      load-bearing piece: students see WHY this cell's Q for THIS move
- *      moved, not just THAT it moved.
+ *     1. Init Q(s,a) to small random noise — no plan yet.
+ *     2. Pick action a at current state s via ε-greedy.
+ *     3. Play a in the world; observe reward r and new state s'.
+ *     4. Pick a' at s' via ε-greedy (the second "A" in SARSA).
+ *     5. Update Q(s,a) toward r + γ·Q(s',a') by α.
+ *     6. s ← s', a ← a'. Repeat.
  *
- *   QTable.mount now exposes `setOnCellClick(handler)` + `getCellNode(s)` +
- *   max-Q heatmap classes on every update.  Everything else inherited.
- *
- *   `&run` flag auto-scrubs through all snapshots for headless verification.
+ *   The +1 / +5 / +10 / +100 buttons drive that loop. The right-hand
+ *   panels show what just happened (full Bellman computation, colour-coded
+ *   back to the formula card) and what is about to happen (live sprites
+ *   + HP bars + queued action). The Q-table heatmap and argmax strip from
+ *   QTable.mount still sit below, updating after every batch.
  */
 (function () {
   window.scenes = window.scenes || {};
 
-  const NB = window.Battle.NUM_BUCKETS;          // 5
+  const NB      = window.Battle.NUM_BUCKETS;
   const BUCKETS = window.Battle.BUCKETS;
   const ACTIONS = window.Moves.MOVE_IDS;
-  const A = ACTIONS.length;
-  const STATES = window.Bellman.STATES;
+  const A       = ACTIONS.length;
+  const STATES  = window.Bellman.STATES;
+  const N       = STATES.length;
 
+  function bucketName(b) { return b >= NB ? 'FAINTED' : BUCKETS[b].toUpperCase(); }
+  function stateLabel(s) {
+    if (!s) return '—';
+    if (s.terminal) return s.win ? 'WIN (terminal)' : 'LOSS (terminal)';
+    return bucketName(s.your) + ' / ' + bucketName(s.opp);
+  }
   function moveShort(id) { return window.QTable.shortMoveLabel(id); }
+  function moveName(id)  { return window.Moves.MOVE_BY_ID[id].name; }
+  function bucketPct(b)  { return Math.max(0, (NB - b) * 100 / NB); }
+  function bucketClass(b) {
+    if (b === 0) return '';
+    if (b === 1) return 'b1';
+    if (b === 2) return 'b2';
+    if (b === 3) return 'b3';
+    return 'b4';
+  }
+  function fmtSigned(v) { return (v >= 0 ? '+' : '') + v.toFixed(2); }
 
-  /* Narration adapts to the actual episode count of the snapshot, so the
-     viz survives precompute changes that add / remove snapshots. */
-  function narrationFor(snapIdx, snap) {
-    if (snapIdx === 0) {
-      return "Episode 0. PIKACHU has played zero battles. Q = 0 by initialization.";
+  function renderBattleNow(host, s, pending, epState) {
+    const fainted = s && s.terminal;
+    let html =
+      '<div class="sc4-bn-title">BATTLE NOW</div>' +
+      '<div class="sc4-bn-row">' +
+        '<div class="sc4-bn-side">' +
+          '<img class="sc4-bn-sprite" src="assets/pikachu-back.png" alt="Pikachu">' +
+          '<div class="sc4-bn-hp"><div class="sc4-bn-hp-fill ' + (fainted && !s.win ? 'b4' : bucketClass(s.your || 0)) + '"' +
+              ' style="width:' + (fainted && !s.win ? 0 : bucketPct(s.your || 0)) + '%"></div></div>' +
+          '<div class="sc4-bn-label">PIKACHU ' + (fainted && !s.win ? 'FAINTED' : bucketName(s.your || 0)) + '</div>' +
+        '</div>' +
+        '<div class="sc4-bn-side">' +
+          '<img class="sc4-bn-sprite" src="assets/charmander-front.png" alt="Charmander">' +
+          '<div class="sc4-bn-hp"><div class="sc4-bn-hp-fill ' + (fainted && s.win ? 'b4' : bucketClass(s.opp || 0)) + '"' +
+              ' style="width:' + (fainted && s.win ? 0 : bucketPct(s.opp || 0)) + '%"></div></div>' +
+          '<div class="sc4-bn-label">CHARM ' + (fainted && s.win ? 'FAINTED' : bucketName(s.opp || 0)) + '</div>' +
+        '</div>' +
+      '</div>';
+
+    if (epState === 'ready') {
+      html += '<div class="sc4-bn-next">EPISODE OVER — click <b>+1</b> to start a new battle.</div>';
+    } else if (pending && pending.aIdx >= 0) {
+      html += '<div class="sc4-bn-next">NEXT MOVE: <b class="comp-mdp">' + moveName(ACTIONS[pending.aIdx]) + '</b>' +
+              '<span class="sc4-bn-pick comp-eps">(' + (pending.exploring ? 'EXPLORE — random' : 'EXPLOIT — argmax Q(s, ·)') + ')</span></div>';
+    } else {
+      html += '<div class="sc4-bn-next"><i>No action queued.</i></div>';
     }
-    const ep = snap ? snap.episode : 0;
-    if (ep <= 1)    return "After 1 battle, the (state, move) pairs PIKACHU visited got their first update. Most cells still zero.";
-    if (ep <= 10)   return "Around " + ep + " battles. Coverage grows; cells near WIN catch positive Q.";
-    if (ep <= 50)   return ep + " battles. Visit-frequent states settling. THUNDERBOLT pulling ahead in the healthy region.";
-    if (ep <= 200)  return ep + " battles. Argmax stable across most-visited cells. Rare states still wobbling.";
-    if (ep <= 1000) return ep + " battles. Nearly converged. Q creeps up slowly via the Bellman target.";
-    return ep + " battles. Q has converged. Compare to scene 2's V — same policy, learned only from battles.";
+    host.innerHTML = html;
+  }
+
+  function renderStepDetail(host, u, alpha, gamma) {
+    if (!u) {
+      host.innerHTML =
+        '<div class="sc4-sd-title">LAST UPDATE</div>' +
+        '<div class="sc4-sd-empty">No steps taken yet.<br>Click <b>+1 STEP</b> to play one turn.</div>';
+      return;
+    }
+    const sLab     = stateLabel(u.s);
+    const aLab     = moveName(ACTIONS[u.aIdx]);
+    const sNextLab = stateLabel(u.sNext);
+    let aNextLab;
+    if (u.terminal) {
+      aNextLab = '— (terminal, Q(s′, a′) = 0)';
+    } else {
+      aNextLab = moveName(ACTIONS[u.aNextIdx]) +
+                 ' <span class="sc4-sd-pick">(' + (u.aNextExplore ? 'explore' : 'argmax') + ')</span>';
+    }
+    const targetParts = u.terminal
+      ? fmtSigned(u.reward) + ' &nbsp;(terminal, drop bootstrap)'
+      : fmtSigned(u.reward) + ' + ' + gamma.toFixed(2) + '·' + fmtSigned(u.qNext) + ' = ' + fmtSigned(u.target);
+
+    host.innerHTML =
+      '<div class="sc4-sd-title">LAST UPDATE — STEP ' + u.step + '</div>' +
+      '<div class="sc4-sd-row"><span>s</span><span class="comp-mdp">' + sLab + '</span></div>' +
+      '<div class="sc4-sd-row"><span>a</span><span><b class="comp-mdp">' + aLab + '</b>' +
+        '<span class="sc4-sd-pick">(' + (u.aExplore ? 'explore' : 'argmax') + ')</span></span></div>' +
+      '<div class="sc4-sd-row"><span>r</span><span class="comp-bellman">' + fmtSigned(u.reward) + '</span></div>' +
+      '<div class="sc4-sd-row"><span>s′</span><span class="comp-mdp">' + sNextLab + '</span></div>' +
+      '<div class="sc4-sd-row"><span>a′</span><span class="comp-eps">' + aNextLab + '</span></div>' +
+      '<div class="sc4-sd-sep"></div>' +
+      '<div class="sc4-sd-calc">' +
+        '<div class="sc4-sd-row"><span>Q(s, a) before</span><span class="comp-mdp">' + fmtSigned(u.qBefore) + '</span></div>' +
+        '<div class="sc4-sd-row"><span>target = r + γ·Q(s′, a′)</span><span class="comp-bellman">' + targetParts + '</span></div>' +
+        '<div class="sc4-sd-row"><span>δ = target − Q(s, a)</span><span class="comp-bellman">' + fmtSigned(u.delta) + '</span></div>' +
+        '<div class="sc4-sd-row sc4-sd-bottom"><span>Q(s, a) after = Q + α·δ</span><span class="comp-mdp">' +
+          fmtSigned(u.qBefore) + ' + ' + alpha.toFixed(2) + '·' + fmtSigned(u.delta) + ' = <b>' + fmtSigned(u.qAfter) + '</b></span></div>' +
+      '</div>';
   }
 
   window.scenes.scene4 = function (root) {
     root.classList.add('scene-pad');
     root.innerHTML = '';
 
-    const cfg = window.DATA.params.sarsa;
-    const snapshots = window.DATA.sarsa.snapshots;
-    const rewardSeries = window.DATA.sarsa.rewardPerEpisode;
-    const visitCounts = window.DATA.sarsa.visitCounts || [];
-    const viGamma = window.DATA.params.gammaDefault;
-    const viKey = viGamma.toFixed(2);
-    const viV = window.DATA.valueIteration.V[viKey];
-    const viPolicy = window.DATA.valueIteration.policy[viKey];
+    const cfg   = window.DATA.params.sarsa;
+    const eps   = cfg.epsilon;
+    const alpha = cfg.alpha;
+    const gamma = cfg.gamma;
 
-    /* ---------- Section heading ---------- */
+    /* Heading */
     const heading = document.createElement('h2');
     heading.className = 'poke-section-title';
-    heading.textContent = 'SARSA — PIKACHU LEARNS Q FROM ITS OWN BATTLES';
+    heading.textContent = 'SARSA — PIKACHU LEARNS Q ONE STEP AT A TIME';
     root.appendChild(heading);
 
-    /* ---------- Narrator dialog ---------- */
+    /* Narrator dialog */
     const narratorHost = document.createElement('div');
     narratorHost.className = 'sc4-narrator';
     root.appendChild(narratorHost);
     const narrator = window.Dialog.mount(narratorHost);
 
-    /* ---------- SARSA formula card (colour-coded chunks) ---------- */
+    /* Plain-English algorithm box */
+    const algoBox = document.createElement('div');
+    algoBox.className = 'sc4-algo poke-box tight';
+    algoBox.innerHTML =
+      '<div class="sc4-algo-title">SARSA — WHAT WE DO EVERY STEP</div>' +
+      '<ol class="sc4-algo-list">' +
+        '<li><b>INIT:</b> Q(s, a) is small random noise — PIKACHU has no plan yet.</li>' +
+        '<li>Stand at state <span class="comp-mdp">s</span>. Pick action <span class="comp-eps">a</span> by ε-greedy.</li>' +
+        '<li>Play <span class="comp-eps">a</span>. Observe reward <span class="comp-bellman">r</span> and new state <span class="comp-mdp">s′</span>.</li>' +
+        '<li>Pick <span class="comp-eps">a′</span> at <span class="comp-mdp">s′</span> by ε-greedy (the second &laquo;A&raquo; of SARSA).</li>' +
+        '<li><b>UPDATE:</b> bump <span class="comp-mdp">Q(s, a)</span> toward <span class="comp-bellman">r + γ·Q(s′, a′)</span> by a fraction <span class="comp-rm">α</span>.</li>' +
+        '<li>Move on: <span class="comp-mdp">s ← s′</span>, <span class="comp-eps">a ← a′</span>. Repeat.</li>' +
+      '</ol>';
+    root.appendChild(algoBox);
+
+    /* SARSA formula card */
     const formulaCard = document.createElement('div');
     formulaCard.className = 'sc4-formula-card';
     formulaCard.innerHTML =
       '<div class="sc4-formula">' +
-        '<span class="comp-mdp">Q(s, a)</span>' +
-        ' ← ' +
-        '<span class="comp-mdp">Q(s, a)</span>' +
-        ' + ' +
-        '<span class="comp-rm">α</span>' +
+        '<span class="comp-mdp">Q(s, a)</span> ← <span class="comp-mdp">Q(s, a)</span> + <span class="comp-rm">α</span>' +
         ' [ <span class="comp-bellman">r + γ&middot;Q(s′, a′)</span>' +
         ' − <span class="comp-mdp">Q(s, a)</span> ]' +
       '</div>' +
       '<div class="sc4-formula-legend">' +
         '<span class="legend-chip comp-mdp">Q(s, a)</span><span> ANYmal — MDP\'s action-value</span>' +
-        '<span class="legend-chip comp-rm">α</span><span> Darts — RM learning rate</span>' +
-        '<span class="legend-chip comp-bellman">r + γ·Q(s′, a′)</span><span> Spooky — TD target (sampled, not enumerated)</span>' +
-        '<span class="legend-chip comp-eps">a, a′ via ε-greedy</span><span> Casino — picks actions</span>' +
+        '<span class="legend-chip comp-rm">α = ' + alpha.toFixed(2) + '</span><span> Darts — RM learning rate</span>' +
+        '<span class="legend-chip comp-bellman">r + γ·Q(s′, a′), γ = ' + gamma.toFixed(2) + '</span><span> Spooky — TD target (sampled, not enumerated)</span>' +
+        '<span class="legend-chip comp-eps">a, a′ via ε-greedy, ε = ' + eps.toFixed(2) + '</span><span> Casino — picks actions</span>' +
       '</div>';
     root.appendChild(formulaCard);
 
-    /* ---------- Param strip (read-only) ---------- */
-    const params = document.createElement('div');
-    params.className = 'sc4-params';
-    params.innerHTML =
-      '<div class="poke-menu-row"><span>&epsilon;</span><span class="val">' + cfg.epsilon.toFixed(2) + '</span></div>' +
-      '<div class="poke-menu-row"><span>&alpha;</span><span class="val">' + cfg.alpha.toFixed(2) + '</span></div>' +
-      '<div class="poke-menu-row"><span>&gamma;</span><span class="val">' + cfg.gamma.toFixed(2) + '</span></div>' +
-      '<div class="poke-menu-row"><span>EPISODES</span><span class="val">' + cfg.episodes + '</span></div>';
-    root.appendChild(params);
+    /* Step controls + status counter */
+    const controlsRow = document.createElement('div');
+    controlsRow.className = 'sc4-controls-row';
+    controlsRow.innerHTML =
+      '<div class="sc4-controls">' +
+        '<button class="poke-btn sc4-btn-step" data-step="1">+1 STEP</button>' +
+        '<button class="poke-btn sc4-btn-step" data-step="5">+5</button>' +
+        '<button class="poke-btn sc4-btn-step" data-step="10">+10</button>' +
+        '<button class="poke-btn sc4-btn-step" data-step="100">+100</button>' +
+        '<button class="poke-btn sc4-reset" data-step="0">RESET</button>' +
+      '</div>' +
+      '<div class="sc4-step-status">' +
+        '<span>STEP <b id="sc4-step-count">0</b></span>' +
+        '<span>BATTLES PLAYED <b id="sc4-ep-count">0</b></span>' +
+        '<span>TURNS THIS BATTLE <b id="sc4-turn-count">0</b></span>' +
+        '<span>WINS <b id="sc4-wins">0</b> / LOSSES <b id="sc4-losses">0</b></span>' +
+      '</div>';
+    root.appendChild(controlsRow);
 
-    /* ---------- Scrubber ---------- */
-    const scrub = document.createElement('div');
-    scrub.className = 'scrubber';
-    scrub.innerHTML =
-      '<div class="scr-label">EP: <span id="sc4-ep">0</span></div>' +
-      '<input type="range" id="sc4-range" min="0" max="' + (snapshots.length - 1) + '" step="1" value="0">' +
-      '<div class="scr-snapshots" id="sc4-snaps"></div>';
-    root.appendChild(scrub);
-    const snapsHost = scrub.querySelector('#sc4-snaps');
-    for (let i = 0; i < snapshots.length; i++) {
-      const pill = document.createElement('button');
-      pill.className = 'scr-snap';
-      pill.type = 'button';
-      pill.textContent = String(snapshots[i].episode);
-      pill.dataset.idx = String(i);
-      pill.addEventListener('click', () => setCursor(i));
-      snapsHost.appendChild(pill);
-    }
+    /* Side-by-side: battle-now + step-detail */
+    const splitRow = document.createElement('div');
+    splitRow.className = 'sc4-split-row';
+    const battleNowHost = document.createElement('div');
+    battleNowHost.className = 'sc4-battle-now poke-box tight';
+    splitRow.appendChild(battleNowHost);
+    const stepDetailHost = document.createElement('div');
+    stepDetailHost.className = 'sc4-step-detail poke-box tight';
+    splitRow.appendChild(stepDetailHost);
+    root.appendChild(splitRow);
 
-    /* ---------- Two-column row: Q-table + inspector ---------- */
-    const row = document.createElement('div');
-    row.className = 'sc4-row';
-    root.appendChild(row);
-
+    /* Q-table */
     const qHost = document.createElement('div');
     qHost.className = 'sc4-q';
-    row.appendChild(qHost);
+    root.appendChild(qHost);
     const qtbl = window.QTable.mount(qHost);
 
-    const inspector = document.createElement('div');
-    inspector.className = 'sc4-inspector poke-box tight';
-    row.appendChild(inspector);
-
-    /* ---------- Learning curve ---------- */
-    const lcWrap = document.createElement('div');
-    lcWrap.className = 'sc4-lc-wrap';
-    root.appendChild(lcWrap);
-    const lcHeader = document.createElement('div');
-    lcHeader.className = 'poke-section-title sc4-lc-header';
-    lcHeader.textContent = 'WIN-RATE PER EPISODE';
-    lcWrap.appendChild(lcHeader);
-    const lcHost = document.createElement('div');
-    lcWrap.appendChild(lcHost);
-    const lc = window.LearningCurve.mount(lcHost, { window: 100 });
-    lc.setData(rewardSeries);
-
-    /* ---------- Caption ---------- */
+    /* Caption */
     const caption = document.createElement('div');
     caption.className = 'poke-caption';
     caption.innerHTML =
-      'Each cell is a state (your HP × opp HP). One <b>episode</b> = one battle ≈ 4–10 turns. ' +
-      'Each turn produces one Q-update via the formula above. ' +
-      'Click any cell to see its four Q-values, the deltas since the previous snapshot, and how SARSA\'s answer compares to scene 2\'s value iteration.';
+      'Each click runs SARSA forward by that many steps — one step = one PIKACHU turn. ' +
+      'The Q-table cell whose value just changed flashes yellow. ' +
+      'Greener cells have higher max-Q (PIKACHU expects to win from there); redder cells, lower.';
     root.appendChild(caption);
 
-    /* ---------- State + render ---------- */
-    let cursor = 0;
-    let selectedState = 0;   // default: state index 0 = (FULL, FULL)
-    function stateIndex(y, o) { return y * NB + o; }
+    /* ----- Live SARSA state ----- */
+    let Q = null;
+    let rng = null;
+    let s = null;
+    let sIdx = -1;
+    let aIdx = -1;
+    let aExplore = false;
+    let epState = 'ready';   // 'ready' | 'mid'
+    let stepCount = 0;
+    let episodeCount = 0;
+    let turnsThisEp = 0;
+    let wins = 0;
+    let losses = 0;
+    let lastUpdate = null;
 
-    function setCursor(i) {
-      i = Math.max(0, Math.min(snapshots.length - 1, i));
-      cursor = i;
-      const snap = snapshots[i];
-      document.getElementById('sc4-ep').textContent = String(snap.episode);
-      const range = document.getElementById('sc4-range');
-      if (parseInt(range.value, 10) !== i) range.value = String(i);
-      const qArr = snap.Q;
-      const Q = new Float32Array(qArr.length);
-      for (let k = 0; k < qArr.length; k++) Q[k] = qArr[k];
-      qtbl.update(Q);
-      lc.setCursor(snap.episode);
-      const pills = scrub.querySelectorAll('.scr-snap');
-      pills.forEach((p, k) => p.classList.toggle('active', k === i));
-      narrator.say(narrationFor(i, snap));
-      renderInspector();
+    function initRandomQ() {
+      Q = new Float32Array(N * A);
+      for (let i = 0; i < Q.length; i++) {
+        Q[i] = (rng() - 0.5) * 0.4;     // uniform in [-0.2, 0.2]
+      }
     }
 
-    /* Inspector: re-renders for the currently-selected state at the
-       currently-active snapshot. Shows current Q + deltas vs prev snap +
-       VI cross-ref + total visits. */
-    function renderInspector() {
-      if (selectedState < 0) {
-        inspector.innerHTML = '<div class="sc4-ins-placeholder">Click any cell on the Q-table to see how its Q values are evolving.</div>';
-        return;
+    function pickActionIdx(stateIdx) {
+      if (rng() < eps) {
+        return { aIdx: Math.floor(rng() * A), exploring: true };
       }
-      const s = selectedState;
-      const st = STATES[s];
-      const snap = snapshots[cursor];
-      const prevSnap = cursor > 0 ? snapshots[cursor - 1] : null;
-      const stateLabel = '(YOUR=' + BUCKETS[st.your].toUpperCase() + ', OPP=' + BUCKETS[st.opp].toUpperCase() + ')';
+      const base = stateIdx * A;
+      let m = Q[base];
+      for (let a = 1; a < A; a++) if (Q[base + a] > m) m = Q[base + a];
+      const ties = [];
+      for (let a = 0; a < A; a++) if (Q[base + a] === m) ties.push(a);
+      const pick = ties.length === 1 ? ties[0] : ties[Math.floor(rng() * ties.length)];
+      return { aIdx: pick, exploring: false };
+    }
 
-      const base = s * A;
-      const curr = ACTIONS.map((aid, a) => snap.Q[base + a]);
-      const prev = prevSnap ? ACTIONS.map((aid, a) => prevSnap.Q[base + a]) : null;
-      let argmax = 0, argmaxVal = -Infinity;
-      let allZero = true;
-      for (let a = 0; a < A; a++) {
-        if (Math.abs(curr[a]) > 1e-9) allZero = false;
-        if (curr[a] > argmaxVal) { argmaxVal = curr[a]; argmax = a; }
+    function startEpisode() {
+      s = window.Battle.initialState();
+      sIdx = s.your * NB + s.opp;
+      const p = pickActionIdx(sIdx);
+      aIdx = p.aIdx;
+      aExplore = p.exploring;
+      turnsThisEp = 0;
+    }
+
+    function reset() {
+      rng = window.Battle.makeRng(0x4242);
+      initRandomQ();
+      stepCount = 0;
+      episodeCount = 0;
+      wins = 0;
+      losses = 0;
+      lastUpdate = null;
+      epState = 'mid';
+      startEpisode();
+      qtbl.reset();
+      qtbl.update(Q, { suppressFlash: true });
+      refreshPanels();
+      narrator.say('Q-table is small random noise — PIKACHU has no plan yet. Click +1 STEP to play the first turn.', { instant: true });
+    }
+
+    function doStep() {
+      if (epState === 'ready') {
+        startEpisode();
+        epState = 'mid';
       }
+      const aId = ACTIONS[aIdx];
+      const qBefore = Q[sIdx * A + aIdx];
+      const out = window.Battle.sample(s, aId, rng);
 
-      const visits = visitCounts[s] || 0;
-      const viValue = viV ? viV[s] : null;
-      const viOptimal = viPolicy ? viPolicy[s] : null;
+      const u = {
+        step: stepCount + 1,
+        s: { your: s.your, opp: s.opp, terminal: false },
+        sIdx, aIdx, aExplore,
+        reward: out.reward,
+        terminal: out.terminal,
+        qBefore,
+      };
 
-      let html = '';
-      html += '<div class="sc4-ins-state">STATE ' + stateLabel + '</div>';
-      html += '<div class="sc4-ins-meta">SNAPSHOT: EP ' + snap.episode + ' &middot; total visits during training: <b>' + visits + '</b></div>';
+      if (out.terminal) {
+        const target = out.reward;             // bootstrap drops at terminal
+        const delta  = target - qBefore;
+        const qAfter = qBefore + alpha * delta;
+        Q[sIdx * A + aIdx] = qAfter;
 
-      if (allZero) {
-        if (snap.episode === 0) {
-          html += '<div class="sc4-ins-empty">Episode 0 — training has not started. Q is initialized to 0 across all four moves.</div>';
-        } else {
-          html += '<div class="sc4-ins-empty">PIKACHU has not reached this state in the first ' + snap.episode + ' battles. Q remains at 0 until the agent visits it.</div>';
-        }
+        u.sNext = { terminal: true, win: !!out.win, lose: !!out.lose };
+        u.aNextIdx = -1;
+        u.aNextExplore = false;
+        u.qNext = 0;
+        u.target = target;
+        u.delta = delta;
+        u.qAfter = qAfter;
+        u.won = !!out.win;
+
+        if (out.win) wins++; else losses++;
+        episodeCount++;
+        turnsThisEp++;
+        stepCount++;
+        lastUpdate = u;
+        /* Preserve at-the-moment-of-kill HP on the terminal marker so
+           BATTLE NOW shows the surviving side at its actual HP and the
+           other side fainted. Pull from out.log so we get Charm's HP
+           after Pikachu's killing move on a loss, not the pre-step value. */
+        const yourEnd = out.log ? out.log.yourAfter : u.s.your;
+        const oppEnd  = out.log ? out.log.oppAfter  : u.s.opp;
+        s = { your: yourEnd, opp: oppEnd, terminal: true,
+              win: !!out.win, lose: !!out.lose };
+        sIdx = -1; aIdx = -1; aExplore = false;
+        epState = 'ready';
       } else {
-        html += '<div class="sc4-ins-block-title">Q-values now</div>';
-        html += '<div class="sc4-ins-moves">';
-        for (let a = 0; a < A; a++) {
-          const isArg = (a === argmax);
-          const v = curr[a];
-          html += '<div class="sc4-ins-move ' + (isArg ? 'argmax' : '') + '">' +
-                    '<span class="sc4-ins-move-name">' + window.Moves.MOVE_BY_ID[ACTIONS[a]].name + '</span>' +
-                    '<span class="sc4-ins-move-q">' + (v >= 0 ? '+' : '') + v.toFixed(2) + '</span>' +
-                    (isArg ? '<span class="sc4-ins-arg">◀ ARGMAX</span>' : '<span></span>') +
-                  '</div>';
-        }
-        html += '</div>';
-      }
+        const sNext = out.sNext;
+        const sNextIdx = sNext.your * NB + sNext.opp;
+        const pNext = pickActionIdx(sNextIdx);
+        const qNext = Q[sNextIdx * A + pNext.aIdx];
+        const target = out.reward + gamma * qNext;
+        const delta  = target - qBefore;
+        const qAfter = qBefore + alpha * delta;
+        Q[sIdx * A + aIdx] = qAfter;
 
-      if (prev) {
-        const prevEp = prevSnap.episode;
-        html += '<div class="sc4-ins-block-title">Δ since EP ' + prevEp + '</div>';
-        html += '<div class="sc4-ins-deltas">';
-        for (let a = 0; a < A; a++) {
-          const d = curr[a] - prev[a];
-          let cls = 'zero';
-          if (d > 0.01) cls = 'pos';
-          else if (d < -0.01) cls = 'neg';
-          const sign = d > 0 ? '+' : (d < 0 ? '' : '±');
-          html += '<div class="sc4-ins-delta-row ' + cls + '">' +
-                    '<span class="sc4-ins-move-name">' + window.Moves.MOVE_BY_ID[ACTIONS[a]].name + '</span>' +
-                    '<span class="sc4-ins-prev">' + (prev[a] >= 0 ? '+' : '') + prev[a].toFixed(2) + ' →</span>' +
-                    '<span class="sc4-ins-curr">' + (curr[a] >= 0 ? '+' : '') + curr[a].toFixed(2) + '</span>' +
-                    '<span class="sc4-ins-delta-val">' + sign + d.toFixed(2) + '</span>' +
-                  '</div>';
-        }
-        html += '</div>';
-      }
+        u.sNext = { your: sNext.your, opp: sNext.opp, terminal: false };
+        u.sNextIdx = sNextIdx;
+        u.aNextIdx = pNext.aIdx;
+        u.aNextExplore = pNext.exploring;
+        u.qNext = qNext;
+        u.target = target;
+        u.delta = delta;
+        u.qAfter = qAfter;
 
-      if (viValue != null) {
-        const viMoveName = viOptimal ? window.Moves.MOVE_BY_ID[viOptimal].name : '—';
-        const match = !allZero && viOptimal === ACTIONS[argmax];
-        html += '<div class="sc4-ins-block-title">Versus scene 2 (VI)</div>';
-        html += '<div class="sc4-ins-vi-row">' +
-                  '<span>V(s) from VI:</span><span class="sc4-ins-num">' + viValue.toFixed(2) + '</span>' +
-                '</div>';
-        html += '<div class="sc4-ins-vi-row">' +
-                  '<span>VI argmax:</span><span><b>' + viMoveName + '</b></span>' +
-                '</div>';
-        if (!allZero) {
-          html += '<div class="sc4-ins-vi-match ' + (match ? 'good' : 'bad') + '">' +
-                    (match ? '✓ SARSA\'s argmax matches VI' : '✗ SARSA\'s argmax differs — this state may need more visits') +
-                  '</div>';
-        }
+        s = sNext;
+        sIdx = sNextIdx;
+        aIdx = pNext.aIdx;
+        aExplore = pNext.exploring;
+        turnsThisEp++;
+        stepCount++;
+        lastUpdate = u;
       }
-
-      inspector.innerHTML = html;
     }
 
-    /* Click-cell handler: highlight selected cell + re-render inspector. */
-    qtbl.setOnCellClick((s, cell) => {
-      const prevNode = qtbl.getCellNode(selectedState);
-      if (prevNode) prevNode.classList.remove('selected');
-      selectedState = s;
-      cell.classList.add('selected');
-      renderInspector();
+    function doSteps(n) {
+      for (let i = 0; i < n; i++) doStep();
+      qtbl.update(Q);
+      refreshPanels();
+      pulseUpdatedCell(lastUpdate.sIdx);
+      narrator.say(narrationFor(n, lastUpdate), { instant: true });
+    }
+
+    function pulseUpdatedCell(stateIdx) {
+      const node = qtbl.getCellNode(stateIdx);
+      if (!node) return;
+      node.classList.remove('just-updated');
+      void node.offsetWidth;
+      node.classList.add('just-updated');
+      setTimeout(() => node.classList.remove('just-updated'), 1400);
+    }
+
+    function refreshPanels() {
+      renderBattleNow(battleNowHost, s, { aIdx, exploring: aExplore }, epState);
+      renderStepDetail(stepDetailHost, lastUpdate, alpha, gamma);
+      document.getElementById('sc4-step-count').textContent = String(stepCount);
+      document.getElementById('sc4-ep-count').textContent   = String(episodeCount);
+      document.getElementById('sc4-turn-count').textContent = String(turnsThisEp);
+      document.getElementById('sc4-wins').textContent       = String(wins);
+      document.getElementById('sc4-losses').textContent     = String(losses);
+    }
+
+    function narrationFor(batchSize, u) {
+      if (!u) return 'No steps yet.';
+      const sLab = stateLabel(u.s);
+      const mvShort = moveShort(ACTIONS[u.aIdx]);
+      const mvLong  = moveName(ACTIONS[u.aIdx]);
+      const tagPick = u.aExplore ? 'EXPLORE' : 'EXPLOIT';
+      const dir = u.delta > 0.05 ? 'went UP' : (u.delta < -0.05 ? 'went DOWN' : 'barely moved');
+
+      if (batchSize === 1) {
+        if (u.terminal) {
+          return 'Step ' + u.step + '. At ' + sLab + ', PIKACHU used ' + mvLong + ' (' + tagPick + '). ' +
+                 (u.won ? 'PIKACHU WON the battle!' : 'PIKACHU FAINTED.') +
+                 ' Reward ' + fmtSigned(u.reward) + '. No bootstrap (terminal). ' +
+                 'Q for (' + sLab + ', ' + mvShort + ') ' + dir + '. Click +1 to start the next battle.';
+        }
+        return 'Step ' + u.step + '. At ' + sLab + ', PIKACHU used ' + mvLong + ' (' + tagPick + '). ' +
+               'Reward ' + fmtSigned(u.reward) + '. Now at ' + stateLabel(u.sNext) + '. ' +
+               'Q for (' + sLab + ', ' + mvShort + ') ' + dir + '.';
+      }
+      return 'Ran ' + batchSize + ' steps. Now step ' + stepCount + ', battle ' + (episodeCount + 1) + '. ' +
+             'Wins ' + wins + ', losses ' + losses + '. Last update at ' + sLab + ' with ' + mvLong + ' (' + tagPick + '). ' +
+             'Heatmap reflects everything learned so far.';
+    }
+
+    /* Wire buttons */
+    controlsRow.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const n = parseInt(btn.dataset.step, 10);
+        if (n === 0) reset();
+        else         doSteps(n);
+      });
     });
 
-    /* Apply default selection highlight on first render. */
-    const range = scrub.querySelector('#sc4-range');
-    range.addEventListener('input', () => setCursor(parseInt(range.value, 10)));
+    /* Initial mount */
+    reset();
 
-    setCursor(0);
-    const defaultNode = qtbl.getCellNode(selectedState);
-    if (defaultNode) defaultNode.classList.add('selected');
-
-    /* `&run` flag: auto-scrub to the final snapshot. */
+    /* Headless verification flag */
     const autoRun = /[#&?]run\b/.test(window.location.hash);
     if (autoRun) {
-      let i = 0;
-      function adv() {
-        if (i >= snapshots.length) return;
-        setCursor(i);
-        i++;
-        if (i < snapshots.length) setTimeout(adv, 800);
-      }
-      setTimeout(adv, 200);
+      setTimeout(() => doSteps(1),   200);
+      setTimeout(() => doSteps(100), 700);
+      setTimeout(() => doSteps(1000),1200);
     }
 
     return {
-      onEnter() {
-        const r = parseInt(range.value, 10);
-        setCursor(r);
-        const node = qtbl.getCellNode(selectedState);
-        if (node) node.classList.add('selected');
-      },
-      onNextKey() {
-        const i = parseInt(range.value, 10);
-        if (i < snapshots.length - 1) { setCursor(i + 1); return true; }
-        return false;
-      },
-      onPrevKey() {
-        const i = parseInt(range.value, 10);
-        if (i > 0) { setCursor(i - 1); return true; }
-        return false;
-      },
+      onEnter() { refreshPanels(); qtbl.update(Q, { suppressFlash: true }); },
     };
   };
 })();

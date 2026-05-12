@@ -279,17 +279,25 @@
     const ALL_HEAT_CLASSES = ['heat-zero', 'heat-pos-strong', 'heat-pos-mid', 'heat-neutral', 'heat-neg-mid', 'heat-neg-strong'];
 
     /* Wire click handlers on every cell — a single registered callback
-       receives the state index when clicked, plus the cell DOM node. */
+       receives the state index when clicked, plus the cell DOM node. The
+       'clickable' affordance is only painted once a caller actually
+       registers a handler, so cells don't lie when no one is listening. */
     let cellClickCb = null;
     for (let s = 0; s < N; s++) {
       const node = cellNodes[s];
-      node.cell.classList.add('clickable');
       node.cell.dataset.state = String(s);
       node.cell.addEventListener('click', () => {
         if (cellClickCb) cellClickCb(s, node.cell);
       });
     }
-    function setOnCellClick(cb) { cellClickCb = cb; }
+    function setOnCellClick(cb) {
+      cellClickCb = cb;
+      if (cb) {
+        for (let s = 0; s < N; s++) cellNodes[s].cell.classList.add('clickable');
+      } else {
+        for (let s = 0; s < N; s++) cellNodes[s].cell.classList.remove('clickable');
+      }
+    }
     function getCellNode(s) { return cellNodes[s] ? cellNodes[s].cell : null; }
 
     /* Wrap the original `update` so each call also applies the heatmap. */
