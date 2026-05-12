@@ -404,7 +404,7 @@ html, body {
   top: 0; left: 0; bottom: 0;
   background: var(--hp-green);
   width: 100%;
-  transition: width 600ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
+  transition: width 1100ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
 }
 .hp-bar-fill.mid { background: var(--hp-yellow); }
 .hp-bar-fill.low { background: var(--hp-red); }
