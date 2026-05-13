@@ -68,74 +68,139 @@
   display: flex;
   align-items: stretch;
   overflow-x: auto;
-  gap: 6px;
+  /* Larger gap between turn-groups than within a group (.traj-group
+     keeps its three boxes tight) — clusters each (s,a,r) triple
+     visually without losing the box-per-symbol mapping. */
+  gap: 22px;
   padding: 14px 12px;
   background: var(--bg-strong);
   border: 4px solid var(--rule);
   min-height: 180px;
 }
 
-.traj-tuple {
+/* One turn = a .traj-group of three boxes (sᵢ, aᵢ, rᵢ) so the eye
+   can trace each subscripted symbol from the formula above into its
+   own box. Within a group the inter-box gap is tight; between groups
+   the .traj-rollout `gap` provides breathing room. */
+.traj-group {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
   flex-shrink: 0;
-  width: 110px;
+}
+
+.traj-box {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 6px;
+  padding: 6px 8px 8px;
   background: var(--bg);
   border: 2px solid var(--ink);
+  border-left-width: 5px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  letter-spacing: 0.04em;
   color: var(--ink-on-box);
-  animation: traj-tuple-pop 280ms ease-out backwards;
+  animation: traj-box-pop 280ms ease-out backwards;
 }
-/* Terminal cards: win and loss encoded by the colour-blind-safe blue ↔
-   vermillion pair, and additionally by a ✓ / ✗ glyph in the step
-   header (added by sceneTrajectory.js). Either channel alone is enough
-   to tell win from loss. */
-.traj-tuple.terminal      { background: var(--cb-blue);       color: #FFF; }
-.traj-tuple.terminal.loss { background: var(--cb-vermillion); color: #FFF; }
-.traj-tuple-step { font-size: 8px; color: var(--ink-secondary); }
-.traj-tuple.terminal .traj-tuple-step { color: rgba(255,255,255,0.8); }
-.traj-tuple-state {
+
+/* Per-component border-left colour — echoes the cross-viz hue
+   identity used in scene-5 recap (MDP red / Casino blue / Bellman
+   purple). Box-label text gives the redundant non-colour cue. */
+.traj-box-state  { border-left-color: var(--hue-anymal); min-width: 100px; }
+.traj-box-action { border-left-color: var(--hue-casino); min-width: 88px;  }
+.traj-box-reward { border-left-color: var(--hue-ghost);  min-width: 60px; align-items: center; }
+
+.traj-box-label {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-bottom: 6px;
+}
+.traj-box-label sub {
+  font-size: 7px;
+  vertical-align: baseline;
+}
+
+/* sᵢ box content: two mini-Pokemons + HP bars + bucket labels. */
+.traj-box-state-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  align-items: center;
+  gap: 4px;
+  flex: 1;
+  align-items: end;
 }
-.traj-tuple-side { text-align: center; }
-.traj-tuple-sprite {
+.traj-box-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.traj-box-sprite {
   width: 28px;
   height: 28px;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
-.traj-tuple-hp {
+.traj-box-hp {
   width: 100%;
   height: 4px;
   background: rgba(0,0,0,0.2);
   border: 1px solid var(--ink);
   box-sizing: border-box;
 }
-.traj-tuple-hp-fill {
-  height: 100%;
-  background: #48C848;
-}
-.traj-tuple-hp-fill.b1 { background: #88D848; }
-.traj-tuple-hp-fill.b2 { background: #E8C828; }
-.traj-tuple-hp-fill.b3 { background: #E89028; }
-.traj-tuple-hp-fill.b4 { background: #E84828; }
-.traj-tuple-action { font-size: 7px; color: var(--pikachu-cheek, #C62828); }
-.traj-tuple-reward { font-size: 8px; font-weight: bold; }
-.traj-tuple-reward.pos { color: var(--cb-blue); }
-.traj-tuple-reward.neg { color: var(--cb-vermillion); }
-.traj-tuple-reward.neutral { color: var(--ink-secondary); }
-.traj-tuple.terminal .traj-tuple-reward { color: #FFF; }
+.traj-box-hp-fill { height: 100%; background: #48C848; }
+.traj-box-hp-fill.b1 { background: #88D848; }
+.traj-box-hp-fill.b2 { background: #E8C828; }
+.traj-box-hp-fill.b3 { background: #E89028; }
+.traj-box-hp-fill.b4 { background: #E84828; }
+.traj-box-bucket { font-size: 7px; }
 
-@keyframes traj-tuple-pop {
-  0%   { opacity: 0; transform: translateX(-10px) scale(0.9); }
-  100% { opacity: 1; transform: translateX(0) scale(1); }
+/* aᵢ box content: just the move name. */
+.traj-box-action-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5px;
+  color: var(--hue-casino);
+  text-align: center;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+/* rᵢ box content: big signed number, centred. Terminal turns swap the
+   border colour to colour-blind blue/vermillion and add a ✓/✗ tag. */
+.traj-box-reward-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--hue-ghost);
+  letter-spacing: 0.04em;
+}
+.traj-box-reward.win {
+  border-color: var(--cb-blue);
+  border-left-color: var(--cb-blue);
+  background: rgba(0, 114, 178, 0.10);
+}
+.traj-box-reward.win  .traj-box-reward-body { color: var(--cb-blue); font-size: 16px; }
+.traj-box-reward.loss {
+  border-color: var(--cb-vermillion);
+  border-left-color: var(--cb-vermillion);
+  background: rgba(213, 94, 0, 0.10);
+}
+.traj-box-reward.loss .traj-box-reward-body { color: var(--cb-vermillion); font-size: 16px; }
+.traj-box-terminal-tag {
+  font-size: 8px;
+  margin-top: 4px;
+  letter-spacing: 0.06em;
+}
+.traj-box-reward.win  .traj-box-terminal-tag { color: var(--cb-blue); }
+.traj-box-reward.loss .traj-box-terminal-tag { color: var(--cb-vermillion); }
+
+@keyframes traj-box-pop {
+  0%   { opacity: 0; transform: translateY(-6px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .traj-controls {
