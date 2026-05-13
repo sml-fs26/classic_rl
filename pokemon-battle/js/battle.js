@@ -30,20 +30,79 @@
   const BUCKET_IDX = { full: 0, high: 1, mid: 2, low: 3, critical: 4 };
   const FAINTED = NUM_BUCKETS;       // bucket index that means "off the bottom"
 
-  /* Damage distributions — bucket-delta given a hit. Each move's expected
-     damage shapes the optimal policy:
-       Quick Attack:  E[d] = 0.45  — too weak alone (Ember outpaces)
-       Thunderbolt :  E[d] = 1.50  — reliable workhorse
-       Thunder     :  E[d] = 1.38 (acct accuracy)  — biggest but variance
-     Ember on Pikachu :  E[d] = 0.55  — Pikachu lives ~9 turns on average. */
-  const HIT_DAMAGE_DIST = {
-    quick_attack: [[0, 0.55], [1, 0.45]],
-    thunderbolt:  [[1, 0.50], [2, 0.50]],
-    thunder:      [[2, 0.50], [3, 0.50]],
+  /* The opponent now has three forms tied to its own HP bucket — a feral
+     Charmander that evolves under battle stress.  Each form has its own
+     type-effectiveness matrix on PIKACHU's three moves AND its own
+     counter-attack damage profile.  Pikachu's optimal policy is therefore
+     NOT a single move everywhere — it shifts as the opponent evolves.
+
+       FORM             OPP HP buckets   Identity                 Counter
+       ────             ──────────────   ────────                 ───────
+       CHARMANDER       FULL, HIGH       baby fire-lizard         Ember     (0/1/2)
+       CHARMELEON       MID              tougher hide             Flame.    (1/2)
+       CHARIZARD        LOW, CRITICAL    enraged dragon           Outrage   (2/3)
+
+     Type chart (damage on hit · accuracy uses move.accuracy unchanged):
+
+                       CHARMANDER     CHARMELEON       CHARIZARD
+       QUICK ATTACK    0/1            0/1              2/3   ← weak underbelly
+       THUNDERBOLT     1/2            0/1              1/2   ← Charmeleon hide
+       THUNDER         2/3            2/3              2/3
+  */
+  function formForOpp(oppBucket) {
+    if (oppBucket <= 1) return 'charmander';   /* FULL or HIGH    */
+    if (oppBucket === 2) return 'charmeleon';  /* MID             */
+    return 'charizard';                         /* LOW or CRITICAL */
+  }
+
+  const HIT_DAMAGE_BY_FORM = {
+    charmander: {
+      quick_attack: [[0, 0.55], [1, 0.45]],
+      thunderbolt:  [[1, 0.50], [2, 0.50]],
+      thunder:      [[2, 0.50], [3, 0.50]],
+    },
+    charmeleon: {
+      quick_attack: [[0, 0.55], [1, 0.45]],   /* unchanged   */
+      thunderbolt:  [[0, 0.50], [1, 0.50]],   /* RESISTED    */
+      thunder:      [[2, 0.50], [3, 0.50]],   /* unchanged   */
+    },
+    charizard: {
+      quick_attack: [[2, 0.50], [3, 0.50]],   /* SUPER       */
+      thunderbolt:  [[1, 0.50], [2, 0.50]],   /* unchanged   */
+      thunder:      [[2, 0.50], [3, 0.50]],   /* unchanged   */
+    },
   };
-  /* Ember calibrated so random policy ~ break-even — gives SARSA something
-     to actually learn instead of winning trivially from episode 0. */
-  const EMBER_DIST = [[0, 0.20], [1, 0.55], [2, 0.25]];
+
+  const OPP_DIST_BY_FORM = {
+    charmander: [[0, 0.20], [1, 0.55], [2, 0.25]],   /* Ember        */
+    charmeleon: [[1, 0.50], [2, 0.50]],              /* Flamethrower */
+    charizard:  [[2, 0.50], [3, 0.50]],              /* Outrage      */
+  };
+
+  const FORM_DISPLAY_NAME = {
+    charmander: 'CHARMANDER',
+    charmeleon: 'CHARMELEON',
+    charizard:  'CHARIZARD',
+  };
+  const FORM_MOVE_NAME = {
+    charmander: 'EMBER',
+    charmeleon: 'FLAMETHROWER',
+    charizard:  'OUTRAGE',
+  };
+
+  /* Legacy aliases — kept so any external consumer that still imports
+     HIT_DAMAGE_DIST / EMBER_DIST gets the CHARMANDER (baseline) tables.
+     All new code should call hitDamageDist(form, moveId) /
+     oppDamageDist(form) instead. */
+  const HIT_DAMAGE_DIST = HIT_DAMAGE_BY_FORM.charmander;
+  const EMBER_DIST      = OPP_DIST_BY_FORM.charmander;
+
+  function hitDamageDist(form, moveId) {
+    return (HIT_DAMAGE_BY_FORM[form] || HIT_DAMAGE_BY_FORM.charmander)[moveId];
+  }
+  function oppDamageDist(form) {
+    return OPP_DIST_BY_FORM[form] || OPP_DIST_BY_FORM.charmander;
+  }
 
   /* ---------- RNG sampling helpers ---------- */
   function sampleDist(rng, dist) {
@@ -95,11 +154,14 @@
       yourAfter: your, oppAfter: oppB,
     };
 
-    /* Pikachu first. */
+    /* Pikachu first. Type-effectiveness depends on the form BEING attacked
+       — Charm-form before Pikachu's hit lands. */
+    const formBefore = formForOpp(state.opp);
+    log.formBefore = formBefore;
     const hit1 = rng() < move.accuracy;
     let oppDelta = 0;
     if (hit1) {
-      oppDelta = sampleDist(rng, HIT_DAMAGE_DIST[moveId]);
+      oppDelta = sampleDist(rng, hitDamageDist(formBefore, moveId));
       oppB = Math.min(FAINTED, oppB + oppDelta);
     }
     log.hit1 = hit1;
@@ -111,8 +173,13 @@
       return { sNext, reward: +10, terminal: true, win: true, lose: false, log };
     }
 
-    /* Charmander counters with Ember (always 100% acc). */
-    const yourDelta = sampleDist(rng, EMBER_DIST);
+    /* Opponent counters using the form it's in AFTER taking the hit —
+       Pikachu's damage may have triggered an evolution mid-turn (e.g.
+       Charmander → Charmeleon when crossing into MID HP). The new form's
+       counter is what hits Pikachu. */
+    const formAfter = formForOpp(oppB);
+    log.formAfter = formAfter;
+    const yourDelta = sampleDist(rng, oppDamageDist(formAfter));
     your = Math.min(FAINTED, your + yourDelta);
     log.yourDelta = yourDelta;
     log.yourAfter = your;
@@ -147,16 +214,23 @@
       else out.set(k, { sNext: sN, p, reward });
     }
 
+    /* Same form chain as sample(): Pikachu's damage table is keyed by
+       the form being attacked (formBefore); the counter is keyed by the
+       form AFTER Pikachu's hit (formAfter). On a miss, no evolution can
+       have happened, so both forms are the same. */
+    const formBefore = formForOpp(state.opp);
+
     /* Hit branch */
     if (pHit > 0) {
-      for (const [oppD, pO] of HIT_DAMAGE_DIST[moveId]) {
+      for (const [oppD, pO] of hitDamageDist(formBefore, moveId)) {
         const oppNew = Math.min(FAINTED, state.opp + oppD);
         if (oppNew >= FAINTED) {
           add({ terminal: true, win: true }, pHit * pO, +10);
           continue;
         }
-        /* Charmander counters. */
-        for (const [yD, pY] of EMBER_DIST) {
+        /* Opponent counters in its post-hit form (may have evolved). */
+        const formAfter = formForOpp(oppNew);
+        for (const [yD, pY] of oppDamageDist(formAfter)) {
           const yNew = Math.min(FAINTED, state.your + yD);
           if (yNew >= FAINTED) {
             add({ terminal: true, lose: true }, pHit * pO * pY, -10);
@@ -167,9 +241,9 @@
       }
     }
 
-    /* Miss branch: Pikachu deals 0; Charmander still counters. */
+    /* Miss branch: Pikachu deals 0, opponent stays in formBefore. */
     if (pMiss > 0) {
-      for (const [yD, pY] of EMBER_DIST) {
+      for (const [yD, pY] of oppDamageDist(formBefore)) {
         const yNew = Math.min(FAINTED, state.your + yD);
         if (yNew >= FAINTED) {
           add({ terminal: true, lose: true }, pMiss * pY, -10);
@@ -230,7 +304,14 @@
     NON_TERMINAL_STATES,
     PIKA_MAX_HP: NUM_BUCKETS,
     CHARM_MAX_HP: NUM_BUCKETS,
+    /* Legacy single-form damage tables (CHARMANDER baseline). New code
+       should call hitDamageDist(form, moveId) / oppDamageDist(form). */
     HIT_DAMAGE_DIST, EMBER_DIST,
+    /* New form-aware surface — read by scenes that render opponent
+       sprites / names / type-effectiveness explanations. */
+    HIT_DAMAGE_BY_FORM, OPP_DIST_BY_FORM,
+    FORM_DISPLAY_NAME, FORM_MOVE_NAME,
+    formForOpp, hitDamageDist, oppDamageDist,
     rewardFor,
     initialState, initialScalar,
     sample,

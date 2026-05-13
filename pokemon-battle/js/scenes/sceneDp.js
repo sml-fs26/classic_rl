@@ -87,44 +87,86 @@
     return { Q: Q, V: V };
   }
 
-  /* Build the detail-cell breakdown for (LOW, LOW, BOLT). We enumerate
-     the successor tree of THUNDERBOLT from (3, 3) and pair each branch
-     with its (r + γ V') contribution, grouped by the BOLT-damage roll
-     so the rendered table reads "dmg 1 → 3 ember sub-cases; dmg 2 →
-     immediate win". */
-  function buildLowLowBreakdown(V) {
-    const state = { your: 3, opp: 3, terminal: false };
-    const HIT  = window.Battle.HIT_DAMAGE_DIST.thunderbolt;   // [[1,0.5],[2,0.5]]
-    const EMB  = window.Battle.EMBER_DIST;                    // [[0,.2],[1,.55],[2,.25]]
+  /* Build a generic Bellman-expansion breakdown of Q*(yourB, oppB, moveId).
+     Walks Battle.successors-style branches grouped by hit / miss and
+     by post-hit form so the rendered table can label CHARMELEON /
+     CHARIZARD counters as the opponent evolves mid-turn. */
+  const DETAIL_CELL = { yourB: 0, oppB: 2, moveId: 'thunder' };
 
-    /* dmg 2 branch — opp faints, terminal win. */
-    const dmg2 = { dmg: 2, pDmg: HIT[1][1], terminal: true, reward: +10, contribution: HIT[1][1] * 10 };
+  function buildBreakdown(yourB, oppB, moveId, V) {
+    const move = window.Moves.MOVE_BY_ID[moveId];
+    const formBefore = window.Battle.formForOpp(oppB);
+    const HIT = window.Battle.hitDamageDist(formBefore, moveId);
+    const pHit = move.accuracy;
+    const pMiss = 1 - pHit;
 
-    /* dmg 1 branch — opp at CRIT; iterate Ember outcomes. */
-    const dmg1 = { dmg: 1, pDmg: HIT[0][1], terminal: false, sub: [] };
-    let dmg1Sum = 0;
-    for (const [emb, pE] of EMB) {
-      const yNew = Math.min(NB, state.your + emb);
-      if (yNew >= NB) {
-        /* PIKACHU faints. */
-        const r = -10;
-        const contrib = pE * r;
-        dmg1.sub.push({ emb, p: pE, faint: true, r, vNext: null, branchVal: r, contribution: contrib });
-        dmg1Sum += contrib;
-      } else {
-        const r = -1;
-        const opp = state.opp + HIT[0][0];   // 4 = CRIT
-        const vNext = V[yNew * NB + opp];
-        const branch = r + GAMMA * vNext;
-        const contrib = pE * branch;
-        dmg1.sub.push({ emb, p: pE, faint: false, yNext: yNew, oNext: opp, r, vNext, branchVal: branch, contribution: contrib });
-        dmg1Sum += contrib;
+    const branches = [];
+    let total = 0;
+
+    /* Hit outcomes. */
+    if (pHit > 0) {
+      for (const [oppD, pO] of HIT) {
+        const oppNew = Math.min(NB, oppB + oppD);
+        const p = pHit * pO;
+        if (oppNew >= NB) {
+          const contrib = p * 10;
+          branches.push({ kind: 'hit-win', oppD, p, contribution: contrib });
+          total += contrib;
+          continue;
+        }
+        const formAfter = window.Battle.formForOpp(oppNew);
+        const COUNTER = window.Battle.oppDamageDist(formAfter);
+        const sub = [];
+        let subSum = 0;
+        for (const [yD, pY] of COUNTER) {
+          const yNew = Math.min(NB, yourB + yD);
+          if (yNew >= NB) {
+            const r = -10;
+            const contrib = pY * r;
+            sub.push({ kind: 'faint', yD, p: pY, branchVal: r, contribution: contrib });
+            subSum += contrib;
+          } else {
+            const r = -1;
+            const vNext = V[yNew * NB + oppNew];
+            const branchVal = r + GAMMA * vNext;
+            const contrib = pY * branchVal;
+            sub.push({ kind: 'continue', yD, p: pY, yNext: yNew, oNext: oppNew, vNext, branchVal, contribution: contrib });
+            subSum += contrib;
+          }
+        }
+        const contrib = p * subSum;
+        branches.push({ kind: 'hit-continue', oppD, oppNew, formAfter, p, sub, subSum, contribution: contrib });
+        total += contrib;
       }
     }
-    dmg1.subSum = dmg1Sum;
-    dmg1.contribution = HIT[0][1] * dmg1Sum;
-    const total = dmg2.contribution + dmg1.contribution;
-    return { dmg2, dmg1, total };
+
+    /* Miss branch — opp stays in formBefore, counters Pikachu. */
+    if (pMiss > 0) {
+      const COUNTER = window.Battle.oppDamageDist(formBefore);
+      const sub = [];
+      let subSum = 0;
+      for (const [yD, pY] of COUNTER) {
+        const yNew = Math.min(NB, yourB + yD);
+        if (yNew >= NB) {
+          const r = -10;
+          const contrib = pY * r;
+          sub.push({ kind: 'faint', yD, p: pY, branchVal: r, contribution: contrib });
+          subSum += contrib;
+        } else {
+          const r = -1;
+          const vNext = V[yNew * NB + oppB];
+          const branchVal = r + GAMMA * vNext;
+          const contrib = pY * branchVal;
+          sub.push({ kind: 'continue', yD, p: pY, yNext: yNew, oNext: oppB, vNext, branchVal, contribution: contrib });
+          subSum += contrib;
+        }
+      }
+      const contrib = pMiss * subSum;
+      branches.push({ kind: 'miss', formBefore, p: pMiss, sub, subSum, contribution: contrib });
+      total += contrib;
+    }
+
+    return { branches, total, formBefore };
   }
 
   function fmtSigned(v, dp) {
@@ -133,61 +175,93 @@
   }
 
   /* Render the detail-cell calculation HTML into `host`. */
-  function renderDetail(host, breakdown) {
-    const b = breakdown;
+  function renderDetail(host, breakdown, cell) {
+    const moveName = window.Moves.MOVE_BY_ID[cell.moveId].name;
+    const stateLab = bucketName(cell.yourB) + ' / ' + bucketName(cell.oppB);
+    const formName = window.Battle.FORM_DISPLAY_NAME[breakdown.formBefore];
+
     let html = '';
-    html += '<div class="dp-panel-title">Q*(YOUR=LOW, OPP=LOW, BOLT)</div>';
+    html += '<div class="dp-panel-title">Q*(YOUR=' + bucketName(cell.yourB) +
+            ', OPP=' + bucketName(cell.oppB) + ', ' + moveName + ')</div>';
     html += '<div class="dp-panel-narration">' +
-              'BOLT hits at 100%. Damage 1 or 2 with equal probability — ' +
-              'either kills CRITICAL, only one kills LOW.' +
+              'Opponent is <b>' + formName + '</b>. ' +
+              moveName + ' deals form-specific damage — and any HP-bucket cross-over ' +
+              'triggers an evolution before the counter lands.' +
             '</div>';
 
-    /* dmg 2 line */
-    html += '<div class="dp-calc-line">' +
-              '<span><span class="dp-calc-prob">P=' + b.dmg2.pDmg.toFixed(2) + '</span>' +
-              ' &middot; BOLT dmg 2 → OPP FAINT (terminal win), r=+10</span>' +
-              '<span class="dp-calc-value">' + b.dmg2.pDmg.toFixed(2) + ' · 10 = ' + fmtSigned(b.dmg2.contribution) + '</span>' +
-            '</div>';
-
-    /* dmg 1 header */
-    html += '<div class="dp-calc-line">' +
-              '<span><span class="dp-calc-prob">P=' + b.dmg1.pDmg.toFixed(2) + '</span>' +
-              ' &middot; BOLT dmg 1 → OPP at CRIT, alive. CHARM counters:</span>' +
-              '<span></span>' +
-            '</div>';
-    /* Ember sub-rows */
-    for (const sub of b.dmg1.sub) {
-      let txt, calc;
-      if (sub.faint) {
-        txt = 'Ember ' + sub.emb + ' → PIKACHU FAINTS, r=−10 (terminal)';
-        calc = sub.p.toFixed(2) + ' · (−10) = ' + fmtSigned(sub.contribution);
-      } else {
-        const sNextLab = bucketName(sub.yNext) + ' / ' + bucketName(sub.oNext);
-        txt = 'Ember ' + sub.emb + ' → ' + sNextLab + ', V′=' + fmtSigned(sub.vNext) +
-              ' → −1 + ' + GAMMA.toFixed(1) + '·' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
-        calc = sub.p.toFixed(2) + ' · ' + fmtSigned(sub.branchVal) + ' = ' + fmtSigned(sub.contribution);
+    for (const br of breakdown.branches) {
+      if (br.kind === 'hit-win') {
+        html += '<div class="dp-calc-line">' +
+                  '<span><span class="dp-calc-prob">P=' + br.p.toFixed(3) + '</span>' +
+                  ' &middot; hit · dmg ' + br.oppD + ' → OPP FAINTS, r=+10</span>' +
+                  '<span class="dp-calc-value">' + br.p.toFixed(3) + ' · 10 = ' + fmtSigned(br.contribution) + '</span>' +
+                '</div>';
+      } else if (br.kind === 'hit-continue') {
+        const counterName = window.Battle.FORM_MOVE_NAME[br.formAfter];
+        const formDisp = window.Battle.FORM_DISPLAY_NAME[br.formAfter];
+        html += '<div class="dp-calc-line">' +
+                  '<span><span class="dp-calc-prob">P=' + br.p.toFixed(3) + '</span>' +
+                  ' &middot; hit · dmg ' + br.oppD + ' → OPP at ' + bucketName(br.oppNew) +
+                  ' (<b>' + formDisp + '</b>) counters ' + counterName + ':</span>' +
+                  '<span></span>' +
+                '</div>';
+        for (const sub of br.sub) {
+          let txt, calc;
+          if (sub.kind === 'faint') {
+            txt = counterName + ' ' + sub.yD + ' → PIKACHU FAINTS, r=−10';
+            calc = sub.p.toFixed(2) + ' · (−10) = ' + fmtSigned(sub.contribution);
+          } else {
+            const sNextLab = bucketName(sub.yNext) + ' / ' + bucketName(sub.oNext);
+            txt = counterName + ' ' + sub.yD + ' → ' + sNextLab + ', V′=' + fmtSigned(sub.vNext) +
+                  ' → −1 + ' + GAMMA.toFixed(1) + '·' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
+            calc = sub.p.toFixed(2) + ' · ' + fmtSigned(sub.branchVal) + ' = ' + fmtSigned(sub.contribution);
+          }
+          html += '<div class="dp-calc-line dp-calc-sub">' +
+                    '<span>&nbsp;&nbsp;&nbsp;<span class="dp-calc-prob">P=' + sub.p.toFixed(2) + '</span>' +
+                    ' &middot; ' + txt + '</span>' +
+                    '<span class="dp-calc-value">' + calc + '</span>' +
+                  '</div>';
+        }
+        html += '<div class="dp-calc-line dp-calc-subtotal">' +
+                  '<span>&nbsp;&nbsp;&nbsp;weighted (' + br.p.toFixed(3) + ' · ' + fmtSigned(br.subSum) + '):</span>' +
+                  '<span class="dp-calc-value">' + fmtSigned(br.contribution) + '</span>' +
+                '</div>';
+      } else if (br.kind === 'miss') {
+        const counterName = window.Battle.FORM_MOVE_NAME[br.formBefore];
+        const formDisp = window.Battle.FORM_DISPLAY_NAME[br.formBefore];
+        html += '<div class="dp-calc-line">' +
+                  '<span><span class="dp-calc-prob">P=' + br.p.toFixed(3) + '</span>' +
+                  ' &middot; MISS — opp stays at ' + bucketName(cell.oppB) +
+                  ' (<b>' + formDisp + '</b>) counters ' + counterName + ':</span>' +
+                  '<span></span>' +
+                '</div>';
+        for (const sub of br.sub) {
+          let txt, calc;
+          if (sub.kind === 'faint') {
+            txt = counterName + ' ' + sub.yD + ' → PIKACHU FAINTS, r=−10';
+            calc = sub.p.toFixed(2) + ' · (−10) = ' + fmtSigned(sub.contribution);
+          } else {
+            const sNextLab = bucketName(sub.yNext) + ' / ' + bucketName(sub.oNext);
+            txt = counterName + ' ' + sub.yD + ' → ' + sNextLab + ', V′=' + fmtSigned(sub.vNext) +
+                  ' → −1 + ' + GAMMA.toFixed(1) + '·' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
+            calc = sub.p.toFixed(2) + ' · ' + fmtSigned(sub.branchVal) + ' = ' + fmtSigned(sub.contribution);
+          }
+          html += '<div class="dp-calc-line dp-calc-sub">' +
+                    '<span>&nbsp;&nbsp;&nbsp;<span class="dp-calc-prob">P=' + sub.p.toFixed(2) + '</span>' +
+                    ' &middot; ' + txt + '</span>' +
+                    '<span class="dp-calc-value">' + calc + '</span>' +
+                  '</div>';
+        }
+        html += '<div class="dp-calc-line dp-calc-subtotal">' +
+                  '<span>&nbsp;&nbsp;&nbsp;weighted (' + br.p.toFixed(3) + ' · ' + fmtSigned(br.subSum) + '):</span>' +
+                  '<span class="dp-calc-value">' + fmtSigned(br.contribution) + '</span>' +
+                '</div>';
       }
-      html += '<div class="dp-calc-line dp-calc-sub">' +
-                '<span>&nbsp;&nbsp;&nbsp;<span class="dp-calc-prob">P=' + sub.p.toFixed(2) + '</span>' +
-                ' &middot; ' + txt + '</span>' +
-                '<span class="dp-calc-value">' + calc + '</span>' +
-              '</div>';
     }
-    /* dmg-1 subtotal */
-    html += '<div class="dp-calc-line dp-calc-subtotal">' +
-              '<span>&nbsp;&nbsp;&nbsp;Σ over Ember rolls (within dmg-1):</span>' +
-              '<span class="dp-calc-value">' + fmtSigned(b.dmg1.subSum) + '</span>' +
-            '</div>';
-    /* dmg-1 weighted contribution */
-    html += '<div class="dp-calc-line">' +
-              '<span>BOLT dmg 1 weighted: ' + b.dmg1.pDmg.toFixed(2) + ' · ' + fmtSigned(b.dmg1.subSum) + '</span>' +
-              '<span class="dp-calc-value">' + fmtSigned(b.dmg1.contribution) + '</span>' +
-            '</div>';
 
-    /* Total */
     html += '<div class="dp-calc-total">' +
-              '<span>Q*(LOW/LOW, BOLT) = ' + fmtSigned(b.dmg2.contribution) + ' + ' + fmtSigned(b.dmg1.contribution) + '</span>' +
-              '<span><b>' + fmtSigned(b.total) + '</b></span>' +
+              '<span>Q*(' + stateLab + ', ' + moveName + ')</span>' +
+              '<span><b>' + fmtSigned(breakdown.total) + '</b></span>' +
             '</div>';
 
     host.innerHTML = html;
@@ -252,64 +326,76 @@
 
     /* ---- Compute Q* once and prep the detail breakdown ---- */
     const { Q: qStar, V } = computeQstar();
-    const lowLowBreakdown = buildLowLowBreakdown(V);
+    const detailBreakdown = buildBreakdown(DETAIL_CELL.yourB, DETAIL_CELL.oppB, DETAIL_CELL.moveId, V);
+    const detailCellIdx = DETAIL_CELL.yourB * NB + DETAIL_CELL.oppB;
 
-    /* ---- Phase definitions ---- */
-    const oppCritCol = [idx(0,4), idx(1,4), idx(2,4), idx(3,4), idx(4,4)];
-    const yourCritRow = [idx(4,0), idx(4,1), idx(4,2), idx(4,3)]; /* (4,4) already in phase 1 */
-    const lowLowCell  = [idx(3,3)];
-    const ring        = [idx(0,3), idx(1,3), idx(2,3), idx(3,0), idx(3,1), idx(3,2)];
-    const inner       = [idx(0,0), idx(0,1), idx(0,2),
-                         idx(1,0), idx(1,1), idx(1,2),
-                         idx(2,0), idx(2,1), idx(2,2)];
+    /* ---- Phase definitions ----
+       Fill order matches the new dynamics: the right two columns (Charizard
+       territory) are pedagogically easiest — QUICK ATTACK super-effective,
+       always wins from LOW or CRITICAL. Then the YOUR=CRITICAL losing row,
+       then a detail walk-through of (FULL, MID, THUNDER) against
+       CHARMELEON, then the rest of the MID column, then the Charmander
+       columns where the policy is most subtle. */
+    const charizardCols = [
+      idx(0,3), idx(1,3), idx(2,3), idx(3,3), idx(4,3),  /* OPP=LOW  */
+      idx(0,4), idx(1,4), idx(2,4), idx(3,4), idx(4,4),  /* OPP=CRIT */
+    ];
+    const yourCritRest  = [idx(4,0), idx(4,1), idx(4,2)]; /* (CRIT, LOW/CRIT) already in phase 1 */
+    const detailCellOnly = [idx(0,2)];                     /* (FULL, MID) */
+    const restOfMidCol  = [idx(1,2), idx(2,2), idx(3,2)]; /* rest of OPP=MID */
+    const charmanderCols = [
+      idx(0,0), idx(1,0), idx(2,0), idx(3,0),  /* OPP=FULL (excl. (CRIT,FULL)) */
+      idx(0,1), idx(1,1), idx(2,1), idx(3,1),  /* OPP=HIGH (excl. (CRIT,HIGH)) */
+    ];
 
     const PHASES = [
       {
-        title: 'EDGES — OPP CRITICAL column',
+        title: 'CHARIZARD COLUMNS — easy wins',
         narration: [
-          'BOLT does 1 or 2 damage at 100% accuracy. Either roll pushes a bucket-4 opponent into FAINTED.',
-          'So the right-most column is settled in one step: <b>Q*(s, BOLT) = +10</b> for every row.',
-          'For the other three moves the Q is computed too, but BOLT is the argmax everywhere here.',
+          'When opponent HP drops to LOW or CRITICAL it has evolved into <b>CHARIZARD</b> — huge frame, exposed.',
+          'QUICK ATTACK is super-effective (2-3 dmg · 100% acc) — always one-shots a LOW or CRIT Charizard.',
+          '<b>Q*(s, QUICK) = +10</b> for every cell in these two columns.',
         ],
-        fillCells: oppCritCol,
+        fillCells: charizardCols,
       },
       {
-        title: 'EDGES — YOUR CRITICAL row',
+        title: 'YOUR=CRITICAL row — losing positions',
         narration: [
-          'PIKACHU at CRITICAL means any Ember of damage ≥ 1 faints us — that\'s 80% of all Ember rolls.',
-          'Cells in this row whose opponent is also low (CRIT, LOW) still have BOLT as the argmax because PIKACHU acts first. The rest are negative.',
+          'PIKACHU at CRITICAL means any counter-attack faints us. Most cells in this row are losing.',
+          'Q tells you the expected loss — useful even when there is no winning move.',
         ],
-        fillCells: yourCritRow,
+        fillCells: yourCritRest,
       },
       {
-        title: 'DETAIL CELL — (LOW, LOW)',
+        title: 'DETAIL — (FULL, MID, THUNDER)',
         narration: null,
-        fillCells: lowLowCell,
-        detailCell: idx(3,3),
-        detailType: 'lowlow',
+        fillCells: detailCellOnly,
+        detailCell: idx(0, 2),
+        detailType: 'show',
       },
       {
-        title: 'PROPAGATE — OPP=LOW column and YOUR=LOW row',
+        title: 'CHARMELEON column — THUNDER reigns',
         narration: [
-          'Each cell looks one step ahead into the already-filled rightmost column / bottom row, plus the (LOW, LOW) cell we just did.',
-          'Bellman backup applied to every remaining (state, action) pair — argmax falls out automatically.',
+          'CHARMELEON\'s hardened hide <b>resists THUNDERBOLT</b> (0-1 dmg, fizzles).',
+          'THUNDER stays at 2-3 dmg → only Pikachu move with reach. Even with 55% accuracy, it dominates.',
         ],
-        fillCells: ring,
+        fillCells: restOfMidCol,
       },
       {
-        title: 'PROPAGATE — inner 3×3',
+        title: 'CHARMANDER columns — subtle territory',
         narration: [
-          'Final sweep. Every cell\'s successors are now known, so one Bellman update finishes the table.',
+          'The baby form: BOLT works at normal damage; QUICK is too weak alone.',
+          'But every BOLT that drops CHARMANDER into MID HP triggers evolution to CHARMELEON, who resists future BOLTs.',
+          'THUNDER keeps the same 2-3 dmg through every form — sometimes worth its 55% accuracy.',
         ],
-        fillCells: inner,
+        fillCells: charmanderCols,
       },
       {
         title: 'Q* CONVERGED.',
         narration: [
-          'Every (s, a) pair has its expected discounted return.',
-          'Pick <b>argmax_a Q*(s, a)</b> in any state and you have the optimal policy.',
-          'But — we needed <i>P(s′ | s, a)</i> for every transition, and we paid one Bellman backup per cell.',
-          'In a real game neither is available.',
+          'All three Pikachu moves earn their place: QUICK against Charizard, THUNDER against Charmeleon, a mix in Charmander territory.',
+          'But this required <i>P(s′ | s, a)</i> for every transition, plus one Bellman backup per cell.',
+          'In real games neither is available — sample-based methods come next.',
         ],
         fillCells: [],
       },
@@ -342,13 +428,13 @@
         cell.classList.add('dp-active', 'dp-just-filled');
         setTimeout(() => cell && cell.classList.remove('dp-just-filled'), 700);
       }
-      if (p.detailType === 'lowlow') {
-        const c = qtbl.getCellNode(idx(3, 3));
+      if (p.detailType === 'show' && p.detailCell !== undefined) {
+        const c = qtbl.getCellNode(p.detailCell);
         if (c) c.classList.add('dp-detail');
       }
       /* Side panel. */
-      if (p.detailType === 'lowlow') {
-        renderDetail(panel, lowLowBreakdown);
+      if (p.detailType === 'show') {
+        renderDetail(panel, detailBreakdown, DETAIL_CELL);
       } else if (p.narration) {
         renderNarration(panel, p.title, p.narration);
       } else {
