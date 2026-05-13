@@ -96,6 +96,49 @@
     group.appendChild(rBox);
 
     host.appendChild(group);
+
+    /* On a terminal turn, append an extra group with the final state
+       s_{N+1} so the trajectory visually closes — without this, the
+       last triple stops at the pre-action state (e.g. PIKACHU at
+       CRITICAL) and the reward (-10) hangs in mid-air. */
+    if (terminal) {
+      const finalGroup = document.createElement('div');
+      finalGroup.className = 'traj-group';
+
+      const sFinalBox = document.createElement('div');
+      sFinalBox.className = 'traj-box traj-box-state traj-box-state-final';
+      sFinalBox.classList.add(won ? 'win' : 'loss');
+      sFinalBox.style.animationDelay = '360ms';
+
+      /* On WIN: PIKACHU keeps its HP, CHARMANDER faints.
+         On LOSS: PIKACHU faints, CHARMANDER keeps its HP. */
+      const pikaFainted = !won;
+      const charmFainted = won;
+      const pikaBucket  = pikaFainted  ? NB : yourBucket;
+      const charmBucket = charmFainted ? NB : oppBucket;
+
+      function sideHtml(spriteSrc, bucket, fainted) {
+        const cls = fainted ? 'b4' : bucketClass(bucket);
+        const pct = fainted ? 0    : bucketPct(bucket);
+        return (
+          '<div class="traj-box-side">' +
+            '<img class="traj-box-sprite ' + (fainted ? 'fainted' : '') + '" src="' + spriteSrc + '" alt="">' +
+            '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + cls + '" style="width:' + pct + '%"></div></div>' +
+            '<div class="traj-box-bucket">' + (fainted ? 'FAINT' : bucketName(bucket)) + '</div>' +
+          '</div>'
+        );
+      }
+
+      sFinalBox.innerHTML =
+        '<div class="traj-box-label">s<sub>' + (step + 1) + '</sub> <span class="traj-box-terminal-mini">(terminal)</span></div>' +
+        '<div class="traj-box-state-body">' +
+          sideHtml('assets/pikachu-back.png',     pikaBucket,  pikaFainted) +
+          sideHtml('assets/charmander-front.png', charmBucket, charmFainted) +
+        '</div>';
+      finalGroup.appendChild(sFinalBox);
+      host.appendChild(finalGroup);
+    }
+
     /* Scroll the rollout so the latest triple is always visible. */
     setTimeout(() => host.scrollLeft = host.scrollWidth, 280);
   }

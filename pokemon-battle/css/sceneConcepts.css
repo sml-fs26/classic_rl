@@ -109,6 +109,32 @@
 .traj-box-action { border-left-color: var(--hue-casino); min-width: 88px;  }
 .traj-box-reward { border-left-color: var(--hue-ghost);  min-width: 60px; align-items: center; }
 
+/* Final-state box (s_{N+1}) — only appears after a terminal turn so
+   the trajectory visibly closes. Whichever side fainted is rendered
+   with the .fainted sprite + a 0%-width HP bar + "FAINT" bucket. The
+   border uses the colour-blind-safe win/loss tokens (blue/vermillion). */
+.traj-box-state-final.win {
+  border-color: var(--cb-blue);
+  border-left-color: var(--cb-blue);
+  background: rgba(0, 114, 178, 0.08);
+}
+.traj-box-state-final.loss {
+  border-color: var(--cb-vermillion);
+  border-left-color: var(--cb-vermillion);
+  background: rgba(213, 94, 0, 0.08);
+}
+.traj-box-terminal-mini {
+  font-size: 6px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  margin-left: 4px;
+}
+.traj-box-sprite.fainted {
+  opacity: 0.32;
+  filter: grayscale(0.7);
+  transform: rotate(-22deg);
+}
+
 .traj-box-label {
   font-size: 10px;
   letter-spacing: 0.04em;
@@ -202,6 +228,85 @@
   0%   { opacity: 0; transform: translateY(-6px) scale(0.95); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* Used by sceneObjective: dim state + action boxes so G_t illustration
+   focuses the eye on the reward boxes alone. */
+.traj-box.muted {
+  opacity: 0.30;
+  filter: grayscale(0.55);
+}
+
+/* Reward boxes in sceneObjective are clickable to pick a new t. */
+.traj-box-reward.clickable { cursor: pointer; transition: transform 100ms ease-out; }
+.traj-box-reward.clickable:hover { transform: scale(1.04); }
+.traj-box-reward.selected {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: 3px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ----- G_t illustration block in sceneObjective ----- */
+.g-illus {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px 14px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+}
+.g-illus-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+.g-illus-rollout {
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+  min-height: 0;
+}
+
+.g-expansion {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.9;
+  color: var(--ink-on-box);
+  padding: 8px 14px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+}
+.g-expansion .g-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.g-expansion .g-lhs {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.g-expansion .g-eq {
+  margin-left: 28px;       /* indent continuation lines under "= " of line 1 */
+  color: var(--ink-secondary);
+}
+.g-expansion .g-gamma { color: var(--hue-star); }
+.g-expansion .g-r     { color: var(--hue-ghost); }
+.g-expansion .g-prod  { color: var(--ink-on-box); font-variant-numeric: tabular-nums; }
+.g-expansion .g-final { padding-top: 6px; border-top: 2px solid var(--rule); margin-top: 4px; }
+.g-expansion .g-result {
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.g-expansion .g-result.pos { color: var(--cb-blue); }
+.g-expansion .g-result.neg { color: var(--cb-vermillion); }
 
 .traj-controls {
   display: flex;

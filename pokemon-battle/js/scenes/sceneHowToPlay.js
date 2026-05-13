@@ -368,8 +368,10 @@
      then a brief settling beat. The 3-row diagram below the stage
      highlights whichever phase is happening, in lock-step. */
   let turnAnimTimer = null;
+  let turnHpResetTimer = null;
   function stopTurnAnimation() {
     if (turnAnimTimer) { clearTimeout(turnAnimTimer); turnAnimTimer = null; }
+    if (turnHpResetTimer) { clearTimeout(turnHpResetTimer); turnHpResetTimer = null; }
   }
   function spawnTurnFlash(stage, side, text, color) {
     const el = document.createElement('div');
@@ -404,9 +406,10 @@
       leave(_stage) {},
     },
   ];
-  function runTurnAnimation(stage, rowNodes) {
+  function runTurnAnimation(stage, rowNodes, ctx) {
     stopTurnAnimation();
     let phase = 0;
+    const NB = window.Battle.NUM_BUCKETS;     // 5 = number of HP buckets (0..4 = FULL..CRITICAL)
     function tick() {
       if (!stage.isConnected) { stopTurnAnimation(); return; }
       /* Tear down previous phase. */
@@ -416,6 +419,28 @@
       const cur = TURN_PHASES[phase];
       rowNodes.forEach((n, i) => n.classList.toggle('active', i === cur.row));
       cur.enter(stage);
+      /* Per-phase HP updates, capped at CRITICAL (NB-1) so the tutorial
+         loop never goes to FAINTED — that concept arrives in scene 1. */
+      if (ctx) {
+        if (phase === 0) {
+          ctx.charmBucket = Math.min(NB - 1, ctx.charmBucket + 1);
+          if (ctx.charmHp) ctx.charmHp.set(ctx.charmBucket);
+        } else if (phase === 1) {
+          ctx.pikaBucket = Math.min(NB - 1, ctx.pikaBucket + 1);
+          if (ctx.pikaHp) ctx.pikaHp.set(ctx.pikaBucket);
+        } else if (phase === 2) {
+          /* If both reached CRITICAL, reset to FULL after the settle dwell
+             so the loop restarts at full health. */
+          if (ctx.pikaBucket >= NB - 1 && ctx.charmBucket >= NB - 1) {
+            turnHpResetTimer = setTimeout(() => {
+              ctx.pikaBucket = 0;
+              ctx.charmBucket = 0;
+              if (ctx.pikaHp)  ctx.pikaHp.set(0);
+              if (ctx.charmHp) ctx.charmHp.set(0);
+            }, 700);
+          }
+        }
+      }
       phase = (phase + 1) % TURN_PHASES.length;
       turnAnimTimer = setTimeout(tick, cur.dwell);
     }
@@ -435,6 +460,26 @@
       '<div class="platform player"></div>' +
       '<div class="sprite-host opponent"><img class="poke-sprite" src="assets/charmander-front.png" alt="CHARMANDER"/></div>' +
       '<div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="PIKACHU"/></div>';
+
+    /* HP boxes — append to stage so the existing absolute positioning
+       on .hp-box.opponent / .hp-box.player puts them in the right
+       corners. They animate dropping a bucket per attack inside
+       runTurnAnimation below. */
+    const oppHpHost = document.createElement('div');
+    const playerHpHost = document.createElement('div');
+    stage.appendChild(oppHpHost);
+    stage.appendChild(playerHpHost);
+    const charmHp = window.HPBar.mount(oppHpHost, {
+      name: 'CHARMANDER', side: 'opponent', level: 5,
+      numBuckets: window.Battle.NUM_BUCKETS,
+    });
+    const pikaHp = window.HPBar.mount(playerHpHost, {
+      name: 'PIKACHU', side: 'player', level: 5,
+      numBuckets: window.Battle.NUM_BUCKETS,
+    });
+    charmHp.set(0);
+    pikaHp.set(0);
+
     wrap.appendChild(stage);
 
     /* 3-row sequence diagram. */
@@ -465,8 +510,12 @@
       'PIKACHU is faster (base speed 90 vs 65), so it always moves first.';
     host.appendChild(note);
 
-    /* Kick off the loop. */
-    runTurnAnimation(stage, rowNodes);
+    /* Kick off the loop with an HP context — bars drop a bucket per
+       attack and reset when both hit CRITICAL. */
+    runTurnAnimation(stage, rowNodes, {
+      pikaHp, charmHp,
+      pikaBucket: 0, charmBucket: 0,
+    });
   }
 
   function renderStepWinLose(host) {
