@@ -3,10 +3,20 @@
 
 .sd-scene { display: flex; flex-direction: column; gap: 14px; }
 
+/* Sticky controls — without this the user must scroll back up to hit
+   STEP after every reveal, because each new card pushes everything
+   else further down the page. */
 .sd-controls {
   display: flex;
   gap: 10px;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: var(--bg);
+  padding: 8px 6px;
+  margin: 0 -6px;
+  border-bottom: 2px solid var(--rule);
 }
 .sd-status {
   font-family: 'Press Start 2P', monospace;

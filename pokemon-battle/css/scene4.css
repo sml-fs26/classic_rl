@@ -346,13 +346,24 @@
 
 /* ---------- Step controls + status counter ---------- */
 
+/* Sticky controls — the +1 / +5 / +10 / +100 / RESET row and the
+   step/battles/wins/losses counter pin to the top of the viewport so
+   the student can drive SARSA from any scroll position, including
+   while watching the Q-table heatmap evolve at the bottom of the
+   scene. */
 .sc4-controls-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  margin: 10px 0;
+  margin: 0 -6px 10px;
+  padding: 8px 6px;
   flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: var(--bg);
+  border-bottom: 2px solid var(--rule);
 }
 .sc4-controls { display: flex; gap: 8px; flex-wrap: wrap; }
 .sc4-controls .poke-btn { min-width: 60px; }
