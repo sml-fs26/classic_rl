@@ -28,12 +28,12 @@
       '</div>' +
       '<div class="why-stat-card">' +
         '<div class="why-stat-title">FULL POKEMON GAME</div>' +
-        '<div class="why-stat-value">~ 10¹⁵</div>' +
+        '<div class="why-stat-value">~ 10<sup>15</sup></div>' +
         '<div class="why-stat-detail">6 mons × HP × status × items × …</div>' +
       '</div>' +
       '<div class="why-stat-card">' +
         '<div class="why-stat-title">GO ENDGAME</div>' +
-        '<div class="why-stat-value">~ 10¹⁷⁰</div>' +
+        '<div class="why-stat-value">~ 10<sup>170</sup></div>' +
         '<div class="why-stat-detail">More positions than atoms.</div>' +
       '</div>';
     root.appendChild(grid);

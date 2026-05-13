@@ -21,7 +21,6 @@
     { key: 'sceneWhyNotDp',    title: "Why DP doesn't scale",         music: 'bridge'   },
     { key: 'sceneSarsaDerive', title: 'Deriving SARSA',               music: 'bridge'   },
     { key: 'scene4',           title: 'SARSA in action',              music: 'battle'   },
-    { key: 'sceneEps',         title: 'ε-greedy at one state',        music: 'eps'      },
     { key: 'scene5',           title: "You've trained PIKACHU.",      music: 'recap'    },
   ];
   const SCENE_TITLES = SCENES.map(s => s.title);

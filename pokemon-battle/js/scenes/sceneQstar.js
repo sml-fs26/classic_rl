@@ -317,6 +317,17 @@
     step();
 
     return {
+      /* Navigating away calls onLeave → clears the timer. The scene is then
+         cached by the scene engine, so when the user navigates back, the
+         builder is NOT re-run; only onEnter fires. Without this hook, the
+         demo would appear frozen on the last frame (no setTimeout chain
+         alive). Reset and re-kick to give the visitor a fresh loop. */
+      onEnter() {
+        stopDemo();
+        phase = 'show';
+        resetDemo();
+        step();
+      },
       onLeave() { stopDemo(); },
     };
   };

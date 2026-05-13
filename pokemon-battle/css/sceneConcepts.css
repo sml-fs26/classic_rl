@@ -498,6 +498,18 @@
   color: var(--pikachu-cheek, #C62828);
   letter-spacing: 0.04em;
 }
+.why-stat-value sup {
+  /* Force the exponent into the same pixel font and lift it cleanly above
+     the baseline. The default browser <sup> styling drops in a fallback
+     font that doesn't match — and Unicode superscripts (¹⁵) only have
+     ¹ in our pixel font, so the rest fall back and misalign. */
+  font: inherit;
+  font-size: 0.62em;
+  vertical-align: super;
+  line-height: 0;
+  margin-left: 0.06em;
+  letter-spacing: 0.02em;
+}
 .why-stat-detail {
   font-size: 7px;
   margin-top: 6px;

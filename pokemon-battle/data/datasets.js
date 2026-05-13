@@ -36,7 +36,7 @@
       { key: 'eps',     from: 'Casino',           hue: 'casino',  title: '\u03b5-greedy on Q',
         symbol: "a \\sim \\varepsilon\\text{-greedy}\\,(Q)",
         caption: 'Pikachu picks the best-so-far move \u2014 sometimes tries THUNDER just in case. Same idea as the slot machines.',
-        anchor: 'Scene 10 \u2014 \u03b5-greedy at one state' },
+        anchor: 'Scene 9 \u2014 SARSA in action (\u03b5 slider)' },
       { key: 'bellman', from: 'Spooky House',     hue: 'ghost',   title: 'Bellman + \u03b3',
         symbol: "V(s) = \\max_a \\bigl\\{ R(s,a) + \\gamma\\,\\mathbb{E}\\,V(s') \\bigr\\}",
         caption: 'Each state\u2019s value is the best move\u2019s expected reward, plus \u03b3 times the next state\u2019s value. Same recursion as Spooky House, with cycles.',
