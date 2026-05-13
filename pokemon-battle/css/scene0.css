@@ -95,4 +95,117 @@
   max-width: 70ch;
   font-size: 9px;
   line-height: 1.8;
+  min-height: 4em;     /* reserve room so caption swap doesn't jump */
+}
+
+/* ---------- Progressive MDP overlay state machine ---------- */
+
+/* Step-gated containers — fade in via the `.show` toggle. */
+.sc0-menu-wrap, .sc0-reward-wrap {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 380ms ease-out;
+}
+.sc0-menu-wrap.show, .sc0-reward-wrap.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* HP boxes use `display: contents` on the wrapper so the children are
+   positioned by the parent .battle-stage (the original CSS expects
+   them as direct children). That means `opacity` cannot live on the
+   wrapper itself — it has no box. Apply opacity to the children. */
+.sc0-hp-wrap { display: contents; }
+.sc0-hp-wrap > .hp-box {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 380ms ease-out;
+}
+.sc0-hp-wrap.show > .hp-box {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Menu wrapper sizing — match the .move-menu look from scene 1, but
+   constrain its width so it sits centred under the stage. */
+.sc0-menu-wrap { width: 100%; max-width: 720px; margin: 12px auto 0; }
+.sc0-menu-wrap .move-menu { width: 100%; }
+.sc0-menu-wrap .move-btn { cursor: default; opacity: 0.92; }
+
+/* Reward pills strip. */
+.sc0-reward-wrap {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.sc0-reward-pill {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: 2px 2px 0 0 var(--ink);
+}
+.sc0-reward-pill.pos { color: var(--cb-blue); border-color: var(--cb-blue); }
+.sc0-reward-pill.neg { color: var(--cb-vermillion); border-color: var(--cb-vermillion); }
+
+/* Step control row. */
+.sc0-mdp-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 8px;
+}
+.sc0-mdp-step {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.sc0-mdp-step b { color: var(--pikachu-cheek); }
+
+/* MDP tags fade in via .show, same convention as the gated wrappers. */
+.mdp-overlay .mdp-tag {
+  opacity: 0;
+  transition: opacity 380ms ease-out;
+}
+.mdp-overlay .mdp-tag.show { opacity: 1; }
+
+/* One-shot attack animation triggered when entering step 3 (TRANSITIONS).
+   PIKACHU lunges forward; CHARMANDER shakes; "−1 HP" floats above the
+   opponent.  Re-armed each time by toggling the .sc0-attacking class. */
+@keyframes sc0-attack-pika {
+  0%   { transform: translate(0, 0); }
+  35%  { transform: translate(60px, -18px); }
+  60%  { transform: translate(60px, -18px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes sc0-shake-charm {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+.sc0-attacking .sprite-host.player img  { animation: sc0-attack-pika 0.9s ease-out; }
+.sc0-attacking .sprite-host.opponent img { animation: sc0-shake-charm 0.5s ease-in-out 0.35s; }
+
+@keyframes sc0-damage-rise {
+  0%   { opacity: 0; transform: translate(-50%, 20px); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -40px); }
+}
+.sc0-damage-flash {
+  position: absolute;
+  right: 22%;
+  top: 30%;
+  transform: translate(-50%, 20px);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: var(--cb-vermillion);
+  pointer-events: none;
+  animation: sc0-damage-rise 1.05s ease-out forwards;
+  text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF, 2px -2px 0 #FFF, -2px 2px 0 #FFF;
+  z-index: 6;
 }
