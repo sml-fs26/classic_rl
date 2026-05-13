@@ -145,6 +145,13 @@ html, body {
 }
 .pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
+/* MUSIC button — same chrome as THEME but with an "on" state. */
+.music-toggle.active {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+  box-shadow: inset 2px 2px 0 0 #B89020;
+}
+
 .dot-pager { display: flex; gap: 4px; align-items: center; }
 .dot-pager .dot {
   width: 10px; height: 10px;
