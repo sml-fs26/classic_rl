@@ -11,18 +11,18 @@
    the driver advance the scene. */
 (function () {
   const SCENES = [
-    { key: 'scene0',           title: 'POKEMON' },
-    { key: 'sceneHowToPlay',   title: 'Tutorial — how to play' },
-    { key: 'scene1',           title: 'A wild CHARMANDER appeared!' },
-    { key: 'sceneTrajectory',  title: 'The trajectory' },
-    { key: 'sceneObjective',   title: 'Return & the Q-function' },
-    { key: 'sceneQstar',       title: 'π* from Q' },
-    { key: 'sceneDp',          title: 'Filling Q with DP' },
-    { key: 'sceneWhyNotDp',    title: "Why DP doesn't scale" },
-    { key: 'sceneSarsaDerive', title: 'Deriving SARSA' },
-    { key: 'scene4',           title: 'SARSA in action' },
-    { key: 'sceneEps',         title: 'ε-greedy at one state' },
-    { key: 'scene5',           title: "You've trained PIKACHU." },
+    { key: 'scene0',           title: 'POKEMON',                      music: 'title'    },
+    { key: 'sceneHowToPlay',   title: 'Tutorial — how to play',       music: 'tutorial' },
+    { key: 'scene1',           title: 'A wild CHARMANDER appeared!',  music: 'battle'   },
+    { key: 'sceneTrajectory',  title: 'The trajectory',               music: 'concept'  },
+    { key: 'sceneObjective',   title: 'Return & the Q-function',      music: 'concept'  },
+    { key: 'sceneQstar',       title: 'π* from Q',                    music: 'concept'  },
+    { key: 'sceneDp',          title: 'Filling Q with DP',            music: 'dp'       },
+    { key: 'sceneWhyNotDp',    title: "Why DP doesn't scale",         music: 'bridge'   },
+    { key: 'sceneSarsaDerive', title: 'Deriving SARSA',               music: 'bridge'   },
+    { key: 'scene4',           title: 'SARSA in action',              music: 'battle'   },
+    { key: 'sceneEps',         title: 'ε-greedy at one state',        music: 'eps'      },
+    { key: 'scene5',           title: "You've trained PIKACHU.",      music: 'recap'    },
   ];
   const SCENE_TITLES = SCENES.map(s => s.title);
 
@@ -112,6 +112,12 @@
     }
 
     current = idx;
+    /* Cross-fade the soundtrack to this scene's mood. Safe if Music
+       isn't loaded yet or the AudioContext is suspended — setTrack
+       just updates the variable in that case. */
+    if (window.Music && SCENES[idx].music) {
+      try { window.Music.setTrack(SCENES[idx].music); } catch (e) {}
+    }
     const instant = /[#&?]instant\b/.test(window.location.hash);
     if (instant) {
       sceneNodes[idx].style.transition = 'none';
