@@ -62,7 +62,7 @@
           '<div class="traj-box-bucket">' + bucketName(yourBucket) + '</div>' +
         '</div>' +
         '<div class="traj-box-side">' +
-          '<img class="traj-box-sprite" src="assets/charmander-front.png" alt="">' +
+          '<img class="traj-box-sprite" src="' + window.Battle.spriteForOpp(oppBucket) + '" alt="' + window.Battle.displayNameForOpp(oppBucket) + '">' +
           '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + bucketClass(oppBucket) + '" style="width:' + bucketPct(oppBucket) + '%"></div></div>' +
           '<div class="traj-box-bucket">' + bucketName(oppBucket) + '</div>' +
         '</div>' +
@@ -133,7 +133,7 @@
         '<div class="traj-box-label">s<sub>' + (step + 1) + '</sub> <span class="traj-box-terminal-mini">(terminal)</span></div>' +
         '<div class="traj-box-state-body">' +
           sideHtml('assets/pikachu-back.png',     pikaBucket,  pikaFainted) +
-          sideHtml('assets/charmander-front.png', charmBucket, charmFainted) +
+          sideHtml(window.Battle.spriteForOpp(Math.min(NB - 1, charmBucket)), charmBucket, charmFainted) +
         '</div>';
       finalGroup.appendChild(sFinalBox);
       host.appendChild(finalGroup);

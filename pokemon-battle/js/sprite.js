@@ -5,9 +5,9 @@
      `side` is 'player' (back-sprite) or 'opponent' (front-sprite). */
   function mount(host, kind, side) {
     host.innerHTML = '';
-    const src = `assets/${kind}-${side === 'player' ? 'back' : 'front'}.png`;
+    let curKind = kind;
     const img = document.createElement('img');
-    img.src = src;
+    img.src = `assets/${kind}-${side === 'player' ? 'back' : 'front'}.png`;
     img.alt = kind.toUpperCase() + ' (' + side + ')';
     img.className = 'poke-sprite';
     host.appendChild(img);
@@ -25,9 +25,19 @@
       img.classList.remove('shake');
       img.classList.remove('faint');
     }
+    /* Swap the sprite source — used when the opponent evolves
+       between Charmander / Charmeleon / Charizard mid-battle. */
+    function setKind(newKind) {
+      if (newKind === curKind) return false;
+      curKind = newKind;
+      img.src = `assets/${newKind}-${side === 'player' ? 'back' : 'front'}.png`;
+      img.alt = newKind.toUpperCase() + ' (' + side + ')';
+      return true;
+    }
+    function kindOf() { return curKind; }
     function el() { return img; }
 
-    return { shake, faint, reset, el };
+    return { shake, faint, reset, setKind, kindOf, el };
   }
 
   window.Sprite = { mount };

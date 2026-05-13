@@ -89,6 +89,28 @@
     charmeleon: 'FLAMETHROWER',
     charizard:  'OUTRAGE',
   };
+  const FORM_SPRITE = {
+    charmander: 'assets/charmander-front.png',
+    charmeleon: 'assets/charmeleon-front.png',
+    charizard:  'assets/charizard-front.png',
+  };
+  const FORM_SPRITE_GEN1 = {
+    charmander: 'assets/charmander-front-gen1.png',
+    charmeleon: 'assets/charmeleon-front-gen1.png',
+    charizard:  'assets/charizard-front-gen1.png',
+  };
+
+  /* Form-aware sprite lookup for the opponent. `style` may be 'gen1'
+     for the small pixel-art Red/Blue sprites used in tiny widgets,
+     anything else returns the larger 96×96 stage sprite. */
+  function spriteForOpp(oppBucket, style) {
+    const form = formForOpp(oppBucket);
+    const tbl = (style === 'gen1') ? FORM_SPRITE_GEN1 : FORM_SPRITE;
+    return tbl[form];
+  }
+  function displayNameForOpp(oppBucket) {
+    return FORM_DISPLAY_NAME[formForOpp(oppBucket)];
+  }
 
   /* Legacy aliases — kept so any external consumer that still imports
      HIT_DAMAGE_DIST / EMBER_DIST gets the CHARMANDER (baseline) tables.
@@ -311,7 +333,9 @@
        sprites / names / type-effectiveness explanations. */
     HIT_DAMAGE_BY_FORM, OPP_DIST_BY_FORM,
     FORM_DISPLAY_NAME, FORM_MOVE_NAME,
+    FORM_SPRITE, FORM_SPRITE_GEN1,
     formForOpp, hitDamageDist, oppDamageDist,
+    spriteForOpp, displayNameForOpp,
     rewardFor,
     initialState, initialScalar,
     sample,

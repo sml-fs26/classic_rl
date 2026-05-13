@@ -57,10 +57,15 @@
           '<div class="sc4-bn-label">PIKACHU ' + (fainted && !s.win ? 'FAINTED' : bucketName(s.your || 0)) + '</div>' +
         '</div>' +
         '<div class="sc4-bn-side">' +
-          '<img class="sc4-bn-sprite" src="assets/charmander-front.png" alt="Charmander">' +
+          '<img class="sc4-bn-sprite" src="' + window.Battle.spriteForOpp(Math.min(NB - 1, s.opp || 0)) + '"' +
+            ' alt="' + window.Battle.displayNameForOpp(Math.min(NB - 1, s.opp || 0)) + '">' +
           '<div class="sc4-bn-hp"><div class="sc4-bn-hp-fill ' + (fainted && s.win ? 'b4' : bucketClass(s.opp || 0)) + '"' +
               ' style="width:' + (fainted && s.win ? 0 : bucketPct(s.opp || 0)) + '%"></div></div>' +
-          '<div class="sc4-bn-label">CHARM ' + (fainted && s.win ? 'FAINTED' : bucketName(s.opp || 0)) + '</div>' +
+          '<div class="sc4-bn-label">' +
+              ((fainted && s.win)
+                ? 'FAINTED'
+                : (window.Battle.displayNameForOpp(s.opp || 0) + ' ' + bucketName(s.opp || 0))) +
+          '</div>' +
         '</div>' +
       '</div>';
 

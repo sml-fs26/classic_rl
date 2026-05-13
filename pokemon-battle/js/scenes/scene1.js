@@ -108,6 +108,9 @@
     let totalReward = 0;
     let busy = false;
     let rng = window.Battle.makeRng(20260512);
+    /* Current opponent display name. Updates when the opponent evolves
+       across a form threshold (Charmander → Charmeleon → Charizard). */
+    let oppFormName = window.Battle.FORM_DISPLAY_NAME.charmander;
     /* `episode` is the cancellation token for the async turn cascade. Reset
        bumps it, and every `await` re-checks; an in-flight turn aborts
        cleanly if the user hits RESTART mid-attack. */
@@ -188,10 +191,29 @@
       }
       if (episode !== myEp) return;
 
-      /* ---- Charmander KO? ---- */
+      /* ---- Opponent evolution? PIKACHU's hit may have pushed the
+         opponent into a new form. Swap sprite + HP-box name + cached
+         display-name so subsequent messages refer to the new form. */
+      const evolvedThisTurn = (log.formBefore !== log.formAfter) &&
+                              (log.oppAfter < window.Battle.FAINTED);
+      if (evolvedThisTurn) {
+        oppSprite.setKind(log.formAfter);
+        oppFormName = window.Battle.FORM_DISPLAY_NAME[log.formAfter];
+        oppHp.setName(oppFormName);
+        await dialogSay('What? Wild ' + window.Battle.FORM_DISPLAY_NAME[log.formBefore] +
+                        ' is evolving!');
+        if (episode !== myEp) return;
+        await wait(500);
+        await dialogSay('Evolved into ' + oppFormName + '!');
+        if (episode !== myEp) return;
+        await wait(700);
+      }
+      if (episode !== myEp) return;
+
+      /* ---- Opponent KO? ---- */
       if (log.oppAfter >= window.Battle.FAINTED) {
         oppSprite.faint();
-        await dialogSay('Wild CHARMANDER fainted!');
+        await dialogSay('Wild ' + oppFormName + ' fainted!');
         if (episode !== myEp) return;
         await wait(700);
         if (episode !== myEp) return;
@@ -201,8 +223,10 @@
         return;
       }
 
-      /* ---- Opponent's turn ---- */
-      await dialogSay('Wild CHARMANDER used EMBER!');
+      /* ---- Opponent's turn — counter-attack name follows the form
+         the opponent is in NOW (formAfter, post-evolution if any). */
+      const counterName = window.Battle.FORM_MOVE_NAME[log.formAfter];
+      await dialogSay('Wild ' + oppFormName + ' used ' + counterName + '!');
       if (episode !== myEp) return;
       await wait(500);
       if (episode !== myEp) return;
@@ -252,8 +276,11 @@
       totalReward = 0;
       rng = window.Battle.makeRng(20260512 + Math.floor(Math.random() * 100000));
       oppSprite.reset();
+      oppSprite.setKind('charmander');
       playerSprite.reset();
+      oppFormName = window.Battle.FORM_DISPLAY_NAME.charmander;
       oppHp.set(0);     // bucket 0 = full
+      oppHp.setName(oppFormName);
       playerHp.set(0);
       document.getElementById('sc1-turn').textContent = '0';
       document.getElementById('sc1-last').textContent = '—';

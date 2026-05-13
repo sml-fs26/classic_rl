@@ -100,15 +100,17 @@
     demoWrap.className = 'qstar-demo';
     root.appendChild(demoWrap);
 
-    /* Battle stage on the left. */
+    /* Battle stage on the left. The opponent sprite swaps when its HP
+       crosses a form threshold — referenced via oppSpriteEl below. */
     const stage = document.createElement('div');
     stage.className = 'battle-stage qstar-stage';
     stage.innerHTML =
       '<div class="grass-rim"></div>' +
       '<div class="platform opponent"></div>' +
       '<div class="platform player"></div>' +
-      '<div class="sprite-host opponent"><img class="poke-sprite" src="assets/charmander-front.png" alt="CHARMANDER"/></div>' +
+      '<div class="sprite-host opponent"><img class="poke-sprite qstar-opp-sprite" src="assets/charmander-front.png" alt="CHARMANDER"/></div>' +
       '<div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="PIKACHU"/></div>';
+    const oppSpriteEl = stage.querySelector('.qstar-opp-sprite');
 
     const oppHpHost = document.createElement('div');
     const playerHpHost = document.createElement('div');
@@ -164,11 +166,28 @@
       argmaxA = k;
     }
 
+    /* Form-aware sprite swap. Called whenever opp HP changes. If the
+       form crosses a threshold the sprite changes mid-battle (the
+       "Charmander → Charmeleon → Charizard" evolution). Also updates
+       the HP-box display name so the label tracks the current form. */
+    let lastOppForm = null;
+    function refreshOppSprite() {
+      if (!oppSpriteEl) return;
+      const b = Math.min(NB - 1, charmBucket);
+      const form = window.Battle.formForOpp(b);
+      if (form === lastOppForm) return;
+      lastOppForm = form;
+      oppSpriteEl.src = window.Battle.spriteForOpp(b);
+      oppSpriteEl.alt = window.Battle.displayNameForOpp(b);
+      if (charmHp && charmHp.setName) charmHp.setName(window.Battle.displayNameForOpp(b));
+    }
+
     function renderQPanel() {
       const base = stateIdx() * A;
+      const oppForm = window.Battle.displayNameForOpp(Math.min(NB - 1, charmBucket));
       let html =
         '<div class="qstar-panel-title">STATE (YOUR=' + bucketName(pikaBucket) +
-        ', OPP=' + bucketName(charmBucket) + ')</div>' +
+        ', ' + oppForm + ' ' + bucketName(charmBucket) + ')</div>' +
         '<div class="qstar-rows">';
       for (let k = 0; k < A; k++) {
         const qv = qStar[base + k];
@@ -210,6 +229,8 @@
     function resetDemo() {
       pikaBucket = 0; charmBucket = 0; turnIdx = 1;
       pikaHp.set(0); charmHp.set(0);
+      lastOppForm = null;
+      refreshOppSprite();
       hideBanner();
       pickArgmax();
       renderQPanel();
@@ -230,6 +251,7 @@
         setTimeout(() => {
           charmBucket = Math.min(NB, charmBucket + 1);
           charmHp.set(Math.min(charmBucket, NB - 1));
+          refreshOppSprite();
           spawnFlash('opp', '−1 HP', 'var(--cb-vermillion)');
         }, 480);
         setTimeout(() => stage.classList.remove('qstar-attack'), 1100);
@@ -287,6 +309,7 @@
     }
 
     /* Initial render. */
+    refreshOppSprite();
     pickArgmax();
     renderQPanel();
     updateStatus('SHOWING Q');

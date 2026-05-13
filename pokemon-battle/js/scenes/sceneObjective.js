@@ -65,7 +65,7 @@
           '<div class="traj-box-bucket">' + bucketName(turn.your) + '</div>' +
         '</div>' +
         '<div class="traj-box-side">' +
-          '<img class="traj-box-sprite" src="assets/charmander-front.png" alt="">' +
+          '<img class="traj-box-sprite" src="' + window.Battle.spriteForOpp(turn.opp) + '" alt="' + window.Battle.displayNameForOpp(turn.opp) + '">' +
           '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + bucketClass(turn.opp) + '" style="width:' + bucketPct(turn.opp) + '%"></div></div>' +
           '<div class="traj-box-bucket">' + bucketName(turn.opp) + '</div>' +
         '</div>' +

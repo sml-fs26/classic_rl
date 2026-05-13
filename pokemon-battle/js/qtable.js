@@ -74,7 +74,16 @@
       cell.style.gridRow = String(st.your + 1);
       cell.dataset.state = stateLabel(st);
 
-      /* Battle thumbnail at the top. */
+      /* Battle thumbnail at the top. Opponent sprite is form-aware:
+         CHARMANDER at FULL/HIGH, CHARMELEON at MID, CHARIZARD at
+         LOW/CRIT — set once at cell mount since each cell represents
+         a fixed (yourHP, oppHP) state. */
+      const oppSprite = (window.Battle && window.Battle.spriteForOpp)
+        ? window.Battle.spriteForOpp(st.opp)
+        : 'assets/charmander-front.png';
+      const oppName = (window.Battle && window.Battle.displayNameForOpp)
+        ? window.Battle.displayNameForOpp(st.opp)
+        : 'CHARMANDER';
       const thumb = document.createElement('div');
       thumb.className = 'q-thumb';
       thumb.innerHTML =
@@ -85,7 +94,7 @@
           '</div>' +
         '</div>' +
         '<div class="q-thumb-side opponent">' +
-          '<img src="assets/charmander-front.png" class="q-thumb-sprite" alt="Charmander">' +
+          '<img src="' + oppSprite + '" class="q-thumb-sprite" alt="' + oppName + '">' +
           '<div class="q-thumb-hp-bg">' +
             '<div class="q-thumb-hp-fill ' + bucketClass(st.opp) + '" style="width:' + bucketToPct(st.opp) + '%"></div>' +
           '</div>' +

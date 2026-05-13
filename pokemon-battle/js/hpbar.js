@@ -76,11 +76,17 @@
       const label = host.querySelector('.hp-num');
       if (label) label.textContent = BUCKET_NAMES[cur] || 'FAINTED';
     }
+    /* Update the displayed name — used in scene 1 when CHARMANDER
+       evolves into CHARMELEON / CHARIZARD mid-battle. */
+    function setName(newName) {
+      const nameEl = host.querySelector('.name');
+      if (nameEl) nameEl.textContent = newName;
+    }
     /* Backwards-compat name used by scene 1's old call site. */
     function drainTo(bucket) { set(bucket); }
     function refreshClass() { /* no-op — CSS reads data-bucket. */ }
 
-    return { set, drainTo, refreshClass, hp: () => cur };
+    return { set, drainTo, refreshClass, setName, hp: () => cur };
   }
 
   window.HPBar = { mount };
