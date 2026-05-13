@@ -1,0 +1,422 @@
+/* Scene — filling Q with dynamic programming.
+ *
+ *   We compute Q*(s, a) for the 25-state battle MDP using value iteration
+ *   (offline, once at mount), then STEP through 6 phases of pedagogical
+ *   "fills" on the reused QTable widget:
+ *
+ *     1. Right edge: OPP = CRITICAL column. BOLT always finishes the
+ *        opponent, so Q*(s, BOLT) = +10 across the column.
+ *
+ *     2. Bottom edge: YOUR = CRITICAL row. PIKACHU is one Ember from
+ *        fainting; most cells are negative.
+ *
+ *     3. The detail cell — (YOUR=LOW, OPP=LOW). Side panel renders the
+ *        full Bellman expansion for BOLT here, term by term, all the
+ *        way down to the +6.75 total.
+ *
+ *     4. Propagate inward through OPP=LOW and YOUR=LOW (skipping the
+ *        cells filled by previous phases).
+ *
+ *     5. Fill the remaining inner 3×3.
+ *
+ *     6. Done — recap.
+ *
+ *   The Bellman optimality formula sits in a card at the top. STEP /
+ *   RUN ALL / RESET drive the phases. The right-hand side panel shows
+ *   per-phase narration, with the detail cell getting a full
+ *   structured breakdown rather than prose.
+ */
+(function () {
+  window.scenes = window.scenes || {};
+
+  const NB      = window.Battle.NUM_BUCKETS;          // 5
+  const BUCKETS = window.Battle.BUCKETS;
+  const ACTIONS = window.Moves.MOVE_IDS;
+  const A       = ACTIONS.length;
+  const STATES  = window.Bellman.STATES;
+  const N       = STATES.length;                       // 25
+  const GAMMA   = window.DATA.params.gammaDefault;     // 0.90
+
+  function bucketName(b) { return b >= NB ? 'FAINT' : BUCKETS[b].toUpperCase(); }
+  function stateLabel(s) {
+    return bucketName(s.your) + ' / ' + bucketName(s.opp);
+  }
+
+  /* Convert (your, opp) → flat state index. */
+  function idx(y, o) { return y * NB + o; }
+
+  /* Compute Q*(s, a) by value iteration over V, then Q from V.
+     Returns Float32Array of length N * A. */
+  function computeQstar() {
+    let V = new Float32Array(N);
+    for (let iter = 0; iter < 400; iter++) {
+      const newV = new Float32Array(N);
+      let maxDelta = 0;
+      for (let s = 0; s < N; s++) {
+        const state = { your: STATES[s].your, opp: STATES[s].opp, terminal: false };
+        let bestQ = -Infinity;
+        for (let a = 0; a < A; a++) {
+          const succ = window.Battle.successors(state, ACTIONS[a]);
+          let q = 0;
+          for (const t of succ) {
+            const vN = t.sNext.terminal ? 0 : V[t.sNext.your * NB + t.sNext.opp];
+            q += t.p * (t.reward + GAMMA * vN);
+          }
+          if (q > bestQ) bestQ = q;
+        }
+        newV[s] = bestQ;
+        const d = Math.abs(bestQ - V[s]);
+        if (d > maxDelta) maxDelta = d;
+      }
+      V = newV;
+      if (maxDelta < 1e-7) break;
+    }
+    const Q = new Float32Array(N * A);
+    for (let s = 0; s < N; s++) {
+      const state = { your: STATES[s].your, opp: STATES[s].opp, terminal: false };
+      for (let a = 0; a < A; a++) {
+        const succ = window.Battle.successors(state, ACTIONS[a]);
+        let q = 0;
+        for (const t of succ) {
+          const vN = t.sNext.terminal ? 0 : V[t.sNext.your * NB + t.sNext.opp];
+          q += t.p * (t.reward + GAMMA * vN);
+        }
+        Q[s * A + a] = q;
+      }
+    }
+    return { Q: Q, V: V };
+  }
+
+  /* Build the detail-cell breakdown for (LOW, LOW, BOLT). We enumerate
+     the successor tree of THUNDERBOLT from (3, 3) and pair each branch
+     with its (r + γ V') contribution, grouped by the BOLT-damage roll
+     so the rendered table reads "dmg 1 → 3 ember sub-cases; dmg 2 →
+     immediate win". */
+  function buildLowLowBreakdown(V) {
+    const state = { your: 3, opp: 3, terminal: false };
+    const HIT  = window.Battle.HIT_DAMAGE_DIST.thunderbolt;   // [[1,0.5],[2,0.5]]
+    const EMB  = window.Battle.EMBER_DIST;                    // [[0,.2],[1,.55],[2,.25]]
+
+    /* dmg 2 branch — opp faints, terminal win. */
+    const dmg2 = { dmg: 2, pDmg: HIT[1][1], terminal: true, reward: +10, contribution: HIT[1][1] * 10 };
+
+    /* dmg 1 branch — opp at CRIT; iterate Ember outcomes. */
+    const dmg1 = { dmg: 1, pDmg: HIT[0][1], terminal: false, sub: [] };
+    let dmg1Sum = 0;
+    for (const [emb, pE] of EMB) {
+      const yNew = Math.min(NB, state.your + emb);
+      if (yNew >= NB) {
+        /* PIKACHU faints. */
+        const r = -10;
+        const contrib = pE * r;
+        dmg1.sub.push({ emb, p: pE, faint: true, r, vNext: null, branchVal: r, contribution: contrib });
+        dmg1Sum += contrib;
+      } else {
+        const r = -1;
+        const opp = state.opp + HIT[0][0];   // 4 = CRIT
+        const vNext = V[yNew * NB + opp];
+        const branch = r + GAMMA * vNext;
+        const contrib = pE * branch;
+        dmg1.sub.push({ emb, p: pE, faint: false, yNext: yNew, oNext: opp, r, vNext, branchVal: branch, contribution: contrib });
+        dmg1Sum += contrib;
+      }
+    }
+    dmg1.subSum = dmg1Sum;
+    dmg1.contribution = HIT[0][1] * dmg1Sum;
+    const total = dmg2.contribution + dmg1.contribution;
+    return { dmg2, dmg1, total };
+  }
+
+  function fmtSigned(v, dp) {
+    const d = dp === undefined ? 2 : dp;
+    return (v >= 0 ? '+' : '') + v.toFixed(d);
+  }
+
+  /* Render the detail-cell calculation HTML into `host`. */
+  function renderDetail(host, breakdown) {
+    const b = breakdown;
+    let html = '';
+    html += '<div class="dp-panel-title">Q*(YOUR=LOW, OPP=LOW, BOLT)</div>';
+    html += '<div class="dp-panel-narration">' +
+              'BOLT hits at 100%. Damage 1 or 2 with equal probability — ' +
+              'either kills CRITICAL, only one kills LOW.' +
+            '</div>';
+
+    /* dmg 2 line */
+    html += '<div class="dp-calc-line">' +
+              '<span><span class="dp-calc-prob">P=' + b.dmg2.pDmg.toFixed(2) + '</span>' +
+              ' &middot; BOLT dmg 2 → OPP FAINT (terminal win), r=+10</span>' +
+              '<span class="dp-calc-value">' + b.dmg2.pDmg.toFixed(2) + ' · 10 = ' + fmtSigned(b.dmg2.contribution) + '</span>' +
+            '</div>';
+
+    /* dmg 1 header */
+    html += '<div class="dp-calc-line">' +
+              '<span><span class="dp-calc-prob">P=' + b.dmg1.pDmg.toFixed(2) + '</span>' +
+              ' &middot; BOLT dmg 1 → OPP at CRIT, alive. CHARM counters:</span>' +
+              '<span></span>' +
+            '</div>';
+    /* Ember sub-rows */
+    for (const sub of b.dmg1.sub) {
+      let txt, calc;
+      if (sub.faint) {
+        txt = 'Ember ' + sub.emb + ' → PIKACHU FAINTS, r=−10 (terminal)';
+        calc = sub.p.toFixed(2) + ' · (−10) = ' + fmtSigned(sub.contribution);
+      } else {
+        const sNextLab = bucketName(sub.yNext) + ' / ' + bucketName(sub.oNext);
+        txt = 'Ember ' + sub.emb + ' → ' + sNextLab + ', V′=' + fmtSigned(sub.vNext) +
+              ' → −1 + ' + GAMMA.toFixed(1) + '·' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
+        calc = sub.p.toFixed(2) + ' · ' + fmtSigned(sub.branchVal) + ' = ' + fmtSigned(sub.contribution);
+      }
+      html += '<div class="dp-calc-line dp-calc-sub">' +
+                '<span>&nbsp;&nbsp;&nbsp;<span class="dp-calc-prob">P=' + sub.p.toFixed(2) + '</span>' +
+                ' &middot; ' + txt + '</span>' +
+                '<span class="dp-calc-value">' + calc + '</span>' +
+              '</div>';
+    }
+    /* dmg-1 subtotal */
+    html += '<div class="dp-calc-line dp-calc-subtotal">' +
+              '<span>&nbsp;&nbsp;&nbsp;Σ over Ember rolls (within dmg-1):</span>' +
+              '<span class="dp-calc-value">' + fmtSigned(b.dmg1.subSum) + '</span>' +
+            '</div>';
+    /* dmg-1 weighted contribution */
+    html += '<div class="dp-calc-line">' +
+              '<span>BOLT dmg 1 weighted: ' + b.dmg1.pDmg.toFixed(2) + ' · ' + fmtSigned(b.dmg1.subSum) + '</span>' +
+              '<span class="dp-calc-value">' + fmtSigned(b.dmg1.contribution) + '</span>' +
+            '</div>';
+
+    /* Total */
+    html += '<div class="dp-calc-total">' +
+              '<span>Q*(LOW/LOW, BOLT) = ' + fmtSigned(b.dmg2.contribution) + ' + ' + fmtSigned(b.dmg1.contribution) + '</span>' +
+              '<span><b>' + fmtSigned(b.total) + '</b></span>' +
+            '</div>';
+
+    host.innerHTML = html;
+  }
+
+  /* Render a non-detail narration into the panel. */
+  function renderNarration(host, title, paragraphs) {
+    let html = '<div class="dp-panel-title">' + title + '</div>';
+    for (const p of paragraphs) {
+      html += '<div class="dp-panel-narration">' + p + '</div>';
+    }
+    host.innerHTML = html;
+  }
+
+  window.scenes.sceneDp = function (root) {
+    root.classList.add('scene-pad', 'dp-scene');
+    root.innerHTML = '';
+
+    /* Heading */
+    const heading = document.createElement('h2');
+    heading.className = 'concept-heading';
+    heading.textContent = 'FILLING Q WITH DYNAMIC PROGRAMMING';
+    root.appendChild(heading);
+
+    /* Bellman card */
+    const fcard = document.createElement('div');
+    fcard.className = 'dp-bellman-card';
+    fcard.innerHTML = '<div class="dp-bellman-label">BELLMAN OPTIMALITY EQUATION</div>';
+    const fhost = document.createElement('div');
+    fcard.appendChild(fhost);
+    window.Katex.render(
+      String.raw`Q^{\star}(s, a) \;=\; \sum_{s'} P(s' \mid s, a)\Big[\, r(s, a, s') \;+\; \gamma\, \max_{a'} Q^{\star}(s', a') \,\Big]`,
+      fhost, true
+    );
+    root.appendChild(fcard);
+
+    /* Controls + status */
+    const ctrls = document.createElement('div');
+    ctrls.className = 'dp-controls-row';
+    ctrls.innerHTML =
+      '<div class="dp-controls">' +
+        '<button class="poke-btn" id="dp-step">▶ STEP</button>' +
+        '<button class="poke-btn" id="dp-run">RUN ALL</button>' +
+        '<button class="poke-btn" id="dp-reset">RESET</button>' +
+      '</div>' +
+      '<div class="dp-status">PHASE <b id="dp-phase">0 / 6</b> · CELLS FILLED <b id="dp-fillc">0 / 25</b></div>';
+    root.appendChild(ctrls);
+
+    /* Row: Q-table + side panel */
+    const row = document.createElement('div');
+    row.className = 'dp-row';
+    root.appendChild(row);
+
+    const qHost = document.createElement('div');
+    qHost.className = 'dp-q';
+    row.appendChild(qHost);
+    const qtbl = window.QTable.mount(qHost);
+
+    const panel = document.createElement('div');
+    panel.className = 'dp-panel poke-box tight';
+    row.appendChild(panel);
+
+    /* ---- Compute Q* once and prep the detail breakdown ---- */
+    const { Q: qStar, V } = computeQstar();
+    const lowLowBreakdown = buildLowLowBreakdown(V);
+
+    /* ---- Phase definitions ---- */
+    const oppCritCol = [idx(0,4), idx(1,4), idx(2,4), idx(3,4), idx(4,4)];
+    const yourCritRow = [idx(4,0), idx(4,1), idx(4,2), idx(4,3)]; /* (4,4) already in phase 1 */
+    const lowLowCell  = [idx(3,3)];
+    const ring        = [idx(0,3), idx(1,3), idx(2,3), idx(3,0), idx(3,1), idx(3,2)];
+    const inner       = [idx(0,0), idx(0,1), idx(0,2),
+                         idx(1,0), idx(1,1), idx(1,2),
+                         idx(2,0), idx(2,1), idx(2,2)];
+
+    const PHASES = [
+      {
+        title: 'EDGES — OPP CRITICAL column',
+        narration: [
+          'BOLT does 1 or 2 damage at 100% accuracy. Either roll pushes a bucket-4 opponent into FAINTED.',
+          'So the right-most column is settled in one step: <b>Q*(s, BOLT) = +10</b> for every row.',
+          'For the other three moves the Q is computed too, but BOLT is the argmax everywhere here.',
+        ],
+        fillCells: oppCritCol,
+      },
+      {
+        title: 'EDGES — YOUR CRITICAL row',
+        narration: [
+          'PIKACHU at CRITICAL means any Ember of damage ≥ 1 faints us — that\'s 80% of all Ember rolls.',
+          'Cells in this row whose opponent is also low (CRIT, LOW) still have BOLT as the argmax because PIKACHU acts first. The rest are negative.',
+        ],
+        fillCells: yourCritRow,
+      },
+      {
+        title: 'DETAIL CELL — (LOW, LOW)',
+        narration: null,
+        fillCells: lowLowCell,
+        detailCell: idx(3,3),
+        detailType: 'lowlow',
+      },
+      {
+        title: 'PROPAGATE — OPP=LOW column and YOUR=LOW row',
+        narration: [
+          'Each cell looks one step ahead into the already-filled rightmost column / bottom row, plus the (LOW, LOW) cell we just did.',
+          'Bellman backup applied to every remaining (state, action) pair — argmax falls out automatically.',
+        ],
+        fillCells: ring,
+      },
+      {
+        title: 'PROPAGATE — inner 3×3',
+        narration: [
+          'Final sweep. Every cell\'s successors are now known, so one Bellman update finishes the table.',
+        ],
+        fillCells: inner,
+      },
+      {
+        title: 'Q* CONVERGED.',
+        narration: [
+          'Every (s, a) pair has its expected discounted return.',
+          'Pick <b>argmax_a Q*(s, a)</b> in any state and you have the optimal policy.',
+          'But — we needed <i>P(s′ | s, a)</i> for every transition, and we paid one Bellman backup per cell.',
+          'In a real game neither is available.',
+        ],
+        fillCells: [],
+      },
+    ];
+
+    /* ---- Phase rendering state ---- */
+    let phaseIdx = -1;
+    const filledMask = new Array(N).fill(false);
+
+    function applyPhase(p) {
+      /* Update mask. */
+      for (const sIdx of p.fillCells) filledMask[sIdx] = true;
+      /* Build a Q array where pending cells stay at 0. */
+      const QView = new Float32Array(N * A);
+      for (let s = 0; s < N; s++) {
+        if (!filledMask[s]) continue;
+        for (let a = 0; a < A; a++) QView[s * A + a] = qStar[s * A + a];
+      }
+      qtbl.update(QView, { suppressFlash: true });
+      /* CSS classes. */
+      for (let s = 0; s < N; s++) {
+        const cell = qtbl.getCellNode(s);
+        if (!cell) continue;
+        cell.classList.toggle('dp-pending', !filledMask[s]);
+        cell.classList.remove('dp-active', 'dp-detail', 'dp-just-filled');
+      }
+      for (const sIdx of p.fillCells) {
+        const cell = qtbl.getCellNode(sIdx);
+        if (!cell) continue;
+        cell.classList.add('dp-active', 'dp-just-filled');
+        setTimeout(() => cell && cell.classList.remove('dp-just-filled'), 700);
+      }
+      if (p.detailType === 'lowlow') {
+        const c = qtbl.getCellNode(idx(3, 3));
+        if (c) c.classList.add('dp-detail');
+      }
+      /* Side panel. */
+      if (p.detailType === 'lowlow') {
+        renderDetail(panel, lowLowBreakdown);
+      } else if (p.narration) {
+        renderNarration(panel, p.title, p.narration);
+      } else {
+        renderNarration(panel, p.title, ['']);
+      }
+      /* Status. */
+      const filledCount = filledMask.filter(Boolean).length;
+      document.getElementById('dp-phase').textContent = (phaseIdx + 1) + ' / ' + PHASES.length;
+      document.getElementById('dp-fillc').textContent = filledCount + ' / ' + N;
+    }
+
+    function step() {
+      if (phaseIdx >= PHASES.length - 1) return;
+      phaseIdx++;
+      applyPhase(PHASES[phaseIdx]);
+    }
+
+    function runAll() {
+      while (phaseIdx < PHASES.length - 1) {
+        phaseIdx++;
+        applyPhase(PHASES[phaseIdx]);
+      }
+    }
+
+    function reset() {
+      phaseIdx = -1;
+      for (let s = 0; s < N; s++) filledMask[s] = false;
+      /* Reset QTable + clear all classes. */
+      qtbl.reset();
+      qtbl.update(new Float32Array(N * A), { suppressFlash: true });
+      for (let s = 0; s < N; s++) {
+        const cell = qtbl.getCellNode(s);
+        if (cell) {
+          cell.classList.add('dp-pending');
+          cell.classList.remove('dp-active', 'dp-detail', 'dp-just-filled');
+        }
+      }
+      renderNarration(panel, 'READY', ['Click <b>STEP</b> to begin computing Q* one phase at a time.']);
+      document.getElementById('dp-phase').textContent = '0 / ' + PHASES.length;
+      document.getElementById('dp-fillc').textContent = '0 / ' + N;
+    }
+
+    document.getElementById('dp-step').addEventListener('click', step);
+    document.getElementById('dp-run').addEventListener('click', runAll);
+    document.getElementById('dp-reset').addEventListener('click', reset);
+
+    /* Initial state */
+    reset();
+
+    /* &run flag: auto-fill for headless capture. */
+    const autoRun = /[#&?]run\b/.test(window.location.hash);
+    if (autoRun) setTimeout(runAll, 200);
+
+    /* &dp=N flag: jump to phase N for headless capture. */
+    const dpMatch = (window.location.hash || '').match(/[#&?]dp=(\d+)/);
+    if (dpMatch) {
+      const target = Math.min(PHASES.length - 1, Math.max(0, parseInt(dpMatch[1], 10) - 1));
+      setTimeout(() => {
+        while (phaseIdx < target) { phaseIdx++; applyPhase(PHASES[phaseIdx]); }
+      }, 200);
+    }
+
+    return {
+      onEnter() {
+        /* Re-apply current phase so visual state is consistent if we
+           re-enter the scene. */
+        if (phaseIdx < 0) reset(); else applyPhase(PHASES[phaseIdx]);
+      },
+    };
+  };
+})();

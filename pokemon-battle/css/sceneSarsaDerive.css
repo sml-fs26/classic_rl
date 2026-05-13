@@ -1,0 +1,102 @@
+/* Scene: deriving SARSA. Seven stacked cards, revealed one click at a
+ * time. Each card builds the next step of the derivation chain. */
+
+.sd-scene { display: flex; flex-direction: column; gap: 14px; }
+
+.sd-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.sd-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-left: auto;
+}
+.sd-status b { color: var(--pikachu-cheek, #C62828); }
+
+.sd-stack { display: flex; flex-direction: column; gap: 12px; }
+
+.sd-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 18px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  opacity: 0.18;
+  transition: opacity 380ms;
+}
+.sd-card.shown {
+  opacity: 1;
+  animation: sd-card-reveal 420ms ease-out;
+}
+
+@keyframes sd-card-reveal {
+  0%   { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.sd-card-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--pikachu-cheek, #C62828);
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.sd-card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.sd-card-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+}
+.sd-card-body code,
+.sd-card-body .sd-q,
+.sd-card-body .sd-q-est {
+  font-family: 'Press Start 2P', monospace;
+}
+.sd-card-body .sd-q     { color: var(--hue-anymal); }     /* mathematical Q */
+.sd-card-body .sd-q-est { color: var(--hue-casino); }     /* typewriter q (table estimate) */
+.sd-card-body .sd-eps   { color: var(--hue-casino); }
+.sd-card-body .sd-rew   { color: var(--hue-ghost); }
+.sd-card-body .sd-alpha { color: var(--hue-star);   }
+
+.sd-card-formula {
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  padding: 10px 12px;
+  margin: 10px 0;
+  text-align: center;
+}
+.sd-card-formula .katex-display { margin: 0; }
+
+.sd-legend {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 10px 14px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  color: var(--ink-on-box);
+}
+.sd-legend-chip {
+  padding: 3px 6px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  font-size: 8px;
+  white-space: nowrap;
+}
+.sd-legend-chip.q { color: var(--hue-anymal); }
+.sd-legend-chip.q-est { color: var(--hue-casino); }

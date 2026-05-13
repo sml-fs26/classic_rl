@@ -148,35 +148,20 @@
     root.appendChild(narratorHost);
     const narrator = window.Dialog.mount(narratorHost);
 
-    /* Plain-English algorithm box */
-    const algoBox = document.createElement('div');
-    algoBox.className = 'sc4-algo poke-box tight';
-    algoBox.innerHTML =
-      '<div class="sc4-algo-title">SARSA — WHAT WE DO EVERY STEP</div>' +
-      '<ol class="sc4-algo-list">' +
-        '<li><b>INIT:</b> Q(s, a) is small random noise — PIKACHU has no plan yet.</li>' +
-        '<li>Stand at state <span class="comp-mdp">s</span>. Pick action <span class="comp-eps">a</span> by ε-greedy.</li>' +
-        '<li>Play <span class="comp-eps">a</span>. Observe reward <span class="comp-bellman">r</span> and new state <span class="comp-mdp">s′</span>.</li>' +
-        '<li>Pick <span class="comp-eps">a′</span> at <span class="comp-mdp">s′</span> by ε-greedy (the second &laquo;A&raquo; of SARSA).</li>' +
-        '<li><b>UPDATE:</b> bump <span class="comp-mdp">Q(s, a)</span> toward <span class="comp-bellman">r + γ·Q(s′, a′)</span> by a fraction <span class="comp-rm">α</span>.</li>' +
-        '<li>Move on: <span class="comp-mdp">s ← s′</span>, <span class="comp-eps">a ← a′</span>. Repeat.</li>' +
-      '</ol>';
-    root.appendChild(algoBox);
-
-    /* SARSA formula card */
+    /* Compact SARSA formula card — derivation lives in the previous
+       scene, so we only need the rule itself plus the hyperparameters. */
     const formulaCard = document.createElement('div');
-    formulaCard.className = 'sc4-formula-card';
+    formulaCard.className = 'sc4-formula-card compact';
     formulaCard.innerHTML =
       '<div class="sc4-formula">' +
-        '<span class="comp-mdp">Q(s, a)</span> ← <span class="comp-mdp">Q(s, a)</span> + <span class="comp-rm">α</span>' +
-        ' [ <span class="comp-bellman">r + γ&middot;Q(s′, a′)</span>' +
-        ' − <span class="comp-mdp">Q(s, a)</span> ]' +
+        '<span class="comp-mdp">q[s, a]</span> ← <span class="comp-mdp">q[s, a]</span> + <span class="comp-rm">α</span>' +
+        ' ( <span class="comp-bellman">r + γ&middot;q[s′, a′]</span>' +
+        ' − <span class="comp-mdp">q[s, a]</span> )' +
       '</div>' +
-      '<div class="sc4-formula-legend">' +
-        '<span class="legend-chip comp-mdp">Q(s, a)</span><span> ANYmal — MDP\'s action-value</span>' +
-        '<span class="legend-chip comp-rm">α = ' + alpha.toFixed(2) + '</span><span> Darts — RM learning rate</span>' +
-        '<span class="legend-chip comp-bellman">r + γ·Q(s′, a′), γ = ' + gamma.toFixed(2) + '</span><span> Spooky — TD target (sampled, not enumerated)</span>' +
-        '<span class="legend-chip comp-eps">a, a′ via ε-greedy, ε = ' + eps.toFixed(2) + '</span><span> Casino — picks actions</span>' +
+      '<div class="sc4-formula-hyper">' +
+        '<span>ε = ' + eps.toFixed(2) + '</span>' +
+        '<span>α = ' + alpha.toFixed(2) + '</span>' +
+        '<span>γ = ' + gamma.toFixed(2) + '</span>' +
       '</div>';
     root.appendChild(formulaCard);
 
@@ -216,14 +201,8 @@
     root.appendChild(qHost);
     const qtbl = window.QTable.mount(qHost);
 
-    /* Caption */
-    const caption = document.createElement('div');
-    caption.className = 'poke-caption';
-    caption.innerHTML =
-      'Each click runs SARSA forward by that many steps — one step = one PIKACHU turn. ' +
-      'The Q-table cell whose value just changed flashes yellow. ' +
-      'Greener cells have higher max-Q (PIKACHU expects to win from there); redder cells, lower.';
-    root.appendChild(caption);
+    /* (caption removed — derivation scene + the live LAST UPDATE panel
+       carry the explanation now.) */
 
     /* ----- Live SARSA state ----- */
     let Q = null;

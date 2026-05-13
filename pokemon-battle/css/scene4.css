@@ -291,6 +291,19 @@
   color: var(--ink-on-box);
   font-family: 'Press Start 2P', monospace;
 }
+.sc4-formula-card.compact { padding: 8px 14px; }
+.sc4-formula-card.compact .sc4-formula { padding: 4px 0 6px; font-size: 11px; }
+.sc4-formula-hyper {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding-top: 6px;
+  border-top: 2px solid var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
 .sc4-formula {
   font-size: 12px;
   text-align: center;
