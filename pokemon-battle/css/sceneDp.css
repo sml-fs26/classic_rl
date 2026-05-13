@@ -2,12 +2,13 @@
  * Reuses qtable.js's grid widget; layout-wise we sit beside a side
  * calculation panel and below the Bellman optimality formula. */
 
-.dp-scene { display: flex; flex-direction: column; gap: 14px; }
+.dp-scene { display: flex; flex-direction: column; gap: 10px; }
 
+/* Bellman card — compact so it leaves room for the table below. */
 .dp-bellman-card {
   background: var(--bg-strong);
   border: 4px solid var(--rule);
-  padding: 14px 18px;
+  padding: 8px 16px;
   box-shadow:
     inset 0 0 0 2px var(--bg-strong),
     inset 0 0 0 4px var(--inner-highlight),
@@ -18,17 +19,28 @@
 .dp-bellman-card .katex-display { margin: 0; }
 .dp-bellman-label {
   font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
+  font-size: 7px;
   letter-spacing: 0.06em;
   color: var(--ink-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
+/* Sticky controls bar — pins STEP / RUN ALL / RESET to the top of
+   the viewport as the user scrolls the Q-table below. The table is
+   tall enough that the user previously had to scroll up to find the
+   buttons. Now the buttons follow them. */
 .dp-controls-row {
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: var(--bg);
+  padding: 8px 6px;
+  margin: 0 -6px;
+  border-bottom: 2px solid var(--rule);
 }
 .dp-controls {
   display: flex;
@@ -51,12 +63,42 @@
 
 .dp-q { max-width: 880px; }
 
+/* Side panel — sticks below the sticky controls so the per-step
+   calculation stays visible while the user scrolls the Q-table. */
 .dp-panel {
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
   color: var(--ink-on-box);
   line-height: 1.6;
+  position: sticky;
+  top: 64px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  align-self: start;
 }
+
+/* ---- Compact Q-table inside the DP scene ----
+   The Q-table widget normally renders at scene-4 size (taller cells
+   with bigger sprites). For the DP scene we want the whole grid to
+   fit in roughly half the viewport so the student can see controls,
+   table, and side panel at once. */
+.dp-scene .q-cell        { padding: 3px 5px 5px; gap: 4px; }
+.dp-scene .q-thumb       { gap: 3px; padding-bottom: 2px; }
+.dp-scene .q-thumb-sprite { width: 22px; height: 22px; }
+.dp-scene .q-thumb-hp-bg { height: 3px; }
+.dp-scene .q-bar-row     { grid-template-columns: 8px 30px 1fr; gap: 3px; padding: 0 2px; font-size: 6.5px; }
+.dp-scene .q-label       { font-size: 6.5px; }
+.dp-scene .q-val         { font-size: 7px; }
+.dp-scene .q-grid        { gap: 4px; }
+.dp-scene .q-row-head    { font-size: 7px; }
+.dp-scene .q-col-head    { font-size: 6.5px; }
+
+/* Hide the argmax-distribution strip + legend in this scene.  The
+   heatmap cell colours + the ▶ markers on each cell already convey
+   the policy; the strip duplicates that info and adds vertical
+   weight we can't afford here. */
+.dp-scene .q-freq-strip { display: none; }
+.dp-scene .q-legend     { display: none; }
 .dp-panel-title {
   font-size: 10px;
   letter-spacing: 0.06em;

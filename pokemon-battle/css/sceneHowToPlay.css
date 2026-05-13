@@ -319,21 +319,25 @@
   gap: 14px;
 }
 
-/* Mini battle stage on top of the sequence diagram. Slightly squashed
-   so the whole step fits in one viewport without scrolling. */
+/* Mini battle stage on top of the sequence diagram. Made taller than
+   220 px (the prior value squeezed sprites into the opponent HP box's
+   lane during the lunge). 300 px gives the sprites room to move
+   without overlapping the HP boxes at the corners. */
 .tut-turn-stage {
-  height: 220px !important;
-  min-height: 220px;
-  max-width: 720px;
+  height: 300px !important;
+  min-height: 300px;
+  max-width: 760px;
   margin: 0 auto;
 }
 .tut-turn-stage .sprite-host img { transition: transform 240ms ease-out; }
 
-/* PIKACHU attacks: lunges right toward CHARMANDER; CHARMANDER shakes. */
+/* PIKACHU attacks: lunges right toward CHARMANDER; CHARMANDER shakes.
+   Y component is only -10 px so the lunge stays well below the
+   opponent HP box at the top of the stage. */
 @keyframes tut-turn-pika-lunge {
   0%   { transform: translate(0, 0); }
-  35%  { transform: translate(70px, -22px); }
-  60%  { transform: translate(70px, -22px); }
+  35%  { transform: translate(90px, -10px); }
+  60%  { transform: translate(90px, -10px); }
   100% { transform: translate(0, 0); }
 }
 @keyframes tut-turn-opp-shake {
@@ -348,11 +352,12 @@
   animation: tut-turn-opp-shake 0.5s ease-in-out 0.4s;
 }
 
-/* CHARMANDER counters: lunges left, PIKACHU shakes. */
+/* CHARMANDER counters: lunges left, PIKACHU shakes. Symmetric +10 px
+   Y so Charm doesn't dive into the player HP box at the bottom. */
 @keyframes tut-turn-charm-lunge {
   0%   { transform: translate(0, 0); }
-  35%  { transform: translate(-70px, 22px); }
-  60%  { transform: translate(-70px, 22px); }
+  35%  { transform: translate(-90px, 10px); }
+  60%  { transform: translate(-90px, 10px); }
   100% { transform: translate(0, 0); }
 }
 @keyframes tut-turn-player-shake {
