@@ -12,6 +12,20 @@
 
   const BUCKET_NAMES = ['FULL', 'HIGH', 'MID', 'LOW', 'CRITICAL', 'FAINTED'];
 
+  /* Map Pikachu moves and opponent forms to SFX names. window.SFX is
+     lazy-loaded — every call is guarded so this scene still works in a
+     build without sfx.js included. */
+  const MOVE_SFX = {
+    quick_attack: 'quick',
+    thunderbolt:  'bolt',
+    thunder:      'thunder',
+  };
+  const COUNTER_SFX = {
+    charmander: 'ember',
+    charmeleon: 'flame',
+    charizard:  'outrage',
+  };
+
   window.scenes.scene1 = function (root) {
     root.classList.add('scene-pad');
     root.innerHTML = '';
@@ -174,15 +188,18 @@
       /* ---- Pikachu's turn ---- */
       await dialogSay('PIKACHU used ' + move.name + '!');
       if (episode !== myEp) return;
+      if (window.SFX) window.SFX.play(MOVE_SFX[moveId]);
       await wait(500);
       if (episode !== myEp) return;
 
       if (!log.hit1) {
+        if (window.SFX) window.SFX.play('miss');
         await dialogSay("PIKACHU's attack missed!");
         if (episode !== myEp) return;
         await wait(800);
       } else {
         oppSprite.shake();
+        if (window.SFX) window.SFX.play('hit');
         showDamage(oppHostEl, log.oppDelta);
         await wait(400);
         if (episode !== myEp) return;
@@ -241,6 +258,7 @@
         await wait(700);
         if (episode !== myEp) return;
         await dialogSay('PIKACHU wins!');
+        if (window.SFX) window.SFX.play('win');
         state = out.sNext;
         finalizeTurn(out);
         return;
@@ -251,9 +269,11 @@
       const counterName = window.Battle.FORM_MOVE_NAME[log.formAfter];
       await dialogSay('Wild ' + oppFormName + ' used ' + counterName + '!');
       if (episode !== myEp) return;
+      if (window.SFX) window.SFX.play(COUNTER_SFX[log.formAfter]);
       await wait(500);
       if (episode !== myEp) return;
       playerSprite.shake();
+      if (window.SFX) window.SFX.play('hit');
       showDamage(playerHostEl, log.yourDelta, '#FFD0A0');
       await wait(400);
       if (episode !== myEp) return;
@@ -269,6 +289,7 @@
         await wait(700);
         if (episode !== myEp) return;
         await dialogSay('You lost!');
+        if (window.SFX) window.SFX.play('loss');
       } else {
         await dialogSay('What will PIKACHU do?');
       }

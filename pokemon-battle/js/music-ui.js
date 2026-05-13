@@ -31,6 +31,7 @@
     btn.addEventListener('click', () => {
       const on = window.Music.toggle();
       setLabel(btn, on);
+      if (window.SFX) window.SFX.setEnabled(on);
       try { localStorage.setItem(KEY, on ? 'on' : 'off'); } catch (e) {}
     });
 
@@ -42,6 +43,7 @@
       const onFirstGesture = () => {
         if (window.Music.start()) {
           setLabel(btn, true);
+          if (window.SFX) window.SFX.setEnabled(true);
         }
         window.removeEventListener('click', onFirstGesture, true);
         window.removeEventListener('keydown', onFirstGesture, true);

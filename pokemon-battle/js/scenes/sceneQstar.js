@@ -19,6 +19,20 @@
 (function () {
   window.scenes = window.scenes || {};
 
+  /* SFX names indexed by move-id / opponent-form. Lookups are guarded
+     against window.SFX being absent so the scene works in builds that
+     don't include sfx.js. */
+  const MOVE_SFX = {
+    quick_attack: 'quick',
+    thunderbolt:  'bolt',
+    thunder:      'thunder',
+  };
+  const COUNTER_SFX = {
+    charmander: 'ember',
+    charmeleon: 'flame',
+    charizard:  'outrage',
+  };
+
   const NB      = window.Battle.NUM_BUCKETS;          // 5
   const BUCKETS = window.Battle.BUCKETS;
   const ACTIONS = window.Moves.MOVE_IDS;
@@ -248,11 +262,14 @@
         stage.classList.remove('qstar-attack');
         void stage.offsetWidth;
         stage.classList.add('qstar-attack');
+        /* Move SFX at attack start; hit SFX at damage-land (480 ms). */
+        if (window.SFX) window.SFX.play(MOVE_SFX[ACTIONS[argmaxA]]);
         setTimeout(() => {
           charmBucket = Math.min(NB, charmBucket + 1);
           charmHp.set(Math.min(charmBucket, NB - 1));
           refreshOppSprite();
           spawnFlash('opp', '−1 HP', 'var(--cb-vermillion)');
+          if (window.SFX) window.SFX.play('hit');
         }, 480);
         setTimeout(() => stage.classList.remove('qstar-attack'), 1100);
         updateStatus('PIKA → ' + window.Moves.MOVE_BY_ID[ACTIONS[argmaxA]].name);
@@ -263,20 +280,27 @@
           phase = 'banner-win';
           showBanner('✓ WIN  +10', 'win');
           updateStatus('OPP FAINTED — WIN');
+          if (window.SFX) window.SFX.play('win');
           dwell = 2600;
         } else {
-          /* Charm counters. */
+          /* Charm counters. The form is whatever the opp is in NOW
+             (post-Pikachu's-hit), which may have just evolved. Use
+             that to pick both the SFX and the dialog name. */
           phase = 'counter';
           stage.classList.remove('qstar-counter');
           void stage.offsetWidth;
           stage.classList.add('qstar-counter');
+          const oppForm = window.Battle.formForOpp(Math.min(NB - 1, charmBucket));
+          const counterName = window.Battle.FORM_MOVE_NAME[oppForm];
+          if (window.SFX) window.SFX.play(COUNTER_SFX[oppForm]);
           setTimeout(() => {
             pikaBucket = Math.min(NB, pikaBucket + 1);
             pikaHp.set(Math.min(pikaBucket, NB - 1));
             spawnFlash('pika', '−1 HP', 'var(--cb-vermillion)');
+            if (window.SFX) window.SFX.play('hit');
           }, 480);
           setTimeout(() => stage.classList.remove('qstar-counter'), 1100);
-          updateStatus('CHARM → EMBER');
+          updateStatus('CHARM → ' + counterName);
           dwell = 1400;
         }
 
@@ -285,6 +309,7 @@
           phase = 'banner-loss';
           showBanner('✗ LOSS  −10', 'loss');
           updateStatus('PIKA FAINTED — LOSS');
+          if (window.SFX) window.SFX.play('loss');
           dwell = 2600;
         } else {
           turnIdx++;
