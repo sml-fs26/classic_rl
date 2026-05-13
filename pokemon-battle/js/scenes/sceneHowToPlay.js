@@ -40,9 +40,8 @@
     {
       title: 'Pick a move',
       dialog:
-        "ACC is the real hit chance.  PWR is classic Pokemon flavour — " +
-        "the line below shows what each move actually does: how many HP " +
-        "buckets it drops.",
+        "PWR is how strong the move feels.  ACC is the real chance it lands.  " +
+        "Higher PWR usually means lower ACC — that's the trade-off PIKACHU has to learn.",
       render: renderStepMoves,
     },
     {
@@ -358,8 +357,8 @@
     const note = document.createElement('div');
     note.className = 'tut-footnote';
     note.innerHTML =
-      'THUNDERBOLT reliably drops 1-2 buckets every turn — the workhorse.<br>' +
-      'THUNDER drops 2-3 when it hits, but only 55% of the time — a gamble worth taking when the opponent is already low.';
+      'THUNDERBOLT is the reliable workhorse — solid PWR, never misses.<br>' +
+      'THUNDER hits harder but only lands 55% of the time — a gamble worth taking when CHARMANDER is already low.';
     host.appendChild(note);
   }
 
