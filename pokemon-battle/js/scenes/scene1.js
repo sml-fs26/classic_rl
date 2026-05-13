@@ -192,18 +192,41 @@
       if (episode !== myEp) return;
 
       /* ---- Opponent evolution? PIKACHU's hit may have pushed the
-         opponent into a new form. Swap sprite + HP-box name + cached
-         display-name so subsequent messages refer to the new form. */
+         opponent into a new form. Run the Gen-1 evolution sequence:
+         flash on the sprite + white wash on the stage; the actual
+         sprite-source swap happens behind the peak of the wash. */
       const evolvedThisTurn = (log.formBefore !== log.formAfter) &&
                               (log.oppAfter < window.Battle.FAINTED);
       if (evolvedThisTurn) {
-        oppSprite.setKind(log.formAfter);
-        oppFormName = window.Battle.FORM_DISPLAY_NAME[log.formAfter];
-        oppHp.setName(oppFormName);
         await dialogSay('What? Wild ' + window.Battle.FORM_DISPLAY_NAME[log.formBefore] +
                         ' is evolving!');
         if (episode !== myEp) return;
-        await wait(500);
+        await wait(450);
+
+        const oppImgEl = oppSprite.el();
+        oppImgEl.classList.add('sc1-evo-sprite');
+        oppHostEl.classList.add('sc1-evo-host');
+        stage.classList.add('sc1-evo-stage');
+
+        /* Swap mid-animation (~50%, behind the white-wash peak). */
+        await wait(1200);
+        if (episode !== myEp) {
+          oppImgEl.classList.remove('sc1-evo-sprite');
+          oppHostEl.classList.remove('sc1-evo-host');
+          stage.classList.remove('sc1-evo-stage');
+          return;
+        }
+        oppSprite.setKind(log.formAfter);
+        oppFormName = window.Battle.FORM_DISPLAY_NAME[log.formAfter];
+        oppHp.setName(oppFormName);
+
+        /* Let the wash fade and the new form settle. */
+        await wait(1250);
+        oppImgEl.classList.remove('sc1-evo-sprite');
+        oppHostEl.classList.remove('sc1-evo-host');
+        stage.classList.remove('sc1-evo-stage');
+        if (episode !== myEp) return;
+
         await dialogSay('Evolved into ' + oppFormName + '!');
         if (episode !== myEp) return;
         await wait(700);
@@ -282,6 +305,13 @@
       oppHp.set(0);     // bucket 0 = full
       oppHp.setName(oppFormName);
       playerHp.set(0);
+      /* Clear any lingering evolution-flash classes from a cancelled
+         in-flight applyTurn. */
+      const oppImgClean = oppSprite.el();
+      if (oppImgClean) oppImgClean.classList.remove('sc1-evo-sprite');
+      const oppHostClean = stage.querySelector('.sprite-host.opponent');
+      if (oppHostClean) oppHostClean.classList.remove('sc1-evo-host');
+      stage.classList.remove('sc1-evo-stage');
       document.getElementById('sc1-turn').textContent = '0';
       document.getElementById('sc1-last').textContent = '—';
       document.getElementById('sc1-rew').textContent = '0';
