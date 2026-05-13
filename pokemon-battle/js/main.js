@@ -14,6 +14,7 @@
     { key: 'scene0',           title: 'POKEMON',                      music: 'title'    },
     { key: 'sceneHowToPlay',   title: 'Tutorial — how to play',       music: 'tutorial' },
     { key: 'scene1',           title: 'A wild CHARMANDER appeared!',  music: 'battle'   },
+    { key: 'sceneMdpOverlay',  title: 'What makes this an MDP?',      music: 'title'    },
     { key: 'sceneTrajectory',  title: 'The trajectory',               music: 'concept'  },
     { key: 'sceneObjective',   title: 'Return & the Q-function',      music: 'concept'  },
     { key: 'sceneQstar',       title: 'π* from Q',                    music: 'concept'  },
