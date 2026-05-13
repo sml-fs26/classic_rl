@@ -115,9 +115,11 @@
     function renderStep(c) {
       cursor = c;
       /* Any prior step's animation loop must be stopped before its DOM is
-         torn down — the HP-bucket demo registers a setInterval that would
-         keep firing into an empty demoHost otherwise. */
+         torn down — both the HP-bucket demo and the turn-flow demo
+         register setTimeouts that would keep firing into an empty
+         demoHost otherwise. */
       stopHpAnimation();
+      stopTurnAnimation();
       counter.textContent = 'STEP ' + (c + 1) + ' / ' + STEPS_DATA.length;
       header.textContent = STEPS_DATA[c].title.toUpperCase();
       demoHost.innerHTML = '';
@@ -141,7 +143,7 @@
 
     return {
       onEnter() { renderStep(readInitialStep()); },
-      onLeave() { stopHpAnimation(); },
+      onLeave() { stopHpAnimation(); stopTurnAnimation(); },
       onNextKey() {
         if (cursor < STEPS_DATA.length - 1) {
           renderStep(cursor + 1);
@@ -361,16 +363,89 @@
     host.appendChild(note);
   }
 
-  function renderStepTurnOrder(host) {
-    /* A small 3-row sequence diagram: each row is one phase of a turn. */
-    const wrap = document.createElement('div');
-    wrap.className = 'tut-turn';
+  /* Looping turn-flow demo (step 4). PIKACHU lunges + lightning,
+     CHARMANDER shakes; then CHARMANDER lunges + ember, PIKACHU shakes;
+     then a brief settling beat. The 3-row diagram below the stage
+     highlights whichever phase is happening, in lock-step. */
+  let turnAnimTimer = null;
+  function stopTurnAnimation() {
+    if (turnAnimTimer) { clearTimeout(turnAnimTimer); turnAnimTimer = null; }
+  }
+  function spawnTurnFlash(stage, side, text, color) {
+    const el = document.createElement('div');
+    el.className = 'tut-turn-flash ' + side;
+    el.textContent = text;
+    if (color) el.style.color = color;
+    stage.appendChild(el);
+    setTimeout(() => { try { stage.removeChild(el); } catch (e) {} }, 1100);
+  }
+  /* Phase ladder: each entry says how long to dwell, which row to
+     highlight, and what to do on entry (sprite classes + damage flash). */
+  const TURN_PHASES = [
+    {
+      dwell: 1400, row: 0,
+      enter(stage) {
+        stage.classList.add('attack-pika');
+        spawnTurnFlash(stage, 'opp', '−1 HP', 'var(--cb-vermillion)');
+      },
+      leave(stage) { stage.classList.remove('attack-pika'); },
+    },
+    {
+      dwell: 1400, row: 1,
+      enter(stage) {
+        stage.classList.add('attack-charm');
+        spawnTurnFlash(stage, 'player', '−1 HP', 'var(--cb-vermillion)');
+      },
+      leave(stage) { stage.classList.remove('attack-charm'); },
+    },
+    {
+      dwell: 1100, row: 2,
+      enter(_stage) { /* settle */ },
+      leave(_stage) {},
+    },
+  ];
+  function runTurnAnimation(stage, rowNodes) {
+    stopTurnAnimation();
+    let phase = 0;
+    function tick() {
+      if (!stage.isConnected) { stopTurnAnimation(); return; }
+      /* Tear down previous phase. */
+      const prev = TURN_PHASES[(phase - 1 + TURN_PHASES.length) % TURN_PHASES.length];
+      prev.leave(stage);
+      /* Enter this phase. */
+      const cur = TURN_PHASES[phase];
+      rowNodes.forEach((n, i) => n.classList.toggle('active', i === cur.row));
+      cur.enter(stage);
+      phase = (phase + 1) % TURN_PHASES.length;
+      turnAnimTimer = setTimeout(tick, cur.dwell);
+    }
+    tick();
+  }
 
+  function renderStepTurnOrder(host) {
+    const wrap = document.createElement('div');
+    wrap.className = 'tut-turn-demo';
+
+    /* Mini battle stage on top of the sequence diagram. */
+    const stage = document.createElement('div');
+    stage.className = 'battle-stage tut-turn-stage';
+    stage.innerHTML =
+      '<div class="grass-rim"></div>' +
+      '<div class="platform opponent"></div>' +
+      '<div class="platform player"></div>' +
+      '<div class="sprite-host opponent"><img class="poke-sprite" src="assets/charmander-front.png" alt="CHARMANDER"/></div>' +
+      '<div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="PIKACHU"/></div>';
+    wrap.appendChild(stage);
+
+    /* 3-row sequence diagram. */
+    const seq = document.createElement('div');
+    seq.className = 'tut-turn';
     const rows = [
       { num: '1', who: 'PIKACHU',    action: 'You pick a move.  PIKACHU attacks first.' },
       { num: '2', who: 'CHARMANDER', action: 'Wild CHARMANDER strikes back with EMBER.' },
-      { num: '3', who: '— — —',      action: 'Both HP bars update.  Now state has changed.' },
+      { num: '3', who: '— — —',      action: 'Both HP bars update.  State has changed.' },
     ];
+    const rowNodes = [];
     for (const r of rows) {
       const row = document.createElement('div');
       row.className = 'tut-turn-row';
@@ -378,8 +453,10 @@
         '<div class="tut-turn-num">' + r.num + '</div>' +
         '<div class="tut-turn-who">' + r.who + '</div>' +
         '<div class="tut-turn-action">' + r.action + '</div>';
-      wrap.appendChild(row);
+      seq.appendChild(row);
+      rowNodes.push(row);
     }
+    wrap.appendChild(seq);
     host.appendChild(wrap);
 
     const note = document.createElement('div');
@@ -387,6 +464,9 @@
     note.textContent =
       'PIKACHU is faster (base speed 90 vs 65), so it always moves first.';
     host.appendChild(note);
+
+    /* Kick off the loop. */
+    runTurnAnimation(stage, rowNodes);
   }
 
   function renderStepWinLose(host) {

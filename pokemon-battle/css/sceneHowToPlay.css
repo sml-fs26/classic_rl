@@ -311,15 +311,94 @@
   opacity: 0.95;
 }
 
-/* ---------- Step 4 — turn flow ---------- */
+/* ---------- Step 4 — turn flow (animated) ---------- */
+
+.tut-turn-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Mini battle stage on top of the sequence diagram. Slightly squashed
+   so the whole step fits in one viewport without scrolling. */
+.tut-turn-stage {
+  height: 220px !important;
+  min-height: 220px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.tut-turn-stage .sprite-host img { transition: transform 240ms ease-out; }
+
+/* PIKACHU attacks: lunges right toward CHARMANDER; CHARMANDER shakes. */
+@keyframes tut-turn-pika-lunge {
+  0%   { transform: translate(0, 0); }
+  35%  { transform: translate(70px, -22px); }
+  60%  { transform: translate(70px, -22px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes tut-turn-opp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.tut-turn-stage.attack-pika .sprite-host.player img {
+  animation: tut-turn-pika-lunge 1.1s ease-out;
+}
+.tut-turn-stage.attack-pika .sprite-host.opponent img {
+  animation: tut-turn-opp-shake 0.5s ease-in-out 0.4s;
+}
+
+/* CHARMANDER counters: lunges left, PIKACHU shakes. */
+@keyframes tut-turn-charm-lunge {
+  0%   { transform: translate(0, 0); }
+  35%  { transform: translate(-70px, 22px); }
+  60%  { transform: translate(-70px, 22px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes tut-turn-player-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.tut-turn-stage.attack-charm .sprite-host.opponent img {
+  animation: tut-turn-charm-lunge 1.1s ease-out;
+}
+.tut-turn-stage.attack-charm .sprite-host.player img {
+  animation: tut-turn-player-shake 0.5s ease-in-out 0.4s;
+}
+
+/* Damage flash that floats up over the side getting hit. */
+@keyframes tut-turn-flash-rise {
+  0%   { opacity: 0; transform: translate(-50%, 12px); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -44px); }
+}
+.tut-turn-flash {
+  position: absolute;
+  top: 30%;
+  transform: translate(-50%, 12px);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  pointer-events: none;
+  animation: tut-turn-flash-rise 1.05s ease-out forwards;
+  text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF, 2px -2px 0 #FFF, -2px 2px 0 #FFF;
+  z-index: 6;
+}
+.tut-turn-flash.opp    { right: 18%; }
+.tut-turn-flash.player { left:  30%; top: 60%; }
+
+/* 3-row sequence diagram. */
 .tut-turn {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 18px;
+  gap: 6px;
+  padding: 14px 18px;
   border: 4px solid var(--rule);
   background: var(--bg-strong);
   color: var(--ink-on-box);
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
 }
 .tut-turn-row {
   display: grid;
@@ -328,14 +407,22 @@
   align-items: center;
   padding: 8px 6px;
   border-bottom: 1px dashed var(--ink-secondary);
+  border-left: 4px solid transparent;
+  transition: background 220ms, border-left-color 220ms;
 }
 .tut-turn-row:last-child { border-bottom: none; }
+.tut-turn-row.active {
+  background: rgba(248, 208, 40, 0.22);
+  border-left-color: var(--pikachu-cheek);
+}
 .tut-turn-num {
   font-family: 'Press Start 2P', monospace;
   font-size: 18px;
-  color: var(--pikachu-cheek);
+  color: var(--ink-secondary);
   text-align: center;
+  transition: color 220ms;
 }
+.tut-turn-row.active .tut-turn-num { color: var(--pikachu-cheek); }
 .tut-turn-who {
   font-family: 'Press Start 2P', monospace;
   font-size: 10px;
