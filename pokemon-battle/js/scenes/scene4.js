@@ -415,6 +415,11 @@
 
     return {
       onEnter() { refreshPanels(); qtbl.update(Q, { suppressFlash: true }); },
+      /* Right arrow = one more SARSA step (matches the +1 STEP button).
+         SARSA's loop is open-ended; to advance to the next scene the
+         student clicks the NEXT button in the topbar. */
+      onNextKey() { doSteps(1); return true; },
+      onPrevKey() { return false; },
     };
   };
 })();

@@ -417,6 +417,16 @@
            re-enter the scene. */
         if (phaseIdx < 0) reset(); else applyPhase(PHASES[phaseIdx]);
       },
+      /* Right arrow = advance one phase (matches the STEP button).
+         Once all 6 phases are filled, right arrow yields to the
+         scene engine so the student can keep pressing forward. */
+      onNextKey() {
+        if (phaseIdx < PHASES.length - 1) { step(); return true; }
+        return false;
+      },
+      /* Rewinding phases would require unfilling cells — use RESET
+         instead. Let left arrow advance to the previous scene. */
+      onPrevKey() { return false; },
     };
   };
 })();

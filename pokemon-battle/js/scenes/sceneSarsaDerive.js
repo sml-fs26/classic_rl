@@ -189,6 +189,19 @@
       setTimeout(() => { cursor = target; applyCursor(); }, 100);
     }
 
-    return {};
+    return {
+      /* Right arrow = reveal one more card (matches the STEP button).
+         After card 7/7, right yields to the scene engine. */
+      onNextKey() {
+        if (cursor < CARDS.length - 1) { step(); return true; }
+        return false;
+      },
+      /* Left arrow = un-reveal one card. When already at card 1, let
+         left arrow back out to the previous scene. */
+      onPrevKey() {
+        if (cursor > 0) { cursor--; applyCursor(); return true; }
+        return false;
+      },
+    };
   };
 })();

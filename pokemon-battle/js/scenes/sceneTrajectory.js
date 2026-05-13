@@ -253,6 +253,11 @@
     return {
       onEnter() { updateStatus(); },
       onLeave() { stopPlay(); },
+      /* Right arrow = "do one more turn" (matches the NEXT TURN button).
+         The loop is open-ended; to advance to the next scene the
+         student clicks the NEXT button in the topbar. */
+      onNextKey() { stopPlay(); nextTurn(); return true; },
+      onPrevKey() { return false; },
     };
   };
 })();
