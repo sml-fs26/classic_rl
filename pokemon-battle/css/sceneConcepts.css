@@ -90,8 +90,12 @@
   color: var(--ink-on-box);
   animation: traj-tuple-pop 280ms ease-out backwards;
 }
-.traj-tuple.terminal { background: var(--hp-green, #48C848); color: #FFF; }
-.traj-tuple.terminal.loss { background: var(--hp-red, #E84828); }
+/* Terminal cards: win and loss encoded by the colour-blind-safe blue ↔
+   vermillion pair, and additionally by a ✓ / ✗ glyph in the step
+   header (added by sceneTrajectory.js). Either channel alone is enough
+   to tell win from loss. */
+.traj-tuple.terminal      { background: var(--cb-blue);       color: #FFF; }
+.traj-tuple.terminal.loss { background: var(--cb-vermillion); color: #FFF; }
 .traj-tuple-step { font-size: 8px; color: var(--ink-secondary); }
 .traj-tuple.terminal .traj-tuple-step { color: rgba(255,255,255,0.8); }
 .traj-tuple-state {
@@ -124,8 +128,8 @@
 .traj-tuple-hp-fill.b4 { background: #E84828; }
 .traj-tuple-action { font-size: 7px; color: var(--pikachu-cheek, #C62828); }
 .traj-tuple-reward { font-size: 8px; font-weight: bold; }
-.traj-tuple-reward.pos { color: #2A6A2A; }
-.traj-tuple-reward.neg { color: #962a1a; }
+.traj-tuple-reward.pos { color: var(--cb-blue); }
+.traj-tuple-reward.neg { color: var(--cb-vermillion); }
 .traj-tuple-reward.neutral { color: var(--ink-secondary); }
 .traj-tuple.terminal .traj-tuple-reward { color: #FFF; }
 

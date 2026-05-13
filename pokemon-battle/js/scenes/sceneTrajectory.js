@@ -42,8 +42,14 @@
     const rewardClass = r > 0 ? 'pos' : (r < 0 ? 'neg' : 'neutral');
     const rewardSign  = r >= 0 ? '+' : '';
 
+    /* Redundant icon channel for colour-blind safety: ✓ on win, ✗ on
+       loss. Pairs with the blue/vermillion terminal background so
+       either channel alone tells the outcome. */
+    let termIcon = '';
+    if (terminal) termIcon = won ? ' ✓ WIN' : ' ✗ LOSS';
+
     card.innerHTML =
-      '<div class="traj-tuple-step">i = ' + step + '</div>' +
+      '<div class="traj-tuple-step">i = ' + step + termIcon + '</div>' +
       '<div class="traj-tuple-state">' +
         '<div class="traj-tuple-side">' +
           '<img class="traj-tuple-sprite" src="assets/pikachu-back.png" alt="">' +

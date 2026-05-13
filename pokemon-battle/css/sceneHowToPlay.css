@@ -279,7 +279,7 @@
   color: var(--ink-on-box);
 }
 .tut-hp-panel.fainted .tut-hp-panel-label {
-  color: var(--hp-red, #C62828);
+  color: var(--cb-vermillion);
 }
 .tut-hp-arrow {
   display: flex;
@@ -361,8 +361,11 @@
   background: var(--bg-strong);
   color: var(--ink-on-box);
 }
-.tut-winlose-cell.win  { box-shadow: inset 0 0 0 3px var(--hp-green); }
-.tut-winlose-cell.loss { box-shadow: inset 0 0 0 3px var(--hp-red); }
+/* Win / loss panels use the colour-blind-safe blue ↔ vermillion border,
+   plus the explicit "YOU WIN!" / "YOU LOSE." text and the fainted-sprite
+   tilt to carry semantic meaning. */
+.tut-winlose-cell.win  { box-shadow: inset 0 0 0 3px var(--cb-blue); }
+.tut-winlose-cell.loss { box-shadow: inset 0 0 0 3px var(--cb-vermillion); }
 .tut-mini-sprite {
   width: 96px; height: 96px;
   image-rendering: pixelated;
@@ -381,7 +384,8 @@
   color: var(--pikachu-cheek);
   margin-bottom: 6px;
 }
-.tut-winlose-cell.win .tut-winlose-reward { color: var(--hp-green); }
+.tut-winlose-cell.win  .tut-winlose-reward { color: var(--cb-blue); }
+.tut-winlose-cell.loss .tut-winlose-reward { color: var(--cb-vermillion); }
 .tut-winlose-detail {
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;

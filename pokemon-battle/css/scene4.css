@@ -159,8 +159,8 @@
   z-index: 5;
   letter-spacing: 0.02em;
 }
-.q-delta.pos { color: #2E7D32; }
-.q-delta.neg { color: #C62828; }
+.q-delta.pos { color: var(--cb-blue); }
+.q-delta.neg { color: var(--cb-vermillion); }
 .q-delta.awake { color: #B7791F; }
 
 /* Argmax-distribution strip below the grid. */
@@ -221,13 +221,17 @@
 }
 .q-legend-bar.argmax { background: var(--accent, #F8D028); }
 
-/* Q-cell heatmap (max-Q over the four moves → coloured cell background). */
+/* Q-cell heatmap (max-Q over the four moves → coloured cell background).
+   Diverging encoding via the colour-blind-safe blue ↔ vermillion ramp —
+   never green ↔ red, since ~8% of viewers can't tell those apart.
+   Redundant cue: the argmax move row in each cell carries a yellow box,
+   so the policy is also readable without relying on cell colour. */
 .q-cell.heat-zero        { background: var(--bg-strong); }
-.q-cell.heat-pos-strong  { background: #5BA85B; color: #FFFFFF; }
-.q-cell.heat-pos-mid     { background: #C8E8C8; }
+.q-cell.heat-pos-strong  { background: var(--cb-blue); color: #FFFFFF; }
+.q-cell.heat-pos-mid     { background: var(--cb-blue-light); }
 .q-cell.heat-neutral     { background: var(--bg-strong); }
-.q-cell.heat-neg-mid     { background: #F8C8C0; }
-.q-cell.heat-neg-strong  { background: #E84828; color: #FFFFFF; }
+.q-cell.heat-neg-mid     { background: var(--cb-vermillion-light); }
+.q-cell.heat-neg-strong  { background: var(--cb-vermillion); color: #FFFFFF; }
 .q-cell.heat-pos-strong .q-thumb-hp-bg,
 .q-cell.heat-neg-strong .q-thumb-hp-bg {
   background: rgba(0,0,0,0.32);
@@ -521,5 +525,5 @@
 :root[data-theme="dark"] .q-delta {
   text-shadow: 1px 1px 0 #1a1a1a, -1px -1px 0 #1a1a1a, 1px -1px 0 #1a1a1a, -1px 1px 0 #1a1a1a;
 }
-:root[data-theme="dark"] .q-delta.pos { color: #82E085; }
-:root[data-theme="dark"] .q-delta.neg { color: #FF7B7B; }
+:root[data-theme="dark"] .q-delta.pos { color: var(--cb-blue); }
+:root[data-theme="dark"] .q-delta.neg { color: var(--cb-vermillion); }

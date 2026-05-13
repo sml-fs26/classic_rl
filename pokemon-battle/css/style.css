@@ -42,6 +42,20 @@
   --damage-stroke:  #181818;
   --ink-on-box:     #181818;     /* ink on Pokemon-white boxes (always dark) */
 
+  /* Colour-blind-safe semantic palette (Okabe-Ito). Use these — not the
+     hp-green / hp-red brand tokens — wherever colour carries meaning
+     (heatmap, win/lose, positive/negative delta). Pair with a label or
+     icon for redundancy. See teaching-viz SKILL §Colour-blind safety. */
+  --cb-blue:             #0072B2;
+  --cb-blue-light:       #B6D9EB;
+  --cb-vermillion:       #D55E00;
+  --cb-vermillion-light: #F4D2B0;
+  --cb-bluish-green:     #009E73;
+  --cb-yellow:           #F0E442;
+  --cb-orange:           #E69F00;
+  --cb-sky:              #56B4E9;
+  --cb-purple:           #CC79A7;
+
   /* Cross-viz hue identities (kept for scene-5 recap chips) */
   --hue-anymal:  #B8323A;     /* red — MDP */
   --hue-casino:  #2F6CB1;     /* blue — ε-greedy */
@@ -81,6 +95,19 @@
   --hue-star:    #D6A766;
   --hue-door:    #7AB392;
   --hue-snakes:  #E6B158;
+
+  /* Colour-blind palette stays the same hue under dark theme — the
+     Okabe-Ito hues are designed to be unambiguous regardless of
+     background lightness, so no override needed. */
+  --cb-blue:             #4FA3DC;
+  --cb-blue-light:       #2C5A7A;
+  --cb-vermillion:       #E89055;
+  --cb-vermillion-light: #75462C;
+  --cb-bluish-green:     #43BA9C;
+  --cb-yellow:           #F0E442;
+  --cb-orange:           #E69F00;
+  --cb-sky:              #82C9F0;
+  --cb-purple:           #DEA1BF;
 }
 
 * { box-sizing: border-box; }
