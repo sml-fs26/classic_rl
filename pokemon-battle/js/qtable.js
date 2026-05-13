@@ -28,7 +28,6 @@
     switch (id) {
       case 'quick_attack': return 'QUICK';
       case 'thunderbolt':  return 'BOLT';
-      case 'iron_tail':    return 'IRON';
       case 'thunder':      return 'THUN';
     }
     return id;

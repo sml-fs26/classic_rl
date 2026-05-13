@@ -6,10 +6,13 @@
  * `battle.js` (HIT_DAMAGE_DIST). `accuracy` IS real and used as the hit prob.
  *
  *   id           power  acc   ON HIT: bucket-drop distribution (in battle.js)
- *   quick_attack  55   1.00   Δ0 55% / Δ1 45%   — E[Δ|hit] = 0.45
- *   thunderbolt   80   1.00   Δ1 50% / Δ2 50%   — E[Δ|hit] = 1.50
- *   iron_tail    100   0.85   Δ1 70% / Δ2 30%   — E[Δ|hit] = 1.30 (E[Δ] = 1.11)
- *   thunder      150   0.55   Δ2 50% / Δ3 50%   — E[Δ|hit] = 2.50 (E[Δ] = 1.38)
+ *   quick_attack  55   1.00   Δ0 55% / Δ1 45%   — E[Δ|hit] = 0.45  (too weak alone)
+ *   thunderbolt   80   1.00   Δ1 50% / Δ2 50%   — E[Δ|hit] = 1.50  (reliable workhorse)
+ *   thunder      150   0.55   Δ2 50% / Δ3 50%   — E[Δ|hit] = 2.50 (E[Δ] = 1.38, gamble)
+ *
+ * Three moves, kept lean: the trio (weak/reliable/gamble) gives the
+ * triangle students need for the exploit-vs-explore lesson without
+ * cluttering the Q-table.
  *
  * Opponent move (Charmander):
  *   ember         80   1.00   Δ0 20% / Δ1 55% / Δ2 25%  (~0.55 buckets/turn)
@@ -23,7 +26,6 @@
   const MOVES = [
     { id: 'quick_attack', name: 'QUICK ATTACK', power: 55,  accuracy: 1.00, type: 'normal'   },
     { id: 'thunderbolt',  name: 'THUNDERBOLT',  power: 80,  accuracy: 1.00, type: 'electric' },
-    { id: 'iron_tail',    name: 'IRON TAIL',    power: 100, accuracy: 0.85, type: 'steel'    },
     { id: 'thunder',      name: 'THUNDER',      power: 150, accuracy: 0.55, type: 'electric' },
   ];
 
@@ -78,11 +80,12 @@
     return prefix + 'DROPS ' + parts.join(' / ');
   }
 
-  /* Render the full inner-HTML of a move button. Two rows under the name:
-       row 1 (.move-stats): type-pill · PWR · ACC      — Pokemon-canon flavour
-       row 2 (.move-drop):  DROPS X (P%) / Y (Q%)      — MDP truth
-     Both scene 1 (live battle) and the tutorial's step-4 demo call this so
-     any change propagates to both without drift. */
+  /* Render the full inner-HTML of a move button: name + type-pill + PWR
+     + ACC. Standard Gen-1 flavour line, nothing more — the per-move
+     bucket-drop distribution is an MDP detail that confuses students
+     when shown next to the move button; the dynamics still hold
+     underneath. Both scene 1 (live battle) and the tutorial's step-4
+     demo call this so any change propagates to both without drift. */
   function moveSubHtml(moveId) {
     const m = MOVE_BY_ID[moveId];
     if (!m) return '';
@@ -91,8 +94,7 @@
         '<span class="type-pill ' + m.type + '">' + typeIconSvg(m.type) + ' ' + m.type + '</span>' +
         '<span>PWR ' + m.power + '</span>' +
         '<span>ACC ' + Math.round(m.accuracy * 100) + '%</span>' +
-      '</span>' +
-      '<span class="move-drop">' + dropPatternStr(moveId) + '</span>'
+      '</span>'
     );
   }
 

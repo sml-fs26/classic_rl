@@ -494,7 +494,7 @@ html, body {
     inset 0 0 0 2px var(--bg-strong),
     inset 0 0 0 4px var(--inner-highlight);
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
   font-family: 'Press Start 2P', monospace;
   font-size: 10px;

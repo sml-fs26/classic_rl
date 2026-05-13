@@ -34,13 +34,11 @@
      damage shapes the optimal policy:
        Quick Attack:  E[d] = 0.45  — too weak alone (Ember outpaces)
        Thunderbolt :  E[d] = 1.50  — reliable workhorse
-       Iron Tail   :  E[d] = 0.98 (acct accuracy)  — medium with miss tax
-       Thunder     :  E[d] = 1.71 (acct accuracy)  — biggest but variance
+       Thunder     :  E[d] = 1.38 (acct accuracy)  — biggest but variance
      Ember on Pikachu :  E[d] = 0.55  — Pikachu lives ~9 turns on average. */
   const HIT_DAMAGE_DIST = {
     quick_attack: [[0, 0.55], [1, 0.45]],
     thunderbolt:  [[1, 0.50], [2, 0.50]],
-    iron_tail:    [[1, 0.70], [2, 0.30]],
     thunder:      [[2, 0.50], [3, 0.50]],
   };
   /* Ember calibrated so random policy ~ break-even — gives SARSA something

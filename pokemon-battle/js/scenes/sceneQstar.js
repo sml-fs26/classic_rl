@@ -16,7 +16,6 @@
     moves: [
       { name: 'QUICK ATTACK',  q: 1.73 },
       { name: 'THUNDERBOLT',   q: 4.29, argmax: true },
-      { name: 'IRON TAIL',     q: 3.36 },
       { name: 'THUNDER',       q: 3.66 },
     ],
   };
