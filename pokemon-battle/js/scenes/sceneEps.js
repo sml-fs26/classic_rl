@@ -22,18 +22,63 @@
 (function () {
   window.scenes = window.scenes || {};
 
-  /* The chosen state: Pikachu mid-HP, Charmander critical. */
+  /* The chosen state: Pikachu mid-HP, opponent at critical → Charizard. */
   const FOCUS = { your: 2, opp: 4 };   // 2 = mid, 4 = critical
   const FOCUS_NAME = 'MID / CRITICAL';
 
   const MOVE_IDS = window.Moves.MOVE_IDS;
   const A = MOVE_IDS.length;
   const NB = window.Battle.NUM_BUCKETS;
+  const N = NB * NB;
   const FOCUS_IDX = FOCUS.your * NB + FOCUS.opp;
+  const GAMMA = window.DATA.params.gammaDefault;
 
-  /* Pull the final SARSA Q from the precompute. */
-  const SARSA_SNAPS = window.DATA.sarsa.snapshots;
-  const FINAL_Q = SARSA_SNAPS[SARSA_SNAPS.length - 1].Q;
+  /* Compute Q* on the fly under the form-aware dynamics — the
+     precomputed SARSA snapshots in DATA.sarsa are stale (built against
+     the old single-form MDP). VI converges in a few dozen iterations
+     for this 25-state grid. */
+  function computeQstar() {
+    let V = new Float64Array(N);
+    for (let iter = 0; iter < 400; iter++) {
+      const newV = new Float64Array(N);
+      let maxDelta = 0;
+      for (let s = 0; s < N; s++) {
+        const yourB = Math.floor(s / NB);
+        const oppB  = s % NB;
+        let bestQ = -Infinity;
+        for (let a = 0; a < A; a++) {
+          const succ = window.Battle.successors({ your: yourB, opp: oppB, terminal: false }, MOVE_IDS[a]);
+          let q = 0;
+          for (const t of succ) {
+            const vN = t.sNext.terminal ? 0 : V[t.sNext.your * NB + t.sNext.opp];
+            q += t.p * (t.reward + GAMMA * vN);
+          }
+          if (q > bestQ) bestQ = q;
+        }
+        newV[s] = bestQ;
+        const d = Math.abs(bestQ - V[s]);
+        if (d > maxDelta) maxDelta = d;
+      }
+      V = newV;
+      if (maxDelta < 1e-7) break;
+    }
+    const Q = new Float32Array(N * A);
+    for (let s = 0; s < N; s++) {
+      const yourB = Math.floor(s / NB);
+      const oppB  = s % NB;
+      for (let a = 0; a < A; a++) {
+        const succ = window.Battle.successors({ your: yourB, opp: oppB, terminal: false }, MOVE_IDS[a]);
+        let q = 0;
+        for (const t of succ) {
+          const vN = t.sNext.terminal ? 0 : V[t.sNext.your * NB + t.sNext.opp];
+          q += t.p * (t.reward + GAMMA * vN);
+        }
+        Q[s * A + a] = q;
+      }
+    }
+    return Q;
+  }
+  const FINAL_Q = computeQstar();
 
   function qRow() {
     const out = new Array(A);
@@ -125,7 +170,10 @@
     `;
     root.appendChild(stage);
 
-    window.Sprite.mount(stage.querySelector('.sprite-host.opponent'), 'charmander', 'opponent');
+    /* Opponent in this state is at CRITICAL HP → form is CHARIZARD. */
+    const oppForm = window.Battle.formForOpp(FOCUS.opp);
+    const oppName = window.Battle.FORM_DISPLAY_NAME[oppForm];
+    window.Sprite.mount(stage.querySelector('.sprite-host.opponent'), oppForm, 'opponent');
     window.Sprite.mount(stage.querySelector('.sprite-host.player'), 'pikachu', 'player');
 
     const oppHpHost = document.createElement('div');
@@ -133,7 +181,7 @@
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
     const oppHp = window.HPBar.mount(oppHpHost, {
-      name: 'CHARMANDER', side: 'opponent', level: 5, numBuckets: NB,
+      name: oppName, side: 'opponent', level: 5, numBuckets: NB,
     });
     const playerHp = window.HPBar.mount(playerHpHost, {
       name: 'PIKACHU', side: 'player', level: 5, numBuckets: NB,
@@ -144,14 +192,14 @@
     const stateNote = document.createElement('div');
     stateNote.className = 'poke-caption sc-eps-state-note';
     stateNote.innerHTML =
-      'STATE: <strong>' + FOCUS_NAME + '</strong>. Pikachu has taken a couple of Embers; ' +
-      "Charmander is one bucket from fainting. <em>One good hit ends it</em>.";
+      'STATE: <strong>' + FOCUS_NAME + '</strong>. PIKACHU faces a critically-wounded <strong>' +
+      oppName + '</strong>. The right move ends it — but the wrong move eats an Outrage.';
     root.appendChild(stateNote);
 
     /* ---------- Q-row display ---------- */
     const qBlock = document.createElement('div');
     qBlock.className = 'poke-box sc-eps-block';
-    qBlock.innerHTML = '<div class="sc-eps-block-title">Q(s, ·) FROM EPISODE 5000</div>';
+    qBlock.innerHTML = '<div class="sc-eps-block-title">Q*(s, ·) — the converged action-value at this state</div>';
     root.appendChild(qBlock);
 
     const qBars = document.createElement('div');
@@ -232,10 +280,12 @@
     caption.className = 'poke-caption';
     caption.innerHTML =
       'Pikachu has been <strong>trained</strong> — Q is known. ' +
-      '<strong>' + shortLabel(MOVE_IDS[argmaxI]) + '</strong> has the highest Q at this state. ' +
+      '<strong>' + shortLabel(MOVE_IDS[argmaxI]) + '</strong> has the highest Q at this state — ' +
+      'against a CHARIZARD on its last legs, the super-effective hit closes the battle in one move. ' +
       'Pure greedy (ε = 0) picks it every time and wins from here essentially every battle. ' +
-      'Higher ε spreads probability across all moves: sometimes THUNDER misses, sometimes QUICK is too weak, ' +
-      'sometimes IRON misses. Each random move is a chance to throw away a sure thing.' +
+      'Higher ε spreads probability across all moves: sometimes you roll THUNDER and it misses (45% chance), ' +
+      'sometimes you pick THUNDERBOLT and only do 1 damage — eating an Outrage that faints you. ' +
+      'Each random move is a chance to throw away a sure thing.' +
       '<br><br>' +
       'But you couldn\'t HAVE Q without exploration — SARSA in the previous scene needed ε > 0 to ' +
       'discover which move was best in the first place. ' +
