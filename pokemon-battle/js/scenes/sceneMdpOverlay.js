@@ -25,14 +25,8 @@
   window.scenes = window.scenes || {};
 
   const STEP_COUNT = 6;   // 0..5 inclusive
-  const STEP_CAPTIONS = [
-    'A POKEMON battle is a <b>Markov Decision Process</b>. Five pieces. We\'ll add them one at a time.',
-    '<b>S — STATE.</b> Each side\'s HP bucket. PIKACHU and CHARMANDER both carry one.',
-    '<b>A — ACTIONS.</b> Three moves PIKACHU can pick from this turn.',
-    '<b>P — TRANSITIONS.</b> Each move has a probabilistic outcome — accuracy + damage roll.',
-    '<b>R — REWARD.</b> −1 every turn, +10 if you win, −10 if you faint. Short wins beat long grinds.',
-    '<b>γ — DISCOUNT.</b> How patient PIKACHU is — how much future reward matters now.',
-  ];
+  /* Step captions are looked up per-render so a language toggle re-paints
+     them. Keys are 'mdp.step.0' .. 'mdp.step.5' in i18n.js. */
 
   window.scenes.sceneMdpOverlay = function (root) {
     root.classList.add('scene-pad');
@@ -44,9 +38,11 @@
     wrap.className = 'sc0-mdp-wrap';
     root.appendChild(wrap);
 
+    const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+
     const heading = document.createElement('h2');
     heading.className = 'poke-subtitle sc0-mdp-heading';
-    heading.textContent = "WHAT MAKES THIS AN MDP?";
+    heading.textContent = T('mdp.heading');
     wrap.appendChild(heading);
 
     /* The battle stage. Sprites are visible from step 0; HP bars + move
@@ -66,10 +62,10 @@
     const hpWrap = document.createElement('div');
     hpWrap.className = 'sc0-hp-wrap';
     const oppHpBox = document.createElement('div');
-    window.HPBar.mount(oppHpBox, { name: 'CHARMANDER', side: 'opponent', level: 5,
+    window.HPBar.mount(oppHpBox, { name: T('pokemon.charmander'), side: 'opponent', level: 5,
       numBuckets: window.Battle.NUM_BUCKETS }).set(0);
     const playerHpBox = document.createElement('div');
-    window.HPBar.mount(playerHpBox, { name: 'PIKACHU', side: 'player', level: 5,
+    window.HPBar.mount(playerHpBox, { name: T('pokemon.pikachu'), side: 'player', level: 5,
       numBuckets: window.Battle.NUM_BUCKETS }).set(0);
     hpWrap.appendChild(oppHpBox);
     hpWrap.appendChild(playerHpBox);
@@ -79,11 +75,11 @@
     const overlay = document.createElement('div');
     overlay.className = 'mdp-overlay';
     overlay.innerHTML = `
-      <div class="mdp-tag mdp-tag-s"     style="left: 4%; top: 38%;">S — STATE (HP)</div>
-      <div class="mdp-tag mdp-tag-a"     style="left: 4%; bottom: 4%;">A — ACTIONS</div>
-      <div class="mdp-tag mdp-tag-p"     style="right: 6%; top: 50%; transform: translateY(-50%);">P — TRANSITIONS</div>
-      <div class="mdp-tag mdp-tag-r"     style="right: 4%; bottom: 4%;">R — REWARD</div>
-      <div class="mdp-tag mdp-tag-gamma" style="left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--charmander-orange); color: #fff;">γ — DISCOUNT</div>
+      <div class="mdp-tag mdp-tag-s"     style="left: 4%; top: 38%;">${T('mdp.tag.s')}</div>
+      <div class="mdp-tag mdp-tag-a"     style="left: 4%; bottom: 4%;">${T('mdp.tag.a')}</div>
+      <div class="mdp-tag mdp-tag-p"     style="right: 6%; top: 50%; transform: translateY(-50%);">${T('mdp.tag.p')}</div>
+      <div class="mdp-tag mdp-tag-r"     style="right: 4%; bottom: 4%;">${T('mdp.tag.r')}</div>
+      <div class="mdp-tag mdp-tag-gamma" style="left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--charmander-orange); color: #fff;">${T('mdp.tag.gamma')}</div>
     `;
     stage.appendChild(overlay);
 
@@ -101,7 +97,7 @@
       btn.className = 'move-btn';
       btn.type = 'button';
       btn.disabled = true;
-      btn.innerHTML = m.name + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
+      btn.innerHTML = T('move.' + m.id) + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
       menu.appendChild(btn);
     }
     menuWrap.appendChild(menu);
@@ -111,9 +107,9 @@
     const rewardWrap = document.createElement('div');
     rewardWrap.className = 'sc0-reward-wrap';
     rewardWrap.innerHTML =
-      '<span class="sc0-reward-pill neg">−1 per turn</span>' +
-      '<span class="sc0-reward-pill pos">+10 win</span>' +
-      '<span class="sc0-reward-pill neg">−10 faint</span>';
+      '<span class="sc0-reward-pill neg">' + T('mdp.reward.neg_turn') + '</span>' +
+      '<span class="sc0-reward-pill pos">' + T('mdp.reward.pos_win') + '</span>' +
+      '<span class="sc0-reward-pill neg">' + T('mdp.reward.neg_faint') + '</span>';
     wrap.appendChild(rewardWrap);
 
     /* Caption + step controls */
@@ -124,14 +120,14 @@
     const ctrls = document.createElement('div');
     ctrls.className = 'sc0-mdp-ctrls';
     ctrls.innerHTML =
-      '<button class="poke-btn" id="mdp-overlay-prev">◀ PREV</button>' +
-      '<div class="sc0-mdp-step">STEP <b id="mdp-overlay-i">1</b> / ' + STEP_COUNT + '</div>' +
-      '<button class="poke-btn" id="mdp-overlay-next">NEXT ▶</button>';
+      '<button class="poke-btn" id="mdp-overlay-prev">' + T('mdp.prev') + '</button>' +
+      '<div class="sc0-mdp-step">' + T('mdp.step_of') + '</div>' +
+      '<button class="poke-btn" id="mdp-overlay-next">' + T('mdp.next') + '</button>';
     wrap.appendChild(ctrls);
 
     const hint = document.createElement('div');
     hint.className = 'footnote';
-    hint.innerHTML = 'When all five pieces are on screen, click <kbd>NEXT</kbd> to continue.';
+    hint.innerHTML = T('mdp.hint');
     wrap.appendChild(hint);
 
     /* ---------- Step state machine ---------- */
@@ -157,7 +153,7 @@
       overlay.querySelector('.mdp-tag-p').classList.toggle('show',     step >= 3);
       overlay.querySelector('.mdp-tag-r').classList.toggle('show',     step >= 4);
       overlay.querySelector('.mdp-tag-gamma').classList.toggle('show', step >= 5);
-      caption.innerHTML = STEP_CAPTIONS[step];
+      caption.innerHTML = T('mdp.step.' + step);
       const idEl = document.getElementById('mdp-overlay-i');
       if (idEl) idEl.textContent = String(step + 1);
       if (step === 3) fireAttackAnimation();

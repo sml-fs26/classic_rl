@@ -30,10 +30,12 @@
     root.classList.add('scene-pad');
     root.innerHTML = '';
 
+    const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+
     /* ---------- Layout ---------- */
     const header = document.createElement('h2');
     header.className = 'poke-section-title';
-    header.textContent = 'YOU ARE PIKACHU. PICK A MOVE EACH TURN.';
+    header.textContent = T('battle.section_title');
     root.appendChild(header);
 
     const row = document.createElement('div');
@@ -61,10 +63,10 @@
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
     const oppHp = window.HPBar.mount(oppHpHost, {
-      name: 'CHARMANDER', side: 'opponent', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
+      name: T('pokemon.charmander'), side: 'opponent', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
     });
     const playerHp = window.HPBar.mount(playerHpHost, {
-      name: 'PIKACHU', side: 'player', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
+      name: T('pokemon.pikachu'), side: 'player', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
     });
 
     /* Right column: dialog + move menu + HUD. */
@@ -86,7 +88,7 @@
       const btn = document.createElement('button');
       btn.className = 'move-btn';
       btn.type = 'button';
-      btn.innerHTML = m.name + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
+      btn.innerHTML = T('move.' + m.id) + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
       btn.addEventListener('click', () => onMove(m.id));
       menuHost.appendChild(btn);
       moveBtns[m.id] = btn;
@@ -124,7 +126,16 @@
     let rng = window.Battle.makeRng(20260512);
     /* Current opponent display name. Updates when the opponent evolves
        across a form threshold (Charmander → Charmeleon → Charizard). */
-    let oppFormName = window.Battle.FORM_DISPLAY_NAME.charmander;
+    let oppFormName = T('pokemon.charmander');
+    /* Helper: looked-up form display name + counter-move display name,
+       based on the live language. */
+    function formName(form) { return T('pokemon.' + form); }
+    function counterMoveName(form) {
+      const id = (window.Battle.FORM_MOVE_NAME[form] || '').toLowerCase();
+      return T('move.' + id);
+    }
+    function pikaName() { return T('pokemon.pikachu'); }
+    function pikaMoveName(id) { return T('move.' + id); }
     /* `episode` is the cancellation token for the async turn cascade. Reset
        bumps it, and every `await` re-checks; an in-flight turn aborts
        cleanly if the user hits RESTART mid-attack. */
@@ -186,7 +197,7 @@
       const playerHostEl = stage.querySelector('.sprite-host.player');
 
       /* ---- Pikachu's turn ---- */
-      await dialogSay('PIKACHU used ' + move.name + '!');
+      await dialogSay(T('battle.used', { name: pikaName(), move: pikaMoveName(moveId) }));
       if (episode !== myEp) return;
       if (window.SFX) window.SFX.play(MOVE_SFX[moveId]);
       await wait(500);
@@ -194,7 +205,7 @@
 
       if (!log.hit1) {
         if (window.SFX) window.SFX.play('miss');
-        await dialogSay("PIKACHU's attack missed!");
+        await dialogSay(T('battle.missed', { name: pikaName() }));
         if (episode !== myEp) return;
         await wait(800);
       } else {
@@ -215,8 +226,7 @@
       const evolvedThisTurn = (log.formBefore !== log.formAfter) &&
                               (log.oppAfter < window.Battle.FAINTED);
       if (evolvedThisTurn) {
-        await dialogSay('What? Wild ' + window.Battle.FORM_DISPLAY_NAME[log.formBefore] +
-                        ' is evolving!');
+        await dialogSay(T('battle.evolving', { name: formName(log.formBefore) }));
         if (episode !== myEp) return;
         await wait(450);
 
@@ -234,7 +244,7 @@
           return;
         }
         oppSprite.setKind(log.formAfter);
-        oppFormName = window.Battle.FORM_DISPLAY_NAME[log.formAfter];
+        oppFormName = formName(log.formAfter);
         oppHp.setName(oppFormName);
 
         /* Let the wash fade and the new form settle. */
@@ -244,7 +254,7 @@
         stage.classList.remove('sc1-evo-stage');
         if (episode !== myEp) return;
 
-        await dialogSay('Evolved into ' + oppFormName + '!');
+        await dialogSay(T('battle.evolved_into', { name: oppFormName }));
         if (episode !== myEp) return;
         await wait(700);
       }
@@ -253,11 +263,11 @@
       /* ---- Opponent KO? ---- */
       if (log.oppAfter >= window.Battle.FAINTED) {
         oppSprite.faint();
-        await dialogSay('Wild ' + oppFormName + ' fainted!');
+        await dialogSay(T('battle.wild_fainted', { name: oppFormName }));
         if (episode !== myEp) return;
         await wait(700);
         if (episode !== myEp) return;
-        await dialogSay('PIKACHU wins!');
+        await dialogSay(T('battle.pika_wins'));
         if (window.SFX) window.SFX.play('win');
         state = out.sNext;
         finalizeTurn(out);
@@ -266,8 +276,8 @@
 
       /* ---- Opponent's turn — counter-attack name follows the form
          the opponent is in NOW (formAfter, post-evolution if any). */
-      const counterName = window.Battle.FORM_MOVE_NAME[log.formAfter];
-      await dialogSay('Wild ' + oppFormName + ' used ' + counterName + '!');
+      const counterName = counterMoveName(log.formAfter);
+      await dialogSay(T('battle.wild_used', { name: oppFormName, move: counterName }));
       if (episode !== myEp) return;
       if (window.SFX) window.SFX.play(COUNTER_SFX[log.formAfter]);
       await wait(500);
@@ -284,14 +294,14 @@
       /* ---- Pikachu KO? ---- */
       if (log.yourAfter >= window.Battle.FAINTED) {
         playerSprite.faint();
-        await dialogSay('PIKACHU fainted!');
+        await dialogSay(T('battle.fainted', { name: pikaName() }));
         if (episode !== myEp) return;
         await wait(700);
         if (episode !== myEp) return;
-        await dialogSay('You lost!');
+        await dialogSay(T('battle.you_lost'));
         if (window.SFX) window.SFX.play('loss');
       } else {
-        await dialogSay('What will PIKACHU do?');
+        await dialogSay(T('battle.what_now'));
       }
       if (episode !== myEp) return;
       state = out.sNext;
@@ -322,7 +332,7 @@
       oppSprite.reset();
       oppSprite.setKind('charmander');
       playerSprite.reset();
-      oppFormName = window.Battle.FORM_DISPLAY_NAME.charmander;
+      oppFormName = T('pokemon.charmander');
       oppHp.set(0);     // bucket 0 = full
       oppHp.setName(oppFormName);
       playerHp.set(0);
@@ -340,15 +350,15 @@
       /* Disable move buttons during the intro cascade. The user can't act
          until the third dialog ("What will PIKACHU do?") lands. */
       setBusy(true);
-      await dialogSay('A wild CHARMANDER appeared!');
+      await dialogSay(T('battle.opening_wild'));
       if (episode !== myEp) return;
       await wait(800);
       if (episode !== myEp) return;
-      await dialogSay('Go, PIKACHU!');
+      await dialogSay(T('battle.go_pika'));
       if (episode !== myEp) return;
       await wait(800);
       if (episode !== myEp) return;
-      await dialogSay('What will PIKACHU do?');
+      await dialogSay(T('battle.what_will'));
       if (episode !== myEp) return;
       setBusy(false);
     }

@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pokemon battle &middot; SML reinforcement learning</title>
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <!-- DotGothic16: Japanese bitmap-style font used when body.lang-jp is set.
+       Falls back gracefully to the OS Japanese font if Google Fonts can't
+       load (e.g. offline lecture room). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/scene0.css">
   <link rel="stylesheet" href="css/sceneHowToPlay.css">
@@ -24,6 +30,7 @@
       <div id="dot-pager" class="dot-pager"></div>
       <button id="next-btn" class="pager-btn" type="button">NEXT</button>
       <button id="music-toggle" class="theme-toggle music-toggle" type="button" aria-label="Toggle music">♪ MUSIC OFF</button>
+      <button id="lang-toggle" class="theme-toggle lang-toggle" type="button" aria-label="Toggle language">日本語</button>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">theme</button>
     </div>
   </header>
@@ -33,6 +40,7 @@
   <script src="vendor/katex/katex.min.js"></script>
   <script src="data/datasets.js"></script>
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/music.js"></script>
   <script src="js/sfx.js"></script>
   <script src="js/music-ui.js"></script>
@@ -60,5 +68,6 @@
   <script src="js/scenes/scene4.js"></script>
   <script src="js/scenes/scene5.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/i18n-ui.js"></script>
 </body>
 </html>

@@ -10,21 +10,36 @@
    step inside the scene, e.g. step the action history forward), false to let
    the driver advance the scene. */
 (function () {
+  /* Each entry has an i18n key (titleKey) used to look up the visible
+     title on each render. The literal `title` is kept as a fallback for
+     builds without i18n loaded. */
   const SCENES = [
-    { key: 'scene0',           title: 'POKEMON',                      music: 'title'    },
-    { key: 'sceneHowToPlay',   title: 'Tutorial — how to play',       music: 'tutorial' },
-    { key: 'scene1',           title: 'A wild CHARMANDER appeared!',  music: 'battle'   },
-    { key: 'sceneMdpOverlay',  title: 'What makes this an MDP?',      music: 'title'    },
-    { key: 'sceneTrajectory',  title: 'The trajectory',               music: 'concept'  },
-    { key: 'sceneObjective',   title: 'Return & the Q-function',      music: 'concept'  },
-    { key: 'sceneQstar',       title: 'π* from Q',                    music: 'concept'  },
-    { key: 'sceneDp',          title: 'Filling Q with DP',            music: 'dp'       },
-    { key: 'sceneWhyNotDp',    title: "Why DP doesn't scale",         music: 'bridge'   },
-    { key: 'sceneSarsaDerive', title: 'Deriving SARSA',               music: 'bridge'   },
-    { key: 'scene4',           title: 'SARSA in action',              music: 'battle'   },
-    { key: 'scene5',           title: "You've trained PIKACHU.",      music: 'recap'    },
+    { key: 'scene0',           titleKey: 'scene.title',       title: 'POKEMON',                      music: 'title'    },
+    { key: 'sceneHowToPlay',   titleKey: 'scene.tutorial',    title: 'Tutorial — how to play',       music: 'tutorial' },
+    { key: 'scene1',           titleKey: 'scene.battle',      title: 'A wild CHARMANDER appeared!',  music: 'battle'   },
+    { key: 'sceneMdpOverlay',  titleKey: 'scene.mdp',         title: 'What makes this an MDP?',      music: 'title'    },
+    { key: 'sceneTrajectory',  titleKey: 'scene.trajectory',  title: 'The trajectory',               music: 'concept'  },
+    { key: 'sceneObjective',   titleKey: 'scene.objective',   title: 'Return & the Q-function',      music: 'concept'  },
+    { key: 'sceneQstar',       titleKey: 'scene.qstar',       title: 'π* from Q',                    music: 'concept'  },
+    { key: 'sceneDp',          titleKey: 'scene.dp',          title: 'Filling Q with DP',            music: 'dp'       },
+    { key: 'sceneWhyNotDp',    titleKey: 'scene.whyNotDp',    title: "Why DP doesn't scale",         music: 'bridge'   },
+    { key: 'sceneSarsaDerive', titleKey: 'scene.sarsaDerive', title: 'Deriving SARSA',               music: 'bridge'   },
+    { key: 'scene4',           titleKey: 'scene.sarsa',       title: 'SARSA in action',              music: 'battle'   },
+    { key: 'scene5',           titleKey: 'scene.recap',       title: "You've trained PIKACHU.",      music: 'recap'    },
   ];
-  const SCENE_TITLES = SCENES.map(s => s.title);
+  function titleAt(idx) {
+    const s = SCENES[idx];
+    if (!s) return '';
+    return (window.I18N ? window.I18N.t(s.titleKey) : s.title);
+  }
+  /* Kept for any older call sites; reads live via titleAt. */
+  const SCENE_TITLES = new Proxy({}, {
+    get(_, k) {
+      if (k === 'length') return SCENES.length;
+      const i = Number(k);
+      return Number.isInteger(i) ? titleAt(i) : undefined;
+    },
+  });
 
   const sceneNodes = [];
   const sceneState = [];
@@ -173,6 +188,29 @@
 
     const initialScene = readHashScene();
     goTo(initialScene != null ? initialScene : 0);
+
+    /* Language toggle: rebuild every cached scene so the new strings
+       take effect. Scenes that were never visited rebuild lazily on
+       first visit (they read I18N.t() at build time). */
+    if (window.I18N && typeof window.I18N.onChange === 'function') {
+      window.I18N.onChange(() => { rebuildAll(); });
+    }
+  }
+
+  /* Drop every cached scene DOM + state and re-build the current scene
+     from scratch. Used by the language toggle. The cached scenes are
+     in the wrong language and would surface stale text the next time
+     the user navigates to one — clearing them forces a fresh build. */
+  function rebuildAll() {
+    for (let i = 0; i < sceneNodes.length; i++) {
+      const node = sceneNodes[i];
+      if (node && node.parentNode) node.parentNode.removeChild(node);
+    }
+    sceneNodes.length = 0;
+    sceneState.length = 0;
+    const c = current;
+    current = -1;
+    if (c >= 0) goTo(c);
   }
 
   if (!window.scenes) window.scenes = {};
@@ -183,5 +221,8 @@
     init();
   }
 
-  window.PokeViz = { goTo, getCurrentScene: () => current, sceneTitles: SCENE_TITLES };
+  window.PokeViz = {
+    goTo, getCurrentScene: () => current, sceneTitles: SCENE_TITLES,
+    rebuildAll,
+  };
 })();

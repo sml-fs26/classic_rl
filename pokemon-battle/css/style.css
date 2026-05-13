@@ -1164,3 +1164,32 @@ html, body {
   box-shadow: 2px 2px 0 0 var(--ink);
   pointer-events: auto;
 }
+
+/* ============================================================
+   Japanese "flavor mode" — body.lang-jp swaps the primary font
+   to DotGothic16 (a bitmap-style Japanese font from Google Fonts)
+   so the kana glyphs match the chiptune pixel-art feel of the
+   English Press-Start-2P text. Press Start 2P stays as a fallback
+   for Latin glyphs nested inside Japanese strings (e.g. "10まんボルト",
+   "SML · ポケモン", "Q*"), giving us bitmap consistency on both sides.
+
+   DotGothic16 is also listed as a tail fallback even in EN mode so
+   the language-toggle button's "日本語" label renders cleanly without
+   falling back to a system font. ============================ */
+body.lang-jp,
+body.lang-jp button,
+body.lang-jp input,
+body.lang-jp .scene,
+body.lang-jp .topbar {
+  font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace;
+}
+body.lang-jp .scene {
+  /* DotGothic16 is denser per glyph than Press Start 2P. Add a touch
+     of letter-spacing so kana don't run together at small sizes. */
+  letter-spacing: 0.02em;
+}
+/* Even in EN mode, allow Japanese glyphs (only the lang-toggle label
+   right now) to fall through to DotGothic16 rather than the OS default. */
+.theme-toggle, .pager-btn, .topbar .brand, .scene-title {
+  font-family: 'Press Start 2P', 'DotGothic16', 'Courier New', monospace;
+}
