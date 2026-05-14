@@ -53,6 +53,70 @@
 }
 .q-cell.unvisited { opacity: 0.62; }
 
+/* Pokedex-style header bar at the top of each Q-cell.  Each cell IS a
+   Pokedex entry: a 3-digit Nº, a state-as-species name, and a star
+   marker that fades in once the cell has been visited (Q-values
+   non-zero).  Sits flush with the cell's top edge inside the existing
+   3px border. */
+.q-pokedex-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin: -4px -6px 2px;
+  padding: 2px 5px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box, #000);
+  background: var(--pikachu-yellow, #F8D028);
+  border-bottom: 2px solid var(--ink, #000);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.q-pokedex-header .q-dex-num {
+  font-weight: bold;
+  color: var(--pikachu-cheek, #C62828);
+  flex: 0 0 auto;
+}
+.q-pokedex-header .q-dex-state {
+  flex: 1 1 auto;
+  text-align: right;
+  opacity: 0.78;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+/* Visited cells get a tiny star next to their Nº — the Pokedex
+   "OWNED" indicator.  Unvisited cells stay un-starred. */
+.q-cell:not(.unvisited) .q-pokedex-header .q-dex-num::after {
+  content: ' ★';
+  color: var(--pikachu-cheek, #C62828);
+}
+
+/* First-visit "REGISTERED!" flash — a yellow box-shadow ring that
+   pulses around the cell at the moment the agent first lands a
+   non-zero Q.  Pairs with the existing 'REGISTERED!' toast spawned
+   by qtable.js's spawnAwake. */
+@keyframes q-pokedex-register {
+  0%   { box-shadow: 0 0 0 0 var(--pikachu-yellow, #F8D028),
+                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
+                     2px 2px 0 0 rgba(0,0,0,0.18); }
+  50%  { box-shadow: 0 0 0 6px var(--pikachu-yellow, #F8D028),
+                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
+                     2px 2px 0 0 rgba(0,0,0,0.18); }
+  100% { box-shadow: 0 0 0 0 transparent,
+                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
+                     2px 2px 0 0 rgba(0,0,0,0.18); }
+}
+.q-cell.q-just-registered {
+  animation: q-pokedex-register 1.05s ease-out;
+  z-index: 4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .q-cell.q-just-registered { animation: none; }
+}
+
 .q-row-head {
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;

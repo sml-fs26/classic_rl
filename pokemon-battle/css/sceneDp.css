@@ -101,6 +101,10 @@
 .dp-scene .q-grid        { gap: 4px; }
 .dp-scene .q-row-head    { font-size: 7px; }
 .dp-scene .q-col-head    { font-size: 6.5px; }
+/* Compact Pokedex header — Nº only (state name is redundant given
+   the row/col axis labels). */
+.dp-scene .q-pokedex-header { font-size: 6px; padding: 1px 4px; margin: -3px -5px 2px; }
+.dp-scene .q-pokedex-header .q-dex-state { display: none; }
 
 /* Hide the argmax-distribution strip + legend in this scene.  The
    heatmap cell colours + the ▶ markers on each cell already convey

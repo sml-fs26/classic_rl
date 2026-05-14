@@ -74,6 +74,20 @@
       cell.style.gridRow = String(st.your + 1);
       cell.dataset.state = stateLabel(st);
 
+      /* Pokedex-style header — each Q-cell IS a Pokedex entry for its
+         (state) species: a Nº NNN number, the state label as the
+         "species name", and a SEEN/OWNED indicator that flips when
+         the cell is first visited (any Q-value becomes non-zero).
+         The Nº numbering goes 001..025 in row-major order so the
+         student can read it left-to-right, top-to-bottom. */
+      const dex = document.createElement('div');
+      dex.className = 'q-pokedex-header';
+      const dexNum = String(s + 1).padStart(3, '0');
+      dex.innerHTML =
+        '<span class="q-dex-num">Nº ' + dexNum + '</span>' +
+        '<span class="q-dex-state">' + stateLabel(st) + '</span>';
+      cell.appendChild(dex);
+
       /* Battle thumbnail at the top. Opponent sprite is form-aware:
          CHARMANDER at FULL/HIGH, CHARMELEON at MID, CHARIZARD at
          LOW/CRIT — set once at cell mount since each cell represents
@@ -242,9 +256,15 @@
     function spawnAwake(cell) {
       const el = document.createElement('div');
       el.className = 'q-delta pos awake';
-      el.textContent = 'NEW!';
+      el.textContent = 'REGISTERED!';
       cell.appendChild(el);
       setTimeout(() => { try { cell.removeChild(el); } catch (e) {} }, 1500);
+      /* Also flash a Pokedex-style outline around the whole cell so
+         the eye catches even peripheral first-visits. */
+      cell.classList.remove('q-just-registered');
+      void cell.offsetWidth;
+      cell.classList.add('q-just-registered');
+      setTimeout(() => cell.classList.remove('q-just-registered'), 1100);
     }
 
     function reset() {
