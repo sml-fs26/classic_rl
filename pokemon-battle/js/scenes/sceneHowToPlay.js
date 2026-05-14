@@ -105,7 +105,7 @@
     navHint.className = 'tutorial-nav-hint';
     navHint.innerHTML =
       'Press <kbd>→</kbd> to continue · <kbd>←</kbd> back · ' +
-      '<kbd>click</kbd> the dialog to fast-fill the text';
+      'Press <kbd>↓</kbd> to fast-fill the dialog text';
     root.appendChild(navHint);
 
     /* ---------- Step engine ---------- */

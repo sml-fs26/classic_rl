@@ -325,6 +325,16 @@
    CHARMANDER; the right-hand Q-panel updates per state with the
    argmax row highlighted. */
 
+.qstar-premise {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin: 8px 4px 12px;
+  max-width: 88ch;
+}
+.qstar-q-star { color: var(--hue-anymal); }
+
 .qstar-demo {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 380px;

@@ -2,10 +2,10 @@
  *
  * The classic Gen-1 dialog reveals one character every ~45 ms — slightly
  * slower than the Game Boy NORMAL speed (~30 ms) so the rhythm matches the
- * full Pokemon turn cadence. Click anywhere on the box to skip-to-end. A
- * small blinking ▼ appears after the reveal
- * completes, indicating the user should press to continue. Multiple lines
- * are queued and flushed one at a time by `next()`.
+ * full Pokemon turn cadence. Press DOWN (or click anywhere on the box) to
+ * skip-to-end. A small blinking ▼ appears after the reveal completes,
+ * indicating the user should press to continue. Multiple lines are queued
+ * and flushed one at a time by `next()`.
  *
  * Usage:
  *   const dlg = Dialog.mount(host);
@@ -91,6 +91,21 @@
 
     host.addEventListener('click', () => {
       if (timer) skipToEnd();
+    });
+
+    /* DOWN-arrow fast-forwards the typewriter — same as clicking the box.
+       Listener is window-level (so the user doesn't have to focus the box
+       first); a `host.isConnected` guard makes it a no-op once the host
+       has been removed from the DOM by a scene swap. */
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowDown') return;
+      if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (!host.isConnected) return;
+      if (timer) {
+        e.preventDefault();
+        skipToEnd();
+      }
     });
 
     return { say, skipToEnd, clear, onDone, el: host };

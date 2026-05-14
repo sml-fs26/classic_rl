@@ -113,7 +113,7 @@
     const resultClass = sum >= 0 ? 'pos' : 'neg';
     host.innerHTML =
       '<div class="g-line">' +
-        '<span class="g-lhs">G<sub>' + t + '</sub></span>' +
+        '<span class="g-lhs">G<sub>' + t + '</sub>(τ)</span>' +
         ' = ' + symLine.join(' + ') +
       '</div>' +
       '<div class="g-line g-numbers">' +
@@ -140,12 +140,13 @@
     const f1 = document.createElement('div');
     c1.appendChild(f1);
     window.Katex.render(
-      String.raw`G_i \;=\; \sum_{j \ge i}\, r_j`,
+      String.raw`G_i(\tau) \;=\; \sum_{j \ge i}\, r_j`,
       f1, true
     );
     const foot1 = document.createElement('div');
     foot1.className = 'concept-formula-foot';
-    foot1.textContent = 'Sum of rewards from step i until the trajectory ends.';
+    foot1.textContent = 'Sum of rewards from step i until the trajectory τ ends. ' +
+      'The return depends on which trajectory you played — different rolls of the dice, different G.';
     c1.appendChild(foot1);
     root.appendChild(c1);
 
@@ -153,8 +154,8 @@
     const illus = document.createElement('div');
     illus.className = 'g-illus';
     illus.innerHTML =
-      '<div class="g-illus-label">ONE TRAJECTORY · click any <span class="g-r">r<sub>t</sub></span>' +
-      ' to recompute G<sub>t</sub></div>';
+      '<div class="g-illus-label">ONE TRAJECTORY τ · click any <span class="g-r">r<sub>t</sub></span>' +
+      ' to recompute G<sub>t</sub>(τ)</div>';
     const rollout = document.createElement('div');
     rollout.className = 'traj-rollout g-illus-rollout';
     illus.appendChild(rollout);
@@ -184,14 +185,30 @@
     const f2 = document.createElement('div');
     c2.appendChild(f2);
     window.Katex.render(
-      String.raw`Q(s, a) \;=\; \mathbb{E}\!\left[\, G_i \;\middle|\; s_i = s,\; a_i = a \,\right]`,
+      String.raw`Q(s, a) \;=\; \mathbb{E}_{\tau}\!\left[\, G_i(\tau) \;\middle|\; s_i = s,\; a_i = a \,\right]`,
       f2, true
     );
     const foot2 = document.createElement('div');
     foot2.className = 'concept-formula-foot';
-    foot2.textContent = 'Expectation over the rest of the trajectory.';
+    foot2.textContent = 'Average of G_i(τ) over all trajectories τ that pass through s with action a.';
     c2.appendChild(foot2);
     root.appendChild(c2);
+
+    /* ---- Q* card ---- */
+    const c3 = document.createElement('div');
+    c3.className = 'concept-formula-card';
+    c3.innerHTML = '<div class="concept-formula-label">OPTIMAL ACTION-VALUE</div>';
+    const f3 = document.createElement('div');
+    c3.appendChild(f3);
+    window.Katex.render(
+      String.raw`Q^{\star}(s) \;=\; \max_{a}\; Q(s, a)`,
+      f3, true
+    );
+    const foot3 = document.createElement('div');
+    foot3.className = 'concept-formula-foot';
+    foot3.textContent = 'The best Q-value reachable from state s.';
+    c3.appendChild(foot3);
+    root.appendChild(c3);
 
     return {};
   };
