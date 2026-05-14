@@ -35,7 +35,7 @@
   const A       = ACTIONS.length;
   const STATES  = window.Bellman.STATES;
   const N       = STATES.length;                       // 25
-  const GAMMA   = window.DATA.params.gammaDefault;     // 0.90
+  const GAMMA   = 1;     // Undiscounted — every trajectory terminates (win/loss).
 
   function bucketName(b) { return b >= NB ? 'FAINT' : BUCKETS[b].toUpperCase(); }
   function stateLabel(s) {
@@ -213,7 +213,7 @@
           } else {
             const sNextLab = bucketName(sub.yNext) + ' / ' + bucketName(sub.oNext);
             txt = counterName + ' ' + sub.yD + ' → ' + sNextLab + ', V′=' + fmtSigned(sub.vNext) +
-                  ' → −1 + ' + GAMMA.toFixed(1) + '·' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
+                  ' → −1 + ' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
             calc = sub.p.toFixed(2) + ' · ' + fmtSigned(sub.branchVal) + ' = ' + fmtSigned(sub.contribution);
           }
           html += '<div class="dp-calc-line dp-calc-sub">' +
@@ -243,7 +243,7 @@
           } else {
             const sNextLab = bucketName(sub.yNext) + ' / ' + bucketName(sub.oNext);
             txt = counterName + ' ' + sub.yD + ' → ' + sNextLab + ', V′=' + fmtSigned(sub.vNext) +
-                  ' → −1 + ' + GAMMA.toFixed(1) + '·' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
+                  ' → −1 + ' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
             calc = sub.p.toFixed(2) + ' · ' + fmtSigned(sub.branchVal) + ' = ' + fmtSigned(sub.contribution);
           }
           html += '<div class="dp-calc-line dp-calc-sub">' +
@@ -305,7 +305,7 @@
     const fhost = document.createElement('div');
     fcard.appendChild(fhost);
     window.Katex.render(
-      String.raw`Q^{\star}(s, a) \;=\; \sum_{s'} P(s' \mid s, a)\Big[\, r(s, a, s') \;+\; \gamma\, \max_{a'} Q^{\star}(s', a') \,\Big]`,
+      String.raw`Q^{\star}(s, a) \;=\; \sum_{s'} P(s' \mid s, a)\Big[\, r(s, a, s') \;+\; \max_{a'} Q^{\star}(s', a') \,\Big]`,
       fhost, true
     );
     root.appendChild(fcard);

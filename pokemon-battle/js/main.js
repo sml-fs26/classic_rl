@@ -2,7 +2,7 @@
 
    7 scenes, 0-indexed. Lifted from snakes-ladders/js/main.js.
    Scene 1 is the optional "How to play" tutorial; the battle, value
-   iteration, γ slider, SARSA, and recap sit at indices 2-6 (keys
+   iteration, SARSA, and recap sit at indices 2-6 (keys
    scene1-scene5 kept stable for deep-link survival).
    Each scene file at js/scenes/sceneN.js registers
      window.scenes.sceneN = function(root) { return { onEnter?, onLeave?, onNextKey?, onPrevKey? }; };

@@ -2,13 +2,13 @@
  *
  *   Three pieces, stacked:
  *
- *     1. G formula card.
+ *     1. G formula card — undiscounted sum of rewards from time i to
+ *        the end of the trajectory.
  *     2. A concrete 4-turn winning trajectory with the same (s, a, r)
  *        boxes as the trajectory scene, but with STATE and ACTION boxes
  *        muted (greyed) so the eye only catches the REWARD boxes — the
  *        ones that actually feed G. Below the rollout, the G_t
- *        expansion is shown for one specific γ = 0.90, with each γ-power
- *        and each rᵢ colour-coded back to its origin.
+ *        expansion shows each r_j colour-coded back to its origin.
  *     3. Q formula card (defines Q in terms of G).
  *
  *   Click any reward box in the rollout to recompute the expansion for
@@ -19,15 +19,13 @@
 
   /* ---- Fixed illustrative trajectory ----
      Pikachu uses Thunderbolt every turn and wins on the 4th turn.
-     Numbers chosen so G_1, G_2, G_3, G_4 give clean values
-     (+4.58, +6.20, +8.00, +10.00) at γ = 0.90. */
+     With undiscounted return: G_1 = +7, G_2 = +8, G_3 = +9, G_4 = +10. */
   const TRAJ = [
     { your: 0, opp: 0, action: 'thunderbolt', reward: -1, terminal: false },
     { your: 0, opp: 1, action: 'thunderbolt', reward: -1, terminal: false },
     { your: 1, opp: 2, action: 'thunderbolt', reward: -1, terminal: false },
     { your: 1, opp: 3, action: 'thunderbolt', reward: 10, terminal: true, won: true },
   ];
-  const GAMMA = 0.90;
 
   const NB = window.Battle.NUM_BUCKETS;
   const BUCKETS = window.Battle.BUCKETS;
@@ -98,27 +96,19 @@
   }
 
   /* Build the G_t expansion HTML for the given starting index (0-based).
-     Each line is colour-coded so γ powers and rᵢ values are visually
-     distinct from the page text. */
+     Undiscounted: G_t = sum of r_j from j=t to the end. */
   function renderExpansion(host, startIdx) {
     const t = startIdx + 1;
     const horizon = TRAJ.length;     // 4
-    /* Build the four lines. */
-    const symLine = []; const numLine = []; const prodLine = [];
+    const symLine = []; const numLine = [];
     let sum = 0;
     for (let j = startIdx; j < horizon; j++) {
-      const k = j - startIdx;
       const r = TRAJ[j].reward;
-      const gPow = Math.pow(GAMMA, k);
-      const contrib = gPow * r;
-      sum += contrib;
+      sum += r;
       const rSpan = '<span class="g-r">r<sub>' + (j + 1) + '</sub></span>';
-      const gSpan = '<span class="g-gamma">γ<sup>' + k + '</sup></span>';
-      symLine.push(gSpan + '·' + rSpan);
-      const gNum = (k === 0) ? '1' : gPow.toFixed(k === 1 ? 1 : (k === 2 ? 2 : 3));
+      symLine.push(rSpan);
       const rStr = (r >= 0 ? '+' : '−') + Math.abs(r);
-      numLine.push('<span class="g-gamma">' + gNum + '</span>·<span class="g-r">(' + rStr + ')</span>');
-      prodLine.push('<span class="g-prod">' + fmtSigned(contrib, 2) + '</span>');
+      numLine.push('<span class="g-r">(' + rStr + ')</span>');
     }
     const resultClass = sum >= 0 ? 'pos' : 'neg';
     host.innerHTML =
@@ -129,11 +119,8 @@
       '<div class="g-line g-numbers">' +
         '<span class="g-eq">=</span> ' + numLine.join(' + ') +
       '</div>' +
-      '<div class="g-line g-products">' +
-        '<span class="g-eq">=</span> ' + prodLine.join(' + ') +
-      '</div>' +
       '<div class="g-line g-final">' +
-        '<span class="g-eq">=</span> <span class="g-result ' + resultClass + '">' + fmtSigned(sum, 2) + '</span>' +
+        '<span class="g-eq">=</span> <span class="g-result ' + resultClass + '">' + fmtSigned(sum, 0) + '</span>' +
       '</div>';
   }
 
@@ -153,12 +140,12 @@
     const f1 = document.createElement('div');
     c1.appendChild(f1);
     window.Katex.render(
-      String.raw`G_i \;=\; \sum_{j \ge i} \gamma^{\,j - i}\, r_j`,
+      String.raw`G_i \;=\; \sum_{j \ge i}\, r_j`,
       f1, true
     );
     const foot1 = document.createElement('div');
     foot1.className = 'concept-formula-foot';
-    foot1.textContent = 'γ ∈ [0, 1) — discount';
+    foot1.textContent = 'Sum of rewards from step i until the trajectory ends.';
     c1.appendChild(foot1);
     root.appendChild(c1);
 
@@ -166,8 +153,8 @@
     const illus = document.createElement('div');
     illus.className = 'g-illus';
     illus.innerHTML =
-      '<div class="g-illus-label">ONE TRAJECTORY · γ = ' + GAMMA.toFixed(2) +
-      ' · click any <span class="g-r">r<sub>t</sub></span> to recompute G<sub>t</sub></div>';
+      '<div class="g-illus-label">ONE TRAJECTORY · click any <span class="g-r">r<sub>t</sub></span>' +
+      ' to recompute G<sub>t</sub></div>';
     const rollout = document.createElement('div');
     rollout.className = 'traj-rollout g-illus-rollout';
     illus.appendChild(rollout);

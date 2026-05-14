@@ -1,8 +1,7 @@
 /* Scene — "What makes this an MDP?"
  *
  *   Explicit definitions of the three MDP ingredients, one click at a
- *   time. Reward is folded into the transition function's output (the
- *   user's preferred framing); γ is left for the Return scene.
+ *   time. Reward is folded into the transition function's output.
  *
  *   4-step ladder:
  *     0: Sprites + heading only. "Three ingredients."
@@ -36,8 +35,7 @@
     wrap.appendChild(heading);
 
     /* The battle stage. Sprites are visible from step 0; HP bars + move
-       menu + reward + γ are gated by .show classes that we toggle in
-       applyStep. */
+       menu are gated by .show classes that we toggle in applyStep. */
     const stage = document.createElement('div');
     stage.className = 'battle-stage sc0-mdp-stage';
     stage.innerHTML = `

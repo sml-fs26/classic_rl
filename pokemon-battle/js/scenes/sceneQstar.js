@@ -39,7 +39,7 @@
   const A       = ACTIONS.length;                      // 3 after the iron_tail drop
   const STATES  = window.Bellman.STATES;
   const N       = STATES.length;                       // 25
-  const GAMMA   = window.DATA.params.gammaDefault;     // 0.90
+  const GAMMA   = 1;     // Undiscounted — every trajectory terminates (win/loss).
 
   function bucketName(b) { return b >= NB ? 'FAINT' : BUCKETS[b].toUpperCase(); }
 

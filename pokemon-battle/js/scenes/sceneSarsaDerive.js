@@ -31,7 +31,7 @@
   const NB      = window.Battle.NUM_BUCKETS;
   const STATES  = window.Bellman.STATES;
   const N       = STATES.length;
-  const GAMMA   = window.DATA.params.gammaDefault;        // 0.90
+  const GAMMA   = 1;        // Undiscounted — every trajectory terminates (win/loss).
 
   /* ---- The seven cards. Each is one click in the derivation. ---- */
   const CARDS = [
@@ -74,8 +74,8 @@
         'By Bellman, <span class="sd-q">Q*(s, a)</span> is an expectation over the random next state and reward. ' +
         'We don\'t get the expectation — we get one sample. Drop the <span class="sd-q">E</span> and use it:',
       latex: [
-        String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\!\left[\, R \;+\; \gamma\, Q^{\star}(S', A') \,\right]`,
-        String.raw`\phantom{Q^{\star}(s, a)}\;\approx\; r \;+\; \gamma\, Q^{\star}(s', a')`,
+        String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\!\left[\, R \;+\; Q^{\star}(S', A') \,\right]`,
+        String.raw`\phantom{Q^{\star}(s, a)}\;\approx\; r \;+\; Q^{\star}(s', a')`,
       ],
       foot: 'One-sample Monte-Carlo estimate of the right-hand side.',
     },
@@ -86,7 +86,7 @@
         'We don\'t have <span class="sd-q">Q*</span> on the right either — only our table <span class="sd-q-est">q</span>. ' +
         'Plug it in. Call the resulting number the <b>target</b>: that\'s where we want <span class="sd-q-est">q[s, a]</span> to be.',
       latex: [
-        String.raw`\mathtt{target} \;:=\; r \;+\; \gamma\, \mathtt{q}[s', a']`,
+        String.raw`\mathtt{target} \;:=\; r \;+\; \mathtt{q}[s', a']`,
         String.raw`\mathtt{q}[s, a] \;\stackrel{\text{want}}{=}\; \mathtt{target}`,
       ],
     },
@@ -437,7 +437,7 @@
       const qNStr  = t.terminal ? '0 (terminal)' : fmt(qNextEst);
       const targetCalc = t.terminal
         ? fmt(t.r) + ' &nbsp;&nbsp; (no bootstrap — next state terminal)'
-        : fmt(t.r) + ' + ' + GAMMA.toFixed(2) + ' &middot; ' + fmt(qNextEst) + ' = <b>' + fmt(target) + '</b>';
+        : fmt(t.r) + ' + ' + fmt(qNextEst) + ' = <b>' + fmt(target) + '</b>';
 
       detail.innerHTML =
         '<div class="sd-f-detail-title">TRANSITION ' + (fCursor + 1) + ' / ' + traj.length + '</div>' +
@@ -448,7 +448,7 @@
           '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">s′</span> <span class="sd-f-row-rhs">' + sNStr + '</span></div>' +
           '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">a′</span> <span class="sd-f-row-rhs">' + aNStr + '</span></div>' +
           '<div class="sd-f-divider"></div>' +
-          '<div class="sd-f-calc-line"><span class="sd-f-calc-label">target = r + γ · q[s′, a′]</span></div>' +
+          '<div class="sd-f-calc-line"><span class="sd-f-calc-label">target = r + q[s′, a′]</span></div>' +
           '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + targetCalc + '</span></div>' +
           '<div class="sd-f-divider"></div>' +
           '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a]  was</span> <b>' + fmt(qCurrent) + '</b></div>' +
