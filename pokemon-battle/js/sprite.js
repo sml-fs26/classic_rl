@@ -18,6 +18,19 @@
       void img.offsetWidth;
       img.classList.add('shake');
     }
+    /* When the one-shot shake finishes, drop the class so the
+       base .poke-sprite rule (which carries the infinite breathing
+       animation) takes effect again.  Without this, the more-specific
+       .shake rule keeps the `animation` property pointed at
+       poke-shake — which has already completed — so the sprite
+       sits frozen instead of resuming idle breathing.  faint is
+       deliberately NOT removed here (its forwards fill-mode is the
+       whole point — the sprite should stay off-screen post-KO). */
+    img.addEventListener('animationend', (e) => {
+      if (e.animationName === 'poke-shake') {
+        img.classList.remove('shake');
+      }
+    });
     function faint() {
       img.classList.add('faint');
     }
