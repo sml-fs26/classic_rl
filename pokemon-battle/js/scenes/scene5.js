@@ -9,11 +9,18 @@
   window.scenes = window.scenes || {};
 
   window.scenes.scene5 = function (root) {
-    root.classList.add('scene-pad');
+    root.classList.add('scene-pad', 'sc5-scene');
     root.innerHTML = '';
 
+    /* Pokemon-League HALL OF FAME banner — sits above the existing
+       heading and frames the scene as a victory screen. */
+    const banner = document.createElement('div');
+    banner.className = 'sc5-hof-banner';
+    banner.innerHTML = '<span class="sc5-star">★</span> HALL OF FAME <span class="sc5-star">★</span>';
+    root.appendChild(banner);
+
     const heading = document.createElement('h2');
-    heading.className = 'poke-section-title';
+    heading.className = 'poke-section-title sc5-heading';
     heading.textContent = "YOU'VE TRAINED PIKACHU.";
     root.appendChild(heading);
 
@@ -27,9 +34,12 @@
     wrap.className = 'sc5-grid';
     root.appendChild(wrap);
 
+    let cardIdx = 0;
     for (const card of window.DATA.recap) {
       const box = document.createElement('div');
       box.className = 'poke-box sc5-card';
+      box.style.setProperty('--i', String(cardIdx));
+      cardIdx++;
       const hueChip = document.createElement('span');
       hueChip.className = 'hue-chip hue-' + card.hue;
       hueChip.textContent = card.from;
@@ -55,6 +65,7 @@
 
     const closer = document.createElement('div');
     closer.className = 'poke-box sc5-closer';
+    closer.style.setProperty('--i', String(cardIdx));
     closer.innerHTML =
       '<span class="hue-chip hue-poke">WHERE THIS GOES NEXT</span>' +
       '<div class="sc5-closer-text">' +
@@ -69,6 +80,19 @@
     footnote.innerHTML = 'Press <kbd>PREV</kbd> or left-arrow to revisit the SARSA derivation.';
     root.appendChild(footnote);
 
-    return {};
+    /* Victory fanfare — 4-note ascending arpeggio. Defer so the
+       sound lands while the cards are still animating in, not
+       before the scene has rendered.  Plays on first build AND on
+       revisits (onEnter). */
+    function playFanfare() {
+      setTimeout(() => {
+        if (window.SFX && window.SFX.play) window.SFX.play('win');
+      }, 180);
+    }
+    playFanfare();
+
+    return {
+      onEnter() { playFanfare(); },
+    };
   };
 })();
