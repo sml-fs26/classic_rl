@@ -110,3 +110,214 @@
 }
 .sd-legend-chip.q { color: var(--hue-anymal); }
 .sd-legend-chip.q-est { color: var(--hue-casino); }
+
+/* ====================================================================
+   F — SARSA on one trajectory (lives below the derivation cards)
+   ==================================================================== */
+
+.sd-f-header {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  margin: 24px 0 6px;
+  padding-top: 14px;
+  border-top: 2px dashed var(--rule);
+}
+.sd-f-intro {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin: 0 0 14px;
+  max-width: 92ch;
+}
+.sd-f-intro kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 2px 5px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+
+/* ----- Trajectory tape ----- */
+.sd-f-tape-wrap {
+  background: var(--box-bg, #FFFEF8);
+  border: 2px solid var(--ink-on-box, #1B1B1B);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+.sd-f-tape-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  margin-bottom: 8px;
+}
+.sd-f-tape-count { font-weight: normal; }
+.sd-f-tape {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.sd-f-tape-tuple {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border: 1px solid rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.03);
+}
+.sd-f-tape-tuple.applied { opacity: 0.50; }
+.sd-f-tape-tuple.active {
+  border: 2px solid var(--pikachu-cheek, #C62828);
+  background: rgba(213,94,0, 0.10);
+}
+.sd-f-tape-tuple.terminal-tail { border-style: dashed; padding: 4px 8px; }
+.sd-f-tape-t {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+.sd-f-tape-state {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 44px;
+}
+.sd-f-tape-state.terminal {
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+}
+.sd-f-tape-state.terminal.win  { background: rgba(0,114,178, 0.12);   border-color: var(--cb-blue, #0072B2); }
+.sd-f-tape-state.terminal.loss { background: rgba(213,94,0, 0.12);    border-color: var(--cb-vermillion, #C62828); }
+.sd-f-tape-banner {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+}
+.sd-f-tape-state.terminal.win  .sd-f-tape-banner { color: var(--cb-blue,       #0072B2); }
+.sd-f-tape-state.terminal.loss .sd-f-tape-banner { color: var(--cb-vermillion, #C62828); }
+.sd-f-tape-mini {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.sd-f-tape-sprite {
+  width: 10px;
+  height: 10px;
+  image-rendering: pixelated;
+}
+.sd-f-tape-hp {
+  flex: 1;
+  height: 2px;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.4);
+}
+.sd-f-tape-hp-fill {
+  height: 100%;
+  background: #48C848;
+}
+.sd-f-tape-hp-fill.b1 { background: #88D848; }
+.sd-f-tape-hp-fill.b2 { background: #E8C828; }
+.sd-f-tape-hp-fill.b3 { background: #E89028; }
+.sd-f-tape-hp-fill.b4 { background: #E84828; }
+.sd-f-tape-arrow {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  text-align: center;
+  color: var(--ink-on-box);
+  min-width: 44px;
+}
+.sd-f-tape-r {
+  font-size: 7px;
+  color: var(--cb-vermillion, #C62828);
+}
+
+/* ----- Two-column row: Q-table + step detail ----- */
+.sd-f-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.sd-f-q { min-width: 0; }
+.sd-f-detail {
+  background: var(--box-bg, #FFFEF8);
+  border: 2px solid var(--ink-on-box, #1B1B1B);
+  padding: 12px 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.6;
+}
+.sd-f-detail-title {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  margin-bottom: 10px;
+}
+.sd-f-detail-body { font-size: 8px; }
+.sd-f-row-eq {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 3px;
+}
+.sd-f-row-lhs {
+  min-width: 22px;
+  color: var(--ink-secondary);
+}
+.sd-f-row-rhs {
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.sd-f-r { color: var(--cb-vermillion, #C62828); }
+.sd-f-divider {
+  border-top: 1px dashed var(--rule);
+  margin: 8px 0;
+}
+.sd-f-calc-line {
+  font-size: 8px;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+}
+.sd-f-calc-label { color: var(--ink-secondary); }
+.sd-f-calc-eq    { color: var(--ink-on-box); }
+.sd-f-td   { color: var(--pikachu-cheek, #C62828); }
+.sd-f-qnew { color: var(--cb-blue,        #0072B2); font-size: 10px; }
+
+/* ----- F controls row ----- */
+.sd-f-ctrls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.sd-f-alpha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  margin-left: auto;
+}
+.sd-f-alpha input[type="range"] {
+  width: 140px;
+  accent-color: var(--pikachu-cheek, #C62828);
+}
+
+/* ----- Cell pulse when being updated ----- */
+@keyframes sd-pulse-anim {
+  0%   { box-shadow: 0 0 0 0 var(--pikachu-cheek, #C62828); }
+  50%  { box-shadow: 0 0 0 4px var(--pikachu-cheek, #C62828); }
+  100% { box-shadow: 0 0 0 0 var(--pikachu-cheek, #C62828); }
+}
+.q-cell.sd-pulse {
+  outline: 3px solid var(--pikachu-cheek, #C62828);
+  outline-offset: -3px;
+  animation: sd-pulse-anim 1.0s ease-out;
+  z-index: 3;
+}
+.q-bar-row.sd-row-mark { background: rgba(213,94,0, 0.20); }
