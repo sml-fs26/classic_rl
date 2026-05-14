@@ -46,7 +46,15 @@
     const stage = document.createElement('div');
     stage.className = 'battle-stage';
     stage.innerHTML = `
-      <div class="grass-rim"></div>
+      <div class="grass-rim">
+        <div class="grass-tufts">
+          <div class="grass-tuft"></div>
+          <div class="grass-tuft"></div>
+          <div class="grass-tuft"></div>
+          <div class="grass-tuft"></div>
+          <div class="grass-tuft"></div>
+        </div>
+      </div>
       <div class="platform opponent"></div>
       <div class="platform player"></div>
       <div class="sprite-host opponent"></div>

@@ -379,6 +379,44 @@ html, body {
      KO animations. */
   animation: poke-breathe 2.4s ease-in-out infinite;
 }
+
+/* Grass tufts at the platform rim — 5 chunky pixel tufts that sway on
+   staggered cycles.  Lives inside .grass-rim so it sits at the right
+   vertical position automatically.  prefers-reduced-motion disables. */
+.grass-tufts {
+  position: absolute;
+  inset: -14px 0 auto 0;        /* lift above the rim */
+  height: 14px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6%;
+  pointer-events: none;
+  z-index: 2;
+}
+.grass-tuft {
+  width: 14px;
+  height: 14px;
+  background: var(--grass-rim);
+  clip-path: polygon(
+    20% 100%,  0%  35%, 18% 55%,
+    35% 0%,   45% 50%, 50% 25%,
+    55% 50%,  65% 0%,  82% 55%,
+    100% 35%, 80% 100%
+  );
+  transform-origin: 50% 100%;
+  animation: grass-sway 4.0s ease-in-out infinite alternate;
+}
+.grass-tuft:nth-child(2) { animation-delay: -0.7s; animation-duration: 4.4s; }
+.grass-tuft:nth-child(3) { animation-delay: -1.5s; animation-duration: 3.6s; }
+.grass-tuft:nth-child(4) { animation-delay: -2.1s; animation-duration: 4.8s; }
+.grass-tuft:nth-child(5) { animation-delay: -0.3s; animation-duration: 4.2s; }
+@keyframes grass-sway {
+  0%   { transform: rotate(-5deg); }
+  100% { transform: rotate(5deg);  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grass-tuft { animation: none; }
+}
 @keyframes poke-breathe {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-1.5px); }
