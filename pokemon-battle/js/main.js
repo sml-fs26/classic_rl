@@ -143,6 +143,24 @@
     updateButtons(idx);
     updateTitle(idx);
     syncHash(idx);
+    playSceneTransition(SCENES[idx].key);
+  }
+
+  /* Gen-1-style rotating-hex wipe — fires only on entries to the three
+     battle-flavored scenes so it lands as a moment, not a tax.  The
+     overlay is pointer-events: none, so the underlying scene stays
+     interactive during the ~700ms reveal.  prefers-reduced-motion
+     skips the spawn entirely. */
+  const TRANSITION_SCENES = ['scene1', 'sceneSarsaDerive', 'sceneQstar'];
+  function playSceneTransition(sceneKey) {
+    if (TRANSITION_SCENES.indexOf(sceneKey) < 0) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'scene-transition';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('animationend', () => {
+      try { overlay.remove(); } catch (_e) {}
+    }, { once: true });
   }
 
   function init() {

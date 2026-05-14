@@ -1422,3 +1422,42 @@ body.lang-jp .scene {
     opacity: 0;
   }
 }
+
+/* ============================================================
+   Gen-1 rotating-hex scene transition
+   ----------------------------------------------------------------
+   A full-viewport overlay shaped as a 6-point hexagon (extended
+   beyond the viewport so the shape fully covers the screen at
+   scale 1) animates from scale 1 / rotate 0 down to scale 0 /
+   rotate 180, opacity fading at the tail.  The new scene is
+   already mounted underneath; the overlay just gates the reveal.
+   pointer-events: none keeps the underlying scene interactive.
+   Fires only on entry to the three battle-flavored scenes
+   (scene1, sceneSarsaDerive, sceneQstar) — see playSceneTransition
+   in main.js.
+   ============================================================ */
+.scene-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  pointer-events: none;
+  clip-path: polygon(
+    50% -50%,
+    130% 25%,
+    130% 75%,
+    50% 150%,
+    -30% 75%,
+    -30% 25%
+  );
+  transform-origin: 50% 50%;
+  animation: scene-trans-hex 700ms cubic-bezier(.42, 0, .58, 1) forwards;
+}
+@keyframes scene-trans-hex {
+  0%   { transform: scale(1) rotate(0deg);     opacity: 1; }
+  70%  {                                       opacity: 1; }
+  100% { transform: scale(0) rotate(180deg);   opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-transition { display: none; }
+}
