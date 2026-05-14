@@ -1,32 +1,22 @@
 /* Scene — "What makes this an MDP?"
  *
- *   Extracted from scene 0 (where it used to live as a second phase
- *   after the title). Now sits after the tutorial and trial battle so
- *   the student has actually played a turn before we name the pieces.
+ *   Explicit definitions of the three MDP ingredients, one click at a
+ *   time. Reward is folded into the transition function's output (the
+ *   user's preferred framing); γ is left for the Return scene.
  *
- *   Progressive 6-step ladder, one MDP piece revealed per click:
- *     0: just sprites + heading. No HP bars, no tags. The student sees
- *        only what a Gen-1 trainer would see at the start of a battle.
- *     1: HP bars fade in + the S tag appears next to them.
- *     2: A static (disabled) move menu fades in below the stage + the
- *        A tag appears.
- *     3: A one-shot attack animation plays (PIKACHU lunges, CHARMANDER
- *        shakes, "−1 HP" floats up) + the P tag appears.
- *     4: A reward indicator floats next to the score-board + the R tag
- *        appears.
- *     5: A centred γ tag appears.
- *
- *   onNextKey / onPrevKey: step within the ladder. When at step 5,
- *   NEXT yields to the scene engine; when at step 0, PREV yields
- *   backwards. We reuse the .sc0-* CSS classes from scene0.css since
- *   that file already styles the title screen + this overlay together.
+ *   4-step ladder:
+ *     0: Sprites + heading only. "Three ingredients."
+ *     1: HP bars + S tag.  State = pair of non-negative integers (h_p, h_o).
+ *     2: Move menu + A tag. Action = any move from { QUICK, BOLT, THUN }.
+ *     3: Attack animation + P tag.  Transition probability function
+ *        P(s, a) → (s', r) — probabilistic.
  */
 (function () {
   window.scenes = window.scenes || {};
 
-  const STEP_COUNT = 6;   // 0..5 inclusive
+  const STEP_COUNT = 4;   // 0..3 inclusive
   /* Step captions are looked up per-render so a language toggle re-paints
-     them. Keys are 'mdp.step.0' .. 'mdp.step.5' in i18n.js. */
+     them. Keys are 'mdp.step.0' .. 'mdp.step.3' in i18n.js. */
 
   window.scenes.sceneMdpOverlay = function (root) {
     root.classList.add('scene-pad');
@@ -78,8 +68,6 @@
       <div class="mdp-tag mdp-tag-s"     style="left: 4%; top: 38%;">${T('mdp.tag.s')}</div>
       <div class="mdp-tag mdp-tag-a"     style="left: 4%; bottom: 4%;">${T('mdp.tag.a')}</div>
       <div class="mdp-tag mdp-tag-p"     style="right: 6%; top: 50%; transform: translateY(-50%);">${T('mdp.tag.p')}</div>
-      <div class="mdp-tag mdp-tag-r"     style="right: 4%; bottom: 4%;">${T('mdp.tag.r')}</div>
-      <div class="mdp-tag mdp-tag-gamma" style="left: 50%; top: 50%; transform: translate(-50%, -50%); background: var(--charmander-orange); color: #fff;">${T('mdp.tag.gamma')}</div>
     `;
     stage.appendChild(overlay);
 
@@ -102,15 +90,6 @@
     }
     menuWrap.appendChild(menu);
     wrap.appendChild(menuWrap);
-
-    /* Reward indicator — appears at step 4. */
-    const rewardWrap = document.createElement('div');
-    rewardWrap.className = 'sc0-reward-wrap';
-    rewardWrap.innerHTML =
-      '<span class="sc0-reward-pill neg">' + T('mdp.reward.neg_turn') + '</span>' +
-      '<span class="sc0-reward-pill pos">' + T('mdp.reward.pos_win') + '</span>' +
-      '<span class="sc0-reward-pill neg">' + T('mdp.reward.neg_faint') + '</span>';
-    wrap.appendChild(rewardWrap);
 
     /* Caption + step controls */
     const caption = document.createElement('div');
@@ -145,14 +124,11 @@
 
     function applyStep(c) {
       step = Math.max(0, Math.min(STEP_COUNT - 1, c));
-      hpWrap.classList.toggle('show',         step >= 1);
-      menuWrap.classList.toggle('show',       step >= 2);
-      rewardWrap.classList.toggle('show',     step >= 4);
-      overlay.querySelector('.mdp-tag-s').classList.toggle('show',     step >= 1);
-      overlay.querySelector('.mdp-tag-a').classList.toggle('show',     step >= 2);
-      overlay.querySelector('.mdp-tag-p').classList.toggle('show',     step >= 3);
-      overlay.querySelector('.mdp-tag-r').classList.toggle('show',     step >= 4);
-      overlay.querySelector('.mdp-tag-gamma').classList.toggle('show', step >= 5);
+      hpWrap.classList.toggle('show', step >= 1);
+      menuWrap.classList.toggle('show', step >= 2);
+      overlay.querySelector('.mdp-tag-s').classList.toggle('show', step >= 1);
+      overlay.querySelector('.mdp-tag-a').classList.toggle('show', step >= 2);
+      overlay.querySelector('.mdp-tag-p').classList.toggle('show', step >= 3);
       caption.innerHTML = T('mdp.step.' + step);
       const idEl = document.getElementById('mdp-overlay-i');
       if (idEl) idEl.textContent = String(step + 1);

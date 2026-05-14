@@ -66,7 +66,7 @@
 
     const footnote = document.createElement('div');
     footnote.className = 'footnote';
-    footnote.innerHTML = 'Press <kbd>PREV</kbd> or left-arrow to revisit the SARSA scrubber.';
+    footnote.innerHTML = 'Press <kbd>PREV</kbd> or left-arrow to revisit the SARSA derivation.';
     root.appendChild(footnote);
 
     return {};

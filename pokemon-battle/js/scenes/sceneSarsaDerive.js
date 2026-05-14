@@ -297,10 +297,27 @@
       'watch the table fill in over many rerolls.';
     root.appendChild(fIntro);
 
-    /* Trajectory tape */
+    /* Q-table on the left, sticky side column (tape + detail + ctrls)
+       on the right. Everything the student needs to drive the demo
+       lives in the side column, so no scrolling is required between
+       clicking a control and watching the cell pulse on the left. */
+    const fRow = document.createElement('div');
+    fRow.className = 'sd-f-row';
+    root.appendChild(fRow);
+
+    const qHost = document.createElement('div');
+    qHost.className = 'sd-f-q';
+    fRow.appendChild(qHost);
+    const qtbl = window.QTable.mount(qHost);
+
+    const side = document.createElement('div');
+    side.className = 'sd-f-side';
+    fRow.appendChild(side);
+
+    /* Trajectory tape (top of side column) */
     const tapeWrap = document.createElement('div');
     tapeWrap.className = 'sd-f-tape-wrap';
-    root.appendChild(tapeWrap);
+    side.appendChild(tapeWrap);
 
     const tapeTitle = document.createElement('div');
     tapeTitle.className = 'sd-f-tape-title';
@@ -311,31 +328,22 @@
     tape.className = 'sd-f-tape';
     tapeWrap.appendChild(tape);
 
-    /* Q-table + step-detail row */
-    const fRow = document.createElement('div');
-    fRow.className = 'sd-f-row';
-    root.appendChild(fRow);
-
-    const qHost = document.createElement('div');
-    qHost.className = 'sd-f-q';
-    fRow.appendChild(qHost);
-    const qtbl = window.QTable.mount(qHost);
-
+    /* Step detail (middle of side column) */
     const detail = document.createElement('div');
     detail.className = 'sd-f-detail';
-    fRow.appendChild(detail);
+    side.appendChild(detail);
 
-    /* F controls */
+    /* Controls (bottom of side column) */
     const fCtrls = document.createElement('div');
     fCtrls.className = 'sd-f-ctrls';
     fCtrls.innerHTML =
-      '<button class="poke-btn" id="sd-f-step">▶ NEXT TRANSITION</button>' +
-      '<button class="poke-btn" id="sd-f-reroll">⟲ REROLL TRAJECTORY</button>' +
+      '<button class="poke-btn" id="sd-f-step">▶ NEXT</button>' +
+      '<button class="poke-btn" id="sd-f-reroll">⟲ REROLL</button>' +
       '<button class="poke-btn" id="sd-f-clear">CLEAR q</button>' +
       '<div class="sd-f-alpha">α <span id="sd-f-alpha-val">0.20</span>' +
         '<input type="range" id="sd-f-alpha-range" min="0" max="100" value="20">' +
       '</div>';
-    root.appendChild(fCtrls);
+    side.appendChild(fCtrls);
 
     /* ---- F state ---- */
     let Q       = window.SARSA.makeQ();
