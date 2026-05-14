@@ -44,6 +44,7 @@
       'scene.dp':         'Filling Q with DP',
       'scene.whyNotDp':   "Why DP doesn't scale",
       'scene.sarsaDerive':'Deriving SARSA',
+      'scene.gym':        'Gym Challenge',
       'scene.recap':      "You've trained PIKACHU.",
 
       /* ---- scene 0 — title screen ---- */
@@ -115,6 +116,7 @@
       'scene.dp':         'DPで Qを うめる',
       'scene.whyNotDp':   'なぜ DPは スケールしない？',
       'scene.sarsaDerive':'SARSAの みちびき',
+      'scene.gym':        'ジムチャレンジ',
       'scene.recap':      'ピカチュウは そだった！',
 
       'title.pokemon':    'ポケモン',

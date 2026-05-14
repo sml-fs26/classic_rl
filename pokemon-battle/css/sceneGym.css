@@ -1,0 +1,347 @@
+/* Scene — Gym Challenge.  Three battles, three badges. */
+
+.gym-scene {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gym-heading {
+  text-align: center;
+  margin: 0 auto 4px;
+  letter-spacing: 0.08em;
+}
+.gym-intro-sub {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  text-align: center;
+  max-width: 70ch;
+  margin: 0 auto 8px;
+}
+
+/* ---------- Intro list ---------- */
+.gym-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 56ch;
+  margin: 0 auto;
+}
+.gym-list-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 1.4fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+.gym-list-row.earned {
+  background: var(--pikachu-yellow);
+  box-shadow:
+    inset 0 0 0 2px var(--pikachu-yellow),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--pikachu-yellow);
+}
+.gym-list-num { color: var(--pikachu-cheek); font-size: 8px; }
+.gym-list-city { letter-spacing: 0.06em; }
+.gym-list-leader { color: var(--ink-secondary); font-size: 8px; }
+.gym-list-badge { text-align: right; }
+
+/* Badge chips — colored to evoke real Gen-1 gym badges. */
+.gym-badge-chip {
+  display: inline-block;
+  padding: 4px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-on-box);
+  letter-spacing: 0.04em;
+}
+.gym-badge-chip.boulder { background: #A07042; color: #FFFFFF; }
+.gym-badge-chip.cascade { background: #5BAACF; color: #FFFFFF; }
+.gym-badge-chip.thunder { background: #F8D028; color: #181818; }
+
+/* ---------- Intro controls ---------- */
+.gym-ctrls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 10px 0 0;
+}
+.gym-begin {
+  font-size: 11px;
+  padding: 10px 18px;
+  background: var(--pikachu-yellow);
+  color: #181818;
+}
+.gym-footnote {
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ============================================================
+   BATTLE SCREEN
+   ============================================================ */
+.gym-battle-banner {
+  text-align: center;
+  padding: 10px 14px;
+  margin: 0 auto 4px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  max-width: 56ch;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.gym-battle-num {
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.gym-battle-title {
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.gym-battle-leader {
+  font-size: 10px;
+  color: var(--pikachu-cheek);
+  margin-bottom: 6px;
+}
+.gym-battle-target {
+  font-size: 8.5px;
+  color: var(--ink-secondary);
+}
+
+.gym-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.gym-stage {
+  position: relative;
+  min-height: 280px;
+}
+
+.gym-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gym-status {
+  padding: 10px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+}
+.gym-status b { color: var(--pikachu-cheek); }
+
+.gym-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gym-giveup {
+  margin-top: 10px;
+  background: var(--bg);
+  font-size: 9px;
+  color: var(--ink-secondary);
+}
+
+/* ============================================================
+   BADGE CEREMONY
+   ============================================================ */
+.gym-ceremony {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 12px;
+  text-align: center;
+}
+.gym-ceremony-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  animation: gym-ceremony-title-pop 480ms ease-out 60ms backwards;
+}
+.gym-ceremony-title.loss { color: var(--ink-secondary); }
+
+.gym-ceremony-badge-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0;
+}
+.gym-ceremony-badge {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 4px var(--bg-strong),
+    inset 0 0 0 8px var(--rule),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  animation: gym-badge-spin 760ms ease-out 120ms backwards;
+}
+.gym-ceremony-badge.boulder { background: #A07042; color: #FFFFFF; }
+.gym-ceremony-badge.cascade { background: #5BAACF; color: #FFFFFF; }
+.gym-ceremony-badge.thunder { background: #F8D028; color: #181818; }
+
+.gym-ceremony-badge-star {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 10px;
+  animation: gym-star-glint 1.8s ease-in-out infinite;
+}
+.gym-ceremony-badge-name { font-size: 16px; letter-spacing: 0.08em; }
+.gym-ceremony-badge-sub  { font-size: 9px;  letter-spacing: 0.06em; margin-top: 4px; opacity: 0.78; }
+
+.gym-ceremony-flavor {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 56ch;
+}
+
+.gym-ceremony-ctrls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+@keyframes gym-ceremony-title-pop {
+  0%   { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0);   opacity: 1; }
+}
+@keyframes gym-badge-spin {
+  0%   { transform: rotate(-540deg) scale(0); opacity: 0; }
+  60%  { transform: rotate(20deg)   scale(1.1); opacity: 1; }
+  100% { transform: rotate(0deg)    scale(1); opacity: 1; }
+}
+@keyframes gym-star-glint {
+  0%, 100% { transform: scale(1)    rotate(-6deg); filter: brightness(1);   }
+  50%      { transform: scale(1.12) rotate(6deg);  filter: brightness(1.4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gym-ceremony-title,
+  .gym-ceremony-badge,
+  .gym-ceremony-badge-star {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   FINAL SCREEN
+   ============================================================ */
+.gym-final {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 12px;
+  text-align: center;
+}
+.gym-final-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  color: var(--pikachu-cheek);
+  background: var(--pikachu-yellow);
+  padding: 14px 22px;
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--pikachu-yellow),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--pikachu-yellow);
+  color: var(--ink-on-box);
+}
+
+.gym-final-score {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 12px 20px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+  min-width: 320px;
+}
+.gym-final-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(0,0,0,0.15);
+}
+.gym-final-row:last-child { border-bottom: none; }
+.gym-final-row b { color: var(--pikachu-cheek); }
+
+.gym-final-trophy {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+}
+.gym-final-badge {
+  width: 110px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  font-family: 'Press Start 2P', monospace;
+  text-align: center;
+  animation: gym-badge-spin 600ms ease-out backwards;
+  animation-delay: calc(var(--i, 0) * 180ms + 220ms);
+}
+.gym-final-badge.boulder.got { background: #A07042; color: #FFFFFF; }
+.gym-final-badge.cascade.got { background: #5BAACF; color: #FFFFFF; }
+.gym-final-badge.thunder.got { background: #F8D028; color: #181818; }
+.gym-final-badge.missing { opacity: 0.34; }
+.gym-final-badge-star { font-size: 24px; line-height: 1; margin-bottom: 4px; }
+.gym-final-badge-name { font-size: 10px; letter-spacing: 0.04em; }
+.gym-final-badge-sub  { font-size: 7px;  margin-top: 4px; opacity: 0.78; }
+
+.gym-final-ctrls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gym-final-badge { animation: none; }
+}
