@@ -286,6 +286,18 @@
     heading.textContent = 'FILLING Q WITH DYNAMIC PROGRAMMING';
     root.appendChild(heading);
 
+    /* Premise — we wrote down P explicitly when we set the battle up
+       (Battle.successors enumerates it). That's the gift that makes DP
+       even possible here; next scene yanks it back. */
+    const premise = document.createElement('div');
+    premise.className = 'dp-premise';
+    premise.innerHTML =
+      '<strong>If we know P</strong> &mdash; the full transition table for ' +
+      'every (s, a, s\') &mdash; <strong>we can compute Q here using dynamic programming!</strong> ' +
+      'Bellman\'s equation is a recursive definition of Q*; sweep it to a fixed point ' +
+      'and we have the optimal action-value for every state.';
+    root.appendChild(premise);
+
     /* Bellman card */
     const fcard = document.createElement('div');
     fcard.className = 'dp-bellman-card';

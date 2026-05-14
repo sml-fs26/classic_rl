@@ -1,10 +1,19 @@
 /* Scene — why DP doesn't scale.
  *
- *   This Pokemon MDP has |S| × |A| = 25 × 4 = 100 entries. Easy.
- *   Real games are millions or more — and you also need to know the
- *   transition probabilities P(s' | s, a), which we usually don't.
+ *   Two reasons DP doesn't survive contact with real RL problems:
  *
- *   Three stat cards + one bridge line.
+ *     1. We usually don't know P. The previous scene's DP sweep only
+ *        worked because we wrote down the transition table ourselves.
+ *        In the wild — playing a real game, controlling a real robot —
+ *        you only get to sample s' from the world, never read P(s'|s,a).
+ *
+ *     2. Even if we *did* know P, computing Q over a realistic state
+ *        space is intractable: a full Pokemon game lives in ~10¹⁵
+ *        positions, a Go endgame in ~10¹⁷⁰. DP's sweep over every
+ *        (s, a) is hopeless.
+ *
+ *   Bridge to SARSA: a sample-based method that never reads P and only
+ *   touches the states the agent actually visits.
  */
 (function () {
   window.scenes = window.scenes || {};
@@ -15,16 +24,49 @@
 
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = "BUT DP DOESN'T SCALE";
+    heading.textContent = "TWO REASONS DP DOESN'T SCALE";
     root.appendChild(heading);
+
+    /* ---- Reason 1: P is unknown in the wild ---- */
+    const r1 = document.createElement('div');
+    r1.className = 'concept-formula-card compact';
+    r1.innerHTML =
+      '<div class="concept-formula-label">REASON 1 — WE DON\'T KNOW P</div>';
+    const r1f = document.createElement('div');
+    r1.appendChild(r1f);
+    window.Katex.render(
+      String.raw`P(s' \mid s, a)\quad\text{is hidden from the agent}`,
+      r1f, true
+    );
+    const r1foot = document.createElement('div');
+    r1foot.className = 'concept-formula-foot';
+    r1foot.textContent =
+      'In the previous scene we wrote P down ourselves. In the wild — a real ' +
+      'game, a real robot — you only get to play. The world hands you one s\' ' +
+      'per step; the table is never on the page.';
+    r1.appendChild(r1foot);
+    root.appendChild(r1);
+
+    /* ---- Reason 2: even with P, the scale is hopeless ---- */
+    const r2head = document.createElement('div');
+    r2head.className = 'concept-formula-card compact';
+    r2head.innerHTML =
+      '<div class="concept-formula-label">REASON 2 — AND IF WE DID, THE SCALE</div>';
+    const r2foot = document.createElement('div');
+    r2foot.className = 'concept-formula-foot';
+    r2foot.textContent =
+      'Even with P in hand, DP\'s sweep visits every (s, a). Realistic MDPs ' +
+      'have too many to enumerate.';
+    r2head.appendChild(r2foot);
+    root.appendChild(r2head);
 
     const grid = document.createElement('div');
     grid.className = 'why-stat-grid';
     grid.innerHTML =
       '<div class="why-stat-card">' +
         '<div class="why-stat-title">PIKACHU MDP</div>' +
-        '<div class="why-stat-value">25 × 4</div>' +
-        '<div class="why-stat-detail">100 Q-entries · feasible by hand.</div>' +
+        '<div class="why-stat-value">25 × 3</div>' +
+        '<div class="why-stat-detail">75 Q-entries · feasible by hand.</div>' +
       '</div>' +
       '<div class="why-stat-card">' +
         '<div class="why-stat-title">FULL POKEMON GAME</div>' +
@@ -37,24 +79,6 @@
         '<div class="why-stat-detail">More positions than atoms.</div>' +
       '</div>';
     root.appendChild(grid);
-
-    /* The second nail in the coffin: we usually don't even *have* the
-       transition model P(s'|s,a). DP needs it. */
-    const issue = document.createElement('div');
-    issue.className = 'concept-formula-card compact';
-    issue.innerHTML =
-      '<div class="concept-formula-label">AND DP REQUIRES THIS</div>';
-    const fhost = document.createElement('div');
-    issue.appendChild(fhost);
-    window.Katex.render(
-      String.raw`P(s' \mid s, a)\quad\text{for every}\; (s, a, s')`,
-      fhost, true
-    );
-    const foot = document.createElement('div');
-    foot.className = 'concept-formula-foot';
-    foot.textContent = "Usually you don't know it. You just get to play.";
-    issue.appendChild(foot);
-    root.appendChild(issue);
 
     /* Bridge to SARSA */
     const q = document.createElement('div');
