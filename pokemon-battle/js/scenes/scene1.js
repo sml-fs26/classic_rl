@@ -26,6 +26,18 @@
     charizard:  'outrage',
   };
 
+  /* Inline Pokeball SVG used by the wild-encounter intro. Red top, white
+     bottom, thick black equatorial band, white centre button. Kept as a
+     module-level constant so the cascade can drop a fresh element on every
+     reset without re-parsing markup. */
+  const POKEBALL_SVG =
+    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+      '<circle cx="12" cy="12" r="10" fill="#FFFFFF" stroke="#181818" stroke-width="1.6"/>' +
+      '<path d="M 2.4 12 A 9.6 9.6 0 0 1 21.6 12 Z" fill="#E84828"/>' +
+      '<line x1="2.4" y1="12" x2="21.6" y2="12" stroke="#181818" stroke-width="2.2"/>' +
+      '<circle cx="12" cy="12" r="2.6" fill="#FFFFFF" stroke="#181818" stroke-width="1.6"/>' +
+    '</svg>';
+
   window.scenes.scene1 = function (root) {
     root.classList.add('scene-pad');
     root.innerHTML = '';
@@ -355,13 +367,68 @@
       document.getElementById('sc1-last').textContent = '—';
       document.getElementById('sc1-rew').textContent = '0';
       document.getElementById('sc1-state').textContent = bucketState();
+
+      /* ---- Wild-encounter intro setup ----
+         Both sprite hosts start hidden (opacity 0). The opponent flashes
+         in BEFORE "A wild CHARMANDER appeared!"; then a Pokeball arcs in
+         from off-screen-left, lands on the player platform, pops open,
+         and Pikachu materializes BEFORE "Go! PIKACHU!". We strip any
+         lingering intro classes from a prior play-through first so the
+         keyframes can re-trigger. */
+      const oppHost = stage.querySelector('.sprite-host.opponent');
+      const plyHost = stage.querySelector('.sprite-host.player');
+      if (oppHost) {
+        oppHost.classList.remove('sc1-wild-appear', 'sc1-materialize', 'sc1-hidden');
+        oppHost.classList.add('sc1-hidden');
+      }
+      if (plyHost) {
+        plyHost.classList.remove('sc1-wild-appear', 'sc1-materialize', 'sc1-hidden');
+        plyHost.classList.add('sc1-hidden');
+      }
+      /* Also clean up any stray Pokeball element left behind by a
+         cancelled intro. */
+      const oldBalls = stage.querySelectorAll('.sc1-pokeball');
+      for (let i = 0; i < oldBalls.length; i++) oldBalls[i].remove();
+
       /* Disable move buttons during the intro cascade. The user can't act
          until the third dialog ("What will PIKACHU do?") lands. */
       setBusy(true);
+
+      /* Tiny tick so the browser commits the .sc1-hidden state before we
+         strip it; otherwise the wild-appear keyframe can be skipped when
+         the host already had no classes. */
+      await wait(80);
+      if (episode !== myEp) return;
+      if (oppHost) {
+        oppHost.classList.remove('sc1-hidden');
+        oppHost.classList.add('sc1-wild-appear');
+      }
+      await wait(450);
+      if (episode !== myEp) return;
+
       await dialogSay(T('battle.opening_wild'));
       if (episode !== myEp) return;
-      await wait(800);
+      await wait(400);
       if (episode !== myEp) return;
+
+      /* Pokeball arc → land → open. */
+      const ball = document.createElement('div');
+      ball.className = 'sc1-pokeball sc1-pokeball-arc';
+      ball.innerHTML = POKEBALL_SVG;
+      stage.appendChild(ball);
+      await wait(620);
+      if (episode !== myEp) { try { ball.remove(); } catch (_e) {} return; }
+
+      ball.classList.remove('sc1-pokeball-arc');
+      ball.classList.add('sc1-pokeball-open');
+      if (plyHost) {
+        plyHost.classList.remove('sc1-hidden');
+        plyHost.classList.add('sc1-materialize');
+      }
+      setTimeout(() => { try { ball.remove(); } catch (_e) {} }, 320);
+      await wait(360);
+      if (episode !== myEp) return;
+
       await dialogSay(T('battle.go_pika'));
       if (episode !== myEp) return;
       await wait(800);
