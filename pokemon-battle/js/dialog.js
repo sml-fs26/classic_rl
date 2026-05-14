@@ -54,6 +54,13 @@
       }
       revealIdx++;
       text.textContent = currentText.slice(0, revealIdx);
+      /* Gen-1 ticks one pip per visible character — every 3rd char keeps
+         the rhythm without crowding the music. Skip whitespace so spaces
+         don't beat at twice the rate of letters. */
+      const ch = currentText.charAt(revealIdx - 1);
+      if (window.SFX && revealIdx % 3 === 0 && /\S/.test(ch)) {
+        window.SFX.play('tick');
+      }
       timer = setTimeout(tick, 45);
     }
 

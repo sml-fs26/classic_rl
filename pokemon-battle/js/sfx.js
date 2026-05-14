@@ -14,6 +14,8 @@
  *     miss       — attack whiffed           (descending phew)
  *     win        — victory cue              (4-note major arpeggio)
  *     loss       — defeat cue               (3-note descending minor)
+ *     tick       — dialog typewriter blip   (~20 ms square pip)
+ *     cursor     — menu cursor blip         (~70 ms two-note pip)
  *
  *   The audio context is created lazily on first .play() — but because
  *   browsers block AudioContext until a user gesture, callers should
@@ -219,6 +221,24 @@
       /* Bass anchor on the final note */
       osc({ type: 'square', freqStart: 261.63,
             when: t0 + 3 * dt, duration: 0.30, peak: 0.22, release: 0.08 });
+    },
+
+    /* TICK — quick square pip per dialog character. Quiet by design; this
+       fires many times in a row so it has to sit under the page music. */
+    tick(t0) {
+      osc({ type: 'square', freqStart: 1800, freqEnd: 1500, sweepType: 'exp',
+            when: t0, duration: 0.022, peak: 0.10,
+            attack: 0.002, release: 0.012 });
+    },
+
+    /* CURSOR — two-note pip on menu navigation / scene step. */
+    cursor(t0) {
+      osc({ type: 'square', freqStart: 660,
+            when: t0, duration: 0.045, peak: 0.22,
+            attack: 0.003, release: 0.020 });
+      osc({ type: 'square', freqStart: 990,
+            when: t0 + 0.030, duration: 0.050, peak: 0.20,
+            attack: 0.003, release: 0.022 });
     },
 
     /* LOSS — 3-note descending minor (G4 Eb4 C4) + low rumble */

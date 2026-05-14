@@ -65,6 +65,79 @@
   --hue-snakes:  #C8902C;     /* gold — Snakes & Ladders sibling */
 }
 
+:root[data-theme="gb"] {
+  /* Game Boy DMG green — the original 4-shade pea-soup palette:
+       #0F380F  darkest   (ink)
+       #306230  dark      (secondary ink)
+       #8BAC0F  light     (box backgrounds)
+       #9BBC0F  lightest  (page background)
+     Every brand colour (HP buckets, hue chips, CB-safe markers) maps
+     onto one of those four shades so the whole viz looks like it's
+     running on a stock DMG screen. */
+
+  --sky-top:        #9BBC0F;
+  --sky-bottom:     #8BAC0F;
+  --grass:          #306230;
+  --grass-rim:      #0F380F;
+
+  --bg:             #9BBC0F;
+  --bg-strong:      #8BAC0F;
+  --ink:            #0F380F;
+  --ink-on-box:     #0F380F;
+  --ink-secondary:  #306230;
+  --rule:           #0F380F;
+  --card-bg:        #8BAC0F;
+  --inner-highlight:#306230;
+  --pikachu-yellow: #9BBC0F;
+  --pikachu-cheek:  #0F380F;
+  --charmander-orange:#306230;
+  --hp-green:       #0F380F;
+  --hp-yellow:      #306230;
+  --hp-red:         #0F380F;
+  --damage-text:    #9BBC0F;
+  --damage-stroke:  #0F380F;
+
+  --hue-anymal:  #0F380F;
+  --hue-casino:  #0F380F;
+  --hue-ghost:   #0F380F;
+  --hue-star:    #306230;
+  --hue-door:    #306230;
+  --hue-snakes:  #306230;
+
+  /* Colour-blind palette — collapse to 2 shades so the heatmap still
+     shows pos/neg via lightness, the only channel DMG has. */
+  --cb-blue:             #0F380F;
+  --cb-blue-light:       #306230;
+  --cb-vermillion:       #0F380F;
+  --cb-vermillion-light: #306230;
+  --cb-bluish-green:     #306230;
+  --cb-yellow:           #8BAC0F;
+  --cb-orange:           #0F380F;
+  --cb-sky:              #306230;
+  --cb-purple:           #0F380F;
+}
+
+/* GB sprite tint — fold every PNG sprite onto the DMG green ramp.
+   grayscale→sepia→hue-rotate gets us a green wash; contrast bumps
+   reproduce the chunky look of the original 4-shade screen. */
+:root[data-theme="gb"] .poke-sprite,
+:root[data-theme="gb"] .traj-box-sprite,
+:root[data-theme="gb"] .q-thumb-sprite,
+:root[data-theme="gb"] .sd-f-tape-sprite,
+:root[data-theme="gb"] .sc0-bn-sprite {
+  filter: grayscale(1) sepia(1) saturate(3.5) hue-rotate(25deg) contrast(1.15) brightness(0.92);
+}
+
+/* DMG HP-bar fills — collapse the green/yellow/orange/red ramp onto
+   light/dark green so the bar still drains visually but stays in
+   palette. */
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="0"] { background: #0F380F; }
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="1"] { background: #0F380F; }
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="2"] { background: #306230; }
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="3"] { background: #306230; }
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="4"] { background: #306230; }
+:root[data-theme="gb"] .hp-bar-track { background: #8BAC0F; }
+
 :root[data-theme="dark"] {
   /* Battle screen — Night */
   --sky-top:        #1A2548;
@@ -300,6 +373,18 @@ html, body {
   image-rendering: -moz-crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;
   display: block;
+  /* Idle breathing — 1.5 px vertical bob on a 2.4s cycle. The
+     animation property is replaced wholesale by .shake / .faint when
+     those classes are added, so it cleanly pauses during damage and
+     KO animations. */
+  animation: poke-breathe 2.4s ease-in-out infinite;
+}
+@keyframes poke-breathe {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .poke-sprite { animation: none; }
 }
 .poke-sprite.shake {
   animation: poke-shake 320ms steps(1, end);

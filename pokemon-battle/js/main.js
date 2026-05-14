@@ -157,24 +157,39 @@
         dot.className = 'dot';
         dot.type = 'button';
         dot.setAttribute('aria-label', `Go to scene ${i}`);
-        dot.addEventListener('click', () => goTo(i));
+        dot.addEventListener('click', () => { cursorBlip(); goTo(i); });
         pager.appendChild(dot);
       }
     }
 
+    function cursorBlip() { if (window.SFX) window.SFX.play('cursor'); }
+
+    /* Delegated cursor-blip for every scene control button (.poke-btn) —
+       STEP / RUN ALL / RESET / NEXT TRANSITION / REROLL / CLEAR q / etc.
+       The pager-btn/dot buttons fire cursorBlip directly above so they
+       are not double-handled. */
+    document.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t && t.classList && t.classList.contains('poke-btn') && !t.disabled) {
+        cursorBlip();
+      }
+    });
+
     const prev = document.getElementById('prev-btn');
     const next = document.getElementById('next-btn');
-    if (prev) prev.addEventListener('click', () => goTo(current - 1));
-    if (next) next.addEventListener('click', () => goTo(current + 1));
+    if (prev) prev.addEventListener('click', () => { cursorBlip(); goTo(current - 1); });
+    if (next) next.addEventListener('click', () => { cursorBlip(); goTo(current + 1); });
 
     window.addEventListener('keydown', (e) => {
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const st = sceneState[current];
       if (e.key === 'ArrowRight') {
+        cursorBlip();
         const handled = st && typeof st.onNextKey === 'function' && st.onNextKey();
         if (!handled) goTo(current + 1);
       } else if (e.key === 'ArrowLeft') {
+        cursorBlip();
         const handled = st && typeof st.onPrevKey === 'function' && st.onPrevKey();
         if (!handled) goTo(current - 1);
       }
