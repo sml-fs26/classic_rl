@@ -82,6 +82,20 @@
   margin-top: 6px;
   font-size: 14px;
 }
+.sc0-mdp-markov {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 80ch;
+  margin: 0 auto 6px;
+  padding: 8px 12px;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  text-align: center;
+}
+.sc0-mdp-markov b  { color: var(--pikachu-cheek); }
+.sc0-mdp-markov em { color: var(--cb-blue); font-style: normal; }
 .sc0-mdp-sub {
   text-align: center;
   margin: 0;

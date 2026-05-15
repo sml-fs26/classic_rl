@@ -34,6 +34,19 @@
     heading.textContent = T('mdp.heading');
     wrap.appendChild(heading);
 
+    /* Markov-assumption sidebar — a small line under the heading
+       calling out the assumption explicitly so students don't take
+       it for granted.  Mentions where the assumption breaks (sleep
+       counters, paralysis, items) so we're honest about the
+       abstraction. */
+    const markov = document.createElement('div');
+    markov.className = 'sc0-mdp-markov';
+    markov.innerHTML =
+      '<b>MARKOV ASSUMPTION:</b> the next (state, reward) depends only on the <em>current</em> ' +
+      '(state, action), not the full history.  We assume it holds here.  Sleep counters, paralysis, and held items ' +
+      'would break it in a real Pokemon game — we abstract them away.';
+    wrap.appendChild(markov);
+
     /* The battle stage. Sprites are visible from step 0; HP bars + move
        menu are gated by .show classes that we toggle in applyStep. */
     const stage = document.createElement('div');
