@@ -196,6 +196,84 @@
     c2.appendChild(foot2);
     root.appendChild(c2);
 
+    /* ---- Variance illustration ---- */
+    const variance = document.createElement('div');
+    variance.className = 'g-variance';
+    variance.innerHTML =
+      '<div class="g-variance-title">Q* IS THE EXPECTED G — VARIANCE LIVES IN ONE TRAJECTORY</div>' +
+      '<div class="g-variance-body">' +
+        '<div class="g-variance-explainer">' +
+          'G<sub>1</sub>(τ) is a <em>random variable</em>. Two rollouts from the same start can land far apart. ' +
+          'Q* is the <b>average</b> over that distribution.  Press SAMPLE to draw 20 trajectories from the start state ' +
+          'under <span class="g-r">always-THUNDERBOLT</span>; each bar is one G<sub>1</sub>.  The dashed line is the mean — ' +
+          'an estimate of Q*(FULL/FULL, THUNDERBOLT).' +
+        '</div>' +
+        '<div class="g-variance-right">' +
+          '<div class="g-variance-stats" id="g-variance-stats">N = 0 · mean — · range —</div>' +
+          '<div class="g-variance-chart" id="g-variance-chart"></div>' +
+          '<button class="poke-btn" id="g-variance-sample">▶ SAMPLE 20 TRAJECTORIES</button>' +
+        '</div>' +
+      '</div>';
+    root.appendChild(variance);
+
+    /* Sample one trajectory under the THUNDERBOLT policy from the FULL/FULL
+       initial state.  Returns G_1 (total reward to terminal). */
+    let varianceRngSeed = 20260516;
+    function sampleOneG() {
+      varianceRngSeed = (varianceRngSeed + 1013904223) | 0;
+      const rng = window.Battle.makeRng(varianceRngSeed >>> 0);
+      let state = window.Battle.initialState();
+      let G = 0;
+      for (let t = 0; t < 30; t++) {
+        const out = window.Battle.sample(state, 'thunderbolt', rng);
+        G += out.reward;
+        state = out.sNext;
+        if (state.terminal) break;
+      }
+      return G;
+    }
+
+    const G_samples = [];
+    function drawSamples(n) {
+      for (let i = 0; i < n; i++) G_samples.push(sampleOneG());
+      renderVarianceChart();
+    }
+    function renderVarianceChart() {
+      const stats = document.getElementById('g-variance-stats');
+      const chart = document.getElementById('g-variance-chart');
+      if (!chart || !stats) return;
+      if (G_samples.length === 0) {
+        stats.innerHTML = 'N = 0 · mean — · range —';
+        chart.innerHTML = '<div class="g-variance-empty">(no samples yet — press SAMPLE to draw 20)</div>';
+        return;
+      }
+      const mean = G_samples.reduce((a, b) => a + b, 0) / G_samples.length;
+      const lo = Math.min(...G_samples);
+      const hi = Math.max(...G_samples);
+      stats.innerHTML =
+        'N = <b>' + G_samples.length + '</b> · mean <b>' + (mean >= 0 ? '+' : '') + mean.toFixed(2) + '</b> · range [<b>' +
+        (lo >= 0 ? '+' : '') + lo + '</b>, <b>' + (hi >= 0 ? '+' : '') + hi + '</b>]';
+      /* Render each sample as a horizontal bar, ordered by G (descending),
+         left-anchored, width proportional to |G|.  Positive = blue, negative = vermillion. */
+      const sorted = G_samples.slice().sort((a, b) => b - a);
+      const maxAbs = Math.max(Math.abs(lo), Math.abs(hi), 1);
+      const meanPct = ((mean + maxAbs) / (2 * maxAbs)) * 100;
+      let html = '<div class="g-variance-zero"></div>';
+      html += '<div class="g-variance-mean" style="left:' + meanPct.toFixed(1) + '%"><span>μ = ' + (mean >= 0 ? '+' : '') + mean.toFixed(2) + '</span></div>';
+      for (const g of sorted) {
+        const sign = g >= 0 ? 'pos' : 'neg';
+        const width = (Math.abs(g) / maxAbs) * 50;            /* up to 50 % of width either side of centre */
+        const offset = g >= 0 ? 50 : (50 - width);            /* anchor at zero line */
+        html +=
+          '<div class="g-variance-bar ' + sign + '" style="left:' + offset.toFixed(2) + '%; width:' + width.toFixed(2) + '%">' +
+            '<span class="g-variance-bar-label">' + (g >= 0 ? '+' : '') + g + '</span>' +
+          '</div>';
+      }
+      chart.innerHTML = html;
+    }
+    document.getElementById('g-variance-sample').addEventListener('click', () => drawSamples(20));
+    renderVarianceChart();
+
     return {};
   };
 })();

@@ -525,3 +525,134 @@
   margin-top: 6px;
   color: var(--ink-secondary);
 }
+
+/* ============================================================
+   Variance illustration in the Objective scene
+   ----------------------------------------------------------------
+   "Q* is the EXPECTED G — variance lives in one trajectory."  20
+   sampled G_1 values rendered as horizontal bars; mean drawn as a
+   dashed vertical line.  Sits below the Q* formula card.
+   ============================================================ */
+.g-variance {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  margin-top: 14px;
+  padding: 14px 18px;
+  color: var(--ink-on-box);
+}
+.g-variance-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  text-align: center;
+  margin-bottom: 10px;
+}
+.g-variance-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 16px;
+  align-items: start;
+}
+.g-variance-explainer {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+}
+.g-variance-explainer em { color: var(--cb-blue); font-style: normal; }
+.g-variance-explainer b  { color: var(--pikachu-cheek); }
+.g-variance-explainer .g-r { color: var(--hue-ghost); }
+
+.g-variance-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.g-variance-stats {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  color: var(--ink-on-box);
+  text-align: center;
+}
+.g-variance-stats b { color: var(--pikachu-cheek); }
+.g-variance-chart {
+  position: relative;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  min-height: 200px;
+  padding: 4px 0;
+  overflow: hidden;
+}
+.g-variance-empty {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: center;
+  padding: 30px 10px;
+}
+.g-variance-zero {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--ink);
+  opacity: 0.25;
+  z-index: 1;
+}
+.g-variance-mean {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: var(--pikachu-cheek);
+  z-index: 3;
+  border-left: 2px dashed var(--pikachu-cheek);
+  background: transparent;
+}
+.g-variance-mean span {
+  position: absolute;
+  top: -2px;
+  left: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: var(--pikachu-cheek);
+  background: var(--bg);
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+.g-variance-bar {
+  position: relative;
+  height: 8px;
+  margin: 2px 0;
+  display: flex;
+  align-items: center;
+  animation: g-variance-bar-grow 280ms ease-out;
+}
+.g-variance-bar.pos { background: var(--cb-blue); }
+.g-variance-bar.neg { background: var(--cb-vermillion); }
+.g-variance-bar-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  color: var(--ink-on-box);
+  padding: 0 4px;
+  position: absolute;
+  white-space: nowrap;
+}
+.g-variance-bar.pos .g-variance-bar-label { right: -28px; }
+.g-variance-bar.neg .g-variance-bar-label { left:  -28px; }
+@keyframes g-variance-bar-grow {
+  0%   { transform: scaleX(0); transform-origin: 0 50%; }
+  100% { transform: scaleX(1); transform-origin: 0 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .g-variance-bar { animation: none; }
+}
+
+#g-variance-sample {
+  align-self: center;
+  margin-top: 6px;
+}
