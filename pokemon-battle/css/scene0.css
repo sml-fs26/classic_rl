@@ -89,6 +89,46 @@
 .sc0-tuple {
   margin-top: 6px;
 }
+
+/* ---------- Side-by-side layout ----------
+   Stage on the left, control column (menu + caption + step controls)
+   on the right.  Total page height now fits in one viewport so the
+   student can see the tag on the stage AND the caption explaining it
+   without scrolling.  See the JS comment in sceneMdpOverlay.js. */
+.sc0-mdp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 360px);
+  gap: 18px;
+  width: 100%;
+  align-items: start;
+}
+.sc0-mdp-row .battle-stage {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+.sc0-mdp-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  align-self: stretch;
+}
+.sc0-mdp-right .sc0-menu-wrap {
+  margin: 0;
+  max-width: none;
+  width: 100%;
+}
+.sc0-mdp-right .sc0-mdp-ctrls {
+  margin-top: auto;        /* push to bottom of the right column */
+  justify-content: flex-start;
+}
+.sc0-mdp-right .sc0-mdp-caption {
+  text-align: left;
+  margin-top: 0;
+  max-width: none;
+}
+
 .sc0-mdp-caption {
   margin-top: 4px;
   text-align: center;

@@ -77,7 +77,20 @@
     `;
     stage.appendChild(overlay);
 
-    wrap.appendChild(stage);
+    /* Side-by-side layout — stage on the left, control column (menu +
+       caption + step controls) on the right.  Lets the whole scene fit
+       in one viewport without scrolling, which matters because the
+       step ladder asks the student to compare the tag positions on
+       the stage with the caption beat-by-beat. */
+    const row = document.createElement('div');
+    row.className = 'sc0-mdp-row';
+    wrap.appendChild(row);
+
+    row.appendChild(stage);
+
+    const rightCol = document.createElement('div');
+    rightCol.className = 'sc0-mdp-right';
+    row.appendChild(rightCol);
 
     /* Static move menu (disabled) — appears at step 2. Uses the same
        Moves.moveSubHtml renderer as scene 1 so the layout matches what
@@ -95,12 +108,12 @@
       menu.appendChild(btn);
     }
     menuWrap.appendChild(menu);
-    wrap.appendChild(menuWrap);
+    rightCol.appendChild(menuWrap);
 
     /* Caption + step controls */
     const caption = document.createElement('div');
     caption.className = 'poke-caption sc0-mdp-caption';
-    wrap.appendChild(caption);
+    rightCol.appendChild(caption);
 
     const ctrls = document.createElement('div');
     ctrls.className = 'sc0-mdp-ctrls';
@@ -108,7 +121,7 @@
       '<button class="poke-btn" id="mdp-overlay-prev">' + T('mdp.prev') + '</button>' +
       '<div class="sc0-mdp-step">' + T('mdp.step_of') + '</div>' +
       '<button class="poke-btn" id="mdp-overlay-next">' + T('mdp.next') + '</button>';
-    wrap.appendChild(ctrls);
+    rightCol.appendChild(ctrls);
 
     const hint = document.createElement('div');
     hint.className = 'footnote';
