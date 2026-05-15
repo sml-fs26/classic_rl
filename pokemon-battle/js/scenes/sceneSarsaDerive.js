@@ -127,6 +127,20 @@
       body: '',     /* Left column becomes the step-detail panel; no card body. */
       latex: [],
     },
+    {
+      id: 'G',
+      title: 'G — ONE LINE → Q-LEARNING (OFF-POLICY)',
+      body:
+        '<b>SARSA</b> targets <span class="sd-q-est">r + q[s′, <em>a′</em>]</span> — the action <em>actually taken</em> at s′ ' +
+        'under the current ε-greedy policy. <b>Q-learning</b> targets <span class="sd-q-est">r + max<sub>a′</sub> q[s′, a′]</span> — ' +
+        'the <em>best</em> action available at s′, regardless of what the policy picked. One operator changes: sampled → argmax. ' +
+        'Q-learning is <b>off-policy</b>: its target is independent of the behaviour policy.',
+      latex: [
+        String.raw`\textbf{SARSA target:} \quad r \;+\; \mathtt{q}[s', \; a']`,
+        String.raw`\textbf{Q-learning target:} \quad r \;+\; \max_{a'} \mathtt{q}[s', \; a']`,
+      ],
+      foot: 'As ε → 0 the policy becomes greedy and the two targets agree.  Otherwise they differ.',
+    },
   ];
 
   /* ---------- Helpers ---------- */
@@ -458,6 +472,15 @@
       renderFTape();
     }
 
+    function illusG() {
+      /* Q-learning extension step.  The Q-table on the right retains
+         whatever state F left behind so the comparison feels like it
+         continues from there. */
+      cap.textContent = '← SARSA targets the sampled a′; Q-LEARNING targets max over a′.  Same q, two different teachers.';
+      qtbl.update(Q, { suppressFlash: true });
+      renderFTape();
+    }
+
     /* ==========================================================
        F-step live demo plumbing
        ========================================================== */
@@ -540,7 +563,7 @@
     function renderFDetail() {
       const ctrls = fControlsHTML();
       const head =
-        '<div class="sd-card-num">STEP 8 / 8</div>' +
+        '<div class="sd-card-num">STEP 8 / ' + STEPS.length + '</div>' +
         '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
         ctrls;
 
@@ -726,6 +749,7 @@
         case 'E2': illusE2(); break;
         case 'E3': illusE3(); break;
         case 'E4': illusE4(); break;
+        case 'G':  illusG();  break;
       }
     }
 
