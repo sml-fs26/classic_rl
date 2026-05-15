@@ -206,7 +206,7 @@
     const legend = document.createElement('div');
     legend.className = 'sd-legend';
     legend.innerHTML =
-      '<span class="sd-legend-chip q">Q(s, a)</span><span>true (unknown) action-value function</span>' +
+      '<span class="sd-legend-chip q">Q*(s, a)</span><span>true (unknown) optimal action-value function</span>' +
       '<span class="sd-legend-chip q-est">q[s, a]</span><span>our table estimate — typewriter q</span>';
     root.appendChild(legend);
 

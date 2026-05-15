@@ -1,14 +1,14 @@
 /* Scene — π* from Q.
  *
- *   Once Q is known, the optimal policy is just argmax_a Q(s, a). The
+ *   Once Q* is known, the optimal policy is just argmax_a Q*(s, a). The
  *   abstract formula sits at the top. Below it, a looping demo battle
  *   makes the argmax tangible:
  *
- *     For the current state, the Q-panel on the right lists all three
- *     Q(s, a) values, with the argmax row highlighted as π*(s). After
+ *     For the current state, the Q*-panel on the right lists all three
+ *     Q*(s, a) values, with the argmax row highlighted as π*(s). After
  *     a beat, PIKACHU plays that action; CHARMANDER counters; HP bars
- *     drop; state advances; Q-panel updates with the new state's
- *     Q-values; argmax re-highlighted. After WIN or LOSS, banner pause,
+ *     drop; state advances; Q*-panel updates with the new state's
+ *     Q*-values; argmax re-highlighted. After WIN or LOSS, banner pause,
  *     reset, repeat.
  *
  *   Q*(s, a) is computed once on mount via plain value iteration.
@@ -96,9 +96,9 @@
     const premise = document.createElement('div');
     premise.className = 'qstar-premise';
     premise.innerHTML =
-      'In each state, the optimal play is to pick the action that reaches ' +
-      '<span class="qstar-q-star">Q*(s) = max<sub>a</sub> Q(s, a)</span>. ' +
-      'So if we had the Q-table in hand, we would just argmax it.';
+      'In each state, the optimal play is to pick the action that achieves ' +
+      '<span class="qstar-q-star">max<sub>a</sub> Q*(s, a)</span>. ' +
+      'So if we had the Q*-table in hand, we would just argmax it.';
     root.appendChild(premise);
 
     /* ---- Optimal-policy formula card ---- */
@@ -108,12 +108,12 @@
     const f = document.createElement('div');
     fcard.appendChild(f);
     window.Katex.render(
-      String.raw`\pi^{\star}(s) \;=\; \operatorname*{arg\,max}_{a}\; Q(s, a)`,
+      String.raw`\pi^{\star}(s) \;=\; \operatorname*{arg\,max}_{a}\; Q^{\star}(s, a)`,
       f, true
     );
     const foot = document.createElement('div');
     foot.className = 'concept-formula-foot';
-    foot.textContent = 'In every state, pick the move with the highest Q.';
+    foot.textContent = 'In every state, pick the action with the highest Q*.';
     fcard.appendChild(foot);
     root.appendChild(fcard);
 

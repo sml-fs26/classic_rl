@@ -19,7 +19,7 @@
     { key: 'scene1',           titleKey: 'scene.battle',      title: 'A wild CHARMANDER appeared!',  music: 'battle'   },
     { key: 'sceneMdpOverlay',  titleKey: 'scene.mdp',         title: 'What makes this an MDP?',      music: 'title'    },
     { key: 'sceneTrajectory',  titleKey: 'scene.trajectory',  title: 'The trajectory',               music: 'concept'  },
-    { key: 'sceneObjective',   titleKey: 'scene.objective',   title: 'Return & the Q-function',      music: 'concept'  },
+    { key: 'sceneObjective',   titleKey: 'scene.objective',   title: 'Return & Q*',                   music: 'concept'  },
     { key: 'sceneQstar',       titleKey: 'scene.qstar',       title: 'π* from Q',                    music: 'concept'  },
     { key: 'sceneDp',          titleKey: 'scene.dp',          title: 'Filling Q with DP',            music: 'dp'       },
     { key: 'sceneWhyNotDp',    titleKey: 'scene.whyNotDp',    title: "Why DP doesn't scale",         music: 'bridge'   },

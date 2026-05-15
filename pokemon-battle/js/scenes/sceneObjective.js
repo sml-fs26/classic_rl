@@ -1,4 +1,4 @@
-/* Scene — Return and the Q-function.
+/* Scene — Return and the optimal action-value Q*.
  *
  *   Three pieces, stacked:
  *
@@ -178,35 +178,37 @@
     }
     rerender();
 
-    /* ---- Q formula card ---- */
+    /* ---- Q* formula card ---- */
     const c2 = document.createElement('div');
     c2.className = 'concept-formula-card';
-    c2.innerHTML = '<div class="concept-formula-label">ACTION-VALUE FUNCTION</div>';
+    c2.innerHTML = '<div class="concept-formula-label">OPTIMAL ACTION-VALUE FUNCTION Q*</div>';
     const f2 = document.createElement('div');
     c2.appendChild(f2);
     window.Katex.render(
-      String.raw`Q(s, a) \;=\; \mathbb{E}_{\tau}\!\left[\, G_i(\tau) \;\middle|\; s_i = s,\; a_i = a \,\right]`,
+      String.raw`Q^{\star}(s, a) \;=\; \max_{\pi}\; \mathbb{E}_{\tau \sim \pi}\!\left[\, G_i(\tau) \;\middle|\; s_i = s,\; a_i = a \,\right]`,
       f2, true
     );
     const foot2 = document.createElement('div');
     foot2.className = 'concept-formula-foot';
-    foot2.textContent = 'Average of G_i(τ) over all trajectories τ that pass through s with action a.';
+    foot2.textContent =
+      'The expected return when you take action a in state s and then play optimally thereafter. ' +
+      'This is what the agent ultimately wants to know — once you have Q*, optimal play is just argmax_a Q*(s, a).';
     c2.appendChild(foot2);
     root.appendChild(c2);
 
-    /* ---- Q* card ---- */
+    /* ---- V* via Q* card ---- */
     const c3 = document.createElement('div');
     c3.className = 'concept-formula-card';
-    c3.innerHTML = '<div class="concept-formula-label">OPTIMAL ACTION-VALUE</div>';
+    c3.innerHTML = '<div class="concept-formula-label">BEST-ACTION VALUE AT STATE s</div>';
     const f3 = document.createElement('div');
     c3.appendChild(f3);
     window.Katex.render(
-      String.raw`Q^{\star}(s) \;=\; \max_{a}\; Q(s, a)`,
+      String.raw`Q^{\star}(s) \;=\; \max_{a}\; Q^{\star}(s, a)`,
       f3, true
     );
     const foot3 = document.createElement('div');
     foot3.className = 'concept-formula-foot';
-    foot3.textContent = 'The best Q-value reachable from state s.';
+    foot3.textContent = 'The best Q* reachable from state s — the value of acting optimally from here on.';
     c3.appendChild(foot3);
     root.appendChild(c3);
 
