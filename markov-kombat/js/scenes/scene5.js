@@ -1,8 +1,8 @@
-/* Scene 5 — "You've trained PIKACHU."
+/* Scene 5 — Kombat League: FLAWLESS POLICY.
  *
- * Six recap cards in Pokemon-dialog-box style, one per prior viz (anymal,
+ * Six recap cards in MK-dialog-box style, one per prior viz (anymal,
  * casino, spooky, darts, sarsa-cliffwalk, snakes-ladders), each citing the
- * piece that became the corresponding part of this battle. Closes with a
+ * piece that became the corresponding part of this kombat. Closes with a
  * one-line where-this-goes-next caption.
  */
 (function () {
@@ -12,22 +12,23 @@
     root.classList.add('scene-pad', 'sc5-scene');
     root.innerHTML = '';
 
-    /* Pokemon-League HALL OF FAME banner — sits above the existing
-       heading and frames the scene as a victory screen. */
+    /* Kombat League victory banner — frames the scene as the post-
+       tournament Hall of Fame screen. */
     const banner = document.createElement('div');
     banner.className = 'sc5-hof-banner';
-    banner.innerHTML = '<span class="sc5-star">★</span> HALL OF FAME <span class="sc5-star">★</span>';
+    banner.innerHTML = '<span class="sc5-star">★</span> KOMBAT LEAGUE KHAMPION <span class="sc5-star">★</span>';
     root.appendChild(banner);
 
     const heading = document.createElement('h2');
     heading.className = 'poke-section-title sc5-heading';
-    heading.textContent = "YOU'VE TRAINED PIKACHU.";
+    heading.textContent = "FLAWLESS POLICY.  SUB-OPTIMAL DEFEATED.";
     root.appendChild(heading);
 
     const sub = document.createElement('div');
     sub.className = 'poke-caption sc5-sub';
     sub.textContent =
-      'The five RL pieces are the same five pieces that fit Snakes & Ladders. Two cultural artefacts, one curriculum.';
+      'The same RL ingredients drove anymal locomotion, the casino bandits, Spooky House cycles, Robbins-Monro darts, ' +
+      'the cliff-walk capstone, and Snakes & Ladders.  Different skins.  One skeleton.';
     root.appendChild(sub);
 
     const wrap = document.createElement('div');
@@ -69,9 +70,9 @@
     closer.innerHTML =
       '<span class="hue-chip hue-poke">WHERE THIS GOES NEXT</span>' +
       '<div class="sc5-closer-text">' +
-      'Bigger problems scale the same five pieces. Real Pokemon AIs — type matching, team building, Z-Move selection — ' +
-      'use the same MDP / Bellman / SARSA bones. So do robots, recommender systems, and game-playing agents at the ' +
-      'frontier. You now know the bones.' +
+      'Bigger fighting games scale the same skeleton.  Real competitive Mortal Kombat AI — ' +
+      'frame-data lookup, matchup tables, neutral-game decisions — runs on the same MDP / Bellman / SARSA bones.  ' +
+      'So do robots, recommender systems, and frontier RL agents.  You now know the bones.' +
       '</div>';
     root.appendChild(closer);
 

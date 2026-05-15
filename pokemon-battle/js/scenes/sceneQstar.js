@@ -165,7 +165,7 @@
     /* ---- Closing question (bridge to sceneDp) ---- */
     const q = document.createElement('div');
     q.className = 'concept-key-question';
-    q.textContent = 'BUT HOW DO WE COMPUTE Q ?';
+    q.textContent = 'BUT HOW DO WE COMPUTE Q* ?';
     root.appendChild(q);
 
     /* ---- Demo state machine ---- */

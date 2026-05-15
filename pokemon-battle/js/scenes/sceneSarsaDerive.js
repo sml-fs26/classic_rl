@@ -79,7 +79,10 @@
         String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\!\left[\, R \;+\; Q^{\star}(S', A') \,\right]`,
         String.raw`\phantom{Q^{\star}(s, a)}\;\approx\; r \;+\; Q^{\star}(s', a')`,
       ],
-      foot: 'One-sample Monte-Carlo estimate of the right-hand side.',
+      foot:
+        'One-sample Monte-Carlo estimate of the right-hand side. ' +
+        '<em>Subtle:</em> with A′ from our ε-greedy policy, the LHS is technically Q under the current policy ' +
+        '(not Q*); as ε → 0 the policy becomes greedy and q → Q*. This is what makes SARSA <em>on-policy</em>.',
     },
     {
       id: 'E2',

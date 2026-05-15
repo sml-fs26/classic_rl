@@ -79,15 +79,18 @@
     charizard:  [[2, 0.50], [3, 0.50]],              /* Outrage      */
   };
 
+  /* MK character forms — same three internal keys as Pokemon's
+     charmander/charmeleon/charizard, just relabelled.  Keeping the
+     keys identical lets every call site work unchanged. */
   const FORM_DISPLAY_NAME = {
-    charmander: 'CHARMANDER',
-    charmeleon: 'CHARMELEON',
-    charizard:  'CHARIZARD',
+    charmander: 'SUB-OPTIMAL',
+    charmeleon: 'SUB-OPTIMAL (FROST-CRACKED)',
+    charizard:  'SUB-OPTIMAL (KHAOS)',
   };
   const FORM_MOVE_NAME = {
-    charmander: 'EMBER',
-    charmeleon: 'FLAMETHROWER',
-    charizard:  'OUTRAGE',
+    charmander: 'ICY HOOK',
+    charmeleon: 'FROZEN AURA',
+    charizard:  'KHAOS RAGE',
   };
   const FORM_SPRITE = {
     charmander: 'assets/charmander-front.png',

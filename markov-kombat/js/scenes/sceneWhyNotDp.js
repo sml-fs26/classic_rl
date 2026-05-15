@@ -24,7 +24,7 @@
 
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = "TWO REASONS DP DOESN'T SCALE";
+    heading.textContent = "THE OUTWORLD IS TOO BIG — TWO REASONS DP DOESN'T SCALE";
     root.appendChild(heading);
 
     /* ---- Reason 1: P is unknown in the wild ---- */
@@ -64,14 +64,14 @@
     grid.className = 'why-stat-grid';
     grid.innerHTML =
       '<div class="why-stat-card">' +
-        '<div class="why-stat-title">PIKACHU MDP</div>' +
+        '<div class="why-stat-title">KOMBAT MDP</div>' +
         '<div class="why-stat-value">25 × 3</div>' +
         '<div class="why-stat-detail">75 Q-entries · feasible by hand.</div>' +
       '</div>' +
       '<div class="why-stat-card">' +
-        '<div class="why-stat-title">FULL POKEMON GAME</div>' +
+        '<div class="why-stat-title">FULL FIGHTING GAME</div>' +
         '<div class="why-stat-value">~ 10<sup>15</sup></div>' +
-        '<div class="why-stat-detail">6 mons × HP × status × items × …</div>' +
+        '<div class="why-stat-detail">positions × stamina × stance × items × …</div>' +
       '</div>' +
       '<div class="why-stat-card">' +
         '<div class="why-stat-title">GO ENDGAME</div>' +

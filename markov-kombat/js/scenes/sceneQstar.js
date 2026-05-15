@@ -90,15 +90,15 @@
 
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'IF WE KNEW Q*, WE WOULD KNOW HOW TO PLAY OPTIMALLY';
+    heading.textContent = 'ARGMAX HIM — KNOW Q*, FINISH OPTIMALLY';
     root.appendChild(heading);
 
     const premise = document.createElement('div');
     premise.className = 'qstar-premise';
     premise.innerHTML =
-      'In each state, the optimal play is to pick the action that achieves ' +
+      'In each state, the optimal kombat move is the action that reaches ' +
       '<span class="qstar-q-star">max<sub>a</sub> Q*(s, a)</span>. ' +
-      'So if we had the Q*-table in hand, we would just argmax it.';
+      'If we had the Q*-table in hand, we just argmax it — and SUB-OPTIMAL is finished.';
     root.appendChild(premise);
 
     /* ---- Optimal-policy formula card ---- */

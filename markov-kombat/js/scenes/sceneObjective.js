@@ -130,7 +130,7 @@
 
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'OBJECTIVE';
+    heading.textContent = 'THE OPTIMAL DAMAGE';
     root.appendChild(heading);
 
     /* ---- G formula card ---- */

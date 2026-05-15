@@ -1,12 +1,13 @@
-/* Scene 0 — POKEMON title screen.
+/* Scene 0 — MARKOV KOMBAT II title screen.
  *
- *   POKEMON wordmark + blinking Pikachu + PRESS START. The MDP overlay
- *   that used to be a second phase of this scene is now its own scene
- *   (sceneMdpOverlay) sitting after the tutorial + trial battle — so
- *   students play a turn before we name the five pieces.
+ *   MARKOV KOMBAT II wordmark + SHAO KAHN-VERGENCE subtitle + idle
+ *   LIU KANG-MAX silhouette + PRESS START.  The MDP overlay that used
+ *   to be a second phase here lives in its own scene (sceneMdpOverlay)
+ *   after the tutorial + trial battle — so students experience one
+ *   round of kombat before we name the three ingredients.
  *
  *   Pressing START or hitting NEXT yields to the scene engine and
- *   advances to scene 1 (the tutorial).
+ *   advances to scene 1 (PRAKTICE MODE).
  */
 (function () {
   window.scenes = window.scenes || {};
@@ -19,13 +20,14 @@
     const titleWrap = document.createElement('div');
     titleWrap.className = 'sc0-title-wrap';
     titleWrap.innerHTML = `
-      <h1 class="poke-title">${T('title.pokemon') || 'POKEMON'}</h1>
-      <div class="sc0-subtitle">${T('title.subtitle') || 'A REINFORCEMENT LEARNING ADVENTURE'}</div>
+      <h1 class="poke-title">${T('title.pokemon') || 'MARKOV KOMBAT II'}</h1>
+      <div class="sc0-subtitle">${T('title.subtitle') || 'SHAO KAHN-VERGENCE'}</div>
+      <div class="sc0-tagline">FINISH HIM — OPTIMALLY.</div>
       <div class="sc0-pika-wrap">
-        <img class="poke-sprite sc0-pika" src="assets/pikachu-front.png" alt="PIKACHU"/>
+        <div class="mk-fighter mk-fighter-liu" aria-label="LIU KANG-MAX"></div>
       </div>
       <button class="sc0-start" type="button">${T('title.start') || '▶ PRESS START'}</button>
-      <div class="sc0-credits">${T('title.credits') || 'SML · ETH ZURICH · CLASSIC RL #7'}</div>
+      <div class="sc0-credits">${T('title.credits') || 'SML · ETH ZURICH · CLASSIC RL #8'}</div>
       <div class="sc0-credits sc0-credits-by">${T('title.by') || 'BY CARLOS COTRINI'}</div>
     `;
     root.appendChild(titleWrap);

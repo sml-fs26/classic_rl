@@ -200,7 +200,7 @@
        ========================================================== */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'DERIVING SARSA';
+    heading.textContent = 'HOW TO TRAIN YOUR FIGHTER (SARSA)';
     root.appendChild(heading);
 
     const ctrls = document.createElement('div');

@@ -164,7 +164,7 @@
     );
     const ffoot = document.createElement('div');
     ffoot.className = 'concept-formula-foot';
-    ffoot.textContent = 'sᵢ = state · aᵢ = PIKACHU\'s move · rᵢ = reward · sᵢ₊₁ = state AFTER aᵢ';
+    ffoot.textContent = 'sᵢ = state · aᵢ = LIU KANG-MAX\'s move · rᵢ = reward · sᵢ₊₁ = state AFTER aᵢ';
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
