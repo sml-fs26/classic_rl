@@ -222,12 +222,15 @@
       el.className = 'sc1-vfx sc1-vfx-' + moveOrCounter + ' sc1-vfx-from-' + fromSide;
       /* For THUNDERBOLT specifically, embed an SVG lightning bolt. */
       if (moveOrCounter === 'thunderbolt') {
+        /* Stroke colours come from --vfx-bolt / --vfx-bolt-hl CSS
+           variables via the polyline rules in scene1.css, so the
+           bolt re-tints under GB / CRT themes automatically. */
         el.innerHTML =
           '<svg viewBox="0 0 200 60" preserveAspectRatio="none" class="sc1-bolt-svg">' +
             '<polyline points="0,30 40,15 60,30 100,10 120,30 160,18 200,30" ' +
-            'stroke="#FFD028" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />' +
+            'stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />' +
             '<polyline points="0,30 40,15 60,30 100,10 120,30 160,18 200,30" ' +
-            'stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />' +
+            'stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />' +
           '</svg>';
       }
       stage.appendChild(el);

@@ -63,6 +63,28 @@
   --hue-star:    #C08A3E;     /* amber — Robbins-Monro */
   --hue-door:    #4A8B6B;     /* green — SARSA */
   --hue-snakes:  #C8902C;     /* gold — Snakes & Ladders sibling */
+
+  /* HP-bar bucket fill tokens — overridable per theme. */
+  --hp-b0: #48C848;
+  --hp-b1: #88D848;
+  --hp-b2: #E8C828;
+  --hp-b3: #E89028;
+  --hp-b4: #E84828;
+
+  /* Battle-VFX colour tokens — used by the scene 1 attack overlays.
+     Each theme overrides these so the lightning bolt / ember / rage
+     aura match the palette. */
+  --vfx-bolt:    #FFD028;     /* THUNDERBOLT SVG stroke */
+  --vfx-bolt-hl: #FFFFFF;     /* THUNDERBOLT inner highlight stroke */
+  --vfx-bolt-glow: rgba(255, 208, 40, 0.95);
+  --vfx-ember-a: rgba(248, 128, 48, 0.95);
+  --vfx-ember-b: rgba(232,  80, 24, 0.85);
+  --vfx-ember-c: rgba(248, 168, 64, 0.95);
+  --vfx-flame-a: rgba(248,  96, 24, 0.9);
+  --vfx-flame-b: rgba(252, 168, 32, 0.95);
+  --vfx-flame-c: rgba(255, 220, 64, 0.95);
+  --vfx-flame-d: rgba(255, 220, 64, 0.0);
+  --vfx-rage:    rgba(232, 40, 40, 0.7);
 }
 
 :root[data-theme="crt"] {
@@ -107,6 +129,27 @@
   --cb-orange:           #FF8030;
   --cb-sky:              #FFB350;
   --cb-purple:           #FF9050;
+
+  /* HP-bar buckets — amber gradient under CRT. */
+  --hp-b0: #FFC060;
+  --hp-b1: #FFB350;
+  --hp-b2: #FF9020;
+  --hp-b3: #FF7010;
+  --hp-b4: #FF4010;
+
+  /* Battle VFX — all amber/orange so the THUNDERBOLT / EMBER /
+     RAGE overlays stay inside the CRT palette. */
+  --vfx-bolt:    #FFC060;
+  --vfx-bolt-hl: #FFE090;
+  --vfx-bolt-glow: rgba(255, 192, 96, 0.95);
+  --vfx-ember-a: rgba(255, 144, 32, 0.95);
+  --vfx-ember-b: rgba(255,  96, 32, 0.85);
+  --vfx-ember-c: rgba(255, 180, 64, 0.95);
+  --vfx-flame-a: rgba(255, 112, 32, 0.9);
+  --vfx-flame-b: rgba(255, 168, 48, 0.95);
+  --vfx-flame-c: rgba(255, 220, 96, 0.95);
+  --vfx-flame-d: rgba(255, 220, 96, 0.0);
+  --vfx-rage:    rgba(255, 96, 32, 0.7);
 }
 
 /* CRT scanlines + vignette overlays — only active under the CRT
@@ -205,6 +248,31 @@
   --cb-orange:           #0F380F;
   --cb-sky:              #306230;
   --cb-purple:           #0F380F;
+
+  /* HP-bar buckets — already collapsed to 2 green shades below via
+     a per-bucket override; we mirror that here so the data-bucket
+     rules use these tokens.  Light green = full / high; dark green
+     = mid / low / critical. */
+  --hp-b0: #0F380F;
+  --hp-b1: #0F380F;
+  --hp-b2: #306230;
+  --hp-b3: #306230;
+  --hp-b4: #306230;
+
+  /* Battle VFX — collapsed to the two-shade DMG green palette so
+     the THUNDERBOLT / EMBER / RAGE overlays still read on the
+     pea-soup background. */
+  --vfx-bolt:    #0F380F;
+  --vfx-bolt-hl: #8BAC0F;
+  --vfx-bolt-glow: rgba(15, 56, 15, 0.85);
+  --vfx-ember-a: rgba(48, 98, 48, 0.95);
+  --vfx-ember-b: rgba(15, 56, 15, 0.85);
+  --vfx-ember-c: rgba(48, 98, 48, 0.95);
+  --vfx-flame-a: rgba(15, 56, 15, 0.9);
+  --vfx-flame-b: rgba(48, 98, 48, 0.9);
+  --vfx-flame-c: rgba(139, 172, 15, 0.95);
+  --vfx-flame-d: rgba(139, 172, 15, 0.0);
+  --vfx-rage:    rgba(15, 56, 15, 0.7);
 }
 
 /* GB sprite tint — fold every PNG sprite onto the DMG green ramp.
@@ -218,14 +286,8 @@
   filter: grayscale(1) sepia(1) saturate(3.5) hue-rotate(25deg) contrast(1.15) brightness(0.92);
 }
 
-/* DMG HP-bar fills — collapse the green/yellow/orange/red ramp onto
-   light/dark green so the bar still drains visually but stays in
-   palette. */
-:root[data-theme="gb"] .hp-bar-fill[data-bucket="0"] { background: #0F380F; }
-:root[data-theme="gb"] .hp-bar-fill[data-bucket="1"] { background: #0F380F; }
-:root[data-theme="gb"] .hp-bar-fill[data-bucket="2"] { background: #306230; }
-:root[data-theme="gb"] .hp-bar-fill[data-bucket="3"] { background: #306230; }
-:root[data-theme="gb"] .hp-bar-fill[data-bucket="4"] { background: #306230; }
+/* DMG HP-bar track only — fills now live on the --hp-bN tokens
+   defined in the GB theme block above. */
 :root[data-theme="gb"] .hp-bar-track { background: #8BAC0F; }
 
 :root[data-theme="dark"] {
@@ -655,12 +717,12 @@ html, body {
 }
 /* Discrete bucket fill — 5 buckets + fainted. Width snaps to 100/80/60/
    40/20/0%, color phases green → light-green → yellow → orange → red. */
-.hp-bar-fill[data-bucket="0"] { width: 100%; background: #48C848; }
-.hp-bar-fill[data-bucket="1"] { width: 80%;  background: #88D848; }
-.hp-bar-fill[data-bucket="2"] { width: 60%;  background: #E8C828; }
-.hp-bar-fill[data-bucket="3"] { width: 40%;  background: #E89028; }
-.hp-bar-fill[data-bucket="4"] { width: 20%;  background: #E84828; }
-.hp-bar-fill[data-bucket="5"] { width: 0%;   background: #E84828; }
+.hp-bar-fill[data-bucket="0"] { width: 100%; background: var(--hp-b0, #48C848); }
+.hp-bar-fill[data-bucket="1"] { width: 80%;  background: var(--hp-b1, #88D848); }
+.hp-bar-fill[data-bucket="2"] { width: 60%;  background: var(--hp-b2, #E8C828); }
+.hp-bar-fill[data-bucket="3"] { width: 40%;  background: var(--hp-b3, #E89028); }
+.hp-bar-fill[data-bucket="4"] { width: 20%;  background: var(--hp-b4, #E84828); }
+.hp-bar-fill[data-bucket="5"] { width: 0%;   background: var(--hp-b4, #E84828); }
 /* Tick marks at the bucket boundaries — makes the discretisation
    readable even in a still screenshot. */
 .hp-bar-tick {
