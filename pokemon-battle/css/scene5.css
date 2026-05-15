@@ -80,13 +80,16 @@
 
 .sc5-heading {
   text-align: center;
-  margin-top: 0;
+  margin: 0 auto 4px;
+  font-size: 12px;
 }
 
 .sc5-sub {
   text-align: center;
-  margin: 0 auto 16px;
+  margin: 0 auto 8px;
   max-width: 70ch;
+  font-size: 8.5px;
+  line-height: 1.55;
 }
 .sc5-grid {
   display: grid;
