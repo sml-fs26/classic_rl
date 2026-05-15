@@ -199,6 +199,91 @@
     if (prev) prev.addEventListener('click', () => { cursorBlip(); goTo(current - 1); });
     if (next) next.addEventListener('click', () => { cursorBlip(); goTo(current + 1); });
 
+    /* Trainer badges — one slot per concept scene.  Light up on
+       first visit; persisted to localStorage via window.Trainer.
+       Badge order: MDP → RETURN → Q* → DP → SARSA. */
+    const BADGE_SCENE_KEY = {
+      sceneMdpOverlay: 'mdp',
+      sceneObjective:  'return',
+      sceneQstar:      'qstar',
+      sceneDp:         'dp',
+      sceneSarsaDerive:'sarsa',
+    };
+    const BADGE_LABEL = { mdp: 'MDP', return: 'RTN', qstar: 'Q*', dp: 'DP', sarsa: 'SAR' };
+    function renderBadgeRow() {
+      const row = document.getElementById('trainer-badges');
+      if (!row || !window.Trainer) return;
+      const keys = window.Trainer.listBadges();
+      let html = '';
+      for (const k of keys) {
+        const got = window.Trainer.hasBadge(k);
+        html += '<span class="trainer-badge ' + k + (got ? ' earned' : '') + '" title="' + k.toUpperCase() + '">' +
+                  '<span class="trainer-badge-label">' + BADGE_LABEL[k] + '</span>' +
+                '</span>';
+      }
+      row.innerHTML = html;
+    }
+    function maybeAwardBadge(sceneKey) {
+      if (!window.Trainer) return;
+      const badge = BADGE_SCENE_KEY[sceneKey];
+      if (!badge) return;
+      const fresh = window.Trainer.awardBadge(badge);
+      if (fresh) {
+        renderBadgeRow();
+        /* Tiny fanfare on first earn — uses the cursor blip so we don't
+           overload the audio mix. */
+        if (window.SFX) window.SFX.play('cursor');
+        /* Flash the just-earned chip. */
+        const el = document.querySelector('.trainer-badge.' + badge);
+        if (el) {
+          el.classList.add('flashing');
+          setTimeout(() => el.classList.remove('flashing'), 1200);
+        }
+      }
+    }
+    renderBadgeRow();
+    window.addEventListener('scene-change', (e) => {
+      const key = (e.detail && e.detail.key) || (SCENES[current] && SCENES[current].key);
+      maybeAwardBadge(key);
+    });
+
+    /* Trainer-name modal on first visit only.  Reads/writes via
+       window.Trainer; the rest of the viz can later interpolate
+       window.Trainer.getName() wherever it wants a personal touch. */
+    if (window.Trainer && !window.Trainer.hasBeenAsked()) {
+      const modal = document.createElement('div');
+      modal.className = 'trainer-name-modal';
+      modal.innerHTML =
+        '<div class="trainer-name-card">' +
+          '<div class="trainer-name-title">A NEW TRAINER!</div>' +
+          '<div class="trainer-name-prompt">What is your name?</div>' +
+          '<input id="trainer-name-input" type="text" maxlength="12" placeholder="TRAINER" autofocus>' +
+          '<div class="trainer-name-ctrls">' +
+            '<button class="poke-btn" id="trainer-name-ok">OK</button>' +
+            '<button class="poke-btn" id="trainer-name-skip">SKIP</button>' +
+          '</div>' +
+          '<div class="trainer-name-hint">12 letters max. You can leave it blank.</div>' +
+        '</div>';
+      document.body.appendChild(modal);
+      const finish = (name) => {
+        if (window.Trainer) window.Trainer.setName(name || 'TRAINER');
+        modal.remove();
+      };
+      document.getElementById('trainer-name-ok').addEventListener('click', () => {
+        const v = document.getElementById('trainer-name-input').value;
+        finish(v);
+      });
+      document.getElementById('trainer-name-skip').addEventListener('click', () => finish('TRAINER'));
+      document.getElementById('trainer-name-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const v = document.getElementById('trainer-name-input').value;
+          finish(v);
+        } else if (e.key === 'Escape') {
+          finish('TRAINER');
+        }
+      });
+    }
+
     /* Speaker-notes overlay — lecturer crib sheet, toggled by `n`.
        Lives outside the scene flow so it's available everywhere. */
     const snOverlay = document.createElement('div');

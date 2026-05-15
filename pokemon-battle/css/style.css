@@ -1533,3 +1533,120 @@ body.lang-jp .scene {
 }
 .speaker-notes-content b { color: var(--pikachu-cheek); }
 .speaker-notes-content em { color: var(--cb-blue); font-style: normal; }
+
+/* ============================================================
+   Trainer badges in the topbar
+   ----------------------------------------------------------------
+   Five concept badges (MDP, RTN, Q*, DP, SAR) sit between the
+   dot-pager and the music toggle.  Grey when unearned, glowing
+   yellow when earned.  Awarded on first visit to each concept
+   scene; persisted via window.Trainer / localStorage.
+   ============================================================ */
+.trainer-badges {
+  display: flex;
+  gap: 4px;
+  margin: 0 6px;
+  align-items: center;
+}
+.trainer-badge {
+  width: 30px;
+  height: 22px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  opacity: 0.4;
+  transition: opacity 200ms, background 200ms, color 200ms;
+}
+.trainer-badge.earned {
+  background: var(--pikachu-yellow);
+  color: var(--ink-on-box);
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px var(--inner-highlight);
+}
+.trainer-badge.mdp.earned    { background: #D55E00; color: #fff; }   /* MDP — red-orange */
+.trainer-badge.return.earned { background: #0072B2; color: #fff; }   /* RTN — blue */
+.trainer-badge.qstar.earned  { background: var(--pikachu-yellow); }
+.trainer-badge.dp.earned     { background: #009E73; color: #fff; }   /* DP — green */
+.trainer-badge.sarsa.earned  { background: #CC79A7; color: #fff; }   /* SAR — purple */
+
+@keyframes trainer-badge-flash {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 var(--pikachu-yellow); }
+  40%  { transform: scale(1.3);  box-shadow: 0 0 0 8px var(--pikachu-yellow); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 transparent; }
+}
+.trainer-badge.flashing {
+  animation: trainer-badge-flash 1.0s ease-out;
+  z-index: 4;
+  position: relative;
+}
+@media (prefers-reduced-motion: reduce) {
+  .trainer-badge.flashing { animation: none; }
+}
+
+/* ============================================================
+   Trainer-name modal — first-visit prompt
+   ============================================================ */
+.trainer-name-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9995;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.trainer-name-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  padding: 22px 26px;
+  width: 340px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  text-align: center;
+}
+.trainer-name-title {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 10px;
+}
+.trainer-name-prompt {
+  font-size: 9px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.trainer-name-card input[type="text"] {
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  text-align: center;
+  letter-spacing: 0.08em;
+  padding: 8px;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-on-box);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.trainer-name-ctrls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.trainer-name-hint {
+  font-size: 7px;
+  color: var(--ink-secondary);
+  line-height: 1.6;
+}
