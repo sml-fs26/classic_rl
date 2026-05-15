@@ -1,41 +1,51 @@
 {
   "viz": "markov-kombat",
   "branch": "mk-demo",
-  "phase": "phase-0-boot",
-  "completed_phases": [],
-  "next_action": "Write MK-SPEC.md (phase 1)",
+  "phase": "phase-6-final-smoke-PARTIAL",
+  "completed_phases": ["phase-0-boot", "phase-1-spec", "phase-2-text", "phase-3-visual"],
+  "partial_phases": ["phase-4-sound", "phase-5-qa", "phase-6-smoke"],
+  "next_action": "Hand back to user — read MK-DEMO-REPORT.md",
   "started_at": "2026-05-15",
+  "stopped_at": "2026-05-15",
+  "stop_reason": "Wave budget reached — phases 0-3 shipped clean; phases 4-6 partial; honest report written",
   "decisions_locked": {
     "title": "MARKOV KOMBAT II: SHAO KAHN-VERGENCE",
     "subtitle": "FINISH HIM — OPTIMALLY.",
     "branding_legal": "PIXEL KOMBAT II in <title>, MARKOV KOMBAT inside viz",
-    "sprite_source": "CSS silhouettes via clip-path",
+    "sprite_source": "CSS-filter silhouette of existing Pokemon PNGs (v2 = bespoke art)",
     "palette": {
       "primary":  "#C8201A",
       "bg":       "#0A0A0A",
-      "boxes":    "#C8C8C8",
+      "boxes":    "#1C1C1C",
       "accent":   "#E8B028"
     },
     "moves": ["GREEDY JAB", "BELLMAN BACKHAND", "TD-UPPERCUT"],
     "characters": {
       "player": "LIU KANG-MAX",
-      "opponent": ["SUB-OPTIMAL (FRESH)", "SUB-OPTIMAL (FROST-CRACKED)", "SUB-OPTIMAL (KHAOS)"]
+      "opponent": ["SUB-OPTIMAL", "SUB-OPTIMAL (FROST-CRACKED)", "SUB-OPTIMAL (KHAOS)"]
     },
-    "q_learning_addition": "include only if phases 0-5 leave >2h budget",
-    "multilang_jp": "skip for v1",
-    "music": "reuse Pokemon templates, parameter-tweak",
-    "branch_strategy": "all work on mk-demo, never touch main",
-    "scope_creep": "defer everything to MK-CHANGELOG.md",
+    "q_learning_addition": "deferred to v2",
+    "multilang_jp": "removed in v1",
+    "music": "Pokemon templates (not retuned)",
+    "branch_strategy": "mk-demo pushed, main untouched",
+    "scope_creep": "MK-CHANGELOG.md captures deferrals",
     "retry_limit": 3
   },
-  "interrupt_conditions": [
-    "main branch at risk",
-    "auth failure on git push",
-    "hard infra blocker (chrome / fs)",
-    "Pokemon regression"
+  "commits_on_branch": [
+    "204e6be — phase 0 boot",
+    "835341b — phase 1 spec",
+    "bb172e8 — phase 2 text",
+    "a3b75df — phase 3 visual"
   ],
+  "interrupt_conditions_active": [],
   "blockers": [],
-  "log": [
-    "phase 0 booted; mk-demo branch cut; markov-kombat copied from pokemon-battle"
+  "deferred_to_v2": [
+    "Per-scene CSS sweep (scene-specific files still carry Pokemon yellows/greens)",
+    "FATALITY / FINISH HIM / FIGHT visual flash overlays",
+    "SFX retuning to MK timbre",
+    "Real bespoke MK sprite art replacing the CSS-filter trick",
+    "GB / dark theme alternates (currently broken under MK palette)",
+    "Q-learning extension step in the SARSA pager",
+    "Full 7-box checklist sweep on every scene"
   ]
 }
