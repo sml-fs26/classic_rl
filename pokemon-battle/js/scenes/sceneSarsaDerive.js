@@ -1,27 +1,27 @@
 /* Scene — deriving SARSA, then watching it run on one trajectory.
  *
- *   Two halves:
+ *   Eight-step pager (A → B → D → E1 → E2 → E3 → E4 → F).  One step
+ *   shows at a time; everything fits in one viewport without scroll.
  *
- *   1) Card stack (A → E4). Seven reveal cards walking the derivation
- *      from the goal ("we want a table q ≈ Q*") to the SARSA update
- *      rule. E3 shows the Robbins–Monro update in TWO explicit cases —
- *      "if q < target, push up; if q > target, push down" — and E4 then
- *      collapses both into the single line that students will recognise
- *      as SARSA. The collapse is the pedagogical punchline: α(target − q)
- *      already carries the right sign in both branches.
+ *   The right column carries a *continuous* illustration that
+ *   evolves with the step:
  *
- *   2) Live demo (F). Below the cards: a Q-table + a trajectory tape +
- *      a step-detail panel. Each click of NEXT TRANSITION applies the
- *      update we just derived to one (s, a, r, s', a') tuple, with the
- *      arithmetic spelled out and the changed Q-table cell pulsing.
- *      REROLL samples a fresh trajectory but KEEPS q, so successive
- *      rerolls let students watch the table take shape from sample
- *      experience — that's the whole point of model-free RL.
+ *     A   table appears (all dashed cells)
+ *     B   staggered +0.00 flash sweeps the cells
+ *     D   one pre-sampled trajectory paints its path on the table
+ *           with 1, 2, 3… badges on visited cells
+ *     E1  same path; the first tuple is bolded and ghosted siblings
+ *           hint at "one sample of an expectation"
+ *     E2  active cell highlighted with a target callout
+ *     E3  number-line viz under the table: q and target as dots,
+ *           BOTH arrows (up / down) shown
+ *     E4  same number-line, collapsed to ONE merged arrow
+ *     F   full live demo activates: trajectory tape becomes
+ *           interactive, step-detail panel replaces the left card,
+ *           and a PLAY toggle auto-advances transitions (auto-
+ *           rerolling at end of trajectory) at a ~750 ms cadence.
  *
- *   The trajectory uses ε-greedy (ε = 0.4) against the running q. With
- *   q = 0 at start, ε-greedy degenerates to uniform random; once a few
- *   cells have values, the policy starts exploiting them — which is
- *   exactly the dynamic SARSA exhibits at scale.
+ *   ε = 0.40; γ = 1 (every trajectory terminates).
  */
 (function () {
   window.scenes = window.scenes || {};
@@ -31,12 +31,14 @@
   const NB      = window.Battle.NUM_BUCKETS;
   const STATES  = window.Bellman.STATES;
   const N       = STATES.length;
-  const GAMMA   = 1;        // Undiscounted — every trajectory terminates (win/loss).
+  const GAMMA   = 1;
 
-  /* ---- The seven cards. Each is one click in the derivation. ---- */
-  const CARDS = [
+  /* ---------- Step content (left column) ----------
+     A through E4 carry text + KaTeX formulas.  F is the live demo
+     and uses the left column as the step-detail panel instead. */
+  const STEPS = [
     {
-      num: '1 / 7',
+      id: 'A',
       title: 'A — WE WANT A TABLE OF Q*',
       body:
         'Aim: build a table <span class="sd-q-est">q[s, a]</span> that approximates the optimal action-value ' +
@@ -46,20 +48,20 @@
       ],
     },
     {
-      num: '2 / 7',
+      id: 'B',
       title: 'B — INITIALISE THE TABLE',
       body:
-        'We don\'t know <span class="sd-q">Q*</span> yet. Seed every entry of <span class="sd-q-est">q</span> ' +
+        'We don\'t know <span class="sd-q">Q*</span> yet.  Seed every entry of <span class="sd-q-est">q</span> ' +
         'to zero (or tiny noise so ties break randomly).',
       latex: [
         String.raw`\mathtt{q}[s, a] \;:=\; 0 \qquad \text{for all } (s, a)`,
       ],
     },
     {
-      num: '3 / 7',
+      id: 'D',
       title: 'D — PLAY THE GAME TO GENERATE A TRAJECTORY',
       body:
-        'We don\'t have P. We <em>do</em> get to play. The world hands us a stream of ' +
+        'We don\'t have P.  We <em>do</em> get to play.  The world hands us a stream of ' +
         '(state, action, reward, next state) tuples — pick the next action by ε-greedy on the <em>current</em> ' +
         '<span class="sd-q-est">q</span>, and let the environment supply the rest.',
       latex: [
@@ -68,11 +70,11 @@
       foot: 'The second &laquo;A&raquo; in S-A-R-S-A is the action we pick at the next state — needed for the update on the previous step.',
     },
     {
-      num: '4 / 7',
+      id: 'E1',
       title: 'E1 — REPLACE THE EXPECTATION WITH ONE SAMPLE',
       body:
         'By Bellman, <span class="sd-q">Q*(s, a)</span> is an expectation over the random next state and reward. ' +
-        'We don\'t get the expectation — we get one sample. Drop the <span class="sd-q">E</span> and use it:',
+        'We don\'t get the expectation — we get one sample.  Drop the <span class="sd-q">E</span> and use it:',
       latex: [
         String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\!\left[\, R \;+\; Q^{\star}(S', A') \,\right]`,
         String.raw`\phantom{Q^{\star}(s, a)}\;\approx\; r \;+\; Q^{\star}(s', a')`,
@@ -80,22 +82,22 @@
       foot: 'One-sample Monte-Carlo estimate of the right-hand side.',
     },
     {
-      num: '5 / 7',
+      id: 'E2',
       title: 'E2 — NAME THE RIGHT-HAND SIDE «TARGET»',
       body:
         'We don\'t have <span class="sd-q">Q*</span> on the right either — only our table <span class="sd-q-est">q</span>. ' +
-        'Plug it in. Call the resulting number the <b>target</b>: that\'s where we want <span class="sd-q-est">q[s, a]</span> to be.',
+        'Plug it in.  Call the resulting number the <b>target</b>: that\'s where we want <span class="sd-q-est">q[s, a]</span> to be.',
       latex: [
         String.raw`\mathtt{target} \;:=\; r \;+\; \mathtt{q}[s', a']`,
         String.raw`\mathtt{q}[s, a] \;\stackrel{\text{want}}{=}\; \mathtt{target}`,
       ],
     },
     {
-      num: '6 / 7',
+      id: 'E3',
       title: 'E3 — MOVE q TOWARD THE TARGET (TWO CASES)',
       body:
         'If <span class="sd-q-est">q[s, a]</span> is <em>below</em> the target, nudge it <em>up</em>. ' +
-        'If it\'s <em>above</em>, nudge it <em>down</em>. Step size <span class="sd-alpha">α ∈ (0, 1)</span> ' +
+        'If it\'s <em>above</em>, nudge it <em>down</em>.  Step size <span class="sd-alpha">α ∈ (0, 1)</span> ' +
         'is small enough not to overshoot.',
       latex: [
         String.raw`\begin{aligned}
@@ -103,22 +105,28 @@
           \text{if } \mathtt{q}[s, a] &> \mathtt{target}: && \mathtt{q}[s, a] \;\mathrel{-}=\; \alpha\,(\,\mathtt{q}[s, a] - \mathtt{target}\,)
         \end{aligned}`,
       ],
-      foot: 'Same step size α in both cases. Same magnitude of correction. Only the sign differs — and α(target − q) already carries that sign for free.',
+      foot: 'Same step size α in both cases.  Same magnitude of correction.  Only the sign differs — and α(target − q) already carries that sign for free.',
     },
     {
-      num: '7 / 7',
+      id: 'E4',
       title: 'E4 — THE TWO CASES COLLAPSE INTO ONE LINE',
       body:
         'Flip the sign of the «above» case: <span class="sd-q-est">−α(q − target)</span> = <span class="sd-q-est">+α(target − q)</span>. ' +
-        'Both branches become the same update. <b>This is SARSA.</b>',
+        'Both branches become the same update.  <b>This is SARSA.</b>',
       latex: [
         String.raw`\boxed{\;\mathtt{q}[s, a] \;\leftarrow\; \mathtt{q}[s, a] \;+\; \alpha\,\bigl(\,\mathtt{target} \;-\; \mathtt{q}[s, a]\,\bigr)\;}`,
       ],
-      foot: 'TD error = target − current estimate. Apply this once per (s, a, r, s′, a′) tuple as the agent plays.',
+      foot: 'TD error = target − current estimate.  Apply this once per (s, a, r, s′, a′) tuple as the agent plays.',
+    },
+    {
+      id: 'F',
+      title: 'F — SARSA ON ONE TRAJECTORY',
+      body: '',     /* Left column becomes the step-detail panel; no card body. */
+      latex: [],
     },
   ];
 
-  /* Short labels used in the F widget for move buttons / trajectory tape. */
+  /* ---------- Helpers ---------- */
   function shortMove(id) {
     if (id === 'quick_attack') return 'QUICK';
     if (id === 'thunderbolt')  return 'BOLT';
@@ -128,9 +136,7 @@
   function fullMove(id) {
     return (window.Moves.MOVE_BY_ID[id] && window.Moves.MOVE_BY_ID[id].name) || id;
   }
-  function bucketName(b) {
-    return (window.Battle.BUCKETS[b] || 'fainted').toUpperCase();
-  }
+  function bucketName(b) { return (window.Battle.BUCKETS[b] || 'fainted').toUpperCase(); }
   function bucketClass(b) {
     if (b === 0) return '';
     if (b === 1) return 'b1';
@@ -148,9 +154,6 @@
     return bucketName(s.your) + ' / ' + bucketName(s.opp);
   }
 
-  /* Generate ONE trajectory by playing ε-greedy against the current Q.
-     Returns a list of transitions: [{ s, sIdx, a, aIdx, r, sNext, sNextIdx, aNext, aNextIdx, terminal }, …].
-     For the terminal transition, aNext / aNextIdx / sNextIdx are null. */
   function genTrajectory(Q, eps, rng, maxTurns) {
     maxTurns = maxTurns || 20;
     const out = [];
@@ -169,8 +172,7 @@
         out.push({
           s, sIdx, a: aId, aIdx, r: reward,
           sNext, sNextIdx: null, aNext: null, aNextIdx: null,
-          terminal: true,
-          win: !!sNext.win, lose: !!sNext.lose,
+          terminal: true, win: !!sNext.win, lose: !!sNext.lose,
         });
         break;
       }
@@ -184,28 +186,23 @@
         terminal: false,
       });
 
-      s = sNext;
-      sIdx = sNextIdx;
-      aId  = aNextId;
-      aIdx = aNextIdx;
+      s = sNext; sIdx = sNextIdx; aId = aNextId; aIdx = aNextIdx;
     }
     return out;
   }
 
   window.scenes.sceneSarsaDerive = function (root) {
-    root.classList.add('scene-pad', 'sd-scene');
+    root.classList.add('scene-pad', 'sd-scene', 'sd-pager');
     root.innerHTML = '';
 
-    /* ====================================================================
-       PART 1 — DERIVATION CARDS
-       ==================================================================== */
-
+    /* ==========================================================
+       Scaffolding
+       ========================================================== */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = 'DERIVING SARSA';
     root.appendChild(heading);
 
-    /* Legend — Q (true) vs q (table). */
     const legend = document.createElement('div');
     legend.className = 'sd-legend';
     legend.innerHTML =
@@ -216,155 +213,265 @@
     const ctrls = document.createElement('div');
     ctrls.className = 'sd-controls';
     ctrls.innerHTML =
-      '<button class="poke-btn" id="sd-step">▶ STEP</button>' +
-      '<button class="poke-btn" id="sd-reveal">REVEAL ALL</button>' +
+      '<button class="poke-btn" id="sd-prev">◀ PREV</button>' +
+      '<button class="poke-btn" id="sd-next">NEXT ▶</button>' +
       '<button class="poke-btn" id="sd-reset">RESET</button>' +
-      '<div class="sd-status">CARD <b id="sd-card-idx">1</b> / ' + CARDS.length + '</div>';
+      '<div class="sd-status">STEP <b id="sd-step-idx">1</b> / ' + STEPS.length + ' · <b id="sd-step-id">A</b></div>';
     root.appendChild(ctrls);
 
-    const stack = document.createElement('div');
-    stack.className = 'sd-stack';
-    root.appendChild(stack);
+    /* 2-column row: left = card content, right = persistent illustration. */
+    const row = document.createElement('div');
+    row.className = 'sd-row';
+    root.appendChild(row);
 
-    const cardNodes = [];
-    for (const c of CARDS) {
-      const card = document.createElement('div');
-      card.className = 'sd-card';
-      card.innerHTML =
-        '<div class="sd-card-num">STEP ' + c.num + '</div>' +
-        '<div class="sd-card-title">' + c.title + '</div>' +
-        '<div class="sd-card-body">' + c.body + '</div>';
-      if (c.latex && c.latex.length) {
-        for (const f of c.latex) {
-          const box = document.createElement('div');
-          box.className = 'sd-card-formula';
-          card.appendChild(box);
-          window.Katex.render(f, box, true);
-        }
-      }
-      if (c.foot) {
-        const foot = document.createElement('div');
-        foot.className = 'concept-formula-foot';
-        foot.style.marginTop = '6px';
-        foot.innerHTML = c.foot;
-        card.appendChild(foot);
-      }
-      stack.appendChild(card);
-      cardNodes.push(card);
-    }
+    const left = document.createElement('div');
+    left.className = 'sd-left';
+    row.appendChild(left);
 
-    let cursor = 0;
-    function applyCursor() {
-      cardNodes.forEach((node, i) => node.classList.toggle('shown', i <= cursor));
-      const el = document.getElementById('sd-card-idx');
-      if (el) el.textContent = String(cursor + 1);
-    }
-    function stepCard()  { if (cursor < CARDS.length - 1) { cursor++; applyCursor(); } }
-    function revealAll() { cursor = CARDS.length - 1; applyCursor(); }
-    function resetCards(){ cursor = 0; applyCursor(); }
+    const right = document.createElement('div');
+    right.className = 'sd-right';
+    row.appendChild(right);
 
-    document.getElementById('sd-step').addEventListener('click', stepCard);
-    document.getElementById('sd-reveal').addEventListener('click', revealAll);
-    document.getElementById('sd-reset').addEventListener('click', resetCards);
+    /* Right column: caption strip + trajectory tape + Q-table + number-line. */
+    const cap = document.createElement('div');
+    cap.className = 'sd-illus-cap';
+    right.appendChild(cap);
 
-    applyCursor();
-
-    /* &run flag: reveal everything for headless capture. */
-    if (/[#&?]run\b/.test(window.location.hash)) setTimeout(revealAll, 200);
-    /* &sd=N flag: jump to card N. */
-    const sdMatch = (window.location.hash || '').match(/[#&?]sd=(\d+)/);
-    if (sdMatch) {
-      const target = Math.min(CARDS.length - 1, Math.max(0, parseInt(sdMatch[1], 10) - 1));
-      setTimeout(() => { cursor = target; applyCursor(); }, 100);
-    }
-
-    /* ====================================================================
-       PART 2 — LIVE DEMO (F) : SARSA ON ONE TRAJECTORY
-       ==================================================================== */
-
-    const fHeader = document.createElement('h3');
-    fHeader.className = 'sd-f-header';
-    fHeader.textContent = 'F — SARSA ON ONE TRAJECTORY';
-    root.appendChild(fHeader);
-
-    const fIntro = document.createElement('div');
-    fIntro.className = 'sd-f-intro';
-    fIntro.innerHTML =
-      'Press <kbd>▶ NEXT TRANSITION</kbd> to apply the rule from E4 to one ' +
-      '<span class="sd-q-est">(s, a, r, s′, a′)</span> tuple. The cell in <span class="sd-q-est">q</span> ' +
-      'being updated pulses; the arithmetic on the right shows the target and the nudge. ' +
-      '<kbd>⟲ REROLL</kbd> samples a fresh trajectory but <em>keeps</em> <span class="sd-q-est">q</span> — ' +
-      'watch the table fill in over many rerolls.';
-    root.appendChild(fIntro);
-
-    /* Q-table on the left, sticky side column (tape + detail + ctrls)
-       on the right. Everything the student needs to drive the demo
-       lives in the side column, so no scrolling is required between
-       clicking a control and watching the cell pulse on the left. */
-    const fRow = document.createElement('div');
-    fRow.className = 'sd-f-row';
-    root.appendChild(fRow);
-
-    const qHost = document.createElement('div');
-    qHost.className = 'sd-f-q';
-    fRow.appendChild(qHost);
-    const qtbl = window.QTable.mount(qHost);
-
-    const side = document.createElement('div');
-    side.className = 'sd-f-side';
-    fRow.appendChild(side);
-
-    /* Trajectory tape (top of side column) */
     const tapeWrap = document.createElement('div');
     tapeWrap.className = 'sd-f-tape-wrap';
-    side.appendChild(tapeWrap);
-
+    right.appendChild(tapeWrap);
     const tapeTitle = document.createElement('div');
     tapeTitle.className = 'sd-f-tape-title';
     tapeTitle.innerHTML = 'TRAJECTORY <span class="sd-f-tape-count" id="sd-f-tape-count"></span>';
     tapeWrap.appendChild(tapeTitle);
-
     const tape = document.createElement('div');
     tape.className = 'sd-f-tape';
     tapeWrap.appendChild(tape);
 
-    /* Step detail (middle of side column) */
-    const detail = document.createElement('div');
-    detail.className = 'sd-f-detail';
-    side.appendChild(detail);
+    const qHost = document.createElement('div');
+    qHost.className = 'sd-q-host';
+    right.appendChild(qHost);
+    const qtbl = window.QTable.mount(qHost);
 
-    /* Controls (bottom of side column) */
-    const fCtrls = document.createElement('div');
-    fCtrls.className = 'sd-f-ctrls';
-    fCtrls.innerHTML =
-      '<button class="poke-btn" id="sd-f-step">▶ NEXT</button>' +
+    const numline = document.createElement('div');
+    numline.className = 'sd-numline';
+    numline.style.display = 'none';
+    right.appendChild(numline);
+
+    /* F-step extras: controls (PLAY etc.) at the bottom of root.  Hidden
+       unless on step F. */
+    const fCtrlsRow = document.createElement('div');
+    fCtrlsRow.className = 'sd-f-ctrls-row';
+    fCtrlsRow.style.display = 'none';
+    fCtrlsRow.innerHTML =
+      '<button class="poke-btn" id="sd-f-play">▶ PLAY</button>' +
+      '<button class="poke-btn" id="sd-f-step">▶ NEXT TRANSITION</button>' +
       '<button class="poke-btn" id="sd-f-reroll">⟲ REROLL</button>' +
       '<button class="poke-btn" id="sd-f-clear">CLEAR q</button>' +
       '<div class="sd-f-alpha">α <span id="sd-f-alpha-val">0.20</span>' +
         '<input type="range" id="sd-f-alpha-range" min="0" max="100" value="20">' +
       '</div>';
-    side.appendChild(fCtrls);
+    root.appendChild(fCtrlsRow);
 
-    /* ---- F state ---- */
+    /* ==========================================================
+       State
+       ========================================================== */
+    let cursor = 0;
+
+    /* Pre-sampled trajectory for the illustration steps (D–E4).  Fixed
+       seed so the same path appears on every visit. */
+    const illusRng = window.Battle.makeRng(20260515);
+    const illusTraj = genTrajectory(window.SARSA.makeQ(), 0.40, illusRng, 6);
+    const illusActiveIdx = 0;   /* which tuple is "the sample" emphasised in E1–E4 */
+
+    /* F state — independent of illustration trajectory. */
     let Q       = window.SARSA.makeQ();
-    let rng     = window.Battle.makeRng(20260514);
+    let fRng    = window.Battle.makeRng(20260520);
     let alpha   = 0.20;
     const eps   = 0.40;
-    let traj    = [];
-    let fCursor = 0;             /* index of next transition to apply */
-    let trajId  = 0;             /* increments on reroll */
+    let fTraj   = [];
+    let fCursor = 0;
 
-    function setAlpha(a) {
-      alpha = Math.max(0, Math.min(1, a));
-      const el = document.getElementById('sd-f-alpha-val');
-      if (el) el.textContent = alpha.toFixed(2);
+    /* PLAY mode state */
+    let playing   = false;
+    let playTimer = null;
+    const PLAY_MS = 750;
+
+    /* ==========================================================
+       Right-column rendering — per-step illustration logic
+       ========================================================== */
+
+    function clearOverlays() {
+      qHost.querySelectorAll('.q-cell.sd-pulse, .q-cell.sd-illus-cell, .q-cell.sd-illus-active')
+        .forEach(c => c.classList.remove('sd-pulse', 'sd-illus-cell', 'sd-illus-active'));
+      qHost.querySelectorAll('.q-bar-row.sd-row-mark, .q-bar-row.sd-illus-bar')
+        .forEach(r => r.classList.remove('sd-row-mark', 'sd-illus-bar'));
+      qHost.querySelectorAll('.sd-cell-badge').forEach(b => b.remove());
+      qHost.querySelectorAll('.sd-cell-target-callout').forEach(b => b.remove());
+      numline.style.display = 'none';
+      numline.innerHTML = '';
+      cap.textContent = '';
     }
-    document.getElementById('sd-f-alpha-range').addEventListener('input', (e) => {
-      setAlpha(Number(e.target.value) / 100);
-      /* Re-render detail with new α (preview the next-step arithmetic). */
-      renderDetail();
-    });
-    setAlpha(0.20);
+
+    function paintIllusTraj(opts) {
+      opts = opts || {};
+      const ghost = !!opts.ghost;
+      const activeOnly = !!opts.activeOnly;
+      illusTraj.forEach((t, i) => {
+        const node = qtbl.getCellNode(t.sIdx);
+        if (!node) return;
+        const isActive = (i === illusActiveIdx);
+        if (activeOnly && !isActive) return;
+        node.classList.add('sd-illus-cell');
+        if (isActive) node.classList.add('sd-illus-active');
+        if (ghost && !isActive) node.classList.add('sd-illus-ghost');
+        /* Add a sequence badge */
+        const badge = document.createElement('div');
+        badge.className = 'sd-cell-badge' + (isActive ? ' active' : '');
+        badge.textContent = String(i + 1);
+        node.appendChild(badge);
+        /* Highlight the action row */
+        const rows = node.querySelectorAll('.q-bar-row');
+        rows.forEach((r, k) => { if (k === t.aIdx) r.classList.add('sd-illus-bar'); });
+      });
+    }
+
+    function renderIllusTape(highlightIdx) {
+      const n = illusTraj.length;
+      document.getElementById('sd-f-tape-count').textContent = n > 0 ? '· ' + n + ' transitions (illustration)' : '';
+      let html = '';
+      for (let i = 0; i < n; i++) {
+        const t = illusTraj[i];
+        const active = (i === highlightIdx) ? ' active' : '';
+        html +=
+          '<div class="sd-f-tape-tuple' + active + '" data-i="' + i + '">' +
+            '<div class="sd-f-tape-t">t = ' + (i + 1) + '</div>' +
+            '<div class="sd-f-tape-arrow">' + shortMove(t.a) + '<br><span class="sd-f-tape-r">' + fmt(t.r) + '</span></div>' +
+          '</div>';
+      }
+      tape.innerHTML = html;
+    }
+
+    function showTargetCallout() {
+      const t = illusTraj[illusActiveIdx];
+      const node = qtbl.getCellNode(t.sIdx);
+      if (!node) return;
+      const target = t.terminal ? t.r : (t.r + GAMMA * 0);   /* q is still 0 in illustration */
+      const co = document.createElement('div');
+      co.className = 'sd-cell-target-callout';
+      co.innerHTML =
+        '<div class="sd-callout-title">TARGET</div>' +
+        '<div class="sd-callout-eq">r + q[s′, a′]</div>' +
+        '<div class="sd-callout-eq">= ' + fmt(t.r) + ' + +0.00</div>' +
+        '<div class="sd-callout-val">= <b>' + fmt(target) + '</b></div>';
+      node.appendChild(co);
+    }
+
+    function showNumLine(mode) {
+      /* mode: 'two-arrow' (E3) or 'one-arrow' (E4).  Builds a horizontal
+         line with q-dot and target-dot, with arrows between them. */
+      numline.style.display = 'block';
+      const t = illusTraj[illusActiveIdx];
+      const targetVal = t.terminal ? t.r : t.r;
+      /* Display values: target = r (since q[s',a']=0), q = 0. */
+      const lo = Math.min(0, targetVal) - 1;
+      const hi = Math.max(0, targetVal) + 1;
+      const pctOf = (v) => ((v - lo) / (hi - lo)) * 100;
+      const qPct = pctOf(0);
+      const tgPct = pctOf(targetVal);
+
+      const html =
+        '<div class="sd-numline-title">' + (mode === 'two-arrow' ? 'TWO CASES — q vs target' : 'COLLAPSED — one update') + '</div>' +
+        '<div class="sd-numline-track">' +
+          '<div class="sd-numline-axis"></div>' +
+          '<div class="sd-numline-dot q"     style="left:' + qPct  + '%"><div class="sd-numline-label">q = +0.00</div></div>' +
+          '<div class="sd-numline-dot tgt"   style="left:' + tgPct + '%"><div class="sd-numline-label">target = ' + fmt(targetVal) + '</div></div>' +
+          (mode === 'two-arrow'
+            ? '<div class="sd-numline-arrow ' + (targetVal > 0 ? 'up'   : 'down') + '" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">α(target − q)</div>' +
+              '<div class="sd-numline-arrow ' + (targetVal > 0 ? 'down' : 'up')   + ' shadow" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">other case (sign-flipped)</div>'
+            : '<div class="sd-numline-arrow unified" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">α(target − q)</div>') +
+        '</div>';
+      numline.innerHTML = html;
+    }
+
+    /* Per-step illustration renderers. */
+    function illusA() {
+      qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
+      tape.innerHTML = '';
+      document.getElementById('sd-f-tape-count').textContent = '';
+      cap.textContent = '← THE TABLE WE WANT TO FILL.  EACH CELL = ONE (STATE, ACTION).';
+    }
+
+    function illusB() {
+      qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
+      tape.innerHTML = '';
+      document.getElementById('sd-f-tape-count').textContent = '';
+      cap.textContent = '← INITIALISING q[s, a] := 0 FOR EVERY CELL';
+      /* Stagger-flash +0.00 into each cell, then leave it visible. */
+      const allCells = qHost.querySelectorAll('.q-cell');
+      allCells.forEach((cell, idx) => {
+        const vals = cell.querySelectorAll('.q-val');
+        setTimeout(() => {
+          vals.forEach(v => { v.textContent = '+0.00'; });
+          cell.classList.add('sd-illus-init');
+          setTimeout(() => cell.classList.remove('sd-illus-init'), 600);
+        }, idx * 22);
+      });
+    }
+
+    function illusD() {
+      qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
+      /* Force +0.00 instead of dashes (we're past initialisation now). */
+      qHost.querySelectorAll('.q-val').forEach(v => v.textContent = '+0.00');
+      renderIllusTape(-1);
+      paintIllusTraj({});
+      cap.textContent = '← ONE SAMPLED TRAJECTORY.  ε-greedy ON THE CURRENT q (ALL ZERO ⇒ UNIFORM RANDOM).';
+    }
+
+    function illusE1() {
+      qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
+      qHost.querySelectorAll('.q-val').forEach(v => v.textContent = '+0.00');
+      renderIllusTape(illusActiveIdx);
+      paintIllusTraj({ ghost: true });
+      cap.textContent = '← THIS ONE SAMPLE IS WHAT WE USE INSTEAD OF THE EXPECTATION.';
+    }
+
+    function illusE2() {
+      qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
+      qHost.querySelectorAll('.q-val').forEach(v => v.textContent = '+0.00');
+      renderIllusTape(illusActiveIdx);
+      paintIllusTraj({ activeOnly: true });
+      showTargetCallout();
+      cap.textContent = '← target = r + q[s′, a′].  q[s, a] WANTS TO BE THERE.';
+    }
+
+    function illusE3() {
+      qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
+      qHost.querySelectorAll('.q-val').forEach(v => v.textContent = '+0.00');
+      renderIllusTape(illusActiveIdx);
+      paintIllusTraj({ activeOnly: true });
+      showNumLine('two-arrow');
+      cap.textContent = '↓ q SITS BELOW target HERE — NUDGE UP BY α(target − q).';
+    }
+
+    function illusE4() {
+      qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
+      qHost.querySelectorAll('.q-val').forEach(v => v.textContent = '+0.00');
+      renderIllusTape(illusActiveIdx);
+      paintIllusTraj({ activeOnly: true });
+      showNumLine('one-arrow');
+      cap.textContent = '↓ ONE UNIFIED UPDATE — α(target − q) — ALREADY CARRIES THE RIGHT SIGN.';
+    }
+
+    function illusF() {
+      cap.textContent = '↓ LIVE: PRESS PLAY OR NEXT TRANSITION.  q FILLS IN OVER MANY REROLLS.';
+      qtbl.update(Q, { suppressFlash: true });
+      renderFTape();
+    }
+
+    /* ==========================================================
+       F-step live demo plumbing
+       ========================================================== */
 
     function tapeStateThumb(s) {
       if (s.terminal) {
@@ -385,13 +492,13 @@
              '</div>';
     }
 
-    function renderTape() {
-      const n = traj.length;
+    function renderFTape() {
+      const n = fTraj.length;
       document.getElementById('sd-f-tape-count').textContent =
         n > 0 ? '· ' + n + ' transition' + (n === 1 ? '' : 's') + ', cursor at ' + Math.min(fCursor, n) : '';
       let html = '';
       for (let i = 0; i < n; i++) {
-        const t = traj[i];
+        const t = fTraj[i];
         const active = (i === fCursor) ? ' active' : '';
         const applied = (i < fCursor) ? ' applied' : '';
         html +=
@@ -401,129 +508,250 @@
             '<div class="sd-f-tape-arrow">' + shortMove(t.a) + '<br><span class="sd-f-tape-r">' + fmt(t.r) + '</span></div>' +
           '</div>';
         if (i === n - 1) {
-          /* Show the terminal next-state at the end. */
           html += '<div class="sd-f-tape-tuple terminal-tail">' + tapeStateThumb(t.sNext) + '</div>';
         }
       }
       tape.innerHTML = html;
     }
 
-    function renderDetail() {
-      if (!traj.length || fCursor >= traj.length) {
-        if (!traj.length) {
-          detail.innerHTML =
-            '<div class="sd-f-detail-title">NO TRANSITIONS YET</div>' +
-            '<div class="sd-f-detail-body">Reroll to sample a trajectory.</div>';
+    function renderFDetail() {
+      if (!fTraj.length || fCursor >= fTraj.length) {
+        if (!fTraj.length) {
+          left.innerHTML =
+            '<div class="sd-card-num">STEP 8 / 8</div>' +
+            '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
+            '<div class="sd-f-detail">' +
+              '<div class="sd-f-detail-title">NO TRANSITIONS YET</div>' +
+              '<div class="sd-f-detail-body">Reroll to sample a trajectory.</div>' +
+            '</div>';
         } else {
-          detail.innerHTML =
-            '<div class="sd-f-detail-title">ALL ' + traj.length + ' TRANSITIONS APPLIED</div>' +
-            '<div class="sd-f-detail-body">Reroll to draw a fresh trajectory. ' +
-              '<span class="sd-q-est">q</span> is preserved, so the next trajectory builds on what we have.</div>';
+          left.innerHTML =
+            '<div class="sd-card-num">STEP 8 / 8</div>' +
+            '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
+            '<div class="sd-f-detail">' +
+              '<div class="sd-f-detail-title">ALL ' + fTraj.length + ' TRANSITIONS APPLIED</div>' +
+              '<div class="sd-f-detail-body">PLAY auto-rerolls.  <span class="sd-q-est">q</span> is preserved, so the next trajectory builds on what we have.</div>' +
+            '</div>';
         }
+        clearFPulse();
         return;
       }
 
-      const t = traj[fCursor];
+      const t = fTraj[fCursor];
       const qCurrent = Q[t.sIdx * A + t.aIdx];
       const qNextEst = t.terminal ? 0 : Q[t.sNextIdx * A + t.aNextIdx];
       const target   = t.terminal ? t.r : (t.r + GAMMA * qNextEst);
       const tdErr    = target - qCurrent;
       const qNew     = qCurrent + alpha * tdErr;
 
-      const sStr   = stateLabel(t.s);
       const aStr   = fullMove(t.a);
-      const sNStr  = stateLabel(t.sNext);
       const aNStr  = t.terminal ? '— (terminal)' : fullMove(t.aNext);
-      const qNStr  = t.terminal ? '0 (terminal)' : fmt(qNextEst);
       const targetCalc = t.terminal
         ? fmt(t.r) + ' &nbsp;&nbsp; (no bootstrap — next state terminal)'
         : fmt(t.r) + ' + ' + fmt(qNextEst) + ' = <b>' + fmt(target) + '</b>';
 
-      detail.innerHTML =
-        '<div class="sd-f-detail-title">TRANSITION ' + (fCursor + 1) + ' / ' + traj.length + '</div>' +
-        '<div class="sd-f-detail-body">' +
-          '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">s</span> <span class="sd-f-row-rhs">' + sStr + '</span></div>' +
-          '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">a</span> <span class="sd-f-row-rhs">' + aStr + '</span></div>' +
-          '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">r</span> <span class="sd-f-row-rhs sd-f-r">' + fmt(t.r) + '</span></div>' +
-          '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">s′</span> <span class="sd-f-row-rhs">' + sNStr + '</span></div>' +
-          '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">a′</span> <span class="sd-f-row-rhs">' + aNStr + '</span></div>' +
-          '<div class="sd-f-divider"></div>' +
-          '<div class="sd-f-calc-line"><span class="sd-f-calc-label">target = r + q[s′, a′]</span></div>' +
-          '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + targetCalc + '</span></div>' +
-          '<div class="sd-f-divider"></div>' +
-          '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a]  was</span> <b>' + fmt(qCurrent) + '</b></div>' +
-          '<div class="sd-f-calc-line"><span class="sd-f-calc-label">TD error = target − q[s, a]</span> = <b class="sd-f-td">' + fmt(tdErr) + '</b></div>' +
-          '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a] += α · (target − q[s, a])</span></div>' +
-          '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + fmt(qCurrent) + ' + ' + alpha.toFixed(2) + ' · ' + fmt(tdErr) + ' = <b class="sd-f-qnew">' + fmt(qNew) + '</b></span></div>' +
+      left.innerHTML =
+        '<div class="sd-card-num">STEP 8 / 8</div>' +
+        '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
+        '<div class="sd-f-detail">' +
+          '<div class="sd-f-detail-title">TRANSITION ' + (fCursor + 1) + ' / ' + fTraj.length + '</div>' +
+          '<div class="sd-f-detail-body">' +
+            '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">s</span> <span class="sd-f-row-rhs">' + stateLabel(t.s) + '</span></div>' +
+            '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">a</span> <span class="sd-f-row-rhs">' + aStr + '</span></div>' +
+            '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">r</span> <span class="sd-f-row-rhs sd-f-r">' + fmt(t.r) + '</span></div>' +
+            '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">s′</span> <span class="sd-f-row-rhs">' + stateLabel(t.sNext) + '</span></div>' +
+            '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">a′</span> <span class="sd-f-row-rhs">' + aNStr + '</span></div>' +
+            '<div class="sd-f-divider"></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">target = r + q[s′, a′]</span></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + targetCalc + '</span></div>' +
+            '<div class="sd-f-divider"></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a]  was</span> <b>' + fmt(qCurrent) + '</b></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">TD error = target − q[s, a]</span> = <b class="sd-f-td">' + fmt(tdErr) + '</b></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a] += α · (target − q[s, a])</span></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + fmt(qCurrent) + ' + ' + alpha.toFixed(2) + ' · ' + fmt(tdErr) + ' = <b class="sd-f-qnew">' + fmt(qNew) + '</b></span></div>' +
+          '</div>' +
         '</div>';
 
-      /* Highlight the cell being updated. */
-      highlightCellForCurrentTuple(t);
+      highlightFCell(t);
     }
 
-    function highlightCellForCurrentTuple(t) {
-      /* Clear previous pulse. */
+    function clearFPulse() {
       const prev = qHost.querySelector('.q-cell.sd-pulse');
       if (prev) prev.classList.remove('sd-pulse');
+      qHost.querySelectorAll('.q-bar-row.sd-row-mark').forEach(r => r.classList.remove('sd-row-mark'));
+    }
+
+    function highlightFCell(t) {
+      clearFPulse();
       const cell = qtbl.getCellNode(t.sIdx);
       if (cell) {
         cell.classList.add('sd-pulse');
-        /* Mark the action row inside that cell — adds .sd-row-mark to a.sIdx row. */
-        const rows = cell.querySelectorAll('.q-bar-row');
-        rows.forEach((row, i) => row.classList.toggle('sd-row-mark', i === t.aIdx));
+        cell.querySelectorAll('.q-bar-row').forEach((row, i) => row.classList.toggle('sd-row-mark', i === t.aIdx));
       }
     }
 
-    function applyCurrentUpdate() {
-      if (fCursor >= traj.length) return;
-      const t = traj[fCursor];
-      window.SARSA.update(
-        Q, t.sIdx, t.a, t.r,
-        t.sNextIdx, t.aNext,
-        alpha, GAMMA, t.terminal
-      );
+    function applyCurrentFUpdate() {
+      if (fCursor >= fTraj.length) return false;
+      const t = fTraj[fCursor];
+      window.SARSA.update(Q, t.sIdx, t.a, t.r, t.sNextIdx, t.aNext, alpha, GAMMA, t.terminal);
       qtbl.update(Q, { suppressFlash: false });
       fCursor += 1;
-      renderTape();
-      renderDetail();
-      /* If we just landed on the after-everything state, clear cell pulse. */
-      if (fCursor >= traj.length) {
-        const prev = qHost.querySelector('.q-cell.sd-pulse');
-        if (prev) prev.classList.remove('sd-pulse');
-        qHost.querySelectorAll('.q-bar-row.sd-row-mark').forEach(r => r.classList.remove('sd-row-mark'));
+      renderFTape();
+      renderFDetail();
+      return true;
+    }
+
+    function fReroll() {
+      fTraj = genTrajectory(Q, eps, fRng, 20);
+      fCursor = 0;
+      qtbl.update(Q, { suppressFlash: true });
+      renderFTape();
+      renderFDetail();
+    }
+
+    function fClearQ() {
+      Q = window.SARSA.makeQ();
+      qtbl.update(Q, { suppressFlash: true });
+      renderFDetail();
+    }
+
+    /* ---- PLAY mode ---- */
+    function playButton() { return document.getElementById('sd-f-play'); }
+    function setPlayLabel(isPlay) {
+      const b = playButton();
+      if (b) b.textContent = isPlay ? '⏸ PAUSE' : '▶ PLAY';
+    }
+    function pausePlay() {
+      if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+      playing = false;
+      setPlayLabel(false);
+    }
+    function schedulePlayTick() {
+      playTimer = setTimeout(() => {
+        playTimer = null;
+        if (!playing) return;
+        /* If we're past the trajectory, auto-reroll. */
+        if (fCursor >= fTraj.length) {
+          fReroll();
+        } else {
+          applyCurrentFUpdate();
+        }
+        if (playing) schedulePlayTick();
+      }, PLAY_MS);
+    }
+    function startPlay() {
+      if (playing) return;
+      playing = true;
+      setPlayLabel(true);
+      schedulePlayTick();
+    }
+    function togglePlay() { if (playing) pausePlay(); else startPlay(); }
+
+    /* ==========================================================
+       Pager — apply current step
+       ========================================================== */
+    function applyCursor() {
+      pausePlay();
+      const step = STEPS[cursor];
+      document.getElementById('sd-step-idx').textContent = String(cursor + 1);
+      document.getElementById('sd-step-id').textContent = step.id;
+      document.getElementById('sd-prev').disabled = (cursor === 0);
+      document.getElementById('sd-next').disabled = (cursor === STEPS.length - 1);
+
+      clearOverlays();
+
+      if (step.id === 'F') {
+        /* F step — live demo.  Show F controls, render detail panel on
+           the left, build a fresh trajectory if we don't have one. */
+        fCtrlsRow.style.display = '';
+        if (!fTraj.length) fReroll();
+        illusF();
+        renderFDetail();
+        return;
+      }
+
+      fCtrlsRow.style.display = 'none';
+
+      /* Render the standard card on the left. */
+      let html =
+        '<div class="sd-card-num">STEP ' + (cursor + 1) + ' / ' + STEPS.length + '</div>' +
+        '<div class="sd-card-title">' + step.title + '</div>' +
+        '<div class="sd-card-body">' + step.body + '</div>';
+      left.innerHTML = html;
+
+      if (step.latex && step.latex.length) {
+        for (const f of step.latex) {
+          const box = document.createElement('div');
+          box.className = 'sd-card-formula';
+          left.appendChild(box);
+          window.Katex.render(f, box, true);
+        }
+      }
+      if (step.foot) {
+        const foot = document.createElement('div');
+        foot.className = 'concept-formula-foot';
+        foot.style.marginTop = '6px';
+        foot.innerHTML = step.foot;
+        left.appendChild(foot);
+      }
+
+      switch (step.id) {
+        case 'A':  illusA();  break;
+        case 'B':  illusB();  break;
+        case 'D':  illusD();  break;
+        case 'E1': illusE1(); break;
+        case 'E2': illusE2(); break;
+        case 'E3': illusE3(); break;
+        case 'E4': illusE4(); break;
       }
     }
 
-    function reroll() {
-      traj = genTrajectory(Q, eps, rng, 20);
-      fCursor = 0;
-      trajId += 1;
-      qtbl.update(Q, { suppressFlash: true });
-      renderTape();
-      renderDetail();
-    }
-
-    function clearQ() {
+    /* ==========================================================
+       Events
+       ========================================================== */
+    document.getElementById('sd-prev').addEventListener('click', () => {
+      if (cursor > 0) { cursor--; applyCursor(); }
+    });
+    document.getElementById('sd-next').addEventListener('click', () => {
+      if (cursor < STEPS.length - 1) { cursor++; applyCursor(); }
+    });
+    document.getElementById('sd-reset').addEventListener('click', () => {
+      cursor = 0;
       Q = window.SARSA.makeQ();
-      qtbl.update(Q, { suppressFlash: true });
-      renderDetail();
+      fTraj = [];
+      fCursor = 0;
+      applyCursor();
+    });
+
+    /* F controls */
+    document.getElementById('sd-f-play').addEventListener('click', togglePlay);
+    document.getElementById('sd-f-step').addEventListener('click', () => { pausePlay(); applyCurrentFUpdate(); });
+    document.getElementById('sd-f-reroll').addEventListener('click', () => { pausePlay(); fReroll(); });
+    document.getElementById('sd-f-clear').addEventListener('click', () => { pausePlay(); fClearQ(); fReroll(); });
+    document.getElementById('sd-f-alpha-range').addEventListener('input', (e) => {
+      alpha = Math.max(0, Math.min(1, Number(e.target.value) / 100));
+      document.getElementById('sd-f-alpha-val').textContent = alpha.toFixed(2);
+      if (STEPS[cursor].id === 'F') renderFDetail();
+    });
+
+    applyCursor();
+
+    /* &run flag for headless capture — jump to last step (F). */
+    if (/[#&?]run\b/.test(window.location.hash)) {
+      setTimeout(() => { cursor = STEPS.length - 1; applyCursor(); }, 200);
     }
-
-    document.getElementById('sd-f-step').addEventListener('click', applyCurrentUpdate);
-    document.getElementById('sd-f-reroll').addEventListener('click', reroll);
-    document.getElementById('sd-f-clear').addEventListener('click', () => { clearQ(); reroll(); });
-
-    /* Initial seed: one trajectory, cursor at 0, q all zeros. */
-    reroll();
+    /* &sd=N flag — jump to step N (1-indexed). */
+    const sdMatch = (window.location.hash || '').match(/[#&?]sd=(\d+)/);
+    if (sdMatch) {
+      const target = Math.min(STEPS.length - 1, Math.max(0, parseInt(sdMatch[1], 10) - 1));
+      setTimeout(() => { cursor = target; applyCursor(); }, 100);
+    }
 
     return {
-      onEnter() {
-        /* Re-render to be safe on navigation back. */
-        applyCursor();
-        renderDetail();
-      },
+      onEnter() { applyCursor(); },
+      onLeave() { pausePlay(); },
       onNextKey() {
-        if (cursor < CARDS.length - 1) { stepCard(); return true; }
+        if (cursor < STEPS.length - 1) { cursor++; applyCursor(); return true; }
         return false;
       },
       onPrevKey() {
