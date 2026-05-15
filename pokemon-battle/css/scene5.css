@@ -41,20 +41,20 @@
    Pokemon-box style. */
 .sc5-hof-banner {
   font-family: 'Press Start 2P', monospace;
-  font-size: 18px;
-  letter-spacing: 0.12em;
+  font-size: 14px;
+  letter-spacing: 0.10em;
   text-align: center;
-  padding: 14px 18px;
-  margin: 6px auto 12px;
+  padding: 8px 14px;
+  margin: 2px auto 6px;
   max-width: 32ch;
   color: var(--ink-on-box);
   background: var(--pikachu-yellow);
-  border: 4px solid var(--rule);
+  border: 3px solid var(--rule);
   box-shadow:
     inset 0 0 0 2px var(--pikachu-yellow),
     inset 0 0 0 4px var(--inner-highlight),
     inset 0 0 0 6px var(--pikachu-yellow),
-    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+    3px 3px 0 0 rgba(0, 0, 0, 0.20);
   text-shadow: 2px 2px 0 var(--bg-strong);
   animation: sc5-banner-pop 480ms ease-out 60ms backwards;
 }
@@ -79,26 +79,29 @@
 
 .sc5-heading {
   text-align: center;
-  margin-top: 0;
+  margin: 0 auto 4px;
+  font-size: 12px;
 }
 
 .sc5-sub {
   text-align: center;
-  margin: 0 auto 16px;
+  margin: 0 auto 8px;
   max-width: 70ch;
+  font-size: 8.5px;
+  line-height: 1.55;
 }
 .sc5-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 .sc5-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 14px;
-  min-height: 200px;
+  gap: 6px;
+  padding: 9px 12px;
+  min-height: 0;
   /* Staggered entry — each card sets --i inline; the 180ms-per-card
      cadence times with the win-fanfare's 4-note arpeggio.  backwards
      keeps the pre-animation state (invisible) until each card's
@@ -113,9 +116,9 @@
 .sc5-card .hue-chip { align-self: flex-start; margin-bottom: 4px; }
 .sc5-card .sc5-title {
   font-family: 'Press Start 2P', monospace;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--ink-on-box);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 .sc5-card .poke-formula.sc5-formula {
   background: transparent;
@@ -129,8 +132,8 @@
 .sc5-card .poke-formula.sc5-formula .katex { font-size: 13px; }
 .sc5-card .sc5-caption {
   font-family: 'Press Start 2P', monospace;
-  font-size: 8.5px;
-  line-height: 1.65;
+  font-size: 8px;
+  line-height: 1.55;
   color: var(--ink-on-box);
   margin-top: 2px;
 }
@@ -145,8 +148,8 @@
 
 .sc5-closer {
   background: var(--pikachu-yellow);
-  margin-top: 8px;
-  padding: 14px 16px;
+  margin-top: 4px;
+  padding: 10px 14px;
   box-shadow:
     inset 0 0 0 2px var(--pikachu-yellow),
     inset 0 0 0 4px var(--inner-highlight),
@@ -154,11 +157,11 @@
   animation: sc5-card-enter 520ms cubic-bezier(.2, .8, .3, 1) backwards;
   animation-delay: calc(var(--i, 5) * 180ms + 220ms);
 }
-.sc5-closer .hue-chip { background: var(--ink-on-box); color: var(--pikachu-yellow); margin-bottom: 10px; display: inline-block; }
+.sc5-closer .hue-chip { background: var(--ink-on-box); color: var(--pikachu-yellow); margin-bottom: 6px; display: inline-block; }
 .sc5-closer-text {
   font-family: 'Press Start 2P', monospace;
-  font-size: 9.5px;
-  line-height: 1.8;
+  font-size: 8.5px;
+  line-height: 1.6;
   color: var(--ink-on-box);
 }
 

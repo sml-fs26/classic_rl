@@ -91,19 +91,21 @@
    with bigger sprites). For the DP scene we want the whole grid to
    fit in roughly half the viewport so the student can see controls,
    table, and side panel at once. */
-.dp-scene .q-cell        { padding: 3px 5px 5px; gap: 4px; }
-.dp-scene .q-thumb       { gap: 3px; padding-bottom: 2px; }
-.dp-scene .q-thumb-sprite { width: 22px; height: 22px; }
-.dp-scene .q-thumb-hp-bg { height: 3px; }
-.dp-scene .q-bar-row     { grid-template-columns: 8px 30px 1fr; gap: 3px; padding: 0 2px; font-size: 6.5px; }
-.dp-scene .q-label       { font-size: 6.5px; }
-.dp-scene .q-val         { font-size: 7px; }
-.dp-scene .q-grid        { gap: 4px; }
-.dp-scene .q-row-head    { font-size: 7px; }
-.dp-scene .q-col-head    { font-size: 6.5px; }
+.dp-scene .q-cell        { padding: 2px 4px 3px; gap: 2px; }
+.dp-scene .q-thumb       { gap: 2px; padding-bottom: 1px; border-bottom-width: 1px; }
+.dp-scene .q-thumb-sprite { width: 16px; height: 16px; }
+.dp-scene .q-thumb-hp-bg { height: 2px; }
+.dp-scene .q-bars        { gap: 1px; }
+.dp-scene .q-bar-row     { grid-template-columns: 7px 26px 1fr; gap: 2px; padding: 0 2px; font-size: 6px; }
+.dp-scene .q-label       { font-size: 6px; }
+.dp-scene .q-val         { font-size: 6.5px; }
+.dp-scene .q-grid        { gap: 3px; grid-template-columns: 56px repeat(var(--nb, 5), minmax(0, 1fr)); }
+.dp-scene .q-col-heads   { grid-template-columns: 56px repeat(var(--nb, 5), minmax(0, 1fr)); gap: 3px; }
+.dp-scene .q-row-head    { font-size: 6.5px; }
+.dp-scene .q-col-head    { font-size: 6px; }
 /* Compact Pokedex header — Nº only (state name is redundant given
    the row/col axis labels). */
-.dp-scene .q-pokedex-header { font-size: 6px; padding: 1px 4px; margin: -3px -5px 2px; }
+.dp-scene .q-pokedex-header { font-size: 5.5px; padding: 0 3px; margin: -2px -4px 1px; line-height: 1.4; }
 .dp-scene .q-pokedex-header .q-dex-state { display: none; }
 
 /* Hide the argmax-distribution strip + legend in this scene.  The
