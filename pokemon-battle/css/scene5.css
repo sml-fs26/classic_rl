@@ -77,18 +77,150 @@
   50%      { transform: rotate(12deg)  scale(1.2); }
 }
 
-.sc5-heading {
-  text-align: center;
-  margin: 0 auto 4px;
-  font-size: 12px;
-}
-
 .sc5-sub {
   text-align: center;
   margin: 0 auto 8px;
   max-width: 70ch;
   font-size: 8.5px;
   line-height: 1.55;
+}
+
+/* ============================================================
+   TRAINER CARD — replaces the generic "YOU'VE TRAINED PIKACHU"
+   heading.  Personal banner with the student's name, earned badges
+   (with timestamps), and lifetime stats.
+   ============================================================ */
+.sc5-trainer-card-host {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 8px;
+  width: 100%;
+}
+.sc5-trainer-card {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong),
+    3px 3px 0 0 rgba(0, 0, 0, 0.20);
+  padding: 10px 18px;
+  max-width: 720px;
+  min-width: 540px;
+  position: relative;
+  animation: sc5-trainer-card-enter 520ms ease-out backwards;
+  animation-delay: 60ms;
+}
+.sc5-trainer-card.champion {
+  background: linear-gradient(135deg, var(--pikachu-yellow) 0%, var(--bg-strong) 100%);
+}
+@keyframes sc5-trainer-card-enter {
+  0%   { transform: translateY(-12px); opacity: 0; }
+  100% { transform: translateY(0);     opacity: 1; }
+}
+.sc5-tc-pika {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+/* Victory bounce on first-ever-visit; otherwise idle bob. */
+.sc5-trainer-card .sc5-tc-pika           { animation: sc5-tc-pika-idle 1.6s ease-in-out infinite; }
+.sc5-trainer-card-celebrate .sc5-tc-pika { animation: sc5-tc-pika-victory 0.55s ease-in-out infinite; }
+@keyframes sc5-tc-pika-idle {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+@keyframes sc5-tc-pika-victory {
+  0%, 100% { transform: translateY(0)    rotate(-3deg); }
+  50%      { transform: translateY(-8px) rotate(3deg);  }
+}
+
+.sc5-tc-body { min-width: 0; }
+.sc5-tc-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-on-box);
+  margin-bottom: 8px;
+}
+.sc5-trainer-card.champion .sc5-tc-name { color: var(--pikachu-cheek); }
+
+.sc5-tc-badges {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.sc5-tc-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 2px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  opacity: 0.4;
+}
+.sc5-tc-badge.earned { opacity: 1; }
+.sc5-tc-badge.mdp.earned    { background: #D55E00; color: #FFFFFF; }
+.sc5-tc-badge.return.earned { background: #0072B2; color: #FFFFFF; }
+.sc5-tc-badge.qstar.earned  { background: var(--pikachu-yellow); color: var(--ink-on-box); }
+.sc5-tc-badge.dp.earned     { background: #009E73; color: #FFFFFF; }
+.sc5-tc-badge.sarsa.earned  { background: #CC79A7; color: #FFFFFF; }
+.sc5-tc-badge-mark  { font-size: 13px; line-height: 1; }
+.sc5-tc-badge-label { font-size: 8px;  letter-spacing: 0.04em; }
+.sc5-tc-badge-date  { font-size: 6px;  letter-spacing: 0.02em; opacity: 0.85; }
+
+.sc5-tc-stats {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.sc5-tc-stats b { color: var(--pikachu-cheek); }
+
+/* ============================================================
+   First-visit-ever confetti — 50 colored pixels rain across the
+   scene for ~3 s.  Pure CSS keyframes, JS spawns the pieces.
+   ============================================================ */
+.sc5-confetti-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 50;
+}
+.sc5-confetti {
+  position: absolute;
+  top: -20px;
+  left: var(--x, 50%);
+  width: var(--w, 6px);
+  height: var(--w, 6px);
+  background: var(--color, var(--pikachu-yellow));
+  animation: sc5-confetti-fall var(--dur, 2s) ease-in var(--delay, 0s) forwards;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.18);
+}
+@keyframes sc5-confetti-fall {
+  0%   { transform: translateY(0) rotate(0);              opacity: 1; }
+  90%  {                                                  opacity: 1; }
+  100% { transform: translateY(90vh) rotate(var(--rot, 360deg)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc5-trainer-card,
+  .sc5-trainer-card .sc5-tc-pika,
+  .sc5-trainer-card-celebrate .sc5-tc-pika,
+  .sc5-confetti {
+    animation: none;
+  }
 }
 .sc5-grid {
   display: grid;

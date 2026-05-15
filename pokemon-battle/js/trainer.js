@@ -53,6 +53,14 @@
     return !!readBadgeSet()[key];
   }
 
+  /* Timestamp (ms since epoch) at which `key` was awarded.  Null if
+     unearned.  Read by the HoF trainer card to render journey
+     stats. */
+  function getBadgeTimestamp(key) {
+    const v = readBadgeSet()[key];
+    return (typeof v === 'number' && v > 0) ? v : null;
+  }
+
   function awardBadge(key) {
     if (BADGES.indexOf(key) < 0) return false;
     const set = readBadgeSet();
@@ -72,7 +80,7 @@
 
   window.Trainer = {
     getName, setName, hasBeenAsked,
-    hasBadge, awardBadge, listBadges,
+    hasBadge, awardBadge, listBadges, getBadgeTimestamp,
     resetAll,
   };
 })();
