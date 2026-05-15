@@ -551,7 +551,24 @@
   color: var(--pikachu-cheek);
   text-align: center;
   margin-bottom: 10px;
+  cursor: pointer;
+  user-select: none;
 }
+.g-variance-caret {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--pikachu-cheek);
+}
+.g-variance-hint {
+  font-size: 7px;
+  color: var(--ink-secondary);
+  margin-left: 8px;
+  letter-spacing: 0.04em;
+}
+.g-variance.collapsed { padding: 10px 18px; }
+.g-variance.collapsed .g-variance-title { margin-bottom: 0; }
+.g-variance.collapsed .g-variance-body { display: none; }
+.g-variance:not(.collapsed) .g-variance-hint { display: none; }
 .g-variance-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);

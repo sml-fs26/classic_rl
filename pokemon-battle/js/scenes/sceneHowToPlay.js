@@ -18,9 +18,7 @@
   const STEPS_DATA = [
     {
       title: 'Welcome, trainer!',
-      dialog:
-        "Hello there!  Welcome to the world of POKEMON!  " +
-        "Before you battle, here is a quick refresher.",
+      dialog: null,    /* Filled in at scene mount with the trainer name. */
       render: renderStepWelcome,
     },
     {
@@ -63,6 +61,13 @@
   window.scenes.sceneHowToPlay = function (root) {
     root.classList.add('scene-pad', 'tutorial-scene');
     root.innerHTML = '';
+
+    /* Personalise the welcome line with the trainer's name (set on
+       first scene transition out of the title screen). */
+    const trainerName = (window.Trainer && window.Trainer.getName()) || 'TRAINER';
+    STEPS_DATA[0].dialog =
+      'Hello there, ' + trainerName + '!  Welcome to the world of POKEMON!  ' +
+      'Before you battle, here is a quick refresher.';
 
     /* ---------- Top bar: step counter + SKIP button ---------- */
     const topbar = document.createElement('div');

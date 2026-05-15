@@ -247,10 +247,12 @@
       maybeAwardBadge(key);
     });
 
-    /* Trainer-name modal on first visit only.  Reads/writes via
-       window.Trainer; the rest of the viz can later interpolate
-       window.Trainer.getName() wherever it wants a personal touch. */
-    if (window.Trainer && !window.Trainer.hasBeenAsked()) {
+    /* Trainer-name modal — deferred from page load to the first scene
+       transition AWAY from the title screen.  The title impression
+       shouldn't be interrupted by a prompt; once the student commits
+       to NEXT, we ask their name.  Triggered exactly once. */
+    function maybeShowTrainerModal() {
+      if (!window.Trainer || window.Trainer.hasBeenAsked()) return;
       const modal = document.createElement('div');
       modal.className = 'trainer-name-modal';
       modal.innerHTML =
@@ -265,24 +267,24 @@
           '<div class="trainer-name-hint">12 letters max. You can leave it blank.</div>' +
         '</div>';
       document.body.appendChild(modal);
+      const inputEl = document.getElementById('trainer-name-input');
       const finish = (name) => {
         if (window.Trainer) window.Trainer.setName(name || 'TRAINER');
         modal.remove();
       };
-      document.getElementById('trainer-name-ok').addEventListener('click', () => {
-        const v = document.getElementById('trainer-name-input').value;
-        finish(v);
-      });
+      document.getElementById('trainer-name-ok').addEventListener('click', () => finish(inputEl.value));
       document.getElementById('trainer-name-skip').addEventListener('click', () => finish('TRAINER'));
-      document.getElementById('trainer-name-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const v = document.getElementById('trainer-name-input').value;
-          finish(v);
-        } else if (e.key === 'Escape') {
-          finish('TRAINER');
-        }
+      inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') finish(inputEl.value);
+        else if (e.key === 'Escape') finish('TRAINER');
       });
+      setTimeout(() => inputEl.focus(), 0);
     }
+    window.addEventListener('scene-change', (e) => {
+      const idx = e.detail && typeof e.detail.idx === 'number' ? e.detail.idx : -1;
+      /* Title screen is index 0; ask once the user advances past it. */
+      if (idx > 0) maybeShowTrainerModal();
+    });
 
     /* Speaker-notes overlay — lecturer crib sheet, toggled by `n`.
        Lives outside the scene flow so it's available everywhere. */

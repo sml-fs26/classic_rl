@@ -198,9 +198,13 @@
 
     /* ---- Variance illustration ---- */
     const variance = document.createElement('div');
-    variance.className = 'g-variance';
+    variance.className = 'g-variance collapsed';   /* collapsed by default — click the title to expand */
     variance.innerHTML =
-      '<div class="g-variance-title">Q* IS THE EXPECTED G — VARIANCE LIVES IN ONE TRAJECTORY</div>' +
+      '<div class="g-variance-title">' +
+        '<span class="g-variance-caret">▶</span> ' +
+        'Q* IS THE EXPECTED G — VARIANCE LIVES IN ONE TRAJECTORY' +
+        '<span class="g-variance-hint">(click to expand)</span>' +
+      '</div>' +
       '<div class="g-variance-body">' +
         '<div class="g-variance-explainer">' +
           'G<sub>1</sub>(τ) is a <em>random variable</em>. Two rollouts from the same start can land far apart. ' +
@@ -272,6 +276,12 @@
       chart.innerHTML = html;
     }
     document.getElementById('g-variance-sample').addEventListener('click', () => drawSamples(20));
+    /* Expand/collapse on title click. */
+    variance.querySelector('.g-variance-title').addEventListener('click', () => {
+      variance.classList.toggle('collapsed');
+      const caret = variance.querySelector('.g-variance-caret');
+      if (caret) caret.textContent = variance.classList.contains('collapsed') ? '▶' : '▼';
+    });
     renderVarianceChart();
 
     return {};
