@@ -229,6 +229,10 @@
               void node.cell.offsetWidth;
               node.cell.classList.add('argmax-flip');
               setTimeout(() => node.cell.classList.remove('argmax-flip'), 1200);
+              /* Argmax-flip ding — auditory cue that the policy just
+                 shifted on this cell.  Quiet enough not to overlap the
+                 melody. */
+              if (window.SFX) window.SFX.play('cursor');
             }
           } else if (prevAllZero && !allZero) {
             spawnAwake(node.cell);

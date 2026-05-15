@@ -71,10 +71,20 @@
     const BUCKET_NAMES = ['FULL', 'HIGH', 'MID', 'LOW', 'CRITICAL', 'FAINTED'];
 
     function set(bucket) {
+      const prev = cur;
       cur = Math.max(0, Math.min(maxB, bucket));
       fill.dataset.bucket = String(cur);
       const label = host.querySelector('.hp-num');
       if (label) label.textContent = BUCKET_NAMES[cur] || 'FAINTED';
+      /* Drain ticks — one short tick per bucket crossed downward, in
+         sync with the CSS width transition (1100 ms total).  Skip if
+         we're going UP (rare, but possible on reset). */
+      if (window.SFX && cur > prev) {
+        const steps = cur - prev;
+        for (let i = 0; i < steps; i++) {
+          setTimeout(() => window.SFX.play('tick'), Math.round((i + 1) * (1100 / Math.max(1, steps + 1))));
+        }
+      }
     }
     /* Update the displayed name — used in scene 1 when CHARMANDER
        evolves into CHARMELEON / CHARIZARD mid-battle. */
