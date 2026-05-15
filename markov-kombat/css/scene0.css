@@ -1,0 +1,251 @@
+/* Scene 0 — title screen + MDP-frame overlay. */
+
+.sc0-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 24px 8px 8px;
+  text-align: center;
+}
+
+.sc0-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.sc0-pika-wrap {
+  margin: 12px 0;
+  display: flex;
+  justify-content: center;
+}
+.sc0-pika {
+  width: 144px;
+  height: 144px;
+  animation: pika-bob 1.2s ease-in-out infinite;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+@keyframes pika-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+.sc0-start {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  padding: 12px 22px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  color: var(--ink-on-box);
+  cursor: pointer;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    4px 4px 0 var(--rule);
+  animation: start-blink 1.0s steps(2, end) infinite;
+}
+.sc0-start:hover {
+  background: var(--pikachu-yellow);
+  animation: none;
+}
+@keyframes start-blink {
+  0%, 60% { opacity: 1; }
+  61%, 100% { opacity: 0.4; }
+}
+
+.sc0-credits {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+  margin-top: 24px;
+}
+.sc0-credits.sc0-credits-by {
+  margin-top: 6px;
+  color: var(--pikachu-cheek, #C62828);
+}
+
+/* MDP overlay phase */
+.sc0-mdp-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.sc0-mdp-heading {
+  text-align: center;
+  margin-top: 6px;
+  font-size: 14px;
+}
+.sc0-mdp-sub {
+  text-align: center;
+  margin: 0;
+}
+.sc0-tuple {
+  margin-top: 6px;
+}
+
+/* ---------- Side-by-side layout ----------
+   Stage on the left, control column (menu + caption + step controls)
+   on the right.  Total page height now fits in one viewport so the
+   student can see the tag on the stage AND the caption explaining it
+   without scrolling.  See the JS comment in sceneMdpOverlay.js. */
+.sc0-mdp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 360px);
+  gap: 18px;
+  width: 100%;
+  align-items: start;
+}
+.sc0-mdp-row .battle-stage {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+.sc0-mdp-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  align-self: stretch;
+}
+.sc0-mdp-right .sc0-menu-wrap {
+  margin: 0;
+  max-width: none;
+  width: 100%;
+}
+.sc0-mdp-right .sc0-mdp-ctrls {
+  margin-top: auto;        /* push to bottom of the right column */
+  justify-content: flex-start;
+}
+.sc0-mdp-right .sc0-mdp-caption {
+  text-align: left;
+  margin-top: 0;
+  max-width: none;
+}
+
+.sc0-mdp-caption {
+  margin-top: 4px;
+  text-align: center;
+  max-width: 70ch;
+  font-size: 9px;
+  line-height: 1.8;
+  min-height: 4em;     /* reserve room so caption swap doesn't jump */
+}
+
+/* ---------- Progressive MDP overlay state machine ---------- */
+
+/* Step-gated containers — fade in via the `.show` toggle. */
+.sc0-menu-wrap, .sc0-reward-wrap {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 380ms ease-out;
+}
+.sc0-menu-wrap.show, .sc0-reward-wrap.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* HP boxes use `display: contents` on the wrapper so the children are
+   positioned by the parent .battle-stage (the original CSS expects
+   them as direct children). That means `opacity` cannot live on the
+   wrapper itself — it has no box. Apply opacity to the children. */
+.sc0-hp-wrap { display: contents; }
+.sc0-hp-wrap > .hp-box {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 380ms ease-out;
+}
+.sc0-hp-wrap.show > .hp-box {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Menu wrapper sizing — match the .move-menu look from scene 1, but
+   constrain its width so it sits centred under the stage. */
+.sc0-menu-wrap { width: 100%; max-width: 720px; margin: 12px auto 0; }
+.sc0-menu-wrap .move-menu { width: 100%; }
+.sc0-menu-wrap .move-btn { cursor: default; opacity: 0.92; }
+
+/* Reward pills strip. */
+.sc0-reward-wrap {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.sc0-reward-pill {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: 2px 2px 0 0 var(--ink);
+}
+.sc0-reward-pill.pos { color: var(--cb-blue); border-color: var(--cb-blue); }
+.sc0-reward-pill.neg { color: var(--cb-vermillion); border-color: var(--cb-vermillion); }
+
+/* Step control row. */
+.sc0-mdp-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 8px;
+}
+.sc0-mdp-step {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.sc0-mdp-step b { color: var(--pikachu-cheek); }
+
+/* MDP tags fade in via .show, same convention as the gated wrappers. */
+.mdp-overlay .mdp-tag {
+  opacity: 0;
+  transition: opacity 380ms ease-out;
+}
+.mdp-overlay .mdp-tag.show { opacity: 1; }
+
+/* One-shot attack animation triggered when entering step 3 (TRANSITIONS).
+   PIKACHU lunges forward; CHARMANDER shakes; "−1 HP" floats above the
+   opponent.  Re-armed each time by toggling the .sc0-attacking class. */
+@keyframes sc0-attack-pika {
+  0%   { transform: translate(0, 0); }
+  35%  { transform: translate(60px, -18px); }
+  60%  { transform: translate(60px, -18px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes sc0-shake-charm {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+.sc0-attacking .sprite-host.player img  { animation: sc0-attack-pika 0.9s ease-out; }
+.sc0-attacking .sprite-host.opponent img { animation: sc0-shake-charm 0.5s ease-in-out 0.35s; }
+
+@keyframes sc0-damage-rise {
+  0%   { opacity: 0; transform: translate(-50%, 20px); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -40px); }
+}
+.sc0-damage-flash {
+  position: absolute;
+  right: 22%;
+  top: 30%;
+  transform: translate(-50%, 20px);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: var(--cb-vermillion);
+  pointer-events: none;
+  animation: sc0-damage-rise 1.05s ease-out forwards;
+  text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF, 2px -2px 0 #FFF, -2px 2px 0 #FFF;
+  z-index: 6;
+}

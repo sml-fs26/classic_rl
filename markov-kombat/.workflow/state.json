@@ -1,0 +1,41 @@
+{
+  "viz": "markov-kombat",
+  "branch": "mk-demo",
+  "phase": "phase-0-boot",
+  "completed_phases": [],
+  "next_action": "Write MK-SPEC.md (phase 1)",
+  "started_at": "2026-05-15",
+  "decisions_locked": {
+    "title": "MARKOV KOMBAT II: SHAO KAHN-VERGENCE",
+    "subtitle": "FINISH HIM — OPTIMALLY.",
+    "branding_legal": "PIXEL KOMBAT II in <title>, MARKOV KOMBAT inside viz",
+    "sprite_source": "CSS silhouettes via clip-path",
+    "palette": {
+      "primary":  "#C8201A",
+      "bg":       "#0A0A0A",
+      "boxes":    "#C8C8C8",
+      "accent":   "#E8B028"
+    },
+    "moves": ["GREEDY JAB", "BELLMAN BACKHAND", "TD-UPPERCUT"],
+    "characters": {
+      "player": "LIU KANG-MAX",
+      "opponent": ["SUB-OPTIMAL (FRESH)", "SUB-OPTIMAL (FROST-CRACKED)", "SUB-OPTIMAL (KHAOS)"]
+    },
+    "q_learning_addition": "include only if phases 0-5 leave >2h budget",
+    "multilang_jp": "skip for v1",
+    "music": "reuse Pokemon templates, parameter-tweak",
+    "branch_strategy": "all work on mk-demo, never touch main",
+    "scope_creep": "defer everything to MK-CHANGELOG.md",
+    "retry_limit": 3
+  },
+  "interrupt_conditions": [
+    "main branch at risk",
+    "auth failure on git push",
+    "hard infra blocker (chrome / fs)",
+    "Pokemon regression"
+  ],
+  "blockers": [],
+  "log": [
+    "phase 0 booted; mk-demo branch cut; markov-kombat copied from pokemon-battle"
+  ]
+}

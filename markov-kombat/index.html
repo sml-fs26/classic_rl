@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pokemon battle &middot; SML reinforcement learning</title>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <!-- DotGothic16: Japanese bitmap-style font used when body.lang-jp is set.
+       Falls back gracefully to the OS Japanese font if Google Fonts can't
+       load (e.g. offline lecture room). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/scene0.css">
+  <link rel="stylesheet" href="css/sceneHowToPlay.css">
+  <link rel="stylesheet" href="css/scene1.css">
+  <link rel="stylesheet" href="css/sceneConcepts.css">
+  <link rel="stylesheet" href="css/qtable.css">
+  <link rel="stylesheet" href="css/sceneDp.css">
+  <link rel="stylesheet" href="css/sceneSarsaDerive.css">
+  <link rel="stylesheet" href="css/scene5.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">SML &middot; POKEMON</div>
+    <div id="scene-title" class="scene-title">loading&hellip;</div>
+    <div class="right-cluster">
+      <button id="prev-btn" class="pager-btn" type="button">PREV</button>
+      <div id="dot-pager" class="dot-pager"></div>
+      <button id="next-btn" class="pager-btn" type="button">NEXT</button>
+      <button id="music-toggle" class="theme-toggle music-toggle" type="button" aria-label="Toggle music">♪ MUSIC OFF</button>
+      <button id="lang-toggle" class="theme-toggle lang-toggle" type="button" aria-label="Toggle language">日本語</button>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">theme</button>
+    </div>
+  </header>
+
+  <main id="stage" class="stage"></main>
+
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="data/datasets.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/music.js"></script>
+  <script src="js/sfx.js"></script>
+  <script src="js/music-ui.js"></script>
+  <script src="js/katex-helpers.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/moves.js"></script>
+  <script src="js/battle.js"></script>
+  <script src="js/bellman.js"></script>
+  <script src="js/sarsa.js"></script>
+  <script src="js/qtable.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/sprite.js"></script>
+  <script src="js/dialog.js"></script>
+  <script src="js/hpbar.js"></script>
+  <script src="js/scenes/scene0.js"></script>
+  <script src="js/scenes/sceneHowToPlay.js"></script>
+  <script src="js/scenes/scene1.js"></script>
+  <script src="js/scenes/sceneMdpOverlay.js"></script>
+  <script src="js/scenes/sceneTrajectory.js"></script>
+  <script src="js/scenes/sceneObjective.js"></script>
+  <script src="js/scenes/sceneQstar.js"></script>
+  <script src="js/scenes/sceneDp.js"></script>
+  <script src="js/scenes/sceneWhyNotDp.js"></script>
+  <script src="js/scenes/sceneSarsaDerive.js"></script>
+  <script src="js/scenes/scene5.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/i18n-ui.js"></script>
+</body>
+</html>

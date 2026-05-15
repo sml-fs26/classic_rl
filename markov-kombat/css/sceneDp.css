@@ -1,0 +1,181 @@
+/* Scene: filling Q with dynamic programming.
+ * Reuses qtable.js's grid widget; layout-wise we sit beside a side
+ * calculation panel and below the Bellman optimality formula. */
+
+.dp-scene { display: flex; flex-direction: column; gap: 10px; }
+
+/* Bellman card — compact so it leaves room for the table below. */
+.dp-premise {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin: 8px 4px 12px;
+  max-width: 86ch;
+}
+.dp-premise strong { color: var(--ink); }
+.dp-bellman-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 8px 16px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  text-align: center;
+  color: var(--ink-on-box);
+}
+.dp-bellman-card .katex-display { margin: 0; }
+.dp-bellman-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  margin-bottom: 4px;
+}
+
+/* Sticky controls bar — pins STEP / RUN ALL / RESET to the top of
+   the viewport as the user scrolls the Q-table below. The table is
+   tall enough that the user previously had to scroll up to find the
+   buttons. Now the buttons follow them. */
+.dp-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: var(--bg);
+  padding: 8px 6px;
+  margin: 0 -6px;
+  border-bottom: 2px solid var(--rule);
+}
+.dp-controls {
+  display: flex;
+  gap: 8px;
+}
+.dp-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.dp-status b { color: var(--pikachu-cheek, #C62828); }
+
+.dp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 14px;
+  align-items: start;
+}
+
+.dp-q { max-width: 880px; }
+
+/* Side panel — sticks below the sticky controls so the per-step
+   calculation stays visible while the user scrolls the Q-table. */
+.dp-panel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  line-height: 1.6;
+  position: sticky;
+  top: 64px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  align-self: start;
+}
+
+/* ---- Compact Q-table inside the DP scene ----
+   The Q-table widget normally renders at scene-4 size (taller cells
+   with bigger sprites). For the DP scene we want the whole grid to
+   fit in roughly half the viewport so the student can see controls,
+   table, and side panel at once. */
+.dp-scene .q-cell        { padding: 3px 5px 5px; gap: 4px; }
+.dp-scene .q-thumb       { gap: 3px; padding-bottom: 2px; }
+.dp-scene .q-thumb-sprite { width: 22px; height: 22px; }
+.dp-scene .q-thumb-hp-bg { height: 3px; }
+.dp-scene .q-bar-row     { grid-template-columns: 8px 30px 1fr; gap: 3px; padding: 0 2px; font-size: 6.5px; }
+.dp-scene .q-label       { font-size: 6.5px; }
+.dp-scene .q-val         { font-size: 7px; }
+.dp-scene .q-grid        { gap: 4px; }
+.dp-scene .q-row-head    { font-size: 7px; }
+.dp-scene .q-col-head    { font-size: 6.5px; }
+/* Compact Pokedex header — Nº only (state name is redundant given
+   the row/col axis labels). */
+.dp-scene .q-pokedex-header { font-size: 6px; padding: 1px 4px; margin: -3px -5px 2px; }
+.dp-scene .q-pokedex-header .q-dex-state { display: none; }
+
+/* Hide the argmax-distribution strip + legend in this scene.  The
+   heatmap cell colours + the ▶ markers on each cell already convey
+   the policy; the strip duplicates that info and adds vertical
+   weight we can't afford here. */
+.dp-scene .q-freq-strip { display: none; }
+.dp-scene .q-legend     { display: none; }
+.dp-panel-title {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.dp-panel-narration {
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+.dp-calc-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(0,0,0,0.15);
+  font-size: 7.5px;
+  line-height: 1.6;
+}
+.dp-calc-line:last-child { border-bottom: none; }
+.dp-calc-line .dp-calc-prob { color: var(--hue-casino); }
+.dp-calc-line .dp-calc-value { color: var(--hue-ghost); font-variant-numeric: tabular-nums; }
+.dp-calc-total {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 2px solid var(--rule);
+  font-size: 9px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--pikachu-cheek, #C62828);
+}
+.dp-calc-total b { font-weight: bold; }
+.dp-calc-line.dp-calc-sub {
+  font-size: 7px;
+  color: var(--ink-secondary);
+  border-bottom: 1px dotted rgba(0,0,0,0.1);
+}
+.dp-calc-line.dp-calc-subtotal {
+  font-size: 7.5px;
+  color: var(--ink-on-box);
+  border-bottom: 2px solid rgba(0,0,0,0.15);
+  margin-bottom: 4px;
+  padding-bottom: 6px;
+}
+
+/* Highlighting the cells being filled this step. */
+.q-cell.dp-active {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: -3px;
+  z-index: 3;
+}
+.q-cell.dp-detail {
+  outline: 3px solid var(--pikachu-cheek, #C62828);
+  outline-offset: -3px;
+  z-index: 4;
+}
+.q-cell.dp-pending {
+  opacity: 0.35;
+}
+
+/* Each fill animates in. */
+@keyframes dp-cell-fill {
+  0%   { background: rgba(248, 208, 40, 0.6); }
+  100% { background: var(--bg-strong); }
+}
+.q-cell.dp-just-filled {
+  animation: dp-cell-fill 700ms ease-out;
+}

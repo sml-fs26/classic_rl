@@ -1,0 +1,173 @@
+/* Scene 5 — recap cards, restyled as a Pokemon League Hall of Fame.
+   Twinkling starfield in the background; champion banner above the
+   heading; cards animate in one-by-one. */
+
+/* Twinkling starfield — stacked radial-gradient dots that fade in
+   and out on a slow loop.  Sits behind everything in the scene. */
+.sc5-scene {
+  position: relative;
+  isolation: isolate;
+}
+.sc5-scene::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 8% 12%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 22% 38%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 38% 8%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 54% 28%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 68% 14%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 82% 40%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 94% 18%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 14% 64%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 28% 88%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 48% 70%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 62% 92%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 78% 76%, var(--ink) 1px, transparent 1.5px),
+    radial-gradient(1.5px 1.5px at 90% 88%, var(--ink) 1px, transparent 1.5px);
+  opacity: 0.16;
+  animation: sc5-twinkle 5.5s ease-in-out infinite;
+}
+@keyframes sc5-twinkle {
+  0%, 100% { opacity: 0.10; }
+  50%      { opacity: 0.22; }
+}
+
+/* HALL OF FAME banner — pixel-art-style title bar above the heading.
+   The yellow inset border + black outer rule mirrors the in-game
+   Pokemon-box style. */
+.sc5-hof-banner {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  padding: 14px 18px;
+  margin: 6px auto 12px;
+  max-width: 32ch;
+  color: var(--ink-on-box);
+  background: var(--pikachu-yellow);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--pikachu-yellow),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--pikachu-yellow),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  text-shadow: 2px 2px 0 var(--bg-strong);
+  animation: sc5-banner-pop 480ms ease-out 60ms backwards;
+}
+.sc5-hof-banner .sc5-star {
+  display: inline-block;
+  color: var(--pikachu-cheek);
+  animation: sc5-star-spin 2.4s ease-in-out infinite;
+  margin: 0 6px;
+}
+.sc5-hof-banner .sc5-star:last-child {
+  animation-delay: -1.2s;
+}
+@keyframes sc5-banner-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes sc5-star-spin {
+  0%, 100% { transform: rotate(-12deg) scale(1);   }
+  50%      { transform: rotate(12deg)  scale(1.2); }
+}
+
+.sc5-heading {
+  text-align: center;
+  margin-top: 0;
+}
+
+.sc5-sub {
+  text-align: center;
+  margin: 0 auto 16px;
+  max-width: 70ch;
+}
+.sc5-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.sc5-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  min-height: 200px;
+  /* Staggered entry — each card sets --i inline; the 180ms-per-card
+     cadence times with the win-fanfare's 4-note arpeggio.  backwards
+     keeps the pre-animation state (invisible) until each card's
+     delay elapses, so we don't see a flash of the final state. */
+  animation: sc5-card-enter 520ms cubic-bezier(.2, .8, .3, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 180ms + 220ms);
+}
+@keyframes sc5-card-enter {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+.sc5-card .hue-chip { align-self: flex-start; margin-bottom: 4px; }
+.sc5-card .sc5-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--ink-on-box);
+  margin-bottom: 4px;
+}
+.sc5-card .poke-formula.sc5-formula {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 4px 0;
+  margin: 0;
+  text-align: left;
+  display: block;
+}
+.sc5-card .poke-formula.sc5-formula .katex { font-size: 13px; }
+.sc5-card .sc5-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.65;
+  color: var(--ink-on-box);
+  margin-top: 2px;
+}
+.sc5-card .sc5-anchor {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #6B6B6B;
+  letter-spacing: 0.5px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+.sc5-closer {
+  background: var(--pikachu-yellow);
+  margin-top: 8px;
+  padding: 14px 16px;
+  box-shadow:
+    inset 0 0 0 2px var(--pikachu-yellow),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--pikachu-yellow);
+  animation: sc5-card-enter 520ms cubic-bezier(.2, .8, .3, 1) backwards;
+  animation-delay: calc(var(--i, 5) * 180ms + 220ms);
+}
+.sc5-closer .hue-chip { background: var(--ink-on-box); color: var(--pikachu-yellow); margin-bottom: 10px; display: inline-block; }
+.sc5-closer-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9.5px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc5-scene::before,
+  .sc5-hof-banner,
+  .sc5-hof-banner .sc5-star,
+  .sc5-card,
+  .sc5-closer {
+    animation: none;
+  }
+}

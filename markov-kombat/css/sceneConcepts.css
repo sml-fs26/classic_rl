@@ -1,0 +1,527 @@
+/* Shared styling for the four "concept" scenes: Trajectory, Objective,
+ * π*-from-Q, why-not-DP. KaTeX-heavy, minimal text. */
+
+.concept-scene {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.concept-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  margin: 6px 0 4px;
+  color: var(--ink);
+}
+
+.concept-formula-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 18px 22px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  text-align: center;
+}
+.concept-formula-card .katex-display {
+  margin: 0;
+}
+.concept-formula-card.compact { padding: 12px 16px; }
+.concept-formula-card .concept-formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  margin-bottom: 10px;
+}
+.concept-formula-card .concept-formula-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-top: 10px;
+}
+
+.concept-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.concept-key-question {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  padding: 14px;
+  color: var(--pikachu-cheek, #C62828);
+  border: 3px solid var(--pikachu-cheek, #C62828);
+  background: var(--bg-strong);
+}
+
+/* ---- Trajectory scene ---- */
+
+.traj-rollout {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  /* Larger gap between turn-groups than within a group (.traj-group
+     keeps its three boxes tight) — clusters each (s,a,r) triple
+     visually without losing the box-per-symbol mapping. */
+  gap: 22px;
+  padding: 14px 12px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  min-height: 180px;
+}
+
+/* One turn = a .traj-group of three boxes (sᵢ, aᵢ, rᵢ) so the eye
+   can trace each subscripted symbol from the formula above into its
+   own box. Within a group the inter-box gap is tight; between groups
+   the .traj-rollout `gap` provides breathing room. */
+.traj-group {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.traj-box {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px 8px;
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  border-left-width: 5px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  animation: traj-box-pop 280ms ease-out backwards;
+}
+
+/* Per-component border-left colour — echoes the cross-viz hue
+   identity used in scene-5 recap (MDP red / Casino blue / Bellman
+   purple). Box-label text gives the redundant non-colour cue. */
+.traj-box-state  { border-left-color: var(--hue-anymal); min-width: 100px; }
+.traj-box-action { border-left-color: var(--hue-casino); min-width: 88px;  }
+.traj-box-reward { border-left-color: var(--hue-ghost);  min-width: 60px; align-items: center; }
+
+/* Final-state box (s_{N+1}) — only appears after a terminal turn so
+   the trajectory visibly closes. Whichever side fainted is rendered
+   with the .fainted sprite + a 0%-width HP bar + "FAINT" bucket. The
+   border uses the colour-blind-safe win/loss tokens (blue/vermillion). */
+.traj-box-state-final.win {
+  border-color: var(--cb-blue);
+  border-left-color: var(--cb-blue);
+  background: rgba(0, 114, 178, 0.08);
+}
+.traj-box-state-final.loss {
+  border-color: var(--cb-vermillion);
+  border-left-color: var(--cb-vermillion);
+  background: rgba(213, 94, 0, 0.08);
+}
+.traj-box-terminal-mini {
+  font-size: 6px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  margin-left: 4px;
+}
+.traj-box-sprite.fainted {
+  opacity: 0.32;
+  filter: grayscale(0.7);
+  transform: rotate(-22deg);
+}
+
+.traj-box-label {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-bottom: 6px;
+}
+.traj-box-label sub {
+  font-size: 7px;
+  vertical-align: baseline;
+}
+
+/* sᵢ box content: two mini-Pokemons + HP bars + bucket labels. */
+.traj-box-state-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  flex: 1;
+  align-items: end;
+}
+.traj-box-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.traj-box-sprite {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.traj-box-hp {
+  width: 100%;
+  height: 4px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--ink);
+  box-sizing: border-box;
+}
+.traj-box-hp-fill { height: 100%; background: #48C848; }
+.traj-box-hp-fill.b1 { background: #88D848; }
+.traj-box-hp-fill.b2 { background: #E8C828; }
+.traj-box-hp-fill.b3 { background: #E89028; }
+.traj-box-hp-fill.b4 { background: #E84828; }
+.traj-box-bucket { font-size: 7px; }
+
+/* aᵢ box content: just the move name. */
+.traj-box-action-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5px;
+  color: var(--hue-casino);
+  text-align: center;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+/* rᵢ box content: big signed number, centred. Terminal turns swap the
+   border colour to colour-blind blue/vermillion and add a ✓/✗ tag. */
+.traj-box-reward-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--hue-ghost);
+  letter-spacing: 0.04em;
+}
+.traj-box-reward.win {
+  border-color: var(--cb-blue);
+  border-left-color: var(--cb-blue);
+  background: rgba(0, 114, 178, 0.10);
+}
+.traj-box-reward.win  .traj-box-reward-body { color: var(--cb-blue); font-size: 16px; }
+.traj-box-reward.loss {
+  border-color: var(--cb-vermillion);
+  border-left-color: var(--cb-vermillion);
+  background: rgba(213, 94, 0, 0.10);
+}
+.traj-box-reward.loss .traj-box-reward-body { color: var(--cb-vermillion); font-size: 16px; }
+.traj-box-terminal-tag {
+  font-size: 8px;
+  margin-top: 4px;
+  letter-spacing: 0.06em;
+}
+.traj-box-reward.win  .traj-box-terminal-tag { color: var(--cb-blue); }
+.traj-box-reward.loss .traj-box-terminal-tag { color: var(--cb-vermillion); }
+
+@keyframes traj-box-pop {
+  0%   { opacity: 0; transform: translateY(-6px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Used by sceneObjective: dim state + action boxes so G_t illustration
+   focuses the eye on the reward boxes alone. */
+.traj-box.muted {
+  opacity: 0.30;
+  filter: grayscale(0.55);
+}
+
+/* Reward boxes in sceneObjective are clickable to pick a new t. */
+.traj-box-reward.clickable { cursor: pointer; transition: transform 100ms ease-out; }
+.traj-box-reward.clickable:hover { transform: scale(1.04); }
+.traj-box-reward.selected {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: 3px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ----- G_t illustration block in sceneObjective ----- */
+.g-illus {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px 14px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+}
+.g-illus-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+.g-illus-rollout {
+  background: transparent;
+  border: none;
+  padding: 4px 0;
+  min-height: 0;
+}
+
+.g-expansion {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.9;
+  color: var(--ink-on-box);
+  padding: 8px 14px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+}
+.g-expansion .g-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.g-expansion .g-lhs {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.g-expansion .g-eq {
+  margin-left: 28px;       /* indent continuation lines under "= " of line 1 */
+  color: var(--ink-secondary);
+}
+.g-expansion .g-gamma { color: var(--hue-star); }
+.g-expansion .g-r     { color: var(--hue-ghost); }
+.g-expansion .g-prod  { color: var(--ink-on-box); font-variant-numeric: tabular-nums; }
+.g-expansion .g-final { padding-top: 6px; border-top: 2px solid var(--rule); margin-top: 4px; }
+.g-expansion .g-result {
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.g-expansion .g-result.pos { color: var(--cb-blue); }
+.g-expansion .g-result.neg { color: var(--cb-vermillion); }
+
+.traj-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.traj-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  margin-left: auto;
+}
+
+/* ---- Q* demo battle (sceneQstar) ----
+   Looping demo where PIKACHU plays argmax_a Q(s,a) each turn against
+   CHARMANDER; the right-hand Q-panel updates per state with the
+   argmax row highlighted. */
+
+.qstar-premise {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin: 8px 4px 12px;
+  max-width: 88ch;
+}
+.qstar-q-star { color: var(--hue-anymal); }
+
+.qstar-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 18px;
+  margin: 0;
+  align-items: stretch;
+}
+
+.qstar-stage {
+  position: relative;
+  height: 300px !important;
+  min-height: 300px;
+  max-width: none;
+}
+.qstar-stage .sprite-host img { transition: transform 240ms ease-out; }
+
+/* Attack animation (PIKACHU lunges right, CHARM shakes). */
+@keyframes qstar-attack-pika {
+  0%   { transform: translate(0, 0); }
+  35%  { transform: translate(70px, -22px); }
+  60%  { transform: translate(70px, -22px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes qstar-shake-opp {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.qstar-stage.qstar-attack .sprite-host.player img  { animation: qstar-attack-pika 1.1s ease-out; }
+.qstar-stage.qstar-attack .sprite-host.opponent img { animation: qstar-shake-opp 0.5s ease-in-out 0.4s; }
+
+/* Counter (CHARM lunges left, PIKA shakes). */
+@keyframes qstar-counter-charm {
+  0%   { transform: translate(0, 0); }
+  35%  { transform: translate(-70px, 22px); }
+  60%  { transform: translate(-70px, 22px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes qstar-shake-pika {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.qstar-stage.qstar-counter .sprite-host.opponent img { animation: qstar-counter-charm 1.1s ease-out; }
+.qstar-stage.qstar-counter .sprite-host.player img   { animation: qstar-shake-pika 0.5s ease-in-out 0.4s; }
+
+/* Damage flash. */
+@keyframes qstar-flash-rise {
+  0%   { opacity: 0; transform: translate(-50%, 12px); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -44px); }
+}
+.qstar-flash {
+  position: absolute;
+  top: 30%;
+  transform: translate(-50%, 12px);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  pointer-events: none;
+  animation: qstar-flash-rise 1.05s ease-out forwards;
+  text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF, 2px -2px 0 #FFF, -2px 2px 0 #FFF;
+  z-index: 6;
+}
+.qstar-flash.opp  { right: 18%; }
+.qstar-flash.pika { left:  30%; top: 60%; }
+
+/* WIN / LOSS banner overlay on the stage. */
+.qstar-banner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  padding: 12px 20px;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms, transform 220ms;
+  z-index: 10;
+}
+.qstar-banner.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.qstar-banner.win  { color: var(--cb-blue);      border-color: var(--cb-blue); }
+.qstar-banner.loss { color: var(--cb-vermillion); border-color: var(--cb-vermillion); }
+
+/* Q-panel — list of moves with the argmax row highlighted. */
+.qstar-q-panel {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 12px 14px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.qstar-panel-title {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+.qstar-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.qstar-row {
+  display: grid;
+  grid-template-columns: 14px 1fr 60px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  font-size: 9px;
+  transition: background 200ms, box-shadow 200ms;
+}
+.qstar-row.argmax {
+  background: rgba(248, 208, 40, 0.32);
+  box-shadow: inset 0 0 0 2px var(--accent, #F8D028);
+}
+.qstar-row.argmax .qstar-tag { color: var(--pikachu-cheek, #C62828); }
+.qstar-mark { text-align: center; color: var(--pikachu-cheek); font-weight: bold; }
+.qstar-name { font-size: 9px; }
+.qstar-q    { text-align: right; font-variant-numeric: tabular-nums; font-size: 10px; }
+.qstar-tag  { font-size: 7px; letter-spacing: 0.04em; }
+
+.qstar-status {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin: 10px 0 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+.qstar-status b { color: var(--pikachu-cheek); }
+
+/* ---- Why-not-DP scene ---- */
+
+.why-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.why-stat-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 16px 14px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.why-stat-title {
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  margin-bottom: 10px;
+}
+.why-stat-value {
+  font-size: 18px;
+  color: var(--pikachu-cheek, #C62828);
+  letter-spacing: 0.04em;
+}
+.why-stat-value sup {
+  /* Force the exponent into the same pixel font and lift it cleanly above
+     the baseline. The default browser <sup> styling drops in a fallback
+     font that doesn't match — and Unicode superscripts (¹⁵) only have
+     ¹ in our pixel font, so the rest fall back and misalign. */
+  font: inherit;
+  font-size: 0.62em;
+  vertical-align: super;
+  line-height: 0;
+  margin-left: 0.06em;
+  letter-spacing: 0.02em;
+}
+.why-stat-detail {
+  font-size: 7px;
+  margin-top: 6px;
+  color: var(--ink-secondary);
+}

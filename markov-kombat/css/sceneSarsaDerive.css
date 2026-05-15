@@ -1,0 +1,617 @@
+/* Scene: deriving SARSA.  PAGER MODE — one of 8 steps (A → B → D →
+ * E1 → E2 → E3 → E4 → F) visible at a time.  Left column carries the
+ * step's text + KaTeX (or the live-demo step-detail in step F).
+ * Right column is a continuous illustration: trajectory tape + Q-table
+ * + a number-line viz that appears for E3/E4.  Everything fits in one
+ * viewport. */
+
+.sd-scene { display: flex; flex-direction: column; gap: 14px; }
+
+/* Sticky controls — without this the user must scroll back up to hit
+   STEP after every reveal, because each new card pushes everything
+   else further down the page. */
+.sd-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: var(--bg);
+  padding: 8px 6px;
+  margin: 0 -6px;
+  border-bottom: 2px solid var(--rule);
+}
+.sd-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-left: auto;
+}
+.sd-status b { color: var(--pikachu-cheek, #C62828); }
+
+.sd-stack { display: flex; flex-direction: column; gap: 12px; }
+
+.sd-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 18px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  opacity: 0.18;
+  transition: opacity 380ms;
+}
+.sd-card.shown {
+  opacity: 1;
+  animation: sd-card-reveal 420ms ease-out;
+}
+
+@keyframes sd-card-reveal {
+  0%   { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.sd-card-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--pikachu-cheek, #C62828);
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.sd-card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.sd-card-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+}
+.sd-card-body code,
+.sd-card-body .sd-q,
+.sd-card-body .sd-q-est {
+  font-family: 'Press Start 2P', monospace;
+}
+.sd-card-body .sd-q     { color: var(--hue-anymal); }     /* mathematical Q */
+.sd-card-body .sd-q-est { color: var(--hue-casino); }     /* typewriter q (table estimate) */
+.sd-card-body .sd-eps   { color: var(--hue-casino); }
+.sd-card-body .sd-rew   { color: var(--hue-ghost); }
+.sd-card-body .sd-alpha { color: var(--hue-star);   }
+
+.sd-card-formula {
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  padding: 10px 12px;
+  margin: 10px 0;
+  text-align: center;
+}
+.sd-card-formula .katex-display { margin: 0; }
+
+.sd-legend {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 10px 14px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  color: var(--ink-on-box);
+}
+.sd-legend-chip {
+  padding: 3px 6px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  font-size: 8px;
+  white-space: nowrap;
+}
+.sd-legend-chip.q { color: var(--hue-anymal); }
+.sd-legend-chip.q-est { color: var(--hue-casino); }
+
+/* ====================================================================
+   F — SARSA on one trajectory (lives below the derivation cards)
+   ==================================================================== */
+
+.sd-f-header {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  margin: 24px 0 6px;
+  padding-top: 14px;
+  border-top: 2px dashed var(--rule);
+}
+.sd-f-intro {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin: 0 0 14px;
+  max-width: 92ch;
+}
+.sd-f-intro kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 2px 5px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+
+/* ----- Trajectory tape ----- */
+.sd-f-tape-wrap {
+  background: var(--box-bg, #FFFEF8);
+  border: 2px solid var(--ink-on-box, #1B1B1B);
+  padding: 8px 10px;
+  margin-bottom: 0;
+}
+.sd-f-tape-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  margin-bottom: 6px;
+}
+.sd-f-tape-count { font-weight: normal; }
+.sd-f-tape {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.sd-f-tape-tuple {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 4px;
+  border: 1px solid rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.03);
+}
+.sd-f-tape-tuple.applied { opacity: 0.50; }
+.sd-f-tape-tuple.active {
+  border: 2px solid var(--pikachu-cheek, #C62828);
+  background: rgba(213,94,0, 0.10);
+}
+.sd-f-tape-tuple.terminal-tail { border-style: dashed; padding: 3px 6px; }
+.sd-f-tape-t {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+.sd-f-tape-state {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 34px;
+}
+.sd-f-tape-state.terminal {
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+}
+.sd-f-tape-state.terminal.win  { background: rgba(0,114,178, 0.12);   border-color: var(--cb-blue, #0072B2); }
+.sd-f-tape-state.terminal.loss { background: rgba(213,94,0, 0.12);    border-color: var(--cb-vermillion, #C62828); }
+.sd-f-tape-banner {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+}
+.sd-f-tape-state.terminal.win  .sd-f-tape-banner { color: var(--cb-blue,       #0072B2); }
+.sd-f-tape-state.terminal.loss .sd-f-tape-banner { color: var(--cb-vermillion, #C62828); }
+.sd-f-tape-mini {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.sd-f-tape-sprite {
+  width: 10px;
+  height: 10px;
+  image-rendering: pixelated;
+}
+.sd-f-tape-hp {
+  flex: 1;
+  height: 2px;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.4);
+}
+.sd-f-tape-hp-fill {
+  height: 100%;
+  background: #48C848;
+}
+.sd-f-tape-hp-fill.b1 { background: #88D848; }
+.sd-f-tape-hp-fill.b2 { background: #E8C828; }
+.sd-f-tape-hp-fill.b3 { background: #E89028; }
+.sd-f-tape-hp-fill.b4 { background: #E84828; }
+.sd-f-tape-arrow {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  text-align: center;
+  color: var(--ink-on-box);
+  min-width: 30px;
+}
+.sd-f-tape-r {
+  font-size: 6.5px;
+  color: var(--cb-vermillion, #C62828);
+}
+
+/* ----- Two-column row: Q-table (left) + sticky side column (right) -----
+   The side column holds the trajectory tape, the per-step arithmetic,
+   and the controls — everything the student needs to interact with the
+   demo. Sticky-positioning the side column means the user never has to
+   scroll between clicking NEXT TRANSITION and watching the cell pulse. */
+.sd-f-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+.sd-f-q { min-width: 0; max-width: 880px; }
+.sd-f-side {
+  position: sticky;
+  top: 48px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+.sd-f-detail {
+  background: var(--box-bg, #FFFEF8);
+  border: 2px solid var(--ink-on-box, #1B1B1B);
+  padding: 12px 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.6;
+}
+.sd-f-detail-title {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  margin-bottom: 10px;
+}
+.sd-f-detail-body { font-size: 8px; }
+.sd-f-row-eq {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 3px;
+}
+.sd-f-row-lhs {
+  min-width: 22px;
+  color: var(--ink-secondary);
+}
+.sd-f-row-rhs {
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.sd-f-r { color: var(--cb-vermillion, #C62828); }
+.sd-f-divider {
+  border-top: 1px dashed var(--rule);
+  margin: 8px 0;
+}
+.sd-f-calc-line {
+  font-size: 8px;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
+}
+.sd-f-calc-label { color: var(--ink-secondary); }
+.sd-f-calc-eq    { color: var(--ink-on-box); }
+.sd-f-td   { color: var(--pikachu-cheek, #C62828); }
+.sd-f-qnew { color: var(--cb-blue,        #0072B2); font-size: 10px; }
+
+/* ----- F controls row -----
+   Lives at the bottom of the sticky side column, so the three buttons
+   wrap to fit the ~360px column width. */
+.sd-f-ctrls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+.sd-f-ctrls .poke-btn { font-size: 9px; padding: 6px 8px; }
+.sd-f-alpha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  width: 100%;
+  margin-top: 4px;
+}
+.sd-f-alpha input[type="range"] {
+  flex: 1;
+  min-width: 100px;
+  accent-color: var(--pikachu-cheek, #C62828);
+}
+
+/* ----- Compact Q-table inside this scene -----
+   Same trick the DP scene uses (see sceneDp.css): shrink cell padding,
+   sprite size, and bar-row font so the 5x5 grid fits in roughly half
+   a viewport. Combined with the sticky side column, the entire F
+   widget then sits in one screenful. */
+.sd-scene .q-cell        { padding: 2px 4px 3px; gap: 2px; }
+.sd-scene .q-thumb       { gap: 2px; padding-bottom: 1px; border-bottom-width: 1px; }
+.sd-scene .q-thumb-sprite { width: 16px; height: 16px; }
+.sd-scene .q-thumb-hp-bg { height: 2px; }
+.sd-scene .q-bars        { gap: 1px; }
+.sd-scene .q-bar-row     { grid-template-columns: 7px 26px 1fr; gap: 2px; padding: 0 2px; font-size: 6px; }
+.sd-scene .q-label       { font-size: 6px; }
+.sd-scene .q-val         { font-size: 6.5px; }
+.sd-scene .q-grid        { gap: 3px; grid-template-columns: 56px repeat(var(--nb, 5), minmax(0, 1fr)); }
+.sd-scene .q-col-heads   { grid-template-columns: 56px repeat(var(--nb, 5), minmax(0, 1fr)); gap: 3px; }
+.sd-scene .q-row-head    { font-size: 6.5px; }
+.sd-scene .q-col-head    { font-size: 6px; }
+.sd-scene .q-freq-strip  { display: none; }
+.sd-scene .q-legend      { display: none; }
+/* Compact Pokedex header — drop the state-name half (the cell's
+   row/col headers already say which state it is) and tighten the
+   font so it doesn't crowd the 25-cell grid. */
+.sd-scene .q-pokedex-header { font-size: 5.5px; padding: 0 3px; margin: -2px -4px 1px; line-height: 1.4; }
+.sd-scene .q-pokedex-header .q-dex-state { display: none; }
+
+/* ----- Cell pulse when being updated ----- */
+@keyframes sd-pulse-anim {
+  0%   { box-shadow: 0 0 0 0 var(--pikachu-cheek, #C62828); }
+  50%  { box-shadow: 0 0 0 4px var(--pikachu-cheek, #C62828); }
+  100% { box-shadow: 0 0 0 0 var(--pikachu-cheek, #C62828); }
+}
+.q-cell.sd-pulse {
+  outline: 3px solid var(--pikachu-cheek, #C62828);
+  outline-offset: -3px;
+  animation: sd-pulse-anim 1.0s ease-out;
+  z-index: 3;
+}
+.q-bar-row.sd-row-mark { background: rgba(213,94,0, 0.20); }
+
+/* ============================================================
+   PAGER MODE — one step at a time, 2-column layout
+   ============================================================ */
+
+/* The pager replaces the old stacked .sd-card opacity reveal.  Left
+   and right columns are both fully visible — the cards no longer
+   "ghost in"; they swap. */
+.sd-pager .sd-card { opacity: 1; transition: none; box-shadow: none; padding: 14px 16px; background: var(--bg-strong); }
+.sd-pager .sd-stack { display: none; }
+
+.sd-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
+  gap: 18px;
+  align-items: start;
+  width: 100%;
+}
+.sd-left {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 18px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  min-width: 0;
+  min-height: 360px;
+  animation: sd-step-fade 320ms ease-out;
+}
+.sd-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  animation: sd-step-fade 320ms ease-out;
+}
+@keyframes sd-step-fade {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.sd-illus-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--pikachu-cheek);
+  padding: 4px 6px;
+  min-height: 1.4em;
+}
+.sd-q-host { min-width: 0; }
+
+/* ---- Trajectory overlays on Q-cells ---- */
+.sd-cell-badge {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  background: var(--pikachu-yellow);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  padding: 1px 4px;
+  z-index: 5;
+  pointer-events: none;
+  animation: sd-badge-pop 380ms ease-out;
+}
+.sd-cell-badge.active { background: var(--pikachu-cheek); color: #fff; }
+@keyframes sd-badge-pop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+.q-cell.sd-illus-cell  { outline: 2px solid var(--pikachu-cheek); outline-offset: -2px; z-index: 2; }
+.q-cell.sd-illus-active { outline: 4px solid var(--pikachu-cheek); outline-offset: -4px; z-index: 4; }
+.q-cell.sd-illus-ghost  { opacity: 0.45; }
+.q-bar-row.sd-illus-bar { background: rgba(248, 208, 40, 0.32); box-shadow: inset 0 0 0 1px var(--pikachu-yellow); }
+
+/* Step B init flash — one-shot cell glow as +0.00 lands. */
+@keyframes sd-illus-init-anim {
+  0%   { background: rgba(248, 208, 40, 0.6); }
+  100% { background: var(--bg-strong); }
+}
+.q-cell.sd-illus-init { animation: sd-illus-init-anim 600ms ease-out; }
+
+/* ---- E2 target callout overlay ---- */
+.sd-cell-target-callout {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 0;
+  z-index: 10;
+  background: var(--bg-strong);
+  border: 3px solid var(--pikachu-cheek);
+  padding: 6px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 0 var(--ink);
+  pointer-events: none;
+  animation: sd-callout-pop 380ms ease-out;
+}
+.sd-cell-target-callout .sd-callout-title { color: var(--pikachu-cheek); margin-bottom: 4px; font-size: 7px; letter-spacing: 0.06em; }
+.sd-cell-target-callout .sd-callout-eq    { color: var(--ink-secondary); line-height: 1.6; }
+.sd-cell-target-callout .sd-callout-val   { margin-top: 4px; color: var(--cb-blue); }
+@keyframes sd-callout-pop {
+  0%   { transform: scale(0.7) translateX(-8px); opacity: 0; }
+  100% { transform: scale(1)    translateX(0);   opacity: 1; }
+}
+
+/* ---- E3 / E4 number-line viz ---- */
+.sd-numline {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 12px 16px 26px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  margin-top: 6px;
+}
+.sd-numline-title {
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 18px;
+}
+.sd-numline-track {
+  position: relative;
+  height: 32px;
+  margin: 0 14px;
+}
+.sd-numline-axis {
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 2px;
+  background: var(--ink);
+  transform: translateY(-50%);
+}
+.sd-numline-dot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--ink);
+  background: var(--bg);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+.sd-numline-dot.q   { background: var(--hue-casino); border-color: var(--hue-casino); }
+.sd-numline-dot.tgt { background: var(--pikachu-cheek); border-color: var(--pikachu-cheek); }
+.sd-numline-label {
+  position: absolute;
+  left: 50%;
+  top: 16px;
+  transform: translateX(-50%);
+  font-size: 7px;
+  color: var(--ink-on-box);
+  white-space: nowrap;
+}
+.sd-numline-dot.tgt .sd-numline-label { top: -22px; color: var(--pikachu-cheek); }
+
+.sd-numline-arrow {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  background: var(--cb-blue);
+  z-index: 2;
+  transform: translateY(-50%);
+  font-size: 7px;
+  color: var(--cb-blue);
+  text-align: center;
+  padding-top: 8px;
+  white-space: nowrap;
+}
+.sd-numline-arrow::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-left: 8px solid var(--cb-blue);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  transform: translateY(-50%);
+}
+.sd-numline-arrow.shadow { background: var(--cb-vermillion); opacity: 0.55; color: var(--cb-vermillion); }
+.sd-numline-arrow.shadow::after { border-left-color: var(--cb-vermillion); }
+.sd-numline-arrow.unified { background: var(--pikachu-cheek); color: var(--pikachu-cheek); height: 6px; }
+.sd-numline-arrow.unified::after { border-left-color: var(--pikachu-cheek); border-top-width: 8px; border-bottom-width: 8px; }
+
+/* ---- Step F controls — now lives INSIDE the left column, just under
+   the step title.  Sticks to that column so the user gets the
+   controls + the step-detail arithmetic in one compact panel on the
+   left, the Q-table on the right, no scroll. ---- */
+.sd-f-ctrls-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 6px 0 10px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+}
+.sd-f-ctrls-row .poke-btn { font-size: 8px; padding: 5px 7px; }
+.sd-f-ctrls-row .sd-f-speed {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  margin-left: auto;
+}
+.sd-f-ctrls-row .sd-f-speed input[type="range"] {
+  width: 80px;
+  accent-color: var(--pikachu-cheek);
+}
+.sd-f-ctrls-row .sd-f-speed-label { color: var(--ink-secondary); font-size: 6.5px; }
+.sd-f-ctrls-row .sd-f-alpha-fixed {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  padding: 0 6px;
+  border-left: 1px solid var(--inner-highlight);
+  margin-left: 4px;
+}
+.sd-f-ctrls-row .sd-f-alpha-fixed b { color: var(--pikachu-cheek); }
+
+/* PLAY button gets a brighter look so the user sees the live state
+   immediately. */
+#sd-f-play { background: var(--pikachu-yellow); font-weight: bold; }
+
+/* Reduced-motion guard for every illustration animation in the scene. */
+@media (prefers-reduced-motion: reduce) {
+  .sd-left, .sd-right,
+  .sd-cell-badge, .sd-cell-target-callout,
+  .q-cell.sd-illus-init {
+    animation: none;
+  }
+}

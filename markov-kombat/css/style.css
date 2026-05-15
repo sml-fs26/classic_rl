@@ -1,0 +1,1463 @@
+/* Pokemon battle — viz #7 of the SML reinforcement-learning curriculum.
+   Second integrative review.  Same lesson as Snakes & Ladders, retold on a
+   Gen-1 Pokemon Red/Blue battle screen.  The editorial cream/serif palette of
+   the rest of the curriculum is deliberately overridden here per the user's
+   request; the SKILL §10 anticipates this exit.  The cross-viz hue identities
+   (anymal-red, casino-blue, ghost-purple, star-amber, door-green) are kept as
+   per-component accent tokens so the scene-5 recap can still cite them. */
+
+/* ---------- Press Start 2P ---------- */
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('../assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+  font-display: block;  /* pixel font: do NOT flash fallback serif first */
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ---------- Tokens ---------- */
+:root,
+:root[data-theme="light"] {
+  /* Battle screen — Day */
+  --sky-top:        #9CC8E8;
+  --sky-bottom:     #C0DEF0;
+  --grass:          #5BA85B;
+  --grass-rim:      #3A8A3A;
+
+  /* Page chrome */
+  --bg:             #E8E0CC;     /* warm grey-cream, NES "shell" */
+  --bg-strong:      #F8F4E4;     /* lighter, for dialog boxes */
+  --ink:            #181818;
+  --ink-secondary:  #585858;
+  --rule:           #181818;     /* hard black for Pokemon borders */
+  --card-bg:        #FFFFFF;
+  --inner-highlight:#404040;     /* the secondary inner border line */
+  --pikachu-yellow: #F8D028;
+  --pikachu-cheek:  #E84828;
+  --charmander-orange:#F58030;
+  --hp-green:       #48C848;
+  --hp-yellow:      #E8C828;
+  --hp-red:         #E84828;
+  --damage-text:    #F8F8F8;
+  --damage-stroke:  #181818;
+  --ink-on-box:     #181818;     /* ink on Pokemon-white boxes (always dark) */
+
+  /* Colour-blind-safe semantic palette (Okabe-Ito). Use these — not the
+     hp-green / hp-red brand tokens — wherever colour carries meaning
+     (heatmap, win/lose, positive/negative delta). Pair with a label or
+     icon for redundancy. See teaching-viz SKILL §Colour-blind safety. */
+  --cb-blue:             #0072B2;
+  --cb-blue-light:       #B6D9EB;
+  --cb-vermillion:       #D55E00;
+  --cb-vermillion-light: #F4D2B0;
+  --cb-bluish-green:     #009E73;
+  --cb-yellow:           #F0E442;
+  --cb-orange:           #E69F00;
+  --cb-sky:              #56B4E9;
+  --cb-purple:           #CC79A7;
+
+  /* Cross-viz hue identities (kept for scene-5 recap chips) */
+  --hue-anymal:  #B8323A;     /* red — MDP */
+  --hue-casino:  #2F6CB1;     /* blue — ε-greedy */
+  --hue-ghost:   #7A5C8C;     /* purple — Bellman */
+  --hue-star:    #C08A3E;     /* amber — Robbins-Monro */
+  --hue-door:    #4A8B6B;     /* green — SARSA */
+  --hue-snakes:  #C8902C;     /* gold — Snakes & Ladders sibling */
+}
+
+:root[data-theme="gb"] {
+  /* Game Boy DMG green — the original 4-shade pea-soup palette:
+       #0F380F  darkest   (ink)
+       #306230  dark      (secondary ink)
+       #8BAC0F  light     (box backgrounds)
+       #9BBC0F  lightest  (page background)
+     Every brand colour (HP buckets, hue chips, CB-safe markers) maps
+     onto one of those four shades so the whole viz looks like it's
+     running on a stock DMG screen. */
+
+  --sky-top:        #9BBC0F;
+  --sky-bottom:     #8BAC0F;
+  --grass:          #306230;
+  --grass-rim:      #0F380F;
+
+  --bg:             #9BBC0F;
+  --bg-strong:      #8BAC0F;
+  --ink:            #0F380F;
+  --ink-on-box:     #0F380F;
+  --ink-secondary:  #306230;
+  --rule:           #0F380F;
+  --card-bg:        #8BAC0F;
+  --inner-highlight:#306230;
+  --pikachu-yellow: #9BBC0F;
+  --pikachu-cheek:  #0F380F;
+  --charmander-orange:#306230;
+  --hp-green:       #0F380F;
+  --hp-yellow:      #306230;
+  --hp-red:         #0F380F;
+  --damage-text:    #9BBC0F;
+  --damage-stroke:  #0F380F;
+
+  --hue-anymal:  #0F380F;
+  --hue-casino:  #0F380F;
+  --hue-ghost:   #0F380F;
+  --hue-star:    #306230;
+  --hue-door:    #306230;
+  --hue-snakes:  #306230;
+
+  /* Colour-blind palette — collapse to 2 shades so the heatmap still
+     shows pos/neg via lightness, the only channel DMG has. */
+  --cb-blue:             #0F380F;
+  --cb-blue-light:       #306230;
+  --cb-vermillion:       #0F380F;
+  --cb-vermillion-light: #306230;
+  --cb-bluish-green:     #306230;
+  --cb-yellow:           #8BAC0F;
+  --cb-orange:           #0F380F;
+  --cb-sky:              #306230;
+  --cb-purple:           #0F380F;
+}
+
+/* GB sprite tint — fold every PNG sprite onto the DMG green ramp.
+   grayscale→sepia→hue-rotate gets us a green wash; contrast bumps
+   reproduce the chunky look of the original 4-shade screen. */
+:root[data-theme="gb"] .poke-sprite,
+:root[data-theme="gb"] .traj-box-sprite,
+:root[data-theme="gb"] .q-thumb-sprite,
+:root[data-theme="gb"] .sd-f-tape-sprite,
+:root[data-theme="gb"] .sc0-bn-sprite {
+  filter: grayscale(1) sepia(1) saturate(3.5) hue-rotate(25deg) contrast(1.15) brightness(0.92);
+}
+
+/* DMG HP-bar fills — collapse the green/yellow/orange/red ramp onto
+   light/dark green so the bar still drains visually but stays in
+   palette. */
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="0"] { background: #0F380F; }
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="1"] { background: #0F380F; }
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="2"] { background: #306230; }
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="3"] { background: #306230; }
+:root[data-theme="gb"] .hp-bar-fill[data-bucket="4"] { background: #306230; }
+:root[data-theme="gb"] .hp-bar-track { background: #8BAC0F; }
+
+:root[data-theme="dark"] {
+  /* Battle screen — Night */
+  --sky-top:        #1A2548;
+  --sky-bottom:     #2A3A6E;
+  --grass:          #2A5A2A;
+  --grass-rim:      #1B3E1B;
+
+  --bg:             #1B1A18;
+  --bg-strong:      #FFFFFF;     /* dialog box stays Pokemon white at night */
+  --ink:            #E8E4D8;     /* page-level ink (against dark bg) */
+  --ink-on-box:     #181818;     /* ink on Pokemon-white boxes (always dark) */
+  --ink-secondary:  #989488;
+  --rule:           #181818;
+  --card-bg:        #FFFFFF;
+  --inner-highlight:#404040;
+  --pikachu-yellow: #F8D028;
+  --pikachu-cheek:  #E84828;
+  --charmander-orange:#F58030;
+  --hp-green:       #48C848;
+  --hp-yellow:      #E8C828;
+  --hp-red:         #E84828;
+  --damage-text:    #F8F8F8;
+  --damage-stroke:  #181818;
+
+  --hue-anymal:  #D77078;
+  --hue-casino:  #6EA3DC;
+  --hue-ghost:   #B394CB;
+  --hue-star:    #D6A766;
+  --hue-door:    #7AB392;
+  --hue-snakes:  #E6B158;
+
+  /* Colour-blind palette stays the same hue under dark theme — the
+     Okabe-Ito hues are designed to be unambiguous regardless of
+     background lightness, so no override needed. */
+  --cb-blue:             #4FA3DC;
+  --cb-blue-light:       #2C5A7A;
+  --cb-vermillion:       #E89055;
+  --cb-vermillion-light: #75462C;
+  --cb-bluish-green:     #43BA9C;
+  --cb-yellow:           #F0E442;
+  --cb-orange:           #E69F00;
+  --cb-sky:              #82C9F0;
+  --cb-purple:           #DEA1BF;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Press Start 2P', "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  -webkit-font-smoothing: none;  /* keep pixel font crisp */
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg);
+  border-bottom: 4px solid var(--rule);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.topbar .brand {
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink);
+  font-size: 9px;
+}
+.topbar .scene-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 0 20px;
+}
+.topbar .right-cluster { display: flex; gap: 6px; align-items: center; }
+
+.theme-toggle, .pager-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  padding: 5px 8px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 #BBB6A2;
+}
+.theme-toggle:hover, .pager-btn:hover {
+  background: var(--pikachu-yellow);
+}
+.pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* MUSIC button — same chrome as THEME but with an "on" state. */
+.music-toggle.active {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+  box-shadow: inset 2px 2px 0 0 #B89020;
+}
+
+.dot-pager { display: flex; gap: 4px; align-items: center; }
+.dot-pager .dot {
+  width: 10px; height: 10px;
+  background: var(--ink-secondary);
+  border: 2px solid var(--rule);
+  padding: 0;
+  cursor: pointer;
+}
+:root[data-theme="dark"] .dot-pager .dot { border-color: var(--bg-strong); }
+.dot-pager .dot.active { background: var(--pikachu-yellow); }
+.dot-pager .dot:hover { background: var(--pikachu-cheek); }
+
+/* ---------- Stage / scene engine ---------- */
+.stage {
+  position: relative;
+  max-width: 1100px;
+  margin: 16px auto 32px;
+  padding: 0 20px;
+  min-height: calc(100vh - 130px);
+}
+.scene {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  left: 0;
+  right: 0;
+}
+
+/* ---------- Pokemon dialog box ----------
+   The iconic look: thick black outer border + thin inner-highlight rectangle.
+   We render the inner highlight with stacked inset box-shadows. */
+.poke-box {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 16px;
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  position: relative;
+}
+.poke-box.tight { padding: 10px 12px; font-size: 10px; }
+
+.poke-box .triangle {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid var(--ink);
+  animation: blink 0.9s steps(2, end) infinite;
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ---------- Headings ---------- */
+.poke-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 38px;
+  color: var(--pikachu-yellow);
+  text-shadow:
+    2px 0 0 var(--ink),
+    -2px 0 0 var(--ink),
+    0 2px 0 var(--ink),
+    0 -2px 0 var(--ink),
+    2px 2px 0 var(--ink),
+    -2px -2px 0 var(--ink),
+    -2px 2px 0 var(--ink),
+    2px -2px 0 var(--ink),
+    4px 4px 0 var(--charmander-orange);
+  margin: 0 0 18px;
+  letter-spacing: 6px;
+}
+.poke-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+.poke-section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.poke-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin: 8px 4px 0;
+  max-width: 76ch;
+}
+
+/* ---------- Pokemon sprite ----------
+   Hard rule: image-rendering: pixelated must apply on both the <img> tag and
+   any wrapper that scales. */
+.poke-sprite {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+  display: block;
+  /* Idle breathing — 1.5 px vertical bob on a 2.4s cycle. The
+     animation property is replaced wholesale by .shake / .faint when
+     those classes are added, so it cleanly pauses during damage and
+     KO animations. */
+  animation: poke-breathe 2.4s ease-in-out infinite;
+}
+
+/* Grass tufts at the platform rim — 5 chunky pixel tufts that sway on
+   staggered cycles.  Lives inside .grass-rim so it sits at the right
+   vertical position automatically.  prefers-reduced-motion disables. */
+.grass-tufts {
+  position: absolute;
+  inset: -14px 0 auto 0;        /* lift above the rim */
+  height: 14px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6%;
+  pointer-events: none;
+  z-index: 2;
+}
+.grass-tuft {
+  width: 14px;
+  height: 14px;
+  background: var(--grass-rim);
+  clip-path: polygon(
+    20% 100%,  0%  35%, 18% 55%,
+    35% 0%,   45% 50%, 50% 25%,
+    55% 50%,  65% 0%,  82% 55%,
+    100% 35%, 80% 100%
+  );
+  transform-origin: 50% 100%;
+  animation: grass-sway 4.0s ease-in-out infinite alternate;
+}
+.grass-tuft:nth-child(2) { animation-delay: -0.7s; animation-duration: 4.4s; }
+.grass-tuft:nth-child(3) { animation-delay: -1.5s; animation-duration: 3.6s; }
+.grass-tuft:nth-child(4) { animation-delay: -2.1s; animation-duration: 4.8s; }
+.grass-tuft:nth-child(5) { animation-delay: -0.3s; animation-duration: 4.2s; }
+@keyframes grass-sway {
+  0%   { transform: rotate(-5deg); }
+  100% { transform: rotate(5deg);  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grass-tuft { animation: none; }
+}
+@keyframes poke-breathe {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .poke-sprite { animation: none; }
+}
+.poke-sprite.shake {
+  animation: poke-shake 320ms steps(1, end);
+}
+@keyframes poke-shake {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-6px, 0); }
+  25%  { transform: translate(6px, 0); }
+  40%  { transform: translate(-5px, 0); }
+  55%  { transform: translate(5px, 0); }
+  70%  { transform: translate(-3px, 0); }
+  85%  { transform: translate(3px, 0); }
+  100% { transform: translate(0, 0); }
+}
+.poke-sprite.faint {
+  animation: poke-faint 600ms ease-in forwards;
+}
+@keyframes poke-faint {
+  0%   { transform: translateY(0); opacity: 1; filter: brightness(1); }
+  100% { transform: translateY(48px); opacity: 0; filter: brightness(0); }
+}
+
+/* ---------- Battle stage ---------- */
+.battle-stage {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 5 / 3;
+  margin: 0 auto;
+  background:
+    linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 65%, var(--grass) 65%, var(--grass) 100%);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  overflow: hidden;
+  font-family: 'Press Start 2P', monospace;
+}
+.battle-stage .grass-rim {
+  position: absolute;
+  left: 0; right: 0;
+  top: 65%;
+  height: 4px;
+  background: var(--grass-rim);
+}
+.battle-stage .platform {
+  position: absolute;
+  width: 38%;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--grass-rim);
+  opacity: 0.65;
+}
+.battle-stage .platform.player   { left: 6%;  bottom: 14%; }
+.battle-stage .platform.opponent { right: 6%; top: 35%;    }
+
+.battle-stage .sprite-host {
+  position: absolute;
+}
+.battle-stage .sprite-host.player {
+  left: 10%;
+  bottom: 16%;
+  width: 30%;
+}
+.battle-stage .sprite-host.opponent {
+  right: 10%;
+  top: 12%;
+  width: 22%;
+}
+.battle-stage .sprite-host img {
+  width: 100%;
+  height: auto;
+  /* feet rest on platform: the platform is at the host's bottom */
+  transform: translateY(0);
+}
+
+/* Stars for night sky */
+.battle-stage.night::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 35% 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 12%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 60% 22%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 78% 8%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 38% 32%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 90% 30%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 8% 25%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 48% 8%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 72% 38%, #fff 1px, transparent 1px);
+  pointer-events: none;
+}
+
+/* HP box — sits floating over the battle */
+.hp-box {
+  position: absolute;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 6px 10px 6px 12px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  min-width: 160px;
+}
+.hp-box.player   { right: 4%; bottom: 6%;   }
+.hp-box.opponent { left:  4%; top: 6%;      }
+
+.hp-box .row1 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+.hp-box .name { color: var(--ink-on-box); }
+.hp-box .lvl { color: var(--ink-on-box); }
+
+.hp-bar-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.hp-bar-row .hp-label {
+  font-size: 8px;
+  color: var(--pikachu-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+}
+.hp-bar-track {
+  flex: 1 1 auto;
+  height: 9px;
+  background: #585858;
+  border: 2px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.hp-bar-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: #48C848;     /* default = full */
+  width: 100%;
+  transition: width 1100ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
+}
+/* Discrete bucket fill — 5 buckets + fainted. Width snaps to 100/80/60/
+   40/20/0%, color phases green → light-green → yellow → orange → red. */
+.hp-bar-fill[data-bucket="0"] { width: 100%; background: #48C848; }
+.hp-bar-fill[data-bucket="1"] { width: 80%;  background: #88D848; }
+.hp-bar-fill[data-bucket="2"] { width: 60%;  background: #E8C828; }
+.hp-bar-fill[data-bucket="3"] { width: 40%;  background: #E89028; }
+.hp-bar-fill[data-bucket="4"] { width: 20%;  background: #E84828; }
+.hp-bar-fill[data-bucket="5"] { width: 0%;   background: #E84828; }
+/* Tick marks at the bucket boundaries — makes the discretisation
+   readable even in a still screenshot. */
+.hp-bar-tick {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(0,0,0,0.45);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hp-box .row3 {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+
+/* Damage flash number */
+.damage-flash {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  color: var(--damage-text);
+  -webkit-text-stroke: 2px var(--damage-stroke);
+  text-stroke: 2px var(--damage-stroke);
+  pointer-events: none;
+  animation: dmg-rise 700ms ease-out forwards;
+}
+@keyframes dmg-rise {
+  0%   { transform: translateY(8px); opacity: 0; }
+  20%  { transform: translateY(0);   opacity: 1; }
+  80%  { transform: translateY(-24px); opacity: 1; }
+  100% { transform: translateY(-32px); opacity: 0; }
+}
+
+/* ---------- Move menu (scene 1) ---------- */
+.move-menu {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px 12px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+}
+.move-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: transparent;
+  border: 0;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 10px;
+  color: var(--ink-on-box);
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  text-transform: uppercase;
+}
+.move-btn::before {
+  content: '\25B6 ';
+  visibility: hidden;
+  color: var(--ink-on-box);
+}
+.move-btn:hover::before, .move-btn:focus::before, .move-btn.selected::before {
+  visibility: visible;
+}
+.move-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.move-btn:disabled::before { visibility: hidden; }
+.move-btn .move-sub {
+  font-size: 8px;
+  color: #585858;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  display: flex;
+  flex-direction: column;     /* two rows: .move-stats then .move-drop */
+  gap: 3px;
+}
+.move-btn .move-stats {
+  display: flex;
+  flex-wrap: wrap;            /* type-pill + PWR + ACC may wrap on narrow viewports */
+  gap: 2px 8px;
+  align-items: center;
+}
+.move-btn .move-drop {
+  font-size: 8px;
+  color: var(--pikachu-cheek);
+  letter-spacing: 0.5px;
+}
+.move-btn:disabled .move-drop { color: #888; }
+.move-btn .type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 4px;
+  border: 1px solid var(--rule);
+  font-size: 7px;
+  text-transform: uppercase;
+}
+.type-pill.electric { background: #F8D028; color: #181818; }
+.type-pill.normal   { background: #C8C0B0; color: #181818; }
+.type-pill.steel    { background: #B0B0C0; color: #181818; }
+.type-pill.fire     { background: #F58030; color: #181818; }
+
+/* ---------- Pokemon-styled "menu option" rows (for sliders / params) ---------- */
+.poke-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink);
+}
+.poke-menu-row::before {
+  content: '\25B6';
+  color: var(--pikachu-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+  margin-right: 4px;
+}
+.poke-menu-row input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 140px;
+  height: 8px;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.poke-menu-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  margin-top: 0;
+  cursor: pointer;
+}
+.poke-menu-row input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  cursor: pointer;
+}
+.poke-menu-row output, .poke-menu-row .val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  min-width: 56px;
+  color: var(--ink);
+}
+.poke-menu-row button {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 4px 8px;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 #BBB6A2;
+}
+.poke-menu-row button:hover { background: var(--pikachu-yellow); }
+.poke-menu-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- KaTeX wrapper ---------- */
+.poke-formula {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 10px 14px;
+  margin: 10px auto;
+  display: inline-block;
+  font-family: "KaTeX_Main", "Iowan Old Style", Georgia, serif;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.poke-formula .katex { color: var(--ink-on-box); font-size: 16px; }
+
+/* ---------- Scenes layout helpers ---------- */
+.scene-pad {
+  padding: 12px 4px 24px;
+}
+.scene-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.scene-row.center { justify-content: center; }
+.scene-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ---------- Cross-viz hue chip ---------- */
+.hue-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.hue-chip.hue-anymal { background: var(--hue-anymal); color: #fff; }
+.hue-chip.hue-casino { background: var(--hue-casino); color: #fff; }
+.hue-chip.hue-ghost  { background: var(--hue-ghost);  color: #fff; }
+.hue-chip.hue-star   { background: var(--hue-star);   color: #181818; }
+.hue-chip.hue-door   { background: var(--hue-door);   color: #fff; }
+.hue-chip.hue-snakes { background: var(--hue-snakes); color: #181818; }
+.hue-chip.hue-poke   { background: var(--pikachu-yellow); color: #181818; }
+
+/* ---------- N×N state grid for VI / γ scenes (NB = 5 for buckets) ----------
+   Rows use `auto` (not `1fr`) — the grid has no explicit container height, so
+   `1fr` would collapse to zero and let .state-cell's min-height fight the
+   track sizing. `auto` lets each row sit at its content height. */
+.state-grid {
+  display: grid;
+  grid-template-columns: 64px repeat(var(--nb, 5), minmax(0, 1fr));
+  grid-template-rows: 28px repeat(var(--nb, 5), auto);
+  gap: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  max-width: 760px;
+}
+.state-grid .axis-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+.state-grid .axis-label.col {
+  letter-spacing: 0.5px;
+}
+.state-grid .axis-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-secondary);
+  font-size: 7px;
+  text-align: center;
+  line-height: 1.3;
+}
+.state-grid .row-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--ink);
+  letter-spacing: 0.5px;
+}
+.state-grid .state-cell {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 78px;
+  position: relative;
+  box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight);
+  color: var(--ink-on-box);
+}
+.state-cell .v-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--ink-on-box);
+}
+.state-cell .v-move {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--charmander-orange);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.state-cell.flash {
+  animation: cell-flash 700ms ease-out;
+}
+@keyframes cell-flash {
+  0%   { box-shadow: 0 0 0 4px var(--pikachu-yellow), inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight); }
+  100% { box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight); }
+}
+
+/* ---------- Scene 2 (value iteration) clarity redesign ----------
+   Adds: narrator dialog + Bellman-above + two-column grid/inspector +
+   heat-map cell colours + terminal strips + inspector panel. */
+
+.sc2-narrator      { margin: 0 0 10px; }
+.sc2-formula       { margin: 0 0 10px; padding: 8px 14px; }
+.sc2-hud           { margin: 0 0 12px; }
+
+.sc2-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  margin-bottom: 14px;
+  align-items: start;
+}
+.sc2-grid-block {
+  min-width: 0;                   /* let the grid shrink inside flex/grid */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sc2-ctrl { margin-bottom: 10px; }
+
+/* ---------- Axis sprite decorations (scenes 2, 3) ----------
+   Pikachu sits to the LEFT of the grid (rows vary your HP).
+   Charmander sits ABOVE the grid (columns vary opp HP).
+   Both are framed as Pokemon dialog boxes so they match the rest of the UI. */
+.vi-axis-top {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+.vi-axis-leftpad { width: 96px; flex-shrink: 0; }   /* matches the .side panel below */
+.vi-axis-row     { display: flex; align-items: stretch; gap: 6px; }
+.vi-axis-pokemon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  color: var(--ink-on-box);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  flex: 1;
+}
+.vi-axis-pokemon.side {
+  flex: 0 0 96px;
+  flex-direction: column;
+  padding: 8px 4px;
+  text-align: center;
+  gap: 6px;
+}
+.vi-axis-sprite {
+  width: 52px;
+  height: 52px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.vi-axis-pokemon.side .vi-axis-sprite { width: 56px; height: 56px; }
+.vi-axis-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  letter-spacing: 0.5px;
+  line-height: 1.55;
+}
+
+/* Extended grid: 64px row-label column + 5 state cells + 56px WIN strip;
+   28px col-label row + 5 state rows + 32px LOSS strip. */
+.sc2-state-grid {
+  grid-template-columns: 64px repeat(var(--nb, 5), minmax(0, 1fr)) 56px;
+  grid-template-rows:    28px repeat(var(--nb, 5), auto)            32px;
+}
+
+/* Terminal strips on the right (WIN +10) and bottom (LOSS −10). */
+.terminal-hdr,
+.terminal-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  text-align: center;
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight);
+}
+.terminal-hdr        { font-size: 7px; line-height: 1.3; }
+.terminal-strip      { font-size: 9px; font-weight: bold; }
+.terminal-hdr.win,
+.terminal-strip.win  { background: var(--hp-green); color: #FFFFFF; }
+.terminal-hdr.loss,
+.terminal-strip.loss { background: var(--hp-red);   color: #FFFFFF; }
+.terminal-corner     { background: transparent; }
+
+/* Heat-map: cell background scales with V. The .v-val/.v-move text colour
+   adjusts so it stays readable on each tint. */
+.state-cell.v-pos-strong { background: #5BA85B; color: #FFFFFF; }
+.state-cell.v-pos-strong .v-val  { color: #FFFFFF; }
+.state-cell.v-pos-strong .v-move { color: #F8D028; }
+
+.state-cell.v-pos-mid    { background: #C8E8C8; }
+.state-cell.v-pos-mid    .v-val  { color: #181818; }
+.state-cell.v-pos-mid    .v-move { color: #2A6A2A; }
+
+.state-cell.v-neutral    { background: var(--bg-strong); }
+
+.state-cell.v-neg-mid    { background: #F8C8C0; }
+.state-cell.v-neg-mid    .v-val  { color: #181818; }
+.state-cell.v-neg-mid    .v-move { color: #962a1a; }
+
+.state-cell.v-neg-strong { background: #E84828; color: #FFFFFF; }
+.state-cell.v-neg-strong .v-val  { color: #FFFFFF; }
+.state-cell.v-neg-strong .v-move { color: #F8D028; }
+
+/* Clickable cells get a subtle hover + selected highlight. */
+.state-cell.clickable {
+  cursor: pointer;
+  transition: transform 80ms ease-out;
+}
+.state-cell.clickable:hover {
+  transform: scale(1.04);
+  z-index: 1;
+}
+.state-cell.selected {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: -3px;
+  z-index: 2;
+}
+
+/* START badge on the (FULL, FULL) cell — the state every battle begins at. */
+.state-cell.start-state { position: relative; }
+.state-cell.start-state::after {
+  content: 'START';
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  background: var(--pikachu-yellow);
+  color: #181818;
+  padding: 2px 4px;
+  border: 2px solid var(--rule);
+  letter-spacing: 0.5px;
+  z-index: 3;
+  white-space: nowrap;
+}
+
+/* ---------- Inspector panel ---------- */
+.vi-inspector {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  line-height: 1.55;
+}
+.vi-inspector .ins-placeholder {
+  color: var(--ink-secondary);
+  text-align: center;
+  padding: 28px 8px;
+  line-height: 1.8;
+  font-size: 9px;
+}
+.vi-inspector .ins-state-label {
+  font-size: 10px;
+  color: var(--ink-on-box);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.vi-inspector .ins-current-v {
+  margin-bottom: 10px;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+.vi-inspector .ins-num {
+  font-size: 14px;
+  color: var(--pikachu-cheek);
+}
+.vi-inspector .ins-explain {
+  font-size: 8px;
+  color: var(--ink-secondary);
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+.vi-inspector .ins-explain .mono {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+.vi-inspector .ins-moves {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.vi-inspector .ins-move-row {
+  display: grid;
+  grid-template-columns: 1fr auto 52px;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 7px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.vi-inspector .ins-move-row.argmax {
+  background: rgba(72, 200, 72, 0.18);
+  border-color: var(--hp-green);
+}
+.vi-inspector .ins-move-name { font-size: 8px; }
+.vi-inspector .ins-move-q    { font-size: 10px; color: var(--ink-on-box); justify-self: end; }
+.vi-inspector .ins-arg-arrow { font-size: 7px; color: #2A6A2A; }
+.vi-inspector .ins-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px solid var(--rule);
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+}
+
+/* ---------- Q-table render (scene 4) ---------- */
+.qtable-host {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px 12px;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  overflow-x: auto;
+}
+.qtable-host table { border-collapse: collapse; }
+.qtable-host th, .qtable-host td {
+  padding: 3px 6px;
+  border: 1px solid var(--inner-highlight);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+}
+.qtable-host th {
+  background: var(--pikachu-yellow);
+  color: #181818;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 7px;
+}
+.qtable-host td.state-head {
+  text-align: left;
+  background: #ECE5C8;
+  font-size: 7px;
+  text-transform: uppercase;
+  min-width: 88px;
+}
+.qtable-host td.argmax {
+  background: #FFF1AE;
+  font-weight: 700;
+}
+.qtable-host td.flash {
+  animation: qcell-flash 700ms ease-out;
+}
+@keyframes qcell-flash {
+  0%   { box-shadow: inset 0 0 0 2px var(--pikachu-yellow); background: #FFF1AE; }
+  100% { box-shadow: inset 0 0 0 0 var(--pikachu-yellow); }
+}
+
+/* ---------- Learning curve (scene 4) ---------- */
+.learning-curve {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.learning-curve .lc-svg { width: 100%; height: auto; display: block; }
+.learning-curve .lc-raw { fill: none; stroke: #888; stroke-width: 0.8; opacity: 0.5; }
+.learning-curve .lc-smooth { fill: none; stroke: var(--charmander-orange); stroke-width: 1.6; }
+.learning-curve .lc-cursor { stroke: var(--ink-on-box); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
+.learning-curve .lc-cursor-marker { fill: var(--pikachu-yellow); stroke: var(--ink-on-box); stroke-width: 0.8; }
+.learning-curve .lc-grid { stroke: var(--inner-highlight); stroke-width: 0.5; stroke-dasharray: 2 3; opacity: 0.4; }
+.learning-curve .lc-tick-label, .learning-curve .lc-axis-label {
+  fill: var(--ink-on-box);
+  font-size: 7px;
+  font-family: 'Press Start 2P', monospace;
+}
+.learning-curve .lc-axis-label { font-size: 8px; }
+
+/* ---------- Scrubber ---------- */
+.scrubber {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  flex-wrap: wrap;
+}
+.scrubber input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1 1 auto;
+  min-width: 120px;
+  height: 8px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  margin: 0;
+}
+.scrubber input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+}
+.scrubber input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+}
+.scrubber .scr-label {
+  min-width: 110px;
+  font-size: 9px;
+}
+.scrubber .scr-snapshots { display: flex; gap: 4px; flex-wrap: wrap; }
+.scrubber .scr-snap {
+  cursor: pointer;
+  padding: 2px 5px;
+  border: 2px solid var(--rule);
+  background: #ECE5C8;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+}
+.scrubber .scr-snap.active {
+  background: var(--pikachu-yellow);
+}
+
+/* ---------- HUD strip (scene 1) ---------- */
+.hud-strip {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  flex-wrap: wrap;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  color: var(--ink-on-box);
+}
+.hud-strip .hud-item { display: flex; flex-direction: column; gap: 2px; }
+.hud-strip .hud-label {
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #585858;
+}
+.hud-strip .hud-val {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+  font-size: 11px;
+}
+
+/* ---------- Footnote ---------- */
+.footnote {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 6px;
+  margin-top: 14px;
+  text-align: right;
+}
+.footnote kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  border: 1px solid var(--rule);
+  padding: 0 4px;
+  background: var(--bg-strong);
+  color: var(--ink);
+}
+
+/* ---------- Component colour spans ---------- */
+.comp-mdp     { color: var(--hue-anymal); }
+.comp-eps     { color: var(--hue-casino); }
+.comp-bellman { color: var(--hue-ghost); }
+.comp-rm      { color: var(--hue-star); }
+.comp-door    { color: var(--hue-door); }
+.comp-poke    { color: var(--pikachu-yellow); -webkit-text-stroke: 0.5px var(--ink); }
+
+/* MDP-frame overlay (scene 0) */
+.mdp-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #181818;
+}
+.mdp-overlay .mdp-tag {
+  position: absolute;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  padding: 3px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 2px 2px 0 0 var(--ink);
+  pointer-events: auto;
+}
+
+/* ============================================================
+   Japanese "flavor mode" — body.lang-jp swaps the primary font
+   to DotGothic16 (a bitmap-style Japanese font from Google Fonts)
+   so the kana glyphs match the chiptune pixel-art feel of the
+   English Press-Start-2P text. Press Start 2P stays as a fallback
+   for Latin glyphs nested inside Japanese strings (e.g. "10まんボルト",
+   "SML · ポケモン", "Q*"), giving us bitmap consistency on both sides.
+
+   DotGothic16 is also listed as a tail fallback even in EN mode so
+   the language-toggle button's "日本語" label renders cleanly without
+   falling back to a system font. ============================ */
+body.lang-jp,
+body.lang-jp button,
+body.lang-jp input,
+body.lang-jp .scene,
+body.lang-jp .topbar {
+  font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace;
+}
+body.lang-jp .scene {
+  /* DotGothic16 is denser per glyph than Press Start 2P. Add a touch
+     of letter-spacing so kana don't run together at small sizes. */
+  letter-spacing: 0.02em;
+}
+/* Even in EN mode, allow Japanese glyphs (only the lang-toggle label
+   right now) to fall through to DotGothic16 rather than the OS default. */
+.theme-toggle, .pager-btn, .topbar .brand, .scene-title {
+  font-family: 'Press Start 2P', 'DotGothic16', 'Courier New', monospace;
+}
+
+/* ============================================================
+   Scene 1 — wild-encounter intro
+   ----------------------------------------------------------------
+   The cascade hides both sprite hosts on reset, flashes the
+   opponent into view ("A wild CHARMANDER appeared!"), then arcs
+   a Pokeball in from off-screen-left onto the player platform,
+   pops it open, and materializes Pikachu in its place ("Go!
+   PIKACHU!"). All animations are opacity- and filter-based on
+   the sprite hosts so they DO NOT conflict with the
+   .poke-sprite breathing/shake/faint transform animations that
+   live on the inner <img>. The Pokeball is its own absolute
+   element layered above the platform.
+   ============================================================ */
+
+/* Initial hidden state for sprite hosts — opacity only, no
+   transform/display so the inner sprite's breathing keyframes
+   keep running unmolested. */
+.sc1-hidden {
+  opacity: 0;
+}
+
+/* Opponent wild-appears: a fast white-flash that brings the
+   host from invisible+overbright down to fully visible at
+   normal brightness. Filter + opacity only — no transform. */
+.sc1-wild-appear {
+  animation: sc1-wild-appear 500ms steps(8, end) forwards;
+}
+@keyframes sc1-wild-appear {
+  0%   { opacity: 0; filter: brightness(6) contrast(0.4); }
+  20%  { opacity: 1; filter: brightness(4) contrast(0.6); }
+  60%  { opacity: 1; filter: brightness(2) contrast(0.9); }
+  100% { opacity: 1; filter: brightness(1) contrast(1); }
+}
+
+/* Player materialize: similar opacity+filter flash for the
+   Pikachu reveal that follows the Pokeball pop. */
+.sc1-materialize {
+  animation: sc1-materialize 360ms steps(6, end) forwards;
+}
+@keyframes sc1-materialize {
+  0%   { opacity: 0; filter: brightness(4) contrast(0.5); }
+  30%  { opacity: 1; filter: brightness(3) contrast(0.7); }
+  100% { opacity: 1; filter: brightness(1) contrast(1); }
+}
+
+/* Pokeball arcing onto the player platform. The ball is its
+   own element appended to .battle-stage; it lives above the
+   platforms but below the HP boxes (z-index: 6). The arc keyframe
+   uses left/bottom percentages so it scales with the stage,
+   plus rotation for the spinning ball feel. */
+.sc1-pokeball {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  z-index: 6;
+  pointer-events: none;
+  left: -20%;
+  bottom: -20%;
+}
+.sc1-pokeball svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.sc1-pokeball-arc {
+  animation: sc1-pokeball-arc 620ms cubic-bezier(0.3, 0.05, 0.55, 1) forwards;
+}
+@keyframes sc1-pokeball-arc {
+  0%   { left: -20%; bottom: -20%; transform: rotate(0deg);   }
+  40%  { left:   2%; bottom:  45%; transform: rotate(360deg); }
+  65%  { left:  18%; bottom:  60%; transform: rotate(540deg); }
+  100% { left:  22%; bottom:  22%; transform: rotate(720deg); }
+}
+.sc1-pokeball-open {
+  left: 22%;
+  bottom: 22%;
+  animation: sc1-pokeball-open 280ms ease-out forwards;
+}
+@keyframes sc1-pokeball-open {
+  0%   { transform: scale(1)   rotate(720deg); opacity: 1; }
+  100% { transform: scale(2.4) rotate(720deg); opacity: 0; }
+}
+
+/* Reduced motion — collapse the cascade to a simple opacity
+   reveal. Pokeball is invisible (the materialize alone reads
+   as "appears"). */
+@media (prefers-reduced-motion: reduce) {
+  .sc1-hidden {
+    opacity: 0;
+    transition: opacity 200ms linear;
+  }
+  .sc1-wild-appear,
+  .sc1-materialize {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transition: opacity 200ms linear;
+  }
+  .sc1-pokeball,
+  .sc1-pokeball-arc,
+  .sc1-pokeball-open {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   Gen-1 rotating-hex scene transition
+   ----------------------------------------------------------------
+   A full-viewport overlay shaped as a 6-point hexagon (extended
+   beyond the viewport so the shape fully covers the screen at
+   scale 1) animates from scale 1 / rotate 0 down to scale 0 /
+   rotate 180, opacity fading at the tail.  The new scene is
+   already mounted underneath; the overlay just gates the reveal.
+   pointer-events: none keeps the underlying scene interactive.
+   Fires only on entry to the three battle-flavored scenes
+   (scene1, sceneSarsaDerive, sceneQstar) — see playSceneTransition
+   in main.js.
+   ============================================================ */
+.scene-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  pointer-events: none;
+  clip-path: polygon(
+    50% -50%,
+    130% 25%,
+    130% 75%,
+    50% 150%,
+    -30% 75%,
+    -30% 25%
+  );
+  transform-origin: 50% 50%;
+  animation: scene-trans-hex 700ms cubic-bezier(.42, 0, .58, 1) forwards;
+}
+@keyframes scene-trans-hex {
+  0%   { transform: scale(1) rotate(0deg);     opacity: 1; }
+  70%  {                                       opacity: 1; }
+  100% { transform: scale(0) rotate(180deg);   opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-transition { display: none; }
+}
