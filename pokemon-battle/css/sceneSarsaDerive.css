@@ -421,6 +421,40 @@
   padding: 4px 6px;
   min-height: 1.4em;
 }
+
+/* Convergence-to-Q* indicator — only shows on step F.  Thin bar
+   keyed to the L1 distance between the live q and the DP-computed
+   Q*; 0 % at q=0, 100 % when q matches Q*. */
+.sd-conv-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  padding: 4px 0;
+}
+.sd-conv-label { color: var(--ink-secondary); letter-spacing: 0.04em; }
+.sd-conv-track {
+  flex: 1 1 auto;
+  height: 10px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.sd-conv-fill {
+  display: block;
+  height: 100%;
+  background: var(--cb-bluish-green);
+  transition: width 350ms ease-out;
+}
+.sd-conv-val {
+  min-width: 32px;
+  text-align: right;
+  color: var(--pikachu-cheek);
+  font-variant-numeric: tabular-nums;
+}
 .sd-q-host { min-width: 0; }
 
 /* ---- Trajectory overlays on Q-cells ---- */

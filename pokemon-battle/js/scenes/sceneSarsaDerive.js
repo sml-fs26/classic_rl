@@ -300,6 +300,69 @@
     let playSpeedLvl  = 2;     /* default = middle (= ~700 ms) */
     const SPEED_MS    = [1400, 1000, 700, 450, 250];
 
+    /* DP-computed Q* — the ground truth.  Used by the convergence
+       indicator in the F step to show how close our SARSA q is to
+       optimal.  Computed lazily (and cached) the first time F is
+       shown so we don't pay the value-iteration cost up front. */
+    let QstarCache   = null;
+    let QstarBaseline = 0;        /* sum|Q*| over all (s,a); the
+                                     denominator for the distance bar */
+    function computeQstar() {
+      if (QstarCache) return QstarCache;
+      let V = new Float32Array(N);
+      for (let iter = 0; iter < 400; iter++) {
+        const Vn = new Float32Array(N);
+        let md = 0;
+        for (let s = 0; s < N; s++) {
+          const st = { your: STATES[s].your, opp: STATES[s].opp, terminal: false };
+          let best = -Infinity;
+          for (let a = 0; a < A; a++) {
+            const succ = window.Battle.successors(st, ACTIONS[a]);
+            let q = 0;
+            for (const t of succ) {
+              const vN = t.sNext.terminal ? 0 : V[t.sNext.your * NB + t.sNext.opp];
+              q += t.p * (t.reward + GAMMA * vN);
+            }
+            if (q > best) best = q;
+          }
+          Vn[s] = best;
+          const d = Math.abs(best - V[s]);
+          if (d > md) md = d;
+        }
+        V = Vn;
+        if (md < 1e-7) break;
+      }
+      const Qs = new Float32Array(N * A);
+      let baseline = 0;
+      for (let s = 0; s < N; s++) {
+        const st = { your: STATES[s].your, opp: STATES[s].opp, terminal: false };
+        for (let a = 0; a < A; a++) {
+          const succ = window.Battle.successors(st, ACTIONS[a]);
+          let q = 0;
+          for (const t of succ) {
+            const vN = t.sNext.terminal ? 0 : V[t.sNext.your * NB + t.sNext.opp];
+            q += t.p * (t.reward + GAMMA * vN);
+          }
+          Qs[s * A + a] = q;
+          baseline += Math.abs(q);
+        }
+      }
+      QstarCache = Qs;
+      QstarBaseline = baseline || 1;
+      return Qs;
+    }
+
+    /* Returns a number in [0, 100]: 0 at the start (q all zero), 100 when
+       q matches Q* exactly.  Uses the L1 distance normalised by sum|Q*|. */
+    function convergencePct() {
+      const Qs = computeQstar();
+      let dist = 0;
+      for (let i = 0; i < Q.length; i++) dist += Math.abs(Q[i] - Qs[i]);
+      const frac = dist / QstarBaseline;
+      const pct = Math.max(0, Math.min(100, 100 * (1 - frac)));
+      return pct;
+    }
+
     /* ==========================================================
        Right-column rendering — per-step illustration logic
        ========================================================== */
@@ -467,9 +530,22 @@
     }
 
     function illusF() {
-      cap.textContent = '↓ LIVE: PRESS PLAY OR NEXT TRANSITION.  q FILLS IN OVER MANY REROLLS.';
       qtbl.update(Q, { suppressFlash: true });
       renderFTape();
+      renderConvergence();
+    }
+
+    /* Convergence-to-Q* indicator — a thin bar that sits where the
+       caption usually lives, only on step F.  Recomputed after every
+       SARSA update and on REROLL / CLEAR.  Cheap (25*3 cells). */
+    function renderConvergence() {
+      const pct = convergencePct();
+      cap.innerHTML =
+        '<div class="sd-conv-row">' +
+          '<span class="sd-conv-label">CLOSENESS TO Q* (DP ORACLE):</span>' +
+          '<span class="sd-conv-track"><span class="sd-conv-fill" style="width:' + pct.toFixed(1) + '%"></span></span>' +
+          '<span class="sd-conv-val">' + pct.toFixed(0) + '%</span>' +
+        '</div>';
     }
 
     function illusG() {
@@ -646,6 +722,7 @@
       fCursor += 1;
       renderFTape();
       renderFDetail();
+      renderConvergence();
       return true;
     }
 
@@ -655,12 +732,14 @@
       qtbl.update(Q, { suppressFlash: true });
       renderFTape();
       renderFDetail();
+      renderConvergence();
     }
 
     function fClearQ() {
       Q = window.SARSA.makeQ();
       qtbl.update(Q, { suppressFlash: true });
       renderFDetail();
+      renderConvergence();
     }
 
     /* ---- PLAY mode ---- */
