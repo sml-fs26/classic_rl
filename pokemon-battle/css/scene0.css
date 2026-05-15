@@ -22,6 +22,10 @@
   margin: 12px 0;
   display: flex;
   justify-content: center;
+  position: relative;
+  width: 240px;
+  height: 200px;
+  align-items: center;
 }
 .sc0-pika {
   width: 144px;
@@ -29,10 +33,44 @@
   animation: pika-bob 1.2s ease-in-out infinite;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
 }
 @keyframes pika-bob {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-4px); }
+}
+/* Cheek-spark on click — short burst that fades.  Layered on top of
+   the breathing animation via a class that re-triggers via JS. */
+@keyframes sc0-pika-zap {
+  0%   { filter: brightness(1) drop-shadow(0 0 0 transparent); }
+  35%  { filter: brightness(1.5) drop-shadow(0 0 18px rgba(255, 220, 80, 0.9)); }
+  100% { filter: brightness(1) drop-shadow(0 0 0 transparent); }
+}
+.sc0-pika.sc0-pika-zap { animation: pika-bob 1.2s ease-in-out infinite, sc0-pika-zap 700ms ease-out; }
+
+/* Sparkles drifting around Pikachu on the title screen. */
+.sc0-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.sc0-sparkle {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  font-size: 18px;
+  color: var(--pikachu-yellow);
+  text-shadow: 0 0 6px rgba(255, 220, 80, 0.8);
+  animation: sc0-sparkle 3.0s ease-in-out infinite;
+  animation-delay: var(--d);
+  opacity: 0;
+}
+@keyframes sc0-sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  50%      { opacity: 1; transform: scale(1.2); }
 }
 
 .sc0-start {
@@ -43,6 +81,9 @@
   border: 4px solid var(--rule);
   color: var(--ink-on-box);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   box-shadow:
     inset 0 0 0 2px var(--bg-strong),
     inset 0 0 0 4px var(--inner-highlight),
@@ -53,9 +94,91 @@
   background: var(--pikachu-yellow);
   animation: none;
 }
+.sc0-start-chevron {
+  display: inline-block;
+  color: var(--pikachu-cheek);
+  animation: sc0-chevron-bounce 0.7s ease-in-out infinite;
+}
+@keyframes sc0-chevron-bounce {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
+}
 @keyframes start-blink {
   0%, 60% { opacity: 1; }
   61%, 100% { opacity: 0.4; }
+}
+
+/* Per-letter drop-in for the POKEMON wordmark (first-visit only). */
+.poke-title {
+  display: inline-flex;
+  gap: 0;
+}
+.poke-title-letter {
+  display: inline-block;
+}
+.sc0-first-visit .poke-title-letter {
+  animation: sc0-letter-drop 520ms cubic-bezier(.34, 1.56, .64, 1) backwards;
+  animation-delay: calc(var(--i) * 90ms + 200ms);
+}
+@keyframes sc0-letter-drop {
+  0%   { transform: translateY(-80px) rotate(-12deg); opacity: 0; }
+  60%  { transform: translateY(6px)   rotate(2deg);   opacity: 1; }
+  100% { transform: translateY(0)     rotate(0);      opacity: 1; }
+}
+
+/* First-visit: subtitle and sprite delay until the wordmark finishes
+   dropping so the moment is staged. */
+.sc0-first-visit .sc0-subtitle {
+  animation: sc0-fade-in 380ms ease-out calc(var(--len, 7) * 90ms + 600ms) backwards;
+}
+.sc0-first-visit .sc0-pika-wrap {
+  animation: sc0-fade-in 380ms ease-out calc(var(--len, 7) * 90ms + 800ms) backwards;
+}
+.sc0-first-visit .sc0-start {
+  animation: sc0-fade-in 380ms ease-out calc(var(--len, 7) * 90ms + 1000ms) backwards,
+             start-blink 1.0s steps(2, end) calc(var(--len, 7) * 90ms + 1400ms) infinite;
+}
+@keyframes sc0-fade-in {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* A thin scrolling grass strip along the bottom of the title screen
+   (pixel-art style); subtle background motion to add life. */
+.sc0-grass-strip {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  height: 14px;
+  margin: 18px auto 4px;
+  background-image: linear-gradient(
+    to right,
+    var(--grass-rim) 0px, var(--grass-rim) 6px,
+    transparent 6px, transparent 12px,
+    var(--grass-rim) 12px, var(--grass-rim) 14px,
+    transparent 14px, transparent 22px,
+    var(--grass-rim) 22px, var(--grass-rim) 26px,
+    transparent 26px, transparent 36px
+  );
+  background-size: 36px 14px;
+  background-repeat: repeat-x;
+  animation: sc0-grass-scroll 14s linear infinite;
+  opacity: 0.55;
+}
+@keyframes sc0-grass-scroll {
+  0%   { background-position-x: 0; }
+  100% { background-position-x: -360px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sc0-first-visit .poke-title-letter,
+  .sc0-first-visit .sc0-subtitle,
+  .sc0-first-visit .sc0-pika-wrap,
+  .sc0-first-visit .sc0-start,
+  .sc0-sparkle,
+  .sc0-grass-strip,
+  .sc0-start-chevron {
+    animation: none;
+  }
 }
 
 .sc0-credits {
