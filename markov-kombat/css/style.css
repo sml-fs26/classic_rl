@@ -15,54 +15,59 @@
   font-style: normal;
 }
 
-/* ---------- Tokens ---------- */
+/* ---------- MK II TOKENS ----------
+   The default theme is MK arcade: jet-black page, deep indigo / brazier
+   battle backdrop, crimson rule borders, gold accents.  Pokemon's
+   light cream is gone; the "light" data-theme also resolves to this
+   so any code path that asks for `data-theme="light"` still lands on
+   MK colours. */
 :root,
 :root[data-theme="light"] {
-  /* Battle screen — Day */
-  --sky-top:        #9CC8E8;
-  --sky-bottom:     #C0DEF0;
-  --grass:          #5BA85B;
-  --grass-rim:      #3A8A3A;
+  /* Battle screen — Throne Room of Q* */
+  --sky-top:        #1A0A2A;   /* indigo above the brazier */
+  --sky-bottom:     #2A1A3A;
+  --grass:          #3A2A2A;   /* stone floor */
+  --grass-rim:      #5C0C08;   /* dark crimson lip at the floor edge */
 
   /* Page chrome */
-  --bg:             #E8E0CC;     /* warm grey-cream, NES "shell" */
-  --bg-strong:      #F8F4E4;     /* lighter, for dialog boxes */
-  --ink:            #181818;
-  --ink-secondary:  #585858;
-  --rule:           #181818;     /* hard black for Pokemon borders */
-  --card-bg:        #FFFFFF;
-  --inner-highlight:#404040;     /* the secondary inner border line */
-  --pikachu-yellow: #F8D028;
-  --pikachu-cheek:  #E84828;
-  --charmander-orange:#F58030;
-  --hp-green:       #48C848;
-  --hp-yellow:      #E8C828;
-  --hp-red:         #E84828;
-  --damage-text:    #F8F8F8;
-  --damage-stroke:  #181818;
-  --ink-on-box:     #181818;     /* ink on Pokemon-white boxes (always dark) */
+  --bg:             #0A0A0A;   /* jet black arcade-cabinet bg */
+  --bg-strong:      #1C1C1C;   /* deep grey for dialog boxes */
+  --ink:            #E8E8E8;   /* page ink — light grey on dark bg */
+  --ink-secondary:  #8C8C8C;
+  --rule:           #C8201A;   /* crimson border — replaces Pokemon black */
+  --card-bg:        #1C1C1C;
+  --inner-highlight:#5C0C08;   /* dark crimson inner border line */
+  --pikachu-yellow: #E8B028;   /* gold accent (FATALITY / FINISH HIM) */
+  --pikachu-cheek:  #C8201A;   /* crimson highlight */
+  --charmander-orange:#7A0A06; /* dried-blood plum (formerly Charmander orange) */
+  --hp-green:       #E8B028;   /* full energy = gold (high in the ramp) */
+  --hp-yellow:      #E87028;   /* orange */
+  --hp-red:         #C8201A;   /* crimson */
+  --damage-text:    #FFFFFF;
+  --damage-stroke:  #000000;
+  --ink-on-box:     #E8E8E8;   /* ink on dark MK boxes is light */
 
-  /* Colour-blind-safe semantic palette (Okabe-Ito). Use these — not the
-     hp-green / hp-red brand tokens — wherever colour carries meaning
-     (heatmap, win/lose, positive/negative delta). Pair with a label or
-     icon for redundancy. See teaching-viz SKILL §Colour-blind safety. */
-  --cb-blue:             #0072B2;
-  --cb-blue-light:       #B6D9EB;
-  --cb-vermillion:       #D55E00;
-  --cb-vermillion-light: #F4D2B0;
-  --cb-bluish-green:     #009E73;
-  --cb-yellow:           #F0E442;
+  /* Colour-blind-safe semantic palette (Okabe-Ito) — kept identical to
+     Pokemon viz so the heatmap stays correctly readable in MK theme. */
+  --cb-blue:             #5A8CC8;
+  --cb-blue-light:       #2C5A7A;
+  --cb-vermillion:       #E87028;
+  --cb-vermillion-light: #75462C;
+  --cb-bluish-green:     #43BA9C;
+  --cb-yellow:           #E8B028;
   --cb-orange:           #E69F00;
-  --cb-sky:              #56B4E9;
-  --cb-purple:           #CC79A7;
+  --cb-sky:              #82C9F0;
+  --cb-purple:           #DEA1BF;
 
-  /* Cross-viz hue identities (kept for scene-5 recap chips) */
-  --hue-anymal:  #B8323A;     /* red — MDP */
-  --hue-casino:  #2F6CB1;     /* blue — ε-greedy */
-  --hue-ghost:   #7A5C8C;     /* purple — Bellman */
-  --hue-star:    #C08A3E;     /* amber — Robbins-Monro */
-  --hue-door:    #4A8B6B;     /* green — SARSA */
-  --hue-snakes:  #C8902C;     /* gold — Snakes & Ladders sibling */
+  /* Cross-viz hue identities (kept for scene-5 recap chips).  Same
+     hues as Pokemon to preserve the "from which sibling" colour
+     coding — the rest of the viz changed; the genealogy stayed. */
+  --hue-anymal:  #B8323A;
+  --hue-casino:  #5A8CC8;
+  --hue-ghost:   #B394CB;
+  --hue-star:    #E8B028;
+  --hue-door:    #7AB392;
+  --hue-snakes:  #E6B158;
 }
 
 :root[data-theme="gb"] {
@@ -1461,3 +1466,118 @@ body.lang-jp .scene {
 @media (prefers-reduced-motion: reduce) {
   .scene-transition { display: none; }
 }
+
+/* ============================================================
+   MK silhouette re-skin
+   ----------------------------------------------------------------
+   Pokemon PNGs ship with the repo (carried over from the
+   pokemon-battle copy).  Rather than commission new MK sprites for
+   v1, we turn the existing PNGs into MK-coloured silhouettes via
+   CSS filter chains.  The PNG outline carries the shape; the
+   filter strips colour, crushes the brightness, and tints.
+   Player side = crimson/gold ninja; opponent side = cold cyan/blue
+   ninja.  Phase-3 deliverable.  Real bespoke sprites are deferred
+   to v2 (MK-CHANGELOG).
+   ============================================================ */
+
+/* Player sprites — crimson silhouette */
+.battle-stage .sprite-host.player .poke-sprite,
+.qstar-stage .sprite-host.player .poke-sprite,
+.q-thumb-side.player .q-thumb-sprite,
+.traj-box-side:first-child .traj-box-sprite,
+.sd-f-tape-mini:first-child .sd-f-tape-sprite,
+.sc0-pika,
+.sc0-bn-sprite.player {
+  filter:
+    grayscale(1) brightness(0.10) contrast(3.0)
+    drop-shadow(0 0 0 var(--pikachu-cheek));
+}
+
+/* Opponent sprites — cyan silhouette, KHAOS form gets crimson tint */
+.battle-stage .sprite-host.opponent .poke-sprite,
+.qstar-stage .sprite-host.opponent .poke-sprite,
+.q-thumb-side.opponent .q-thumb-sprite,
+.traj-box-side:last-child .traj-box-sprite,
+.sd-f-tape-mini:last-child .sd-f-tape-sprite,
+.sc0-bn-sprite.opponent {
+  filter:
+    grayscale(1) brightness(0.10) contrast(3.0) sepia(1)
+    hue-rotate(170deg) saturate(2);
+}
+
+/* MK fighter silhouette block on the title screen (scene 0).  Pure CSS
+   shape — no PNG.  Wide-stance ninja silhouette in crimson on gold
+   "pillar of light" backdrop. */
+.mk-fighter {
+  width: 96px;
+  height: 132px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, transparent 0 8%, var(--pikachu-cheek) 8% 92%, transparent 92% 100%);
+  clip-path: polygon(
+    35% 0%, 65% 0%, 70% 12%, 80% 28%, 80% 38%,
+    96% 50%, 92% 56%, 80% 52%, 78% 64%, 80% 84%,
+    72% 100%, 62% 100%, 58% 76%, 50% 80%, 42% 76%, 38% 100%,
+    28% 100%, 20% 84%, 22% 64%, 20% 52%, 8% 56%, 4% 50%,
+    20% 38%, 20% 28%, 30% 12%
+  );
+  animation: mk-fighter-breathe 2.4s ease-in-out infinite;
+}
+.mk-fighter-liu { background: linear-gradient(180deg, transparent 0 8%, var(--pikachu-cheek) 8% 92%, transparent 92% 100%); }
+.mk-fighter-sub { background: linear-gradient(180deg, transparent 0 8%, #5A8CC8 8% 92%, transparent 92% 100%); }
+@keyframes mk-fighter-breathe {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-fighter { animation: none; }
+}
+
+/* Title screen subtitle / tagline.  Crimson tagline pulses below the
+   gold "SHAO KAHN-VERGENCE" subtitle. */
+.sc0-tagline {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  color: var(--pikachu-cheek);
+  text-align: center;
+  margin: 8px 0 16px;
+  animation: mk-tagline-pulse 1.6s ease-in-out infinite;
+}
+@keyframes mk-tagline-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.04); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sc0-tagline { animation: none; }
+}
+
+/* Battle-stage gradient: replace the day-sky → grass gradient with a
+   throne-room column of indigo over stone-grey, with a deep crimson
+   line at the rim. */
+.battle-stage {
+  background:
+    linear-gradient(
+      to bottom,
+      var(--sky-top) 0%,
+      var(--sky-bottom) 55%,
+      var(--grass) 55%,
+      var(--grass) 100%
+    );
+  border-color: var(--pikachu-cheek);
+}
+
+/* "Grass tufts" become silhouette skull-icons at the floor rim. */
+.grass-tuft {
+  background: var(--pikachu-cheek);
+  /* simple skull-ish silhouette via clip-path */
+  clip-path: polygon(
+    50% 0%, 70% 8%, 82% 28%, 82% 50%, 70% 60%, 70% 78%,
+    62% 90%, 62% 100%, 38% 100%, 38% 90%, 30% 78%, 30% 60%,
+    18% 50%, 18% 28%, 30% 8%
+  );
+}
+
+/* MK theme: hide GB-only filter for now (the gb theme is preserved
+   structurally but the silhouette filter above already wins). */
+:root[data-theme="gb"] .poke-sprite { filter: none; }
+
