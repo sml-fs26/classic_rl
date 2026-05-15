@@ -196,22 +196,6 @@
     c2.appendChild(foot2);
     root.appendChild(c2);
 
-    /* ---- V* via Q* card ---- */
-    const c3 = document.createElement('div');
-    c3.className = 'concept-formula-card';
-    c3.innerHTML = '<div class="concept-formula-label">BEST-ACTION VALUE AT STATE s</div>';
-    const f3 = document.createElement('div');
-    c3.appendChild(f3);
-    window.Katex.render(
-      String.raw`Q^{\star}(s) \;=\; \max_{a}\; Q^{\star}(s, a)`,
-      f3, true
-    );
-    const foot3 = document.createElement('div');
-    foot3.className = 'concept-formula-foot';
-    foot3.textContent = 'The best Q* reachable from state s — the value of acting optimally from here on.';
-    c3.appendChild(foot3);
-    root.appendChild(c3);
-
     return {};
   };
 })();

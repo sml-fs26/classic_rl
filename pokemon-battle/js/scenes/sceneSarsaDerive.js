@@ -203,13 +203,6 @@
     heading.textContent = 'DERIVING SARSA';
     root.appendChild(heading);
 
-    const legend = document.createElement('div');
-    legend.className = 'sd-legend';
-    legend.innerHTML =
-      '<span class="sd-legend-chip q">Q*(s, a)</span><span>true (unknown) optimal action-value function</span>' +
-      '<span class="sd-legend-chip q-est">q[s, a]</span><span>our table estimate — typewriter q</span>';
-    root.appendChild(legend);
-
     const ctrls = document.createElement('div');
     ctrls.className = 'sd-controls';
     ctrls.innerHTML =
@@ -258,20 +251,9 @@
     numline.style.display = 'none';
     right.appendChild(numline);
 
-    /* F-step extras: controls (PLAY etc.) at the bottom of root.  Hidden
-       unless on step F. */
-    const fCtrlsRow = document.createElement('div');
-    fCtrlsRow.className = 'sd-f-ctrls-row';
-    fCtrlsRow.style.display = 'none';
-    fCtrlsRow.innerHTML =
-      '<button class="poke-btn" id="sd-f-play">▶ PLAY</button>' +
-      '<button class="poke-btn" id="sd-f-step">▶ NEXT TRANSITION</button>' +
-      '<button class="poke-btn" id="sd-f-reroll">⟲ REROLL</button>' +
-      '<button class="poke-btn" id="sd-f-clear">CLEAR q</button>' +
-      '<div class="sd-f-alpha">α <span id="sd-f-alpha-val">0.20</span>' +
-        '<input type="range" id="sd-f-alpha-range" min="0" max="100" value="20">' +
-      '</div>';
-    root.appendChild(fCtrlsRow);
+    /* F-step controls live in the left column alongside the step-detail
+       panel — see fControlsHTML() / wireFControls().  The bottom-row
+       layout was dropped to fit the F step on a single viewport. */
 
     /* ==========================================================
        State
@@ -287,15 +269,19 @@
     /* F state — independent of illustration trajectory. */
     let Q       = window.SARSA.makeQ();
     let fRng    = window.Battle.makeRng(20260520);
-    let alpha   = 0.20;
+    const ALPHA = 0.20;     /* Step size, fixed.  Standard tabular SARSA
+                               sits in 0.1–0.3; 0.2 gives a visible per-
+                               tuple nudge without being chaotic. */
     const eps   = 0.40;
     let fTraj   = [];
     let fCursor = 0;
 
-    /* PLAY mode state */
-    let playing   = false;
-    let playTimer = null;
-    const PLAY_MS = 750;
+    /* PLAY mode state — speed level (0=slowest .. 4=fastest) maps to a
+       ms cadence between transitions. */
+    let playing       = false;
+    let playTimer     = null;
+    let playSpeedLvl  = 2;     /* default = middle (= ~700 ms) */
+    const SPEED_MS    = [1400, 1000, 700, 450, 250];
 
     /* ==========================================================
        Right-column rendering — per-step illustration logic
@@ -514,25 +500,62 @@
       tape.innerHTML = html;
     }
 
+    function fControlsHTML() {
+      /* The F-step controls live on the left, alongside the step-detail
+         panel.  Speed slider is 0..4; α is fixed at 0.20 (no slider). */
+      return (
+        '<div class="sd-f-ctrls-row">' +
+          '<button class="poke-btn" id="sd-f-play">' + (playing ? '⏸ PAUSE' : '▶ PLAY') + '</button>' +
+          '<button class="poke-btn" id="sd-f-step">▶ NEXT TRANSITION</button>' +
+          '<button class="poke-btn" id="sd-f-reroll">⟲ REROLL</button>' +
+          '<button class="poke-btn" id="sd-f-clear">CLEAR q</button>' +
+          '<div class="sd-f-speed">SPEED ' +
+            '<span class="sd-f-speed-label">SLOW</span>' +
+            '<input type="range" id="sd-f-speed-range" min="0" max="4" step="1" value="' + playSpeedLvl + '">' +
+            '<span class="sd-f-speed-label">FAST</span>' +
+          '</div>' +
+          '<div class="sd-f-alpha-fixed">α = <b>' + ALPHA.toFixed(2) + '</b></div>' +
+        '</div>'
+      );
+    }
+
+    function wireFControls() {
+      const play = document.getElementById('sd-f-play');
+      if (play) play.addEventListener('click', togglePlay);
+      const step = document.getElementById('sd-f-step');
+      if (step) step.addEventListener('click', () => { pausePlay(); applyCurrentFUpdate(); });
+      const rer = document.getElementById('sd-f-reroll');
+      if (rer) rer.addEventListener('click', () => { pausePlay(); fReroll(); });
+      const clr = document.getElementById('sd-f-clear');
+      if (clr) clr.addEventListener('click', () => { pausePlay(); fClearQ(); fReroll(); });
+      const spd = document.getElementById('sd-f-speed-range');
+      if (spd) spd.addEventListener('input', (e) => {
+        playSpeedLvl = Math.max(0, Math.min(4, parseInt(e.target.value, 10) || 2));
+      });
+    }
+
     function renderFDetail() {
+      const ctrls = fControlsHTML();
+      const head =
+        '<div class="sd-card-num">STEP 8 / 8</div>' +
+        '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
+        ctrls;
+
       if (!fTraj.length || fCursor >= fTraj.length) {
         if (!fTraj.length) {
-          left.innerHTML =
-            '<div class="sd-card-num">STEP 8 / 8</div>' +
-            '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
+          left.innerHTML = head +
             '<div class="sd-f-detail">' +
               '<div class="sd-f-detail-title">NO TRANSITIONS YET</div>' +
               '<div class="sd-f-detail-body">Reroll to sample a trajectory.</div>' +
             '</div>';
         } else {
-          left.innerHTML =
-            '<div class="sd-card-num">STEP 8 / 8</div>' +
-            '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
+          left.innerHTML = head +
             '<div class="sd-f-detail">' +
               '<div class="sd-f-detail-title">ALL ' + fTraj.length + ' TRANSITIONS APPLIED</div>' +
               '<div class="sd-f-detail-body">PLAY auto-rerolls.  <span class="sd-q-est">q</span> is preserved, so the next trajectory builds on what we have.</div>' +
             '</div>';
         }
+        wireFControls();
         clearFPulse();
         return;
       }
@@ -542,7 +565,7 @@
       const qNextEst = t.terminal ? 0 : Q[t.sNextIdx * A + t.aNextIdx];
       const target   = t.terminal ? t.r : (t.r + GAMMA * qNextEst);
       const tdErr    = target - qCurrent;
-      const qNew     = qCurrent + alpha * tdErr;
+      const qNew     = qCurrent + ALPHA * tdErr;
 
       const aStr   = fullMove(t.a);
       const aNStr  = t.terminal ? '— (terminal)' : fullMove(t.aNext);
@@ -550,9 +573,7 @@
         ? fmt(t.r) + ' &nbsp;&nbsp; (no bootstrap — next state terminal)'
         : fmt(t.r) + ' + ' + fmt(qNextEst) + ' = <b>' + fmt(target) + '</b>';
 
-      left.innerHTML =
-        '<div class="sd-card-num">STEP 8 / 8</div>' +
-        '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
+      left.innerHTML = head +
         '<div class="sd-f-detail">' +
           '<div class="sd-f-detail-title">TRANSITION ' + (fCursor + 1) + ' / ' + fTraj.length + '</div>' +
           '<div class="sd-f-detail-body">' +
@@ -568,10 +589,11 @@
             '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a]  was</span> <b>' + fmt(qCurrent) + '</b></div>' +
             '<div class="sd-f-calc-line"><span class="sd-f-calc-label">TD error = target − q[s, a]</span> = <b class="sd-f-td">' + fmt(tdErr) + '</b></div>' +
             '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a] += α · (target − q[s, a])</span></div>' +
-            '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + fmt(qCurrent) + ' + ' + alpha.toFixed(2) + ' · ' + fmt(tdErr) + ' = <b class="sd-f-qnew">' + fmt(qNew) + '</b></span></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + fmt(qCurrent) + ' + ' + ALPHA.toFixed(2) + ' · ' + fmt(tdErr) + ' = <b class="sd-f-qnew">' + fmt(qNew) + '</b></span></div>' +
           '</div>' +
         '</div>';
 
+      wireFControls();
       highlightFCell(t);
     }
 
@@ -593,7 +615,7 @@
     function applyCurrentFUpdate() {
       if (fCursor >= fTraj.length) return false;
       const t = fTraj[fCursor];
-      window.SARSA.update(Q, t.sIdx, t.a, t.r, t.sNextIdx, t.aNext, alpha, GAMMA, t.terminal);
+      window.SARSA.update(Q, t.sIdx, t.a, t.r, t.sNextIdx, t.aNext, ALPHA, GAMMA, t.terminal);
       qtbl.update(Q, { suppressFlash: false });
       fCursor += 1;
       renderFTape();
@@ -637,7 +659,7 @@
           applyCurrentFUpdate();
         }
         if (playing) schedulePlayTick();
-      }, PLAY_MS);
+      }, SPEED_MS[playSpeedLvl]);
     }
     function startPlay() {
       if (playing) return;
@@ -661,16 +683,14 @@
       clearOverlays();
 
       if (step.id === 'F') {
-        /* F step — live demo.  Show F controls, render detail panel on
-           the left, build a fresh trajectory if we don't have one. */
-        fCtrlsRow.style.display = '';
+        /* F step — live demo.  The left column is built from scratch
+           by renderFDetail (it contains the step-detail + the
+           PLAY/NEXT/REROLL/CLEAR/SPEED controls). */
         if (!fTraj.length) fReroll();
         illusF();
         renderFDetail();
         return;
       }
-
-      fCtrlsRow.style.display = 'none';
 
       /* Render the standard card on the left. */
       let html =
@@ -723,16 +743,9 @@
       applyCursor();
     });
 
-    /* F controls */
-    document.getElementById('sd-f-play').addEventListener('click', togglePlay);
-    document.getElementById('sd-f-step').addEventListener('click', () => { pausePlay(); applyCurrentFUpdate(); });
-    document.getElementById('sd-f-reroll').addEventListener('click', () => { pausePlay(); fReroll(); });
-    document.getElementById('sd-f-clear').addEventListener('click', () => { pausePlay(); fClearQ(); fReroll(); });
-    document.getElementById('sd-f-alpha-range').addEventListener('input', (e) => {
-      alpha = Math.max(0, Math.min(1, Number(e.target.value) / 100));
-      document.getElementById('sd-f-alpha-val').textContent = alpha.toFixed(2);
-      if (STEPS[cursor].id === 'F') renderFDetail();
-    });
+    /* F controls are re-bound on each renderFDetail() call (see
+       wireFControls) because the buttons live in the left column
+       which gets rebuilt every step. */
 
     applyCursor();
 

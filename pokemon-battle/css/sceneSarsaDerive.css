@@ -563,31 +563,48 @@
 .sd-numline-arrow.unified { background: var(--pikachu-cheek); color: var(--pikachu-cheek); height: 6px; }
 .sd-numline-arrow.unified::after { border-left-color: var(--pikachu-cheek); border-top-width: 8px; border-bottom-width: 8px; }
 
-/* ---- Step F controls row (PLAY etc.) — full-width bar below the
-   main row, only visible while on step F. ---- */
+/* ---- Step F controls — now lives INSIDE the left column, just under
+   the step title.  Sticks to that column so the user gets the
+   controls + the step-detail arithmetic in one compact panel on the
+   left, the Q-table on the right, no scroll. ---- */
 .sd-f-ctrls-row {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   align-items: center;
   flex-wrap: wrap;
-  margin-top: 6px;
-  padding: 10px 12px;
-  background: var(--bg-strong);
-  border: 3px solid var(--rule);
+  margin: 6px 0 10px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
 }
-.sd-f-ctrls-row .poke-btn { font-size: 9px; padding: 6px 8px; }
-.sd-f-ctrls-row .sd-f-alpha {
+.sd-f-ctrls-row .poke-btn { font-size: 8px; padding: 5px 7px; }
+.sd-f-ctrls-row .sd-f-speed {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
   margin-left: auto;
 }
-.sd-f-ctrls-row .sd-f-alpha input[type="range"] { width: 140px; accent-color: var(--pikachu-cheek); }
+.sd-f-ctrls-row .sd-f-speed input[type="range"] {
+  width: 80px;
+  accent-color: var(--pikachu-cheek);
+}
+.sd-f-ctrls-row .sd-f-speed-label { color: var(--ink-secondary); font-size: 6.5px; }
+.sd-f-ctrls-row .sd-f-alpha-fixed {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  padding: 0 6px;
+  border-left: 1px solid var(--inner-highlight);
+  margin-left: 4px;
+}
+.sd-f-ctrls-row .sd-f-alpha-fixed b { color: var(--pikachu-cheek); }
 
-/* PLAY button gets a brighter look when active so the user sees the
-   live state immediately. */
+/* PLAY button gets a brighter look so the user sees the live state
+   immediately. */
 #sd-f-play { background: var(--pikachu-yellow); font-weight: bold; }
 
 /* Reduced-motion guard for every illustration animation in the scene. */
