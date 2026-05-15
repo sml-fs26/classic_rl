@@ -144,6 +144,7 @@
     updateTitle(idx);
     syncHash(idx);
     playSceneTransition(SCENES[idx].key);
+    window.dispatchEvent(new CustomEvent('scene-change', { detail: { idx: idx, key: SCENES[idx].key } }));
   }
 
   /* Gen-1-style rotating-hex wipe — fires only on entries to the three
@@ -198,6 +199,31 @@
     if (prev) prev.addEventListener('click', () => { cursorBlip(); goTo(current - 1); });
     if (next) next.addEventListener('click', () => { cursorBlip(); goTo(current + 1); });
 
+    /* Speaker-notes overlay — lecturer crib sheet, toggled by `n`.
+       Lives outside the scene flow so it's available everywhere. */
+    const snOverlay = document.createElement('div');
+    snOverlay.id = 'speaker-notes-overlay';
+    snOverlay.className = 'speaker-notes-overlay';
+    snOverlay.hidden = true;
+    snOverlay.innerHTML =
+      '<div class="speaker-notes-card">' +
+        '<div class="speaker-notes-title">SPEAKER NOTES · press <kbd>n</kbd> to close</div>' +
+        '<div class="speaker-notes-content" id="speaker-notes-content"></div>' +
+      '</div>';
+    document.body.appendChild(snOverlay);
+    let snVisible = false;
+    function refreshSpeakerNotes() {
+      const key = SCENES[current] && SCENES[current].key;
+      const html = (window.SpeakerNotes && window.SpeakerNotes.getNotes(key)) || '<em>(No notes for this scene yet.)</em>';
+      const target = document.getElementById('speaker-notes-content');
+      if (target) target.innerHTML = html;
+    }
+    function toggleSpeakerNotes() {
+      snVisible = !snVisible;
+      if (snVisible) { refreshSpeakerNotes(); snOverlay.hidden = false; }
+      else           { snOverlay.hidden = true; }
+    }
+
     window.addEventListener('keydown', (e) => {
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -210,7 +236,18 @@
         cursorBlip();
         const handled = st && typeof st.onPrevKey === 'function' && st.onPrevKey();
         if (!handled) goTo(current - 1);
+      } else if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        toggleSpeakerNotes();
+      } else if (e.key === 'Escape' && snVisible) {
+        toggleSpeakerNotes();
       }
+    });
+
+    /* Refresh notes content when the scene changes — only meaningful
+       when the overlay is open. */
+    window.addEventListener('scene-change', () => {
+      if (snVisible) refreshSpeakerNotes();
     });
 
     window.addEventListener('hashchange', () => {
