@@ -637,6 +637,22 @@
 }
 .sd-f-ctrls-row .sd-f-alpha-fixed b { color: var(--pikachu-cheek); }
 
+.sd-f-ctrls-row .sd-f-eps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  padding: 0 6px;
+  border-left: 1px solid var(--inner-highlight);
+}
+.sd-f-ctrls-row .sd-f-eps b { color: var(--pikachu-cheek); min-width: 28px; }
+.sd-f-ctrls-row .sd-f-eps input[type="range"] {
+  width: 70px;
+  accent-color: var(--pikachu-cheek);
+}
+
 /* PLAY button gets a brighter look so the user sees the live state
    immediately. */
 #sd-f-play { background: var(--pikachu-yellow); font-weight: bold; }

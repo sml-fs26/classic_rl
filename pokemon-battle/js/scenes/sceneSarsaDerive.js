@@ -289,7 +289,9 @@
     const ALPHA = 0.20;     /* Step size, fixed.  Standard tabular SARSA
                                sits in 0.1–0.3; 0.2 gives a visible per-
                                tuple nudge without being chaotic. */
-    const eps   = 0.40;
+    let eps     = 0.40;     /* Exploration rate.  Live-tunable via the
+                               slider in the F controls so students can
+                               see ε = 0 → stuck, ε = 1 → no exploit. */
     let fTraj   = [];
     let fCursor = 0;
 
@@ -604,7 +606,9 @@
 
     function fControlsHTML() {
       /* The F-step controls live on the left, alongside the step-detail
-         panel.  Speed slider is 0..4; α is fixed at 0.20 (no slider). */
+         panel.  Speed slider is 0..4; α is fixed at 0.20; ε is a live
+         slider 0..1 so students discover the exploration tradeoff. */
+      const epsPct = Math.round(eps * 100);
       return (
         '<div class="sd-f-ctrls-row">' +
           '<button class="poke-btn" id="sd-f-play">' + (playing ? '⏸ PAUSE' : '▶ PLAY') + '</button>' +
@@ -615,6 +619,9 @@
             '<span class="sd-f-speed-label">SLOW</span>' +
             '<input type="range" id="sd-f-speed-range" min="0" max="4" step="1" value="' + playSpeedLvl + '">' +
             '<span class="sd-f-speed-label">FAST</span>' +
+          '</div>' +
+          '<div class="sd-f-eps">ε <b id="sd-f-eps-val">' + eps.toFixed(2) + '</b>' +
+            '<input type="range" id="sd-f-eps-range" min="0" max="100" step="5" value="' + epsPct + '">' +
           '</div>' +
           '<div class="sd-f-alpha-fixed">α = <b>' + ALPHA.toFixed(2) + '</b></div>' +
         '</div>'
@@ -633,6 +640,14 @@
       const spd = document.getElementById('sd-f-speed-range');
       if (spd) spd.addEventListener('input', (e) => {
         playSpeedLvl = Math.max(0, Math.min(4, parseInt(e.target.value, 10) || 2));
+      });
+      const epsEl = document.getElementById('sd-f-eps-range');
+      if (epsEl) epsEl.addEventListener('input', (e) => {
+        eps = Math.max(0, Math.min(1, (parseInt(e.target.value, 10) || 0) / 100));
+        const lbl = document.getElementById('sd-f-eps-val');
+        if (lbl) lbl.textContent = eps.toFixed(2);
+        /* New ε kicks in on the next REROLL — current trajectory was
+           sampled under the old ε. */
       });
     }
 
