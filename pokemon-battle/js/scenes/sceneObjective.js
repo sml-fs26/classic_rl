@@ -208,11 +208,19 @@
       '<div class="g-variance-body">' +
         '<div class="g-variance-explainer">' +
           'G<sub>1</sub>(τ) is a <em>random variable</em>. Two rollouts from the same start can land far apart. ' +
-          'Q* is the <b>average</b> over that distribution.  Press SAMPLE to draw 20 trajectories from the start state ' +
-          'under <span class="g-r">always-THUNDERBOLT</span>; each bar is one G<sub>1</sub>.  The dashed line is the mean — ' +
-          'an estimate of Q*(FULL/FULL, THUNDERBOLT).' +
+          '<b>Q*</b> is the maximum, over all policies, of the average G under that policy.  Pick a policy below, ' +
+          'press SAMPLE to draw 20 trajectories; each bar is one G<sub>1</sub>(τ).  The dashed line is the mean — an ' +
+          'estimate of Q under that policy.  <span class="g-r">Try different policies — different distribution, ' +
+          'different mean.</span>' +
         '</div>' +
         '<div class="g-variance-right">' +
+          '<div class="g-variance-policy-row">' +
+            'POLICY:' +
+            '<button class="g-variance-policy" data-policy="quick_attack">QUICK</button>' +
+            '<button class="g-variance-policy active" data-policy="thunderbolt">BOLT</button>' +
+            '<button class="g-variance-policy" data-policy="thunder">THUN</button>' +
+            '<button class="g-variance-policy" data-policy="random">RANDOM</button>' +
+          '</div>' +
           '<div class="g-variance-stats" id="g-variance-stats">N = 0 · mean — · range —</div>' +
           '<div class="g-variance-chart" id="g-variance-chart"></div>' +
           '<button class="poke-btn" id="g-variance-sample">▶ SAMPLE 20 TRAJECTORIES</button>' +
@@ -220,8 +228,11 @@
       '</div>';
     root.appendChild(variance);
 
-    /* Sample one trajectory under the THUNDERBOLT policy from the FULL/FULL
-       initial state.  Returns G_1 (total reward to terminal). */
+    let variancePolicy = 'thunderbolt';
+    const ACTIONS_LOCAL = window.Moves.MOVE_IDS;
+
+    /* Sample one trajectory under the current policy from FULL/FULL.
+       'random' picks a uniform action each turn; named moves repeat. */
     let varianceRngSeed = 20260516;
     function sampleOneG() {
       varianceRngSeed = (varianceRngSeed + 1013904223) | 0;
@@ -229,7 +240,10 @@
       let state = window.Battle.initialState();
       let G = 0;
       for (let t = 0; t < 30; t++) {
-        const out = window.Battle.sample(state, 'thunderbolt', rng);
+        const action = (variancePolicy === 'random')
+          ? ACTIONS_LOCAL[Math.floor(rng.next() * ACTIONS_LOCAL.length)]
+          : variancePolicy;
+        const out = window.Battle.sample(state, action, rng);
         G += out.reward;
         state = out.sNext;
         if (state.terminal) break;
@@ -237,7 +251,7 @@
       return G;
     }
 
-    const G_samples = [];
+    let G_samples = [];
     function drawSamples(n) {
       for (let i = 0; i < n; i++) G_samples.push(sampleOneG());
       renderVarianceChart();
@@ -276,6 +290,22 @@
       chart.innerHTML = html;
     }
     document.getElementById('g-variance-sample').addEventListener('click', () => drawSamples(20));
+
+    /* Policy-selector buttons: clicking one switches the policy and
+       resets the samples (since they're conditioned on the policy). */
+    variance.querySelectorAll('.g-variance-policy').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const p = btn.getAttribute('data-policy');
+        if (!p || p === variancePolicy) return;
+        variancePolicy = p;
+        variance.querySelectorAll('.g-variance-policy').forEach((b) => {
+          b.classList.toggle('active', b === btn);
+        });
+        G_samples = [];
+        renderVarianceChart();
+      });
+    });
+
     /* Expand/collapse on title click. */
     variance.querySelector('.g-variance-title').addEventListener('click', () => {
       variance.classList.toggle('collapsed');
