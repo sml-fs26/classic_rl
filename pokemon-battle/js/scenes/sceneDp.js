@@ -305,7 +305,7 @@
     const fhost = document.createElement('div');
     fcard.appendChild(fhost);
     window.Katex.render(
-      String.raw`Q^{\star}(s, a) \;=\; \sum_{s'} P(s' \mid s, a)\Big[\, r(s, a, s') \;+\; \max_{a'} Q^{\star}(s', a') \,\Big]`,
+      String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\!\left[\, R \;+\; \max_{a'} Q^{\star}(S', a') \;\middle|\; S = s,\; A = a \,\right]`,
       fhost, true
     );
     root.appendChild(fcard);
