@@ -363,52 +363,52 @@
 
     const PHASES = [
       {
-        title: 'CHARIZARD COLUMNS — easy wins',
+        title: 'SUB-OPTIMAL (KHAOS) COLUMNS — easy finishes',
         narration: [
-          'When opponent HP drops to LOW or CRITICAL it has evolved into <b>CHARIZARD</b> — huge frame, exposed.',
-          'QUICK ATTACK is super-effective (2-3 dmg · 100% acc) — always one-shots a LOW or CRIT Charizard.',
-          '<b>Q*(s, QUICK) = +10</b> for every cell in these two columns.',
+          'When opponent HP drops to LOW or CRITICAL he is now <b>SUB-OPTIMAL (KHAOS)</b> — huge frame, exposed.',
+          'GREEDY JAB is super-effective (2-3 dmg · 100% acc) — always finishes a LOW or CRIT KHAOS form.',
+          '<b>Q*(s, GREEDY JAB) = +10</b> for every cell in these two columns.',
         ],
         fillCells: charizardCols,
       },
       {
         title: 'YOUR=CRITICAL row — losing positions',
         narration: [
-          'PIKACHU at CRITICAL means any counter-attack faints us. Most cells in this row are losing.',
-          'Q tells you the expected loss — useful even when there is no winning move.',
+          'LIU KANG-MAX at CRITICAL means any counter-attack finishes us. Most cells in this row are losing.',
+          'Q* tells you the expected loss — useful even when there is no winning move.',
         ],
         fillCells: yourCritRest,
       },
       {
-        title: 'DETAIL — (FULL, MID, THUNDER)',
+        title: 'DETAIL — (FULL, MID, TD-UPPERCUT)',
         narration: null,
         fillCells: detailCellOnly,
         detailCell: idx(0, 2),
         detailType: 'show',
       },
       {
-        title: 'CHARMELEON column — THUNDER reigns',
+        title: 'SUB-OPTIMAL (FROST-CRACKED) column — TD-UPPERCUT reigns',
         narration: [
           'CHARMELEON\'s hardened hide <b>resists THUNDERBOLT</b> (0-1 dmg, fizzles).',
-          'THUNDER stays at 2-3 dmg → only Pikachu move with reach. Even with 55% accuracy, it dominates.',
+          'TD-UPPERCUT stays at 2-3 dmg → only LIU KANG-MAX move with reach. Even with 55% accuracy, it dominates.',
         ],
         fillCells: restOfMidCol,
       },
       {
-        title: 'CHARMANDER columns — subtle territory',
+        title: 'SUB-OPTIMAL (FRESH) columns — subtle territory',
         narration: [
-          'The baby form: BOLT works at normal damage; QUICK is too weak alone.',
-          'But every BOLT that drops CHARMANDER into MID HP triggers evolution to CHARMELEON, who resists future BOLTs.',
-          'THUNDER keeps the same 2-3 dmg through every form — sometimes worth its 55% accuracy.',
+          'The fresh form: BACKHAND works at normal damage; JAB is too weak alone.',
+          'But every BACKHAND that drops SUB-OPTIMAL into MID HP triggers a transform to FROST-CRACKED, who resists future BACKHANDs.',
+          'TD-UPPERCUT keeps the same 2-3 dmg through every form — sometimes worth its 55% accuracy.',
         ],
         fillCells: charmanderCols,
       },
       {
         title: 'Q* CONVERGED.',
         narration: [
-          'All three Pikachu moves earn their place: QUICK against Charizard, THUNDER against Charmeleon, a mix in Charmander territory.',
+          'All three LIU KANG-MAX moves earn their place: GREEDY JAB against the KHAOS form, TD-UPPERCUT against FROST-CRACKED, a mix against the fresh SUB-OPTIMAL.',
           'But this required <i>P(s′ | s, a)</i> for every transition, plus one Bellman backup per cell.',
-          'In real games neither is available — sample-based methods come next.',
+          'In real kombat neither is available — sample-based methods come next.',
         ],
         fillCells: [],
       },

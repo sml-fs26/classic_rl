@@ -1581,3 +1581,72 @@ body.lang-jp .scene {
    structurally but the silhouette filter above already wins). */
 :root[data-theme="gb"] .poke-sprite { filter: none; }
 
+/* ============================================================
+   MK ninja silhouette OVERLAY (replaces the filter-tinted Pokemon
+   shape in the big battle stages).  The user noticed that Pikachu's
+   ears and Charmander's tail still read through the filter chain
+   — so on every battle-stage / qstar-stage sprite-host we hide the
+   underlying <img> (opacity: 0 preserves the layout box) and paint
+   a flat-colour ninja-stance clip-path via ::after.  Player =
+   crimson back-stance silhouette; opponent = cyan front-stance.
+
+   Small thumbnails (Q-table cells, trajectory tape) keep the
+   filter-only approach above — at 16-22 px the shape doesn't read
+   anyway, and the filter is enough to neutralise the Pokemon
+   colours.
+   ============================================================ */
+
+.battle-stage .sprite-host img.poke-sprite,
+.qstar-stage  .sprite-host img.poke-sprite {
+  opacity: 0;
+}
+
+.battle-stage .sprite-host::after,
+.qstar-stage  .sprite-host::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--pikachu-cheek);   /* crimson player by default */
+  clip-path: polygon(
+    44% 4%,  56% 4%,                  /* head */
+    62% 14%, 60% 22%,
+    78% 26%, 90% 36%, 84% 46%,        /* right arm out */
+    76% 44%, 72% 54%,                 /* armpit / waist right */
+    78% 74%, 84% 96%, 64% 96%,        /* right leg, foot */
+    58% 78%, 52% 62%,                 /* inner right leg */
+    48% 62%, 42% 78%,                 /* inner left leg */
+    36% 96%, 16% 96%, 22% 74%,        /* left foot, left leg */
+    28% 54%, 24% 44%, 16% 46%,        /* armpit / waist left */
+    10% 36%, 22% 26%, 40% 22%,        /* left arm out */
+    38% 14%
+  );
+  animation: mk-fighter-breathe 2.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+/* Opponent variant — cooler cyan tint. */
+.battle-stage .sprite-host.opponent::after,
+.qstar-stage  .sprite-host.opponent::after {
+  background: #5A8CC8;
+}
+
+/* SUB-OPTIMAL evolution colour states.  We can't react to sprite.setKind
+   without a JS hook, but adding a [data-kind=...] toggle in sprite.js
+   (logged as v2) would light these up.  Until then, opponent stays
+   cool-cyan. */
+.battle-stage .sprite-host[data-kind="charmeleon"]::after,
+.qstar-stage  .sprite-host[data-kind="charmeleon"]::after {
+  background: #8CBED4;
+}
+.battle-stage .sprite-host[data-kind="charizard"]::after,
+.qstar-stage  .sprite-host[data-kind="charizard"]::after {
+  background: #C84028;
+  filter: drop-shadow(0 0 4px #E8B028);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battle-stage .sprite-host::after,
+  .qstar-stage  .sprite-host::after { animation: none; }
+}
+

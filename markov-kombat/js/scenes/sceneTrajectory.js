@@ -149,7 +149,7 @@
 
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'THE TRAJECTORY';
+    heading.textContent = 'REPLAY THE KARNAGE';
     root.appendChild(heading);
 
     /* Formula card */

@@ -24,16 +24,16 @@
  * numbers. See `moveSubHtml()` below. */
 (function () {
   const MOVES = [
-    { id: 'quick_attack', name: 'QUICK ATTACK', power: 55,  accuracy: 1.00, type: 'normal'   },
-    { id: 'thunderbolt',  name: 'THUNDERBOLT',  power: 80,  accuracy: 1.00, type: 'electric' },
-    { id: 'thunder',      name: 'THUNDER',      power: 150, accuracy: 0.55, type: 'electric' },
+    { id: 'quick_attack', name: 'GREEDY JAB',       power: 55,  accuracy: 1.00, type: 'normal'   },
+    { id: 'thunderbolt',  name: 'BELLMAN BACKHAND', power: 80,  accuracy: 1.00, type: 'electric' },
+    { id: 'thunder',      name: 'TD-UPPERCUT',      power: 150, accuracy: 0.55, type: 'electric' },
   ];
 
   const MOVE_IDS = MOVES.map(m => m.id);
   const MOVE_BY_ID = {};
   for (const m of MOVES) MOVE_BY_ID[m.id] = m;
 
-  const OPP_MOVE = { id: 'ember', name: 'EMBER', power: 80, accuracy: 1.00, type: 'fire' };
+  const OPP_MOVE = { id: 'ember', name: 'ICY HOOK', power: 80, accuracy: 1.00, type: 'fire' };
 
   /* Inline SVG icon per type — cheap pixel-art glyphs, no extra asset. */
   function typeIconSvg(type) {

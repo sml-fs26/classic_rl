@@ -139,10 +139,10 @@
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
     const charmHp = window.HPBar.mount(oppHpHost, {
-      name: 'CHARMANDER', side: 'opponent', level: 5, numBuckets: NB,
+      name: 'SUB-OPTIMAL', side: 'opponent', level: 5, numBuckets: NB,
     });
     const pikaHp = window.HPBar.mount(playerHpHost, {
-      name: 'PIKACHU', side: 'player', level: 5, numBuckets: NB,
+      name: 'LIU KANG-MAX', side: 'player', level: 5, numBuckets: NB,
     });
     charmHp.set(0);
     pikaHp.set(0);

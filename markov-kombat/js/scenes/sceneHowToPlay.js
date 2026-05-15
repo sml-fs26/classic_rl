@@ -19,43 +19,43 @@
     {
       title: 'Welcome, trainer!',
       dialog:
-        "Hello there!  Welcome to the world of POKEMON!  " +
-        "Before you battle, here is a quick refresher.",
+        "Hello there!  Welcome to MARKOV KOMBAT!  " +
+        "Before you fight, here is a quick refresher.",
       render: renderStepWelcome,
     },
     {
       title: 'The battle screen',
       dialog:
-        "Look at the screen.  Your PIKACHU faces away from you.  " +
-        "The wild CHARMANDER faces you.  Each has an HP box.",
+        "Look at the screen.  LIU KANG-MAX faces away from you.  " +
+        "Challenger SUB-OPTIMAL faces you.  Each has an HP box.",
       render: renderStepBattleScreen,
     },
     {
       title: 'HP has five buckets',
       dialog:
-        "Each POKEMON's HP is split into five buckets: FULL, HIGH, MID, " +
-        "LOW, CRITICAL.  Past CRITICAL, the POKEMON faints!",
+        "Each fighter's HP is split into five buckets: FULL, HIGH, MID, " +
+        "LOW, CRITICAL.  Past CRITICAL, the fighter is finished!",
       render: renderStepHpBuckets,
     },
     {
       title: 'Pick a move',
       dialog:
         "PWR is how strong the move feels.  ACC is the real chance it lands.  " +
-        "Higher PWR usually means lower ACC — that's the trade-off PIKACHU has to learn.",
+        "Higher PWR usually means lower ACC — that's the trade-off LIU KANG-MAX has to learn.",
       render: renderStepMoves,
     },
     {
       title: 'How a turn flows',
       dialog:
-        "Your PIKACHU is faster, so it moves first.  Then the wild " +
-        "CHARMANDER strikes back with EMBER.  One turn — both actions.",
+        "LIU KANG-MAX is faster, so it moves first.  Then challenger " +
+        "SUB-OPTIMAL strikes back with ICY HOOK.  One turn — both actions.",
       render: renderStepTurnOrder,
     },
     {
       title: 'Win, lose, and reward',
       dialog:
-        "Faint CHARMANDER to WIN (+10 reward).  Faint yourself to LOSE " +
-        "(-10).  Each turn costs -1.  Now you are ready.  GO!",
+        "Finish SUB-OPTIMAL to WIN (+10 reward).  Get finished to LOSE " +
+        "(-10).  Each turn costs -1.  Now you are ready.  KOMBAT!",
       render: renderStepWinLose,
     },
   ];
@@ -170,10 +170,10 @@
     wrap.className = 'tut-welcome';
     wrap.innerHTML =
       '<div class="tut-welcome-sprite">' +
-        '<img src="assets/pikachu-front.png" alt="PIKACHU" class="poke-sprite tut-big-sprite">' +
+        '<img src="assets/pikachu-front.png" alt="LIU KANG-MAX" class="poke-sprite tut-big-sprite">' +
       '</div>' +
       '<div class="tut-welcome-text">' +
-        '<div class="tut-welcome-line big">PIKACHU CHOOSES YOU!</div>' +
+        '<div class="tut-welcome-line big">LIU KANG-MAX CHOOSES YOU!</div>' +
         '<div class="tut-welcome-line small">Five quick lessons.  Then you fight.</div>' +
       '</div>';
     host.appendChild(wrap);
@@ -200,10 +200,10 @@
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
     window.HPBar.mount(oppHpHost, {
-      name: 'CHARMANDER', side: 'opponent', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
+      name: 'SUB-OPTIMAL', side: 'opponent', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
     });
     window.HPBar.mount(playerHpHost, {
-      name: 'PIKACHU',    side: 'player',   level: 5, numBuckets: window.Battle.NUM_BUCKETS,
+      name: 'LIU KANG-MAX',    side: 'player',   level: 5, numBuckets: window.Battle.NUM_BUCKETS,
     });
 
     /* Callout overlay layer.  Pure CSS-positioned labels (no SVG arrows —
@@ -212,7 +212,7 @@
     callouts.className = 'tut-callouts';
     callouts.innerHTML =
       '<div class="tut-callout c-pika">YOU — back view</div>' +
-      '<div class="tut-callout c-charm">WILD POKEMON — front view</div>' +
+      '<div class="tut-callout c-charm">CHALLENGER — front view</div>' +
       '<div class="tut-callout c-pikahp">YOUR HP</div>' +
       '<div class="tut-callout c-charmhp">THEIR HP</div>';
     stage.appendChild(callouts);
@@ -288,9 +288,9 @@
     const anim = document.createElement('div');
     anim.className = 'tut-hp-anim';
     anim.innerHTML =
-      '<div class="tut-hp-anim-title">WATCH CHARMANDER TAKE A HIT</div>' +
+      '<div class="tut-hp-anim-title">WATCH SUB-OPTIMAL TAKE A HIT</div>' +
       '<div class="tut-hp-anim-stage" id="tut-hp-anim-stage">' +
-        '<img id="tut-hp-anim-img" src="assets/charmander-front.png" class="poke-sprite tut-hp-anim-sprite" alt="Charmander">' +
+        '<img id="tut-hp-anim-img" src="assets/charmander-front.png" class="poke-sprite tut-hp-anim-sprite" alt="">' +
         '<div class="tut-hp-anim-bar">' +
           '<div class="tut-hp-anim-track">' +
             '<div class="tut-hp-anim-fill" id="tut-hp-anim-fill" style="width:100%"></div>' +
@@ -329,7 +329,7 @@
     const footnote = document.createElement('div');
     footnote.className = 'tut-footnote';
     footnote.innerHTML =
-      'Each attack drops the bar by <b>0 to 3</b> buckets.  Past CRITICAL, the POKEMON faints.  ' +
+      'Each attack drops the bar by <b>0 to 3</b> buckets.  Past CRITICAL, the fighter is finished.  ' +
       'Stronger moves drop more — THUNDER can land a 3-bucket hit in one go.';
     wrap.appendChild(footnote);
 
@@ -358,12 +358,12 @@
     note.className = 'tut-footnote';
     note.innerHTML =
       'THUNDERBOLT is the reliable workhorse — solid PWR, never misses.<br>' +
-      'THUNDER hits harder but only lands 55% of the time — a gamble worth taking when CHARMANDER is already low.';
+      'THUNDER hits harder but only lands 55% of the time — a gamble worth taking when SUB-OPTIMAL is already low.';
     host.appendChild(note);
   }
 
-  /* Looping turn-flow demo (step 4). PIKACHU lunges + lightning,
-     CHARMANDER shakes; then CHARMANDER lunges + ember, PIKACHU shakes;
+  /* Looping turn-flow demo (step 4). LIU KANG-MAX lunges + thunder,
+     SUB-OPTIMAL shakes; then SUB-OPTIMAL lunges + frost, LIU KANG-MAX shakes;
      then a brief settling beat. The 3-row diagram below the stage
      highlights whichever phase is happening, in lock-step. */
   let turnAnimTimer = null;
@@ -457,8 +457,8 @@
       '<div class="grass-rim"></div>' +
       '<div class="platform opponent"></div>' +
       '<div class="platform player"></div>' +
-      '<div class="sprite-host opponent"><img class="poke-sprite" src="assets/charmander-front.png" alt="CHARMANDER"/></div>' +
-      '<div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="PIKACHU"/></div>';
+      '<div class="sprite-host opponent"><img class="poke-sprite" src="assets/charmander-front.png" alt="SUB-OPTIMAL"/></div>' +
+      '<div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="LIU KANG-MAX"/></div>';
 
     /* HP boxes — append to stage so the existing absolute positioning
        on .hp-box.opponent / .hp-box.player puts them in the right
@@ -469,11 +469,11 @@
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
     const charmHp = window.HPBar.mount(oppHpHost, {
-      name: 'CHARMANDER', side: 'opponent', level: 5,
+      name: 'SUB-OPTIMAL', side: 'opponent', level: 5,
       numBuckets: window.Battle.NUM_BUCKETS,
     });
     const pikaHp = window.HPBar.mount(playerHpHost, {
-      name: 'PIKACHU', side: 'player', level: 5,
+      name: 'LIU KANG-MAX', side: 'player', level: 5,
       numBuckets: window.Battle.NUM_BUCKETS,
     });
     charmHp.set(0);
@@ -485,8 +485,8 @@
     const seq = document.createElement('div');
     seq.className = 'tut-turn';
     const rows = [
-      { num: '1', who: 'PIKACHU',    action: 'You pick a move.  PIKACHU attacks first.' },
-      { num: '2', who: 'CHARMANDER', action: 'Wild CHARMANDER strikes back with EMBER.' },
+      { num: '1', who: 'LIU KANG-MAX',    action: 'You pick a move.  LIU KANG-MAX attacks first.' },
+      { num: '2', who: 'SUB-OPTIMAL', action: 'Wild SUB-OPTIMAL strikes back with ICY HOOK.' },
       { num: '3', who: '— — —',      action: 'Both HP bars update.  State has changed.' },
     ];
     const rowNodes = [];
@@ -506,7 +506,7 @@
     const note = document.createElement('div');
     note.className = 'tut-footnote';
     note.textContent =
-      'PIKACHU is faster (base speed 90 vs 65), so it always moves first.';
+      'LIU KANG-MAX is faster (base speed 90 vs 65), so he always moves first.';
     host.appendChild(note);
 
     /* Kick off the loop with an HP context — bars drop a bucket per
@@ -530,7 +530,7 @@
       '</div>' +
       '<div class="tut-winlose-title">YOU WIN!</div>' +
       '<div class="tut-winlose-reward">+10 reward</div>' +
-      '<div class="tut-winlose-detail">CHARMANDER fainted.  Episode ends.</div>';
+      '<div class="tut-winlose-detail">SUB-OPTIMAL is finished.  Episode ends.</div>';
     wrap.appendChild(wins);
 
     const loses = document.createElement('div');
@@ -541,7 +541,7 @@
       '</div>' +
       '<div class="tut-winlose-title">YOU LOSE.</div>' +
       '<div class="tut-winlose-reward">-10 reward</div>' +
-      '<div class="tut-winlose-detail">PIKACHU fainted.  Try again.</div>';
+      '<div class="tut-winlose-detail">LIU KANG-MAX is finished.  Try again.</div>';
     wrap.appendChild(loses);
 
     host.appendChild(wrap);
