@@ -434,6 +434,33 @@
       if (n != null) goTo(n);
     });
 
+    /* Boot-up animation — Game Boy "Nintendo" logo drop + chime on
+       the first page load of each browser tab (sessionStorage flag).
+       Suppressed if the URL has &skipboot or &run. */
+    function playBootAnimation() {
+      try { if (sessionStorage.getItem('pokemon-battle.booted')) return false; } catch (_e) {}
+      if (/[#&?](skipboot|run)\b/.test(window.location.hash)) {
+        try { sessionStorage.setItem('pokemon-battle.booted', '1'); } catch (_e) {}
+        return false;
+      }
+      const overlay = document.createElement('div');
+      overlay.className = 'boot-overlay';
+      overlay.innerHTML =
+        '<div class="boot-stack">' +
+          '<div class="boot-logo">SML</div>' +
+          '<div class="boot-tag">A REINFORCEMENT-LEARNING ADVENTURE</div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      setTimeout(() => { if (window.SFX && window.SFX.isEnabled && window.SFX.isEnabled()) window.SFX.play('cursor'); }, 220);
+      setTimeout(() => {
+        overlay.classList.add('boot-fade');
+        setTimeout(() => { try { overlay.remove(); } catch (_e) {} }, 380);
+      }, 1300);
+      try { sessionStorage.setItem('pokemon-battle.booted', '1'); } catch (_e) {}
+      return true;
+    }
+    playBootAnimation();
+
     const initialScene = readHashScene();
     goTo(initialScene != null ? initialScene : 0);
 

@@ -65,6 +65,96 @@
   --hue-snakes:  #C8902C;     /* gold — Snakes & Ladders sibling */
 }
 
+:root[data-theme="crt"] {
+  /* Amber-phosphor CRT terminal — dark background, warm-amber text.
+     Distinct from the GB green theme.  Pairs with the scanlines +
+     vignette + phosphor-glow rules at the bottom of this file. */
+  --sky-top:        #1a0d05;
+  --sky-bottom:     #2a160a;
+  --grass:          #382010;
+  --grass-rim:      #1a0d05;
+
+  --bg:             #0a0500;
+  --bg-strong:      #1a0d05;
+  --ink:            #FFB350;     /* amber phosphor on the page chrome */
+  --ink-on-box:     #FFB350;
+  --ink-secondary:  #8B6030;
+  --rule:           #FF9020;
+  --card-bg:        #1a0d05;
+  --inner-highlight:#5A3010;
+  --pikachu-yellow: #FFC060;
+  --pikachu-cheek:  #FF6020;
+  --charmander-orange:#FF8030;
+  --hp-green:       #FFB350;
+  --hp-yellow:      #FFB350;
+  --hp-red:         #FF6020;
+  --damage-text:    #FFB350;
+  --damage-stroke:  #0a0500;
+
+  --hue-anymal:  #FF6020;
+  --hue-casino:  #FFB350;
+  --hue-ghost:   #FF9050;
+  --hue-star:    #FFC060;
+  --hue-door:    #FF9020;
+  --hue-snakes:  #FFA040;
+
+  --cb-blue:             #FFB350;
+  --cb-blue-light:       #5A3010;
+  --cb-vermillion:       #FF6020;
+  --cb-vermillion-light: #5A3010;
+  --cb-bluish-green:     #FFB350;
+  --cb-yellow:           #FFC060;
+  --cb-orange:           #FF8030;
+  --cb-sky:              #FFB350;
+  --cb-purple:           #FF9050;
+}
+
+/* CRT scanlines + vignette overlays — only active under the CRT
+   theme.  Pointer-events: none on both so clicks pass through.  */
+:root[data-theme="crt"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9991;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.0) 0px,
+    rgba(0, 0, 0, 0.0) 2px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  mix-blend-mode: multiply;
+}
+:root[data-theme="crt"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9992;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+/* Phosphor glow on text in the CRT theme. */
+:root[data-theme="crt"] body,
+:root[data-theme="crt"] .scene-title,
+:root[data-theme="crt"] .topbar,
+:root[data-theme="crt"] .poke-section-title,
+:root[data-theme="crt"] .concept-heading {
+  text-shadow: 0 0 6px rgba(255, 180, 80, 0.55);
+}
+/* Sprites washed amber for CRT. */
+:root[data-theme="crt"] .poke-sprite,
+:root[data-theme="crt"] .traj-box-sprite,
+:root[data-theme="crt"] .q-thumb-sprite,
+:root[data-theme="crt"] .sd-f-tape-sprite,
+:root[data-theme="crt"] .sc0-bn-sprite {
+  filter: grayscale(1) sepia(1) saturate(5) hue-rotate(-10deg) contrast(1.05) brightness(0.95);
+}
+
 :root[data-theme="gb"] {
   /* Game Boy DMG green — the original 4-shade pea-soup palette:
        #0F380F  darkest   (ink)
@@ -1749,3 +1839,57 @@ body.slide-mode .stage  { padding: 12px 18px; }
   border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
 }
 .help-card .help-row:last-child { border-bottom: none; }
+
+/* ============================================================
+   Boot-up animation — Game Boy-style "Nintendo" splash
+   ----------------------------------------------------------------
+   Drops "SML" from the top, lingers, fades out.  ~1.5 s total.
+   Fires once per browser session (sessionStorage flag).
+   ============================================================ */
+.boot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.boot-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: boot-drop 700ms cubic-bezier(.4, 1.8, .6, 1) 60ms backwards;
+}
+.boot-logo {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 64px;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+}
+.boot-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  animation: boot-tag-in 320ms ease-out 520ms backwards;
+}
+.boot-overlay.boot-fade {
+  opacity: 0;
+  transition: opacity 320ms ease-out;
+}
+@keyframes boot-drop {
+  0%   { transform: translateY(-220px); opacity: 0; }
+  60%  { transform: translateY(8px);    opacity: 1; }
+  100% { transform: translateY(0);      opacity: 1; }
+}
+@keyframes boot-tag-in {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boot-stack { animation: none; }
+  .boot-tag   { animation: none; }
+}

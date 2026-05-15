@@ -4,7 +4,7 @@
 (function () {
   const STORAGE_KEY = 'pokemon-battle.theme';
   const root = document.documentElement;
-  const THEMES = ['light', 'dark', 'gb'];
+  const THEMES = ['light', 'dark', 'gb', 'crt'];
 
   function apply(theme) {
     if (THEMES.indexOf(theme) < 0) theme = 'light';
@@ -23,7 +23,7 @@
   }
 
   function readHashTheme() {
-    const m = (window.location.hash || '').match(/[#&?]theme=(light|dark|gb)/);
+    const m = (window.location.hash || '').match(/[#&?]theme=(light|dark|gb|crt)/);
     return m ? m[1] : null;
   }
 
