@@ -326,10 +326,102 @@
       } else if (e.key === 'n' || e.key === 'N') {
         e.preventDefault();
         toggleSpeakerNotes();
-      } else if (e.key === 'Escape' && snVisible) {
-        toggleSpeakerNotes();
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleSlideMode();
+      } else if (e.key === 'g' || e.key === 'G') {
+        e.preventDefault();
+        toggleQuickJump();
+      } else if (e.key === '?') {
+        e.preventDefault();
+        toggleHelpOverlay();
+      } else if (e.key === 'Escape') {
+        if (snVisible) toggleSpeakerNotes();
+        if (qjVisible) toggleQuickJump();
+        if (helpVisible) toggleHelpOverlay();
+        if (document.body.classList.contains('slide-mode')) toggleSlideMode();
       }
     });
+
+    /* ---- Slide mode: fullscreen-feel, no topbar ---- */
+    function toggleSlideMode() {
+      document.body.classList.toggle('slide-mode');
+    }
+
+    /* ---- Quick-jump dropdown: list every scene, number-key to jump ---- */
+    const qjOverlay = document.createElement('div');
+    qjOverlay.id = 'quick-jump-overlay';
+    qjOverlay.className = 'centered-overlay';
+    qjOverlay.hidden = true;
+    qjOverlay.innerHTML = '<div class="centered-card quick-jump-card"></div>';
+    document.body.appendChild(qjOverlay);
+    let qjVisible = false;
+    function renderQuickJump() {
+      const card = qjOverlay.querySelector('.centered-card');
+      let html = '<div class="centered-title">QUICK JUMP — number to go, ESC to cancel</div>';
+      html += '<div class="quick-jump-list">';
+      for (let i = 0; i < SCENES.length; i++) {
+        const key = i < 10 ? String((i + 1) % 10) : '';   /* 1..9, 0 = scene 10 (index 9) */
+        const lbl = key ? '<kbd>' + key + '</kbd>' : '<span class="qj-key-empty">  </span>';
+        const title = titleAt(i);
+        const cur = i === current ? ' current' : '';
+        html += '<button class="quick-jump-row' + cur + '" data-idx="' + i + '">' +
+                  lbl + '<span class="qj-num">' + (i < 10 ? String(i).padStart(2, '0') : String(i)) + '</span>' +
+                  '<span class="qj-title">' + title + '</span>' +
+                '</button>';
+      }
+      html += '</div>';
+      card.innerHTML = html;
+      card.querySelectorAll('.quick-jump-row').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.getAttribute('data-idx'), 10);
+          if (!isNaN(idx)) goTo(idx);
+          toggleQuickJump();
+        });
+      });
+    }
+    function toggleQuickJump() {
+      qjVisible = !qjVisible;
+      if (qjVisible) { renderQuickJump(); qjOverlay.hidden = false; }
+      else           { qjOverlay.hidden = true; }
+    }
+    /* Number-key shortcuts work while quick-jump is open. */
+    window.addEventListener('keydown', (e) => {
+      if (!qjVisible) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const ch = e.key;
+      if (/^[0-9]$/.test(ch)) {
+        e.preventDefault();
+        const n = parseInt(ch, 10);
+        const idx = n === 0 ? 9 : (n - 1);      /* 1..9 → 0..8; 0 → 9 (scene 10) */
+        if (idx >= 0 && idx < SCENES.length) goTo(idx);
+        toggleQuickJump();
+      }
+    });
+
+    /* ---- Help overlay: list every hotkey ---- */
+    const helpOverlay = document.createElement('div');
+    helpOverlay.id = 'help-overlay';
+    helpOverlay.className = 'centered-overlay';
+    helpOverlay.hidden = true;
+    helpOverlay.innerHTML =
+      '<div class="centered-card help-card">' +
+        '<div class="centered-title">KEYBOARD SHORTCUTS</div>' +
+        '<div class="help-row"><kbd>→</kbd><kbd>←</kbd><span>navigate scenes (or step within a scene)</span></div>' +
+        '<div class="help-row"><kbd>n</kbd><span>speaker notes overlay (lecturer crib)</span></div>' +
+        '<div class="help-row"><kbd>f</kbd><span>slide mode (fullscreen-feel, hide topbar)</span></div>' +
+        '<div class="help-row"><kbd>g</kbd><span>quick-jump to any scene</span></div>' +
+        '<div class="help-row"><kbd>?</kbd><span>this help overlay</span></div>' +
+        '<div class="help-row"><kbd>t</kbd><span>cycle theme (light → dark → GB)</span></div>' +
+        '<div class="help-row"><kbd>↓</kbd><span>fast-fill the typewriter dialog</span></div>' +
+        '<div class="help-row"><kbd>Esc</kbd><span>close any overlay / leave slide mode</span></div>' +
+      '</div>';
+    document.body.appendChild(helpOverlay);
+    let helpVisible = false;
+    function toggleHelpOverlay() {
+      helpVisible = !helpVisible;
+      helpOverlay.hidden = !helpVisible;
+    }
 
     /* Refresh notes content when the scene changes — only meaningful
        when the overlay is open. */
