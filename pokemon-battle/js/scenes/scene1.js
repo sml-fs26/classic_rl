@@ -195,6 +195,45 @@
       setTimeout(() => { try { stage.removeChild(el); } catch (e) {} }, 720);
     }
 
+    /* Pre-attack windup — leans the attacker back briefly before the
+       hit lands.  ~220 ms. */
+    function triggerWindup(spriteHost) {
+      if (!spriteHost) return;
+      spriteHost.classList.remove('sc1-windup');
+      void spriteHost.offsetWidth;
+      spriteHost.classList.add('sc1-windup');
+      setTimeout(() => spriteHost.classList.remove('sc1-windup'), 240);
+    }
+
+    /* Full-stage white flash — fires on THUNDER and other big hits. */
+    function flashStage() {
+      stage.classList.remove('sc1-flash');
+      void stage.offsetWidth;
+      stage.classList.add('sc1-flash');
+      setTimeout(() => stage.classList.remove('sc1-flash'), 220);
+    }
+
+    /* Spawn a move-specific visual effect on the stage.  The CSS for
+       each .sc1-vfx-* class handles the actual animation; this
+       function just creates the element and removes it after the
+       animation finishes. */
+    function spawnMoveVfx(moveOrCounter, fromSide) {
+      const el = document.createElement('div');
+      el.className = 'sc1-vfx sc1-vfx-' + moveOrCounter + ' sc1-vfx-from-' + fromSide;
+      /* For THUNDERBOLT specifically, embed an SVG lightning bolt. */
+      if (moveOrCounter === 'thunderbolt') {
+        el.innerHTML =
+          '<svg viewBox="0 0 200 60" preserveAspectRatio="none" class="sc1-bolt-svg">' +
+            '<polyline points="0,30 40,15 60,30 100,10 120,30 160,18 200,30" ' +
+            'stroke="#FFD028" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />' +
+            '<polyline points="0,30 40,15 60,30 100,10 120,30 160,18 200,30" ' +
+            'stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />' +
+          '</svg>';
+      }
+      stage.appendChild(el);
+      setTimeout(() => { try { el.remove(); } catch (_e) {} }, 720);
+    }
+
     /* Classic Gen-1 turn cadence:
          move-announce typewriter ▶ pause ▶ shake + damage flash ▶ HP drain
          ▶ pause ▶ (if KO) faint message ▶ END
@@ -220,6 +259,11 @@
       await dialogSay(T('battle.used', { name: pikaName(), move: pikaMoveName(moveId) }));
       if (episode !== myEp) return;
       if (window.SFX) window.SFX.play(MOVE_SFX[moveId]);
+      /* Pre-attack windup on the player sprite + move-specific VFX
+         spawned on the stage; THUNDER also flashes the whole stage. */
+      triggerWindup(playerHostEl);
+      spawnMoveVfx(moveId, 'player');
+      if (moveId === 'thunder') flashStage();
       await wait(500);
       if (episode !== myEp) return;
 
@@ -231,8 +275,13 @@
       } else {
         oppSprite.shake();
         if (window.SFX) window.SFX.play('hit');
-        showDamage(oppHostEl, log.oppDelta);
-        await wait(400);
+        const critical = log.oppDelta >= 3;     /* big damage rolls land as crits */
+        showDamage(oppHostEl, log.oppDelta, critical ? '#FFD028' : undefined);
+        if (critical) {
+          await dialogSay('A critical hit!');
+          if (episode !== myEp) return;
+        }
+        await wait(critical ? 250 : 400);
         if (episode !== myEp) return;
         oppHp.drainTo(log.oppAfter);
         await wait(1300);     /* HP-drain transition is 1100 ms + breathing room */
@@ -282,7 +331,9 @@
 
       /* ---- Opponent KO? ---- */
       if (log.oppAfter >= window.Battle.FAINTED) {
+        stage.classList.add('sc1-slowmo');
         oppSprite.faint();
+        setTimeout(() => stage.classList.remove('sc1-slowmo'), 900);
         await dialogSay(T('battle.wild_fainted', { name: oppFormName }));
         if (episode !== myEp) return;
         await wait(700);
@@ -300,12 +351,19 @@
       await dialogSay(T('battle.wild_used', { name: oppFormName, move: counterName }));
       if (episode !== myEp) return;
       if (window.SFX) window.SFX.play(COUNTER_SFX[log.formAfter]);
+      triggerWindup(oppHostEl);
+      spawnMoveVfx('opp_' + log.formAfter, 'opponent');
       await wait(500);
       if (episode !== myEp) return;
       playerSprite.shake();
       if (window.SFX) window.SFX.play('hit');
-      showDamage(playerHostEl, log.yourDelta, '#FFD0A0');
-      await wait(400);
+      const oppCrit = log.yourDelta >= 3;
+      showDamage(playerHostEl, log.yourDelta, oppCrit ? '#FFD028' : '#FFD0A0');
+      if (oppCrit) {
+        await dialogSay('A critical hit!');
+        if (episode !== myEp) return;
+      }
+      await wait(oppCrit ? 250 : 400);
       if (episode !== myEp) return;
       playerHp.drainTo(log.yourAfter);
       await wait(1300);
@@ -313,7 +371,9 @@
 
       /* ---- Pikachu KO? ---- */
       if (log.yourAfter >= window.Battle.FAINTED) {
+        stage.classList.add('sc1-slowmo');
         playerSprite.faint();
+        setTimeout(() => stage.classList.remove('sc1-slowmo'), 900);
         await dialogSay(T('battle.fainted', { name: pikaName() }));
         if (episode !== myEp) return;
         await wait(700);
