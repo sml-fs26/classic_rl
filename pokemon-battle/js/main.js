@@ -335,6 +335,10 @@
       } else if (e.key === '?') {
         e.preventDefault();
         toggleHelpOverlay();
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        const musicBtn = document.getElementById('music-toggle');
+        if (musicBtn) musicBtn.click();
       } else if (e.key === 'Escape') {
         if (snVisible) toggleSpeakerNotes();
         if (qjVisible) toggleQuickJump();
@@ -343,9 +347,22 @@
       }
     });
 
-    /* ---- Slide mode: fullscreen-feel, no topbar ---- */
+    /* ---- Slide mode: fullscreen-feel, no topbar ----
+       On entry we flash a brief toast in the bottom-right corner so
+       the user (lecturer) doesn't wonder where the topbar went. */
     function toggleSlideMode() {
-      document.body.classList.toggle('slide-mode');
+      const wasOn = document.body.classList.toggle('slide-mode');
+      if (wasOn) showSlideToast('SLIDE MODE · press ESC or F to exit');
+    }
+    function showSlideToast(msg) {
+      let toast = document.getElementById('slide-toast');
+      if (toast) toast.remove();
+      toast = document.createElement('div');
+      toast.id = 'slide-toast';
+      toast.className = 'slide-toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => { try { toast.remove(); } catch (_e) {} }, 2400);
     }
 
     /* ---- Quick-jump dropdown: list every scene, number-key to jump ---- */
@@ -408,13 +425,17 @@
       '<div class="centered-card help-card">' +
         '<div class="centered-title">KEYBOARD SHORTCUTS</div>' +
         '<div class="help-row"><kbd>→</kbd><kbd>←</kbd><span>navigate scenes (or step within a scene)</span></div>' +
+        '<div class="help-row"><kbd>↓</kbd><span>fast-fill the typewriter dialog</span></div>' +
         '<div class="help-row"><kbd>n</kbd><span>speaker notes overlay (lecturer crib)</span></div>' +
         '<div class="help-row"><kbd>f</kbd><span>slide mode (fullscreen-feel, hide topbar)</span></div>' +
         '<div class="help-row"><kbd>g</kbd><span>quick-jump to any scene</span></div>' +
         '<div class="help-row"><kbd>?</kbd><span>this help overlay</span></div>' +
-        '<div class="help-row"><kbd>t</kbd><span>cycle theme (light → dark → GB)</span></div>' +
-        '<div class="help-row"><kbd>↓</kbd><span>fast-fill the typewriter dialog</span></div>' +
+        '<div class="help-row"><kbd>t</kbd><span>cycle theme: light → dark → GB → CRT</span></div>' +
+        '<div class="help-row"><kbd>m</kbd><span>toggle music on / off</span></div>' +
         '<div class="help-row"><kbd>Esc</kbd><span>close any overlay / leave slide mode</span></div>' +
+        '<div class="help-card-section">EASTER EGGS</div>' +
+        '<div class="help-row"><span class="help-mouse">🖱</span><span>click PIKACHU on the title screen — cheek-spark zap; ten clicks for the THUNDER cameo</span></div>' +
+        '<div class="help-row"><span class="help-mouse">🖱</span><span>click any Q-cell in scene 9 step F to see its Pokedex number</span></div>' +
       '</div>';
     document.body.appendChild(helpOverlay);
     let helpVisible = false;

@@ -1901,6 +1901,48 @@ body.slide-mode .stage  { padding: 12px 18px; }
   border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
 }
 .help-card .help-row:last-child { border-bottom: none; }
+.help-card-section {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  margin: 12px 0 6px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+}
+.help-mouse {
+  display: inline-block;
+  text-align: center;
+  font-size: 14px;
+  min-width: 28px;
+}
+
+/* Slide-mode toast — bottom-right, fades in/out, ~2.4 s. */
+.slide-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 99990;
+  background: var(--pikachu-yellow);
+  color: var(--ink-on-box);
+  border: 3px solid var(--rule);
+  padding: 8px 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.20);
+  pointer-events: none;
+  animation: slide-toast-life 2.4s ease-out forwards;
+}
+@keyframes slide-toast-life {
+  0%   { opacity: 0; transform: translateX(20px); }
+  10%  { opacity: 1; transform: translateX(0); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(20px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide-toast { animation: none; }
+}
 
 /* ============================================================
    Boot-up animation — Game Boy-style "Nintendo" splash

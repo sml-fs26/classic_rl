@@ -229,10 +229,12 @@
               void node.cell.offsetWidth;
               node.cell.classList.add('argmax-flip');
               setTimeout(() => node.cell.classList.remove('argmax-flip'), 1200);
-              /* Argmax-flip ding — auditory cue that the policy just
-                 shifted on this cell.  Quiet enough not to overlap the
-                 melody. */
-              if (window.SFX) window.SFX.play('cursor');
+              /* Argmax-flip ding — debounced.  RUN-ALL on the DP scene
+                 can flip a dozen cells in one frame; instead of playing
+                 a dozen cursor pips back-to-back, we collapse all
+                 flips inside a 220 ms window down to a single ding
+                 fired on the trailing edge. */
+              scheduleArgmaxDing();
             }
           } else if (prevAllZero && !allZero) {
             spawnAwake(node.cell);
@@ -248,6 +250,17 @@
       }
 
       prevQ = new Float32Array(Q);
+    }
+
+    /* Argmax-flip ding debounce — one cursor blip per ~220 ms cluster
+       so RUN-ALL doesn't unleash a cascade of pips. */
+    let argmaxDingTimer = null;
+    function scheduleArgmaxDing() {
+      if (argmaxDingTimer) return;
+      argmaxDingTimer = setTimeout(() => {
+        argmaxDingTimer = null;
+        if (window.SFX) window.SFX.play('cursor');
+      }, 220);
     }
 
     function spawnDelta(cell, delta) {
