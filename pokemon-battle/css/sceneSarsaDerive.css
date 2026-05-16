@@ -665,3 +665,42 @@
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). Stack the two-column step pager and the F-step's
+   sticky side panel so the left card stops wrapping text to 1-2 chars
+   per line. The Q-table itself stays at its desktop minimum width and
+   horizontally pans inside its host (.qtable-host rule lives in
+   qtable.css) — squashing the 5-bar layout would make the heatmap
+   unreadable, whereas panning preserves it.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .sd-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .sd-left {
+    min-height: 0;
+    padding: 12px 14px;
+  }
+
+  .sd-f-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .sd-f-side {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+  .sd-f-q { max-width: none; }
+
+  .sd-controls {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .sd-status { margin-left: 0; flex: 0 0 100%; }
+
+  .sd-card-body { font-size: 9px; }
+  .sd-f-header { font-size: 12px; }
+}

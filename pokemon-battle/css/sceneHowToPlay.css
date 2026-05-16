@@ -493,3 +493,21 @@
   color: var(--ink-secondary);
   padding: 0 4px;
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). The welcome step uses `grid-template-columns: 220px 1fr`
+   which leaves the 1fr dialog column at ~140px on a phone — wide enough
+   to clip "PIKACHU CHOOSES YOU!". Stack to a single column, shrink the
+   sprite, and let the headline reflow.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .tut-welcome {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 18px 14px;
+  }
+  .tut-welcome-sprite { justify-content: center; }
+  .tut-big-sprite { width: 144px; height: 144px; }
+  .tut-welcome-line.big { font-size: 14px; }
+  .tut-welcome-line.small { font-size: 9px; }
+}

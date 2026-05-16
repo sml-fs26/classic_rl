@@ -290,3 +290,23 @@
   background: rgba(255,255,255,0.32);
   box-shadow: inset 0 0 0 1px #FFFFFF;
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). The Q-table is the main reading surface for SARSA/DP
+   scenes; shrinking 5 columns × 5 rows × ~6 sub-bars each to fit a 390px
+   phone makes labels and bar fills illegible. Instead, keep the desktop
+   sizing and let the user pan horizontally inside .qtable-host. The
+   wider min-width matches scenes that show the full 5×5 grid; .sd-scene
+   uses the already-tighter q-bar layout so a smaller floor is fine.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .qtable-host {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .qtable-host .q-col-heads,
+  .qtable-host .q-grid { min-width: 540px; }
+  .sd-scene .qtable-host .q-col-heads,
+  .sd-scene .qtable-host .q-grid { min-width: 420px; }
+}

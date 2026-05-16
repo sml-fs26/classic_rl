@@ -1997,3 +1997,56 @@ body.slide-mode .stage  { padding: 12px 18px; }
   .boot-stack { animation: none; }
   .boot-tag   { animation: none; }
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). The pixel-font chrome packs brand + title + ~7 buttons
+   into one flex row at desktop; on a phone the row overflows and the
+   scene-title gets squeezed into a vertical column. Below 720px the
+   topbar collapses to two rows (brand → pager row), the scene-title is
+   hidden (each scene already opens with its own H2), and the non-pager
+   toggles (theme / music / lang / badges) drop out so the pager controls
+   can take the full second row at iOS-tappable size. Per-scene
+   responsive rules (sd-row, sd-f-row, tut-welcome, Q-table scroll) live
+   alongside their desktop rules in the scene CSS files.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .topbar {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 8px;
+    row-gap: 8px;
+  }
+  .topbar .scene-title { display: none; }
+  .topbar .brand { flex: 1 1 auto; font-size: 10px; }
+  .topbar .right-cluster {
+    flex: 0 0 100%;
+    justify-content: space-between;
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+  .topbar .right-cluster #music-toggle,
+  .topbar .right-cluster #lang-toggle,
+  .topbar .right-cluster #theme-toggle,
+  .topbar .right-cluster .trainer-badges {
+    display: none;
+  }
+  .theme-toggle, .pager-btn {
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 10px;
+  }
+  .dot-pager { flex: 1 1 auto; justify-content: center; }
+  .dot-pager .dot { width: 12px; height: 12px; }
+
+  .stage {
+    padding: 0 12px;
+    margin: 12px auto 24px;
+    min-height: calc(100dvh - 150px);
+  }
+  .scene { left: 12px; right: 12px; }
+  .scene.active { left: 0; right: 0; }
+
+  /* Cards/scene-row helpers: two-column scene-rows fall back to stack. */
+  .scene-row { gap: 12px; }
+  .scene-pad { padding: 8px 0 18px; }
+}
