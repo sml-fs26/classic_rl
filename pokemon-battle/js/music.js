@@ -12,12 +12,22 @@
  *   Tracks:
  *     title       — heroic D major arpeggios (scene 0)
  *     tutorial    — gentle F-major loop (scene 1)
- *     battle      — energetic A-minor battle loop (scenes 2 + 9)
- *     concept     — contemplative E-minor (scenes 3-5)
- *     dp          — methodical A-minor puzzle loop (scene 6)
- *     bridge      — tense C-minor build (scenes 7-8)
- *     eps         — bouncy syncopated G major (scene 10)
- *     recap       — triumphant C major (scene 11)
+ *     boss        — 8-bar Andalusian battle theme i-VII-VI-V, octave-jumping
+ *                   bass, climbing second half (scene 2 — wild encounter)
+ *     concept     — contemplative E-minor (scenes 4-5 — trajectory, return)
+ *     discover    — I-V-vi-IV "lightbulb" staircase, G4 → C6, sparkling
+ *                   (scene 6 — π* from Q reveal)
+ *     dp          — methodical A-minor puzzle loop (scene 7)
+ *     bridge      — tense C-minor build (scene 8 — DP fails)
+ *     sarsa       — D-Mixolydian 8-bar training-montage; bass octave-
+ *                   bounce, lead arpeggio-up / scale-down. 160 bpm so the
+ *                   half-bar coincides with step F's 750 ms Q-update tick
+ *                   (scene 9 — SARSA fills the Q-table)
+ *     champion    — slow anthemic C-major Hall-of-Fame, perfect cadence
+ *                   to C6 (scene 10 — recap)
+ *     battle      — legacy energetic A-minor loop (kept for reference)
+ *     eps         — legacy bouncy syncopated G major (kept for reference)
+ *     recap       — legacy triumphant C major (kept for reference)
  *
  *   Browser autoplay policies: AudioContext starts suspended. Music
  *   starts only after a user gesture (handled by music-ui.js); we just
@@ -121,6 +131,88 @@
     ],
   };
 
+  /* BOSS — wild-battle replacement. Two-half 8-bar form:
+       Bars 1-4: classic Andalusian cadence Am-G-F-E (i-VII-VI-V), call-and-
+       response motif (rise then fall).
+       Bars 5-8: variation that opens up to Dm (iv) and G7 before reaching
+       the V with a leading-tone climb back to the top of the loop.
+     Bass octave-jumps (root2 ↔ root3) on every step to drive the engine
+     instead of the every-other-eighth pulse the legacy battle used. */
+  const TRACK_BOSS = {
+    tempoBpm: 172, leadGain: 0.42, bassGain: 0.32,
+    pattern: [
+      /* Bar 1 — Am, call (rise) */
+      ['A4', 'A2'], ['C5', 'A3'], ['E5', 'A2'], ['A5', 'A3'],
+      ['G5', 'A2'], ['E5', 'A3'], ['C5', 'A2'], ['A4', 'A3'],
+      /* Bar 2 — G, response (step down) */
+      ['G4', 'G2'], ['B4', 'G3'], ['D5', 'G2'], ['G5', 'G3'],
+      ['F5', 'G2'], ['D5', 'G3'], ['B4', 'G2'], ['G4', 'G3'],
+      /* Bar 3 — F, deepening */
+      ['F4', 'F2'], ['A4', 'F3'], ['C5', 'F2'], ['F5', 'F3'],
+      ['E5', 'F2'], ['C5', 'F3'], ['A4', 'F2'], ['F4', 'F3'],
+      /* Bar 4 — E (V), leading-tone climb to the top of the bar */
+      ['E4', 'E2'], ['Gs4', 'E3'], ['B4', 'E2'], ['E5', 'E3'],
+      ['Gs5', 'E2'], ['B5', 'E3'], ['Gs5', 'E2'], ['E5', 'E3'],
+      /* Bar 5 — Am restated in the high register */
+      ['A5', 'A2'], ['E5', 'A3'], ['C5', 'A2'], ['A4', 'A3'],
+      ['E4', 'A2'], ['A4', 'A3'], ['C5', 'A2'], ['E5', 'A3'],
+      /* Bar 6 — Dm (iv) — sub-dominant pivot, melodic peak */
+      ['D5', 'D3'], ['F5', 'D2'], ['A5', 'D3'], ['D5', 'D2'],
+      ['F5', 'D3'], ['A4', 'D2'], ['D5', 'D3'], ['F4', 'D2'],
+      /* Bar 7 — G7 walk-down to the V */
+      ['G4', 'G2'], ['B4', 'G3'], ['D5', 'G2'], ['F5', 'G3'],
+      ['G5', 'G2'], ['F5', 'G3'], ['D5', 'G2'], ['B4', 'G3'],
+      /* Bar 8 — E (V), descending arpeggio cadences back to bar 1 */
+      ['E5', 'E2'], ['Gs5', 'E3'], ['B5', 'E2'], ['Gs5', 'E3'],
+      ['E5', 'E2'], ['B4', 'E3'], ['Gs4', 'E2'], ['E4', 'E3'],
+    ],
+  };
+
+  /* DISCOVER — Q*-reveal "lightbulb" arpeggio staircase. Classic
+     I-V-vi-IV with the lead climbing G4 → C6 across the four bars so the
+     listener feels the line "we've found it" without any lyrics. Bass on
+     every other eighth so the high arpeggios have room to sparkle. */
+  const TRACK_DISCOVER = {
+    tempoBpm: 118, leadGain: 0.34, bassGain: 0.22,
+    pattern: [
+      /* Bar 1 — G (I): rising arp with a twinkle on top */
+      ['G4', 'G2'], ['B4', null], ['D5', 'D3'], ['G5', null],
+      ['B5', 'G2'], ['D5', null], ['G5', 'D3'], ['B4', null],
+      /* Bar 2 — D (V): suspended, hovering */
+      ['Fs5', 'D2'], ['A5', null], ['D5', 'A2'], ['Fs5', null],
+      ['A5', 'D2'], ['Fs5', null], ['D5', 'A2'], ['A4', null],
+      /* Bar 3 — Em (vi): warm interior sigh */
+      ['E5', 'E2'], ['G5', null], ['B4', 'B2'], ['E5', null],
+      ['G5', 'E2'], ['B5', null], ['G5', 'B2'], ['E5', null],
+      /* Bar 4 — C (IV): resolve home with the top-octave peak */
+      ['C5', 'C3'], ['E5', null], ['G5', 'G2'], ['C6', null],
+      ['G5', 'C3'], ['E5', null], ['C5', 'G2'], ['G4', null],
+    ],
+  };
+
+  /* CHAMPION — Hall-of-Fame anthem. Half-time C-major, I-vi-IV-V with a
+     perfect cadence to C6 at the end. Slower than anything else in the
+     score (96 bpm) so each chord lands. Rests in the lead voice give it
+     end-credits breathing room rather than the chase-style arps the
+     legacy recap track used. */
+  const TRACK_CHAMPION = {
+    tempoBpm: 96, leadGain: 0.42, bassGain: 0.34,
+    pattern: [
+      /* Bar 1 — C (I): proclamation, rest after the call */
+      ['C5', 'C3'], ['E5', null], ['G5', 'C3'], [null, null],
+      ['E5', 'G2'], ['C5', null], ['G4', 'C3'], [null, null],
+      /* Bar 2 — Am (vi): noble fall */
+      ['A4', 'A2'], ['C5', null], ['E5', 'A2'], [null, null],
+      ['C5', 'E3'], ['A4', null], ['E4', 'A2'], [null, null],
+      /* Bar 3 — F (IV): warmth and lift to the top of the loop */
+      ['F4', 'F2'], ['A4', null], ['C5', 'F2'], ['F5', null],
+      ['A4', 'C3'], ['C5', null], ['F4', 'F2'], [null, null],
+      /* Bar 4 — G (V) → C (I): perfect cadence climbing to C6 */
+      ['G4', 'G2'], ['B4', null], ['D5', 'G2'], ['G5', null],
+      ['C5', 'C3'], ['E5', null], ['G5', 'C3'], ['C6', null],
+    ],
+  };
+
   /* Sparse, contemplative — used for trajectory / return-and-Q / Q*. */
   const TRACK_CONCEPT = {
     tempoBpm: 96, leadGain: 0.28, bassGain: 0.20,
@@ -178,6 +270,47 @@
     ],
   };
 
+  /* SARSA — training-montage in D Mixolydian (D major with natural C
+     for that "quest underway" b7 flavor).  8-bar form, two contrasting
+     halves with the same arpeggio-up / scale-down motif over shifting
+     chords (D - G - A - Bm - G - A - D).  Bass octave-bounces root↔fifth
+     on every eighth so it feels like methodical Q-update machinery
+     ticking underneath.  Tempo chosen so a half-bar (four eighths) lasts
+     750 ms — the same cadence as step F's autoplay transitions, so the
+     filling cells visually align with the strong beats. */
+  const TRACK_SARSA = {
+    tempoBpm: 160, leadGain: 0.40, bassGain: 0.32,
+    pattern: [
+      /* === FIRST HALF — statement of the motif === */
+      /* Bar 1 — D (I): chord arpeggio climbs to A5 */
+      ['D4', 'D2'], ['Fs4', 'A2'], ['A4', 'D3'], ['D5', 'A2'],
+      ['A4', 'D2'], ['D5', 'A2'], ['Fs5', 'D3'], ['A5', 'A2'],
+      /* Bar 2 — D Mixolydian descent through natural C ("quest" flavor) */
+      ['G5', 'D2'], ['Fs5', 'A2'], ['E5', 'D3'], ['D5', 'A2'],
+      ['C5', 'D2'], ['A4', 'A2'], ['Fs4', 'D3'], ['D4', 'A2'],
+      /* Bar 3 — G (IV): warmth lift, peak on B5 */
+      ['G4', 'G2'], ['B4', 'D3'], ['D5', 'G2'], ['G5', 'D3'],
+      ['B5', 'G2'], ['G5', 'D3'], ['D5', 'G2'], ['B4', 'D3'],
+      /* Bar 4 — A (V): tension up, drop back */
+      ['A4', 'A2'], ['Cs5', 'E3'], ['E5', 'A2'], ['A5', 'E3'],
+      ['G5', 'A2'], ['E5', 'E3'], ['Cs5', 'A2'], ['A4', 'E3'],
+
+      /* === SECOND HALF — variation, higher peak === */
+      /* Bar 5 — Bm (vi): plaintive turn, melodic apex at B5 */
+      ['B4', 'B2'], ['D5', 'Fs3'], ['Fs5', 'B2'], ['B5', 'Fs3'],
+      ['A5', 'B2'], ['Fs5', 'Fs3'], ['D5', 'B2'], ['B4', 'Fs3'],
+      /* Bar 6 — G (IV) revisited: warmth, scale descent */
+      ['G4', 'G2'], ['B4', 'D3'], ['D5', 'G2'], ['G5', 'D3'],
+      ['Fs5', 'G2'], ['E5', 'D3'], ['D5', 'G2'], ['B4', 'D3'],
+      /* Bar 7 — A (V): climbing push, then circular */
+      ['A4', 'A2'], ['Cs5', 'E3'], ['E5', 'A2'], ['G5', 'E3'],
+      ['A5', 'A2'], ['G5', 'E3'], ['E5', 'A2'], ['Cs5', 'E3'],
+      /* Bar 8 — D (I): cadence, riding home to D4 */
+      ['D5', 'D2'], ['Fs5', 'A2'], ['A5', 'D3'], ['Fs5', 'A2'],
+      ['D5', 'D2'], ['A4', 'A2'], ['Fs4', 'D3'], ['D4', 'A2'],
+    ],
+  };
+
   /* Bouncy, dice-rolling — for ε-greedy zoom. */
   const TRACK_EPS = {
     tempoBpm: 138, leadGain: 0.36, bassGain: 0.28,
@@ -219,11 +352,15 @@
   const TRACKS = {
     title:    TRACK_TITLE,
     tutorial: TRACK_TUTORIAL,
+    boss:     TRACK_BOSS,
     battle:   TRACK_BATTLE,
     concept:  TRACK_CONCEPT,
+    discover: TRACK_DISCOVER,
     dp:       TRACK_DP,
     bridge:   TRACK_BRIDGE,
+    sarsa:    TRACK_SARSA,
     eps:      TRACK_EPS,
+    champion: TRACK_CHAMPION,
     recap:    TRACK_RECAP,
   };
   let currentTrackKey = 'battle';

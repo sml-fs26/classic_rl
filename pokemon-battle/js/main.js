@@ -16,15 +16,15 @@
   const SCENES = [
     { key: 'scene0',           titleKey: 'scene.title',       title: 'POKEMON',                      music: 'title'    },
     { key: 'sceneHowToPlay',   titleKey: 'scene.tutorial',    title: 'Tutorial — how to play',       music: 'tutorial' },
-    { key: 'scene1',           titleKey: 'scene.battle',      title: 'A wild CHARMANDER appeared!',  music: 'battle'   },
+    { key: 'scene1',           titleKey: 'scene.battle',      title: 'A wild CHARMANDER appeared!',  music: 'boss'     },
     { key: 'sceneMdpOverlay',  titleKey: 'scene.mdp',         title: 'What makes this an MDP?',      music: 'title'    },
     { key: 'sceneTrajectory',  titleKey: 'scene.trajectory',  title: 'The trajectory',               music: 'concept'  },
     { key: 'sceneObjective',   titleKey: 'scene.objective',   title: 'Return & Q*',                   music: 'concept'  },
-    { key: 'sceneQstar',       titleKey: 'scene.qstar',       title: 'π* from Q',                    music: 'concept'  },
+    { key: 'sceneQstar',       titleKey: 'scene.qstar',       title: 'π* from Q',                    music: 'discover' },
     { key: 'sceneDp',          titleKey: 'scene.dp',          title: 'Filling Q with DP',            music: 'dp'       },
     { key: 'sceneWhyNotDp',    titleKey: 'scene.whyNotDp',    title: "Why DP doesn't scale",         music: 'bridge'   },
-    { key: 'sceneSarsaDerive', titleKey: 'scene.sarsaDerive', title: 'Deriving SARSA',               music: 'bridge'   },
-    { key: 'scene5',           titleKey: 'scene.recap',       title: "You've trained PIKACHU.",      music: 'recap'    },
+    { key: 'sceneSarsaDerive', titleKey: 'scene.sarsaDerive', title: 'Deriving SARSA',               music: 'sarsa'    },
+    { key: 'scene5',           titleKey: 'scene.recap',       title: "You've trained PIKACHU.",      music: 'champion' },
   ];
   function titleAt(idx) {
     const s = SCENES[idx];
