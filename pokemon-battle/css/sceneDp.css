@@ -181,3 +181,16 @@
 .q-cell.dp-just-filled {
   animation: dp-cell-fill 700ms ease-out;
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). Stack the two-column DP layout (Q-table + side
+   panel). The Q-table itself horizontally pans inside .qtable-host —
+   see qtable.css for that rule.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .dp-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .dp-q { max-width: none; }
+}

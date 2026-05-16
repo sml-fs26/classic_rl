@@ -386,3 +386,15 @@
   text-shadow: 2px 2px 0 #FFF, -2px -2px 0 #FFF, 2px -2px 0 #FFF, -2px 2px 0 #FFF;
   z-index: 6;
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). The MDP-overlay scene puts the battle stage and the
+   control column side-by-side at desktop; on a phone the 280px column
+   minimum squeezes the stage into a tiny strip, so we stack them.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .sc0-mdp-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+}

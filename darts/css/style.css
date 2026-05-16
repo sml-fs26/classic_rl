@@ -681,3 +681,40 @@ kbd.kbd {
   font-style: normal;
   white-space: nowrap;
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). Phones get the topbar on two rows, larger tap targets,
+   and the dynamic-viewport unit so iOS Safari's URL-bar collapse doesn't
+   leave a tall empty band above the scene content.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .topbar {
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    gap: 8px;
+    row-gap: 8px;
+  }
+  .topbar .scene-title { display: none; }
+  .topbar .brand { flex: 1 1 auto; font-size: 11px; }
+  .topbar .right-cluster {
+    flex: 0 0 100%;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .topbar .right-cluster .theme-toggle { display: none; }
+  .pager-btn, .theme-toggle {
+    min-height: 36px;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  .dot-pager { flex: 1 1 auto; justify-content: center; }
+  .dot-pager .dot { width: 8px; height: 8px; }
+
+  .stage {
+    padding: 0 14px;
+    margin: 12px auto 24px;
+    min-height: calc(100dvh - 160px);
+  }
+  .scene { left: 14px; right: 14px; }
+  .scene.active { left: 0; right: 0; }
+}
