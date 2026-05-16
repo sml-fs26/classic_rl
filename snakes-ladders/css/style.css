@@ -780,7 +780,6 @@ html, body {
     justify-content: space-between;
     gap: 6px;
   }
-  .topbar .right-cluster .theme-toggle { display: none; }
   .pager-btn, .theme-toggle {
     min-height: 36px;
     padding: 8px 14px;
