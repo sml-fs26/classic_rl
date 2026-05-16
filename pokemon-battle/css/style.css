@@ -2002,10 +2002,14 @@ body.slide-mode .stage  { padding: 12px 18px; }
    Mobile (≤ 720px). The pixel-font chrome packs brand + title + ~7 buttons
    into one flex row at desktop; on a phone the row overflows and the
    scene-title gets squeezed into a vertical column. Below 720px the
-   topbar collapses to two rows (brand → pager row), the scene-title is
-   hidden (each scene already opens with its own H2), and the non-pager
-   toggles (theme / music / lang / badges) drop out so the pager controls
-   can take the full second row at iOS-tappable size. Per-scene
+   topbar collapses to three wrapping rows:
+     row 1 — brand
+     row 2 — PREV + dot-pager + NEXT  (primary navigation, big taps)
+     row 3 — trainer-badges            (full-width, centered)
+     row 4 — music + lang + theme     (secondary toggles, compact)
+   The trainer-badges row forces a wrap via `flex: 1 1 100%`, which pushes
+   the three secondary toggles to a fresh row beneath it. The scene-title
+   is hidden — every scene already opens with its own H2 — and per-scene
    responsive rules (sd-row, sd-f-row, tut-welcome, Q-table scroll) live
    alongside their desktop rules in the scene CSS files.
    --------------------------------------------------------------------------- */
@@ -2014,34 +2018,55 @@ body.slide-mode .stage  { padding: 12px 18px; }
     flex-wrap: wrap;
     padding: 10px 12px;
     gap: 8px;
-    row-gap: 8px;
+    row-gap: 10px;
   }
   .topbar .scene-title { display: none; }
   .topbar .brand { flex: 1 1 auto; font-size: 10px; }
+
+  /* Right cluster spans full width below the brand and wraps its own
+     children into the three rows described above. */
   .topbar .right-cluster {
     flex: 0 0 100%;
-    justify-content: space-between;
-    gap: 6px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
   }
-  .topbar .right-cluster #music-toggle,
-  .topbar .right-cluster #lang-toggle,
-  .topbar .right-cluster #theme-toggle,
-  .topbar .right-cluster .trainer-badges {
-    display: none;
-  }
-  .theme-toggle, .pager-btn {
-    min-height: 38px;
+
+  /* Row 2 — primary pager controls get the iOS-tappable size. */
+  .topbar .right-cluster #prev-btn,
+  .topbar .right-cluster #next-btn {
+    min-height: 36px;
     padding: 8px 12px;
     font-size: 10px;
   }
-  .dot-pager { flex: 1 1 auto; justify-content: center; }
+  .topbar .right-cluster .dot-pager {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
   .dot-pager .dot { width: 12px; height: 12px; }
+
+  /* Row 3 — trainer badges, forced to their own full-width row. */
+  .topbar .right-cluster .trainer-badges {
+    flex: 1 1 100%;
+    margin: 0;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  /* Row 4 — secondary toggles. Compact (these are tapped once per
+     session, not primary actions) so the three fit on one row. */
+  .topbar .right-cluster #theme-toggle,
+  .topbar .right-cluster #music-toggle,
+  .topbar .right-cluster #lang-toggle {
+    min-height: 30px;
+    padding: 6px 10px;
+    font-size: 8px;
+  }
 
   .stage {
     padding: 0 12px;
     margin: 12px auto 24px;
-    min-height: calc(100dvh - 150px);
+    min-height: calc(100dvh - 220px);
   }
   .scene { left: 12px; right: 12px; }
   .scene.active { left: 0; right: 0; }
