@@ -18,7 +18,11 @@
  *     discover    — I-V-vi-IV "lightbulb" staircase, G4 → C6, sparkling
  *                   (scene 6 — π* from Q reveal)
  *     dp          — methodical A-minor puzzle loop (scene 7)
- *     bridge      — tense C-minor build (scenes 8-9 — DP fails, SARSA derive)
+ *     bridge      — tense C-minor build (scene 8 — DP fails)
+ *     sarsa       — D-Mixolydian 8-bar training-montage; bass octave-
+ *                   bounce, lead arpeggio-up / scale-down. 160 bpm so the
+ *                   half-bar coincides with step F's 750 ms Q-update tick
+ *                   (scene 9 — SARSA fills the Q-table)
  *     champion    — slow anthemic C-major Hall-of-Fame, perfect cadence
  *                   to C6 (scene 10 — recap)
  *     battle      — legacy energetic A-minor loop (kept for reference)
@@ -266,6 +270,47 @@
     ],
   };
 
+  /* SARSA — training-montage in D Mixolydian (D major with natural C
+     for that "quest underway" b7 flavor).  8-bar form, two contrasting
+     halves with the same arpeggio-up / scale-down motif over shifting
+     chords (D - G - A - Bm - G - A - D).  Bass octave-bounces root↔fifth
+     on every eighth so it feels like methodical Q-update machinery
+     ticking underneath.  Tempo chosen so a half-bar (four eighths) lasts
+     750 ms — the same cadence as step F's autoplay transitions, so the
+     filling cells visually align with the strong beats. */
+  const TRACK_SARSA = {
+    tempoBpm: 160, leadGain: 0.40, bassGain: 0.32,
+    pattern: [
+      /* === FIRST HALF — statement of the motif === */
+      /* Bar 1 — D (I): chord arpeggio climbs to A5 */
+      ['D4', 'D2'], ['Fs4', 'A2'], ['A4', 'D3'], ['D5', 'A2'],
+      ['A4', 'D2'], ['D5', 'A2'], ['Fs5', 'D3'], ['A5', 'A2'],
+      /* Bar 2 — D Mixolydian descent through natural C ("quest" flavor) */
+      ['G5', 'D2'], ['Fs5', 'A2'], ['E5', 'D3'], ['D5', 'A2'],
+      ['C5', 'D2'], ['A4', 'A2'], ['Fs4', 'D3'], ['D4', 'A2'],
+      /* Bar 3 — G (IV): warmth lift, peak on B5 */
+      ['G4', 'G2'], ['B4', 'D3'], ['D5', 'G2'], ['G5', 'D3'],
+      ['B5', 'G2'], ['G5', 'D3'], ['D5', 'G2'], ['B4', 'D3'],
+      /* Bar 4 — A (V): tension up, drop back */
+      ['A4', 'A2'], ['Cs5', 'E3'], ['E5', 'A2'], ['A5', 'E3'],
+      ['G5', 'A2'], ['E5', 'E3'], ['Cs5', 'A2'], ['A4', 'E3'],
+
+      /* === SECOND HALF — variation, higher peak === */
+      /* Bar 5 — Bm (vi): plaintive turn, melodic apex at B5 */
+      ['B4', 'B2'], ['D5', 'Fs3'], ['Fs5', 'B2'], ['B5', 'Fs3'],
+      ['A5', 'B2'], ['Fs5', 'Fs3'], ['D5', 'B2'], ['B4', 'Fs3'],
+      /* Bar 6 — G (IV) revisited: warmth, scale descent */
+      ['G4', 'G2'], ['B4', 'D3'], ['D5', 'G2'], ['G5', 'D3'],
+      ['Fs5', 'G2'], ['E5', 'D3'], ['D5', 'G2'], ['B4', 'D3'],
+      /* Bar 7 — A (V): climbing push, then circular */
+      ['A4', 'A2'], ['Cs5', 'E3'], ['E5', 'A2'], ['G5', 'E3'],
+      ['A5', 'A2'], ['G5', 'E3'], ['E5', 'A2'], ['Cs5', 'E3'],
+      /* Bar 8 — D (I): cadence, riding home to D4 */
+      ['D5', 'D2'], ['Fs5', 'A2'], ['A5', 'D3'], ['Fs5', 'A2'],
+      ['D5', 'D2'], ['A4', 'A2'], ['Fs4', 'D3'], ['D4', 'A2'],
+    ],
+  };
+
   /* Bouncy, dice-rolling — for ε-greedy zoom. */
   const TRACK_EPS = {
     tempoBpm: 138, leadGain: 0.36, bassGain: 0.28,
@@ -313,6 +358,7 @@
     discover: TRACK_DISCOVER,
     dp:       TRACK_DP,
     bridge:   TRACK_BRIDGE,
+    sarsa:    TRACK_SARSA,
     eps:      TRACK_EPS,
     champion: TRACK_CHAMPION,
     recap:    TRACK_RECAP,

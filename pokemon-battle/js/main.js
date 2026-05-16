@@ -23,7 +23,7 @@
     { key: 'sceneQstar',       titleKey: 'scene.qstar',       title: 'π* from Q',                    music: 'discover' },
     { key: 'sceneDp',          titleKey: 'scene.dp',          title: 'Filling Q with DP',            music: 'dp'       },
     { key: 'sceneWhyNotDp',    titleKey: 'scene.whyNotDp',    title: "Why DP doesn't scale",         music: 'bridge'   },
-    { key: 'sceneSarsaDerive', titleKey: 'scene.sarsaDerive', title: 'Deriving SARSA',               music: 'bridge'   },
+    { key: 'sceneSarsaDerive', titleKey: 'scene.sarsaDerive', title: 'Deriving SARSA',               music: 'sarsa'    },
     { key: 'scene5',           titleKey: 'scene.recap',       title: "You've trained PIKACHU.",      music: 'champion' },
   ];
   function titleAt(idx) {
