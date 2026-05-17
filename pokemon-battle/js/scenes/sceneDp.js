@@ -37,9 +37,16 @@
   const N       = STATES.length;                       // 25
   const GAMMA   = 1;     // Undiscounted — every trajectory terminates (win/loss).
 
-  function bucketName(b) { return b >= NB ? 'FAINT' : BUCKETS[b].toUpperCase(); }
+  const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+  function bucketName(b) { return b >= NB ? T('hp.bucket.faint_short') : T('hp.bucket.' + BUCKETS[b]); }
   function stateLabel(s) {
     return bucketName(s.your) + ' / ' + bucketName(s.opp);
+  }
+  function moveName(id) { return T('move.' + id); }
+  function oppFormName(form) { return T('pokemon.' + form); }
+  function oppMoveName(form) {
+    const id = (window.Battle.FORM_MOVE_NAME[form] || '').toLowerCase();
+    return T('move.' + id);
   }
 
   /* Convert (your, opp) → flat state index. */
@@ -176,44 +183,46 @@
 
   /* Render the detail-cell calculation HTML into `host`. */
   function renderDetail(host, breakdown, cell) {
-    const moveName = window.Moves.MOVE_BY_ID[cell.moveId].name;
+    const mv       = moveName(cell.moveId);
     const stateLab = bucketName(cell.yourB) + ' / ' + bucketName(cell.oppB);
-    const formName = window.Battle.FORM_DISPLAY_NAME[breakdown.formBefore];
+    const formNm   = oppFormName(breakdown.formBefore);
 
     let html = '';
-    html += '<div class="dp-panel-title">Q*(YOUR=' + bucketName(cell.yourB) +
-            ', OPP=' + bucketName(cell.oppB) + ', ' + moveName + ')</div>';
+    html += '<div class="dp-panel-title">' + T('dp.detail.title', {
+              your: bucketName(cell.yourB), opp: bucketName(cell.oppB), move: mv,
+            }) + '</div>';
     html += '<div class="dp-panel-narration">' +
-              'Opponent is <b>' + formName + '</b>. ' +
-              moveName + ' deals form-specific damage — and any HP-bucket cross-over ' +
-              'triggers an evolution before the counter lands.' +
+              T('dp.detail.narration', { form: formNm, move: mv }) +
             '</div>';
 
     for (const br of breakdown.branches) {
       if (br.kind === 'hit-win') {
         html += '<div class="dp-calc-line">' +
                   '<span><span class="dp-calc-prob">P=' + br.p.toFixed(3) + '</span>' +
-                  ' &middot; hit · dmg ' + br.oppD + ' → OPP FAINTS, r=+10</span>' +
+                  ' &middot; ' + T('dp.detail.hit_win', { n: br.oppD }) + '</span>' +
                   '<span class="dp-calc-value">' + br.p.toFixed(3) + ' · 10 = ' + fmtSigned(br.contribution) + '</span>' +
                 '</div>';
       } else if (br.kind === 'hit-continue') {
-        const counterName = window.Battle.FORM_MOVE_NAME[br.formAfter];
-        const formDisp = window.Battle.FORM_DISPLAY_NAME[br.formAfter];
+        const counterName = oppMoveName(br.formAfter);
+        const formDisp = oppFormName(br.formAfter);
         html += '<div class="dp-calc-line">' +
                   '<span><span class="dp-calc-prob">P=' + br.p.toFixed(3) + '</span>' +
-                  ' &middot; hit · dmg ' + br.oppD + ' → OPP at ' + bucketName(br.oppNew) +
-                  ' (<b>' + formDisp + '</b>) counters ' + counterName + ':</span>' +
+                  ' &middot; ' + T('dp.detail.hit_continue', {
+                    n: br.oppD, state: bucketName(br.oppNew), form: formDisp, move: counterName,
+                  }) + '</span>' +
                   '<span></span>' +
                 '</div>';
         for (const sub of br.sub) {
           let txt, calc;
           if (sub.kind === 'faint') {
-            txt = counterName + ' ' + sub.yD + ' → PIKACHU FAINTS, r=−10';
+            txt = T('dp.detail.sub_faint', { move: counterName, n: sub.yD });
             calc = sub.p.toFixed(2) + ' · (−10) = ' + fmtSigned(sub.contribution);
           } else {
             const sNextLab = bucketName(sub.yNext) + ' / ' + bucketName(sub.oNext);
-            txt = counterName + ' ' + sub.yD + ' → ' + sNextLab + ', V′=' + fmtSigned(sub.vNext) +
-                  ' → −1 + ' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
+            txt = T('dp.detail.sub_continue', {
+              move: counterName, n: sub.yD, state: sNextLab,
+              v: fmtSigned(sub.vNext), bv: fmtSigned(sub.branchVal),
+            });
             calc = sub.p.toFixed(2) + ' · ' + fmtSigned(sub.branchVal) + ' = ' + fmtSigned(sub.contribution);
           }
           html += '<div class="dp-calc-line dp-calc-sub">' +
@@ -223,27 +232,32 @@
                   '</div>';
         }
         html += '<div class="dp-calc-line dp-calc-subtotal">' +
-                  '<span>&nbsp;&nbsp;&nbsp;weighted (' + br.p.toFixed(3) + ' · ' + fmtSigned(br.subSum) + '):</span>' +
+                  '<span>&nbsp;&nbsp;&nbsp;' +
+                    T('dp.detail.weighted', { p: br.p.toFixed(3), sum: fmtSigned(br.subSum) }) +
+                  '</span>' +
                   '<span class="dp-calc-value">' + fmtSigned(br.contribution) + '</span>' +
                 '</div>';
       } else if (br.kind === 'miss') {
-        const counterName = window.Battle.FORM_MOVE_NAME[br.formBefore];
-        const formDisp = window.Battle.FORM_DISPLAY_NAME[br.formBefore];
+        const counterName = oppMoveName(br.formBefore);
+        const formDisp = oppFormName(br.formBefore);
         html += '<div class="dp-calc-line">' +
                   '<span><span class="dp-calc-prob">P=' + br.p.toFixed(3) + '</span>' +
-                  ' &middot; MISS — opp stays at ' + bucketName(cell.oppB) +
-                  ' (<b>' + formDisp + '</b>) counters ' + counterName + ':</span>' +
+                  ' &middot; ' + T('dp.detail.miss', {
+                    state: bucketName(cell.oppB), form: formDisp, move: counterName,
+                  }) + '</span>' +
                   '<span></span>' +
                 '</div>';
         for (const sub of br.sub) {
           let txt, calc;
           if (sub.kind === 'faint') {
-            txt = counterName + ' ' + sub.yD + ' → PIKACHU FAINTS, r=−10';
+            txt = T('dp.detail.sub_faint', { move: counterName, n: sub.yD });
             calc = sub.p.toFixed(2) + ' · (−10) = ' + fmtSigned(sub.contribution);
           } else {
             const sNextLab = bucketName(sub.yNext) + ' / ' + bucketName(sub.oNext);
-            txt = counterName + ' ' + sub.yD + ' → ' + sNextLab + ', V′=' + fmtSigned(sub.vNext) +
-                  ' → −1 + ' + fmtSigned(sub.vNext) + ' = ' + fmtSigned(sub.branchVal);
+            txt = T('dp.detail.sub_continue', {
+              move: counterName, n: sub.yD, state: sNextLab,
+              v: fmtSigned(sub.vNext), bv: fmtSigned(sub.branchVal),
+            });
             calc = sub.p.toFixed(2) + ' · ' + fmtSigned(sub.branchVal) + ' = ' + fmtSigned(sub.contribution);
           }
           html += '<div class="dp-calc-line dp-calc-sub">' +
@@ -253,14 +267,16 @@
                   '</div>';
         }
         html += '<div class="dp-calc-line dp-calc-subtotal">' +
-                  '<span>&nbsp;&nbsp;&nbsp;weighted (' + br.p.toFixed(3) + ' · ' + fmtSigned(br.subSum) + '):</span>' +
+                  '<span>&nbsp;&nbsp;&nbsp;' +
+                    T('dp.detail.weighted', { p: br.p.toFixed(3), sum: fmtSigned(br.subSum) }) +
+                  '</span>' +
                   '<span class="dp-calc-value">' + fmtSigned(br.contribution) + '</span>' +
                 '</div>';
       }
     }
 
     html += '<div class="dp-calc-total">' +
-              '<span>Q*(' + stateLab + ', ' + moveName + ')</span>' +
+              '<span>' + T('dp.detail.q_total', { state: stateLab, move: mv }) + '</span>' +
               '<span><b>' + fmtSigned(breakdown.total) + '</b></span>' +
             '</div>';
 
@@ -283,7 +299,7 @@
     /* Heading */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'FILLING Q WITH DYNAMIC PROGRAMMING';
+    heading.textContent = T('dp.heading');
     root.appendChild(heading);
 
     /* Premise — we wrote down P explicitly when we set the battle up
@@ -291,17 +307,13 @@
        even possible here; next scene yanks it back. */
     const premise = document.createElement('div');
     premise.className = 'dp-premise';
-    premise.innerHTML =
-      '<strong>If we know P</strong> &mdash; the full transition table for ' +
-      'every (s, a, s\') &mdash; <strong>we can compute Q here using dynamic programming!</strong> ' +
-      'Bellman\'s equation is a recursive definition of Q*; sweep it to a fixed point ' +
-      'and we have the optimal action-value for every state.';
+    premise.innerHTML = T('dp.premise');
     root.appendChild(premise);
 
     /* Bellman card */
     const fcard = document.createElement('div');
     fcard.className = 'dp-bellman-card';
-    fcard.innerHTML = '<div class="dp-bellman-label">BELLMAN OPTIMALITY EQUATION</div>';
+    fcard.innerHTML = '<div class="dp-bellman-label">' + T('dp.formula.label') + '</div>';
     const fhost = document.createElement('div');
     fcard.appendChild(fhost);
     window.Katex.render(
@@ -315,11 +327,12 @@
     ctrls.className = 'dp-controls-row';
     ctrls.innerHTML =
       '<div class="dp-controls">' +
-        '<button class="poke-btn" id="dp-step">▶ STEP</button>' +
-        '<button class="poke-btn" id="dp-run">RUN ALL</button>' +
-        '<button class="poke-btn" id="dp-reset">RESET</button>' +
+        '<button class="poke-btn" id="dp-step">'  + T('dp.btn.step')  + '</button>' +
+        '<button class="poke-btn" id="dp-run">'   + T('dp.btn.run')   + '</button>' +
+        '<button class="poke-btn" id="dp-reset">' + T('dp.btn.reset') + '</button>' +
       '</div>' +
-      '<div class="dp-status">PHASE <b id="dp-phase">0 / 6</b> · CELLS FILLED <b id="dp-fillc">0 / 25</b></div>';
+      '<div class="dp-status">' + T('dp.status.phase') + ' <b id="dp-phase">0 / 6</b> · ' +
+        T('dp.status.cells') + ' <b id="dp-fillc">0 / 25</b></div>';
     root.appendChild(ctrls);
 
     /* Row: Q-table + side panel */
@@ -360,57 +373,30 @@
       idx(0,1), idx(1,1), idx(2,1), idx(3,1),  /* OPP=HIGH (excl. (CRIT,HIGH)) */
     ];
 
+    /* Phase content keys live in i18n.js (dp.phase.<id>.*) so a
+       language toggle re-paints the side panel without altering this
+       structural list. */
     const PHASES = [
-      {
-        title: 'CHARIZARD COLUMNS — easy wins',
-        narration: [
-          'When opponent HP drops to LOW or CRITICAL it has evolved into <b>CHARIZARD</b> — huge frame, exposed.',
-          'QUICK ATTACK is super-effective (2-3 dmg · 100% acc) — always one-shots a LOW or CRIT Charizard.',
-          '<b>Q*(s, QUICK) = +10</b> for every cell in these two columns.',
-        ],
-        fillCells: charizardCols,
-      },
-      {
-        title: 'YOUR=CRITICAL row — losing positions',
-        narration: [
-          'PIKACHU at CRITICAL means any counter-attack faints us. Most cells in this row are losing.',
-          'Q tells you the expected loss — useful even when there is no winning move.',
-        ],
-        fillCells: yourCritRest,
-      },
-      {
-        title: 'DETAIL — (FULL, MID, THUNDER)',
-        narration: null,
+      { titleKey: 'dp.phase.charizard.title',
+        narrationKeys: ['dp.phase.charizard.n1', 'dp.phase.charizard.n2', 'dp.phase.charizard.n3'],
+        fillCells: charizardCols },
+      { titleKey: 'dp.phase.crit.title',
+        narrationKeys: ['dp.phase.crit.n1', 'dp.phase.crit.n2'],
+        fillCells: yourCritRest },
+      { titleKey: 'dp.phase.detail.title',
+        narrationKeys: null,
         fillCells: detailCellOnly,
         detailCell: idx(0, 2),
-        detailType: 'show',
-      },
-      {
-        title: 'CHARMELEON column — THUNDER reigns',
-        narration: [
-          'CHARMELEON\'s hardened hide <b>resists THUNDERBOLT</b> (0-1 dmg, fizzles).',
-          'THUNDER stays at 2-3 dmg → only Pikachu move with reach. Even with 55% accuracy, it dominates.',
-        ],
-        fillCells: restOfMidCol,
-      },
-      {
-        title: 'CHARMANDER columns — subtle territory',
-        narration: [
-          'The baby form: BOLT works at normal damage; QUICK is too weak alone.',
-          'But every BOLT that drops CHARMANDER into MID HP triggers evolution to CHARMELEON, who resists future BOLTs.',
-          'THUNDER keeps the same 2-3 dmg through every form — sometimes worth its 55% accuracy.',
-        ],
-        fillCells: charmanderCols,
-      },
-      {
-        title: 'Q* CONVERGED.',
-        narration: [
-          'All three Pikachu moves earn their place: QUICK against Charizard, THUNDER against Charmeleon, a mix in Charmander territory.',
-          'But this required <i>P(s′ | s, a)</i> for every transition, plus one Bellman backup per cell.',
-          'In real games neither is available — sample-based methods come next.',
-        ],
-        fillCells: [],
-      },
+        detailType: 'show' },
+      { titleKey: 'dp.phase.charmeleon.title',
+        narrationKeys: ['dp.phase.charmeleon.n1', 'dp.phase.charmeleon.n2'],
+        fillCells: restOfMidCol },
+      { titleKey: 'dp.phase.charmander.title',
+        narrationKeys: ['dp.phase.charmander.n1', 'dp.phase.charmander.n2', 'dp.phase.charmander.n3'],
+        fillCells: charmanderCols },
+      { titleKey: 'dp.phase.done.title',
+        narrationKeys: ['dp.phase.done.n1', 'dp.phase.done.n2', 'dp.phase.done.n3'],
+        fillCells: [] },
     ];
 
     /* ---- Phase rendering state ---- */
@@ -447,10 +433,10 @@
       /* Side panel. */
       if (p.detailType === 'show') {
         renderDetail(panel, detailBreakdown, DETAIL_CELL);
-      } else if (p.narration) {
-        renderNarration(panel, p.title, p.narration);
+      } else if (p.narrationKeys) {
+        renderNarration(panel, T(p.titleKey), p.narrationKeys.map(k => T(k)));
       } else {
-        renderNarration(panel, p.title, ['']);
+        renderNarration(panel, T(p.titleKey), ['']);
       }
       /* Status. */
       const filledCount = filledMask.filter(Boolean).length;
@@ -484,7 +470,7 @@
           cell.classList.remove('dp-active', 'dp-detail', 'dp-just-filled');
         }
       }
-      renderNarration(panel, 'READY', ['Click <b>STEP</b> to begin computing Q* one phase at a time.']);
+      renderNarration(panel, T('dp.ready.title'), [T('dp.ready.body')]);
       document.getElementById('dp-phase').textContent = '0 / ' + PHASES.length;
       document.getElementById('dp-fillc').textContent = '0 / ' + N;
     }

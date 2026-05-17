@@ -14,8 +14,9 @@
 (function () {
 
   function mount(host, opts) {
+    const T = (k) => (window.I18N ? window.I18N.t(k) : k);
     const o = Object.assign({
-      name: 'PIKACHU',
+      name: T('pokemon.pikachu'),
       side: 'player',
       level: 5,
       numBuckets: 5,
@@ -35,7 +36,7 @@
     /* HP bar — segmented track with tick marks. */
     const barRow = document.createElement('div');
     barRow.className = 'hp-bar-row';
-    barRow.innerHTML = '<span class="hp-label">HP</span>';
+    barRow.innerHTML = '<span class="hp-label">' + T('hp.label') + '</span>';
     const track = document.createElement('div');
     track.className = 'hp-bar-track';
 
@@ -62,20 +63,22 @@
     if (o.side === 'player') {
       const row3 = document.createElement('div');
       row3.className = 'row3';
-      row3.innerHTML = '<span class="hp-num" id="hp-bucket-label">FULL</span>';
+      row3.innerHTML = '<span class="hp-num" id="hp-bucket-label">' + T('hp.bucket.full') + '</span>';
       host.appendChild(row3);
     }
 
     let cur = 0;     // bucket index 0..numBuckets (numBuckets = fainted)
     const maxB = o.numBuckets;
-    const BUCKET_NAMES = ['FULL', 'HIGH', 'MID', 'LOW', 'CRITICAL', 'FAINTED'];
+    const BUCKET_KEYS = ['full', 'high', 'mid', 'low', 'critical', 'fainted'];
+
+    function bucketLabel(b) { return T('hp.bucket.' + (BUCKET_KEYS[b] || 'fainted')); }
 
     function set(bucket) {
       const prev = cur;
       cur = Math.max(0, Math.min(maxB, bucket));
       fill.dataset.bucket = String(cur);
       const label = host.querySelector('.hp-num');
-      if (label) label.textContent = BUCKET_NAMES[cur] || 'FAINTED';
+      if (label) label.textContent = bucketLabel(cur);
       /* Drain ticks — one short tick per bucket crossed downward, in
          sync with the CSS width transition (1100 ms total).  Skip if
          we're going UP (rare, but possible on reset). */

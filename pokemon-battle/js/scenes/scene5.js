@@ -20,13 +20,16 @@
     { key: 'sarsa',  label: 'SAR'    },
   ];
 
+  const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+
   function fmtDate(ts) {
-    if (!ts) return '—';
+    if (!ts) return T('recap.trainer.dash');
     try {
-      return new Date(ts).toLocaleDateString(undefined, {
+      const locale = (window.I18N && window.I18N.lang === 'jp') ? 'ja-JP' : undefined;
+      return new Date(ts).toLocaleDateString(locale, {
         year: 'numeric', month: 'short', day: 'numeric'
       }).toUpperCase();
-    } catch (_e) { return '—'; }
+    } catch (_e) { return T('recap.trainer.dash'); }
   }
 
   function isHofFirstVisitEver() {
@@ -57,7 +60,7 @@
   }
 
   function renderTrainerCard() {
-    const name = (window.Trainer && window.Trainer.getName()) || 'TRAINER';
+    const name = (window.Trainer && window.Trainer.getName()) || T('recap.trainer.fallback');
     let earned = 0, firstTs = null, latestTs = null;
     const badgeHtml = TRAINER_BADGE_META.map((b) => {
       const ts = window.Trainer && window.Trainer.getBadgeTimestamp(b.key);
@@ -70,18 +73,19 @@
         '<div class="sc5-tc-badge ' + b.key + (ts ? ' earned' : ' missing') + '">' +
           '<div class="sc5-tc-badge-mark">' + (ts ? '★' : '·') + '</div>' +
           '<div class="sc5-tc-badge-label">' + b.label + '</div>' +
-          '<div class="sc5-tc-badge-date">' + (ts ? fmtDate(ts) : 'LOCKED') + '</div>' +
+          '<div class="sc5-tc-badge-date">' + (ts ? fmtDate(ts) : T('recap.trainer.locked')) + '</div>' +
         '</div>'
       );
     }).join('');
 
     const isChampion = earned === TRAINER_BADGE_META.length;
-    const title = name + ' — ' + (isChampion ? 'POKEMON CHAMPION' : 'TRAINER IN PROGRESS');
+    const titleSuffix = isChampion ? T('recap.trainer.champion') : T('recap.trainer.in_progress');
+    const title = name + ' — ' + titleSuffix;
     const stats =
-      '<b>' + earned + ' / ' + TRAINER_BADGE_META.length + '</b> badges' +
-      (firstTs  ? ' · since <b>' + fmtDate(firstTs) + '</b>'  : '') +
+      T('recap.trainer.stats_base', { earned: earned, total: TRAINER_BADGE_META.length }) +
+      (firstTs  ? T('recap.trainer.stats_since', { date: fmtDate(firstTs) })  : '') +
       (isChampion && latestTs && latestTs !== firstTs
-        ? ' · crowned <b>' + fmtDate(latestTs) + '</b>'
+        ? T('recap.trainer.stats_crowned', { date: fmtDate(latestTs) })
         : '');
 
     return (
@@ -104,7 +108,7 @@
        card.  Frames the scene as a victory screen. */
     const banner = document.createElement('div');
     banner.className = 'sc5-hof-banner';
-    banner.innerHTML = '<span class="sc5-star">★</span> HALL OF FAME <span class="sc5-star">★</span>';
+    banner.innerHTML = '<span class="sc5-star">★</span> ' + T('recap.hof') + ' <span class="sc5-star">★</span>';
     root.appendChild(banner);
 
     /* Trainer card — name + badge row + lifetime stats.  Replaces
@@ -117,8 +121,7 @@
 
     const sub = document.createElement('div');
     sub.className = 'poke-caption sc5-sub';
-    sub.textContent =
-      'The five RL pieces are the same five pieces that fit Snakes & Ladders. Two cultural artefacts, one curriculum.';
+    sub.textContent = T('recap.sub');
     root.appendChild(sub);
 
     const wrap = document.createElement('div');
@@ -158,17 +161,13 @@
     closer.className = 'poke-box sc5-closer';
     closer.style.setProperty('--i', String(cardIdx));
     closer.innerHTML =
-      '<span class="hue-chip hue-poke">WHERE THIS GOES NEXT</span>' +
-      '<div class="sc5-closer-text">' +
-      'Bigger problems scale the same five pieces. Real Pokemon AIs — type matching, team building, Z-Move selection — ' +
-      'use the same MDP / Bellman / SARSA bones. So do robots, recommender systems, and game-playing agents at the ' +
-      'frontier. You now know the bones.' +
-      '</div>';
+      '<span class="hue-chip hue-poke">' + T('recap.closer.label') + '</span>' +
+      '<div class="sc5-closer-text">' + T('recap.closer.text') + '</div>';
     root.appendChild(closer);
 
     const footnote = document.createElement('div');
     footnote.className = 'footnote';
-    footnote.innerHTML = 'Press <kbd>PREV</kbd> or left-arrow to revisit the SARSA derivation.';
+    footnote.innerHTML = T('recap.footnote');
     root.appendChild(footnote);
 
     /* Victory fanfare — 4-note ascending arpeggio. Defer so the

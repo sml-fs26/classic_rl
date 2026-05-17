@@ -15,47 +15,20 @@
 (function () {
   window.scenes = window.scenes || {};
 
+  /* Module-level i18n helper — used by both the scene builder and
+     the per-step render functions below. */
+  const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+
+  /* Step ids drive i18n lookups: tut.step.<id>.title / .dialog. The
+     dialog for the welcome step uses {name} interpolation so the
+     trainer's chosen name appears in either language. */
   const STEPS_DATA = [
-    {
-      title: 'Welcome, trainer!',
-      dialog: null,    /* Filled in at scene mount with the trainer name. */
-      render: renderStepWelcome,
-    },
-    {
-      title: 'The battle screen',
-      dialog:
-        "Look at the screen.  Your PIKACHU faces away from you.  " +
-        "The wild CHARMANDER faces you.  Each has an HP box.",
-      render: renderStepBattleScreen,
-    },
-    {
-      title: 'HP has five buckets',
-      dialog:
-        "Each POKEMON's HP is split into five buckets: FULL, HIGH, MID, " +
-        "LOW, CRITICAL.  Past CRITICAL, the POKEMON faints!",
-      render: renderStepHpBuckets,
-    },
-    {
-      title: 'Pick a move',
-      dialog:
-        "PWR is how strong the move feels.  ACC is the real chance it lands.  " +
-        "Higher PWR usually means lower ACC — that's the trade-off PIKACHU has to learn.",
-      render: renderStepMoves,
-    },
-    {
-      title: 'How a turn flows',
-      dialog:
-        "Your PIKACHU is faster, so it moves first.  Then the wild " +
-        "CHARMANDER strikes back with EMBER.  One turn — both actions.",
-      render: renderStepTurnOrder,
-    },
-    {
-      title: 'Win, lose, and reward',
-      dialog:
-        "Faint CHARMANDER to WIN (+10 reward).  Faint yourself to LOSE " +
-        "(-10).  Each turn costs -1.  Now you are ready.  GO!",
-      render: renderStepWinLose,
-    },
+    { id: 'welcome', render: renderStepWelcome     },
+    { id: 'battle',  render: renderStepBattleScreen },
+    { id: 'hp',      render: renderStepHpBuckets   },
+    { id: 'moves',   render: renderStepMoves       },
+    { id: 'turn',    render: renderStepTurnOrder   },
+    { id: 'winlose', render: renderStepWinLose     },
   ];
 
   window.scenes.sceneHowToPlay = function (root) {
@@ -64,10 +37,12 @@
 
     /* Personalise the welcome line with the trainer's name (set on
        first scene transition out of the title screen). */
-    const trainerName = (window.Trainer && window.Trainer.getName()) || 'TRAINER';
-    STEPS_DATA[0].dialog =
-      'Hello there, ' + trainerName + '!  Welcome to the world of POKEMON!  ' +
-      'Before you battle, here is a quick refresher.';
+    const trainerName = (window.Trainer && window.Trainer.getName()) || T('trainer.modal.placeholder');
+    function stepTitle(step)  { return T('tut.step.' + step.id + '.title'); }
+    function stepDialog(step) {
+      const key = 'tut.step.' + step.id + '.dialog';
+      return T(key, { name: trainerName });
+    }
 
     /* ---------- Top bar: step counter + SKIP button ---------- */
     const topbar = document.createElement('div');
@@ -81,8 +56,8 @@
     const skipBtn = document.createElement('button');
     skipBtn.type = 'button';
     skipBtn.className = 'tutorial-skip-btn';
-    skipBtn.textContent = 'SKIP TUTORIAL →';
-    skipBtn.title = 'Jump straight to the battle';
+    skipBtn.textContent = T('tut.skip');
+    skipBtn.title = T('tut.skip_title');
     topbar.appendChild(skipBtn);
     skipBtn.addEventListener('click', () => {
       /* Tutorial is at index 1; battle is at index 2 after insertion. */
@@ -108,9 +83,7 @@
     /* ---------- Nav hint ---------- */
     const navHint = document.createElement('div');
     navHint.className = 'tutorial-nav-hint';
-    navHint.innerHTML =
-      'Press <kbd>→</kbd> to continue · <kbd>←</kbd> back · ' +
-      'Press <kbd>↓</kbd> to fast-fill the dialog text';
+    navHint.innerHTML = T('tut.nav.hint');
     root.appendChild(navHint);
 
     /* ---------- Step engine ---------- */
@@ -124,15 +97,16 @@
          demoHost otherwise. */
       stopHpAnimation();
       stopTurnAnimation();
-      counter.textContent = 'STEP ' + (c + 1) + ' / ' + STEPS_DATA.length;
-      header.textContent = STEPS_DATA[c].title.toUpperCase();
+      const step = STEPS_DATA[c];
+      counter.textContent = T('tut.step_of', { i: c + 1, total: STEPS_DATA.length });
+      header.textContent = stepTitle(step).toUpperCase();
       demoHost.innerHTML = '';
-      STEPS_DATA[c].render(demoHost);
-      dialog.say(STEPS_DATA[c].dialog);
+      step.render(demoHost);
+      dialog.say(stepDialog(step));
       /* On the last step, swap the skip-button text to "GO TO BATTLE" so the
          student feels closure. */
       skipBtn.textContent =
-        c === STEPS_DATA.length - 1 ? 'GO TO BATTLE →' : 'SKIP TUTORIAL →';
+        c === STEPS_DATA.length - 1 ? T('tut.go_to_battle') : T('tut.skip');
     }
 
     /* Optional `#…&tut=N` hash flag jumps straight to internal step N — used
@@ -175,11 +149,11 @@
     wrap.className = 'tut-welcome';
     wrap.innerHTML =
       '<div class="tut-welcome-sprite">' +
-        '<img src="assets/pikachu-front.png" alt="PIKACHU" class="poke-sprite tut-big-sprite">' +
+        '<img src="assets/pikachu-front.png" alt="' + T('pokemon.pikachu') + '" class="poke-sprite tut-big-sprite">' +
       '</div>' +
       '<div class="tut-welcome-text">' +
-        '<div class="tut-welcome-line big">PIKACHU CHOOSES YOU!</div>' +
-        '<div class="tut-welcome-line small">Five quick lessons.  Then you fight.</div>' +
+        '<div class="tut-welcome-line big">'   + T('tut.welcome.big')   + '</div>' +
+        '<div class="tut-welcome-line small">' + T('tut.welcome.small') + '</div>' +
       '</div>';
     host.appendChild(wrap);
   }
@@ -205,10 +179,10 @@
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
     window.HPBar.mount(oppHpHost, {
-      name: 'CHARMANDER', side: 'opponent', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
+      name: T('pokemon.charmander'), side: 'opponent', level: 5, numBuckets: window.Battle.NUM_BUCKETS,
     });
     window.HPBar.mount(playerHpHost, {
-      name: 'PIKACHU',    side: 'player',   level: 5, numBuckets: window.Battle.NUM_BUCKETS,
+      name: T('pokemon.pikachu'),    side: 'player',   level: 5, numBuckets: window.Battle.NUM_BUCKETS,
     });
 
     /* Callout overlay layer.  Pure CSS-positioned labels (no SVG arrows —
@@ -216,10 +190,10 @@
     const callouts = document.createElement('div');
     callouts.className = 'tut-callouts';
     callouts.innerHTML =
-      '<div class="tut-callout c-pika">YOU — back view</div>' +
-      '<div class="tut-callout c-charm">WILD POKEMON — front view</div>' +
-      '<div class="tut-callout c-pikahp">YOUR HP</div>' +
-      '<div class="tut-callout c-charmhp">THEIR HP</div>';
+      '<div class="tut-callout c-pika">'    + T('tut.callout.you')      + '</div>' +
+      '<div class="tut-callout c-charm">'   + T('tut.callout.wild')     + '</div>' +
+      '<div class="tut-callout c-pikahp">'  + T('tut.callout.your_hp')  + '</div>' +
+      '<div class="tut-callout c-charmhp">' + T('tut.callout.their_hp') + '</div>';
     stage.appendChild(callouts);
   }
 
@@ -230,13 +204,16 @@
      all six stages — FULL → HIGH → MID → LOW → CRITICAL → FAINTED — with
      "−1 HP" arrows between panels, so the student sees the whole ladder at
      once. */
+  /* Bucket order matches Battle.BUCKETS — label is looked up live so a
+     language toggle re-paints the demo without reseting the animation. */
   const HP_STAGES = [
-    { label: 'FULL',     pct: 100, cls: '' },
-    { label: 'HIGH',     pct: 80,  cls: 'b1' },
-    { label: 'MID',      pct: 60,  cls: 'b2' },
-    { label: 'LOW',      pct: 40,  cls: 'b3' },
-    { label: 'CRITICAL', pct: 20,  cls: 'b4' },
+    { key: 'full',     pct: 100, cls: '' },
+    { key: 'high',     pct: 80,  cls: 'b1' },
+    { key: 'mid',      pct: 60,  cls: 'b2' },
+    { key: 'low',      pct: 40,  cls: 'b3' },
+    { key: 'critical', pct: 20,  cls: 'b4' },
   ];
+  function hpStageLabel(s) { return T('hp.bucket.' + s.key); }
   let hpAnimTimer = null;
   function stopHpAnimation() {
     if (hpAnimTimer) { clearInterval(hpAnimTimer); hpAnimTimer = null; }
@@ -263,20 +240,20 @@
         const b = HP_STAGES[i];
         fill.style.width = b.pct + '%';
         fill.className = 'tut-hp-anim-fill ' + b.cls;
-        label.textContent = b.label;
+        label.textContent = hpStageLabel(b);
         sprite.classList.remove('fainted');
-        spawnHpDamage(stage, '−1 HP');
+        spawnHpDamage(stage, T('hp.damage_minus', { n: 1 }));
       } else if (i === HP_STAGES.length) {
         fill.style.width = '0%';
         fill.className = 'tut-hp-anim-fill b4';
-        label.textContent = 'FAINTED!';
+        label.textContent = T('tut.hp.fainted_flash');
         sprite.classList.add('fainted');
-        spawnHpDamage(stage, 'FAINT!', '#962a1a');
+        spawnHpDamage(stage, T('hp.faint_flash'), '#962a1a');
       } else {
         /* Reset to FULL for the next loop. */
         fill.style.width = '100%';
         fill.className = 'tut-hp-anim-fill';
-        label.textContent = 'FULL';
+        label.textContent = T('hp.bucket.full');
         sprite.classList.remove('fainted');
         i = 0;
       }
@@ -293,14 +270,14 @@
     const anim = document.createElement('div');
     anim.className = 'tut-hp-anim';
     anim.innerHTML =
-      '<div class="tut-hp-anim-title">WATCH CHARMANDER TAKE A HIT</div>' +
+      '<div class="tut-hp-anim-title">' + T('tut.hp.watch') + '</div>' +
       '<div class="tut-hp-anim-stage" id="tut-hp-anim-stage">' +
-        '<img id="tut-hp-anim-img" src="assets/charmander-front.png" class="poke-sprite tut-hp-anim-sprite" alt="Charmander">' +
+        '<img id="tut-hp-anim-img" src="assets/charmander-front.png" class="poke-sprite tut-hp-anim-sprite" alt="' + T('pokemon.charmander') + '">' +
         '<div class="tut-hp-anim-bar">' +
           '<div class="tut-hp-anim-track">' +
             '<div class="tut-hp-anim-fill" id="tut-hp-anim-fill" style="width:100%"></div>' +
           '</div>' +
-          '<div class="tut-hp-anim-label" id="tut-hp-anim-label">FULL</div>' +
+          '<div class="tut-hp-anim-label" id="tut-hp-anim-label">' + T('hp.bucket.full') + '</div>' +
         '</div>' +
       '</div>';
     wrap.appendChild(anim);
@@ -308,23 +285,24 @@
     /* Comic-strip reference: all six stages at once with damage arrows. */
     const strip = document.createElement('div');
     strip.className = 'tut-hp-strip';
-    const allStages = HP_STAGES.concat([{ label: 'FAINTED!', pct: 0, cls: 'b4', fainted: true }]);
+    const allStages = HP_STAGES.concat([{ key: 'fainted_flash', pct: 0, cls: 'b4', fainted: true }]);
     for (let i = 0; i < allStages.length; i++) {
       const s = allStages[i];
       const panel = document.createElement('div');
       panel.className = 'tut-hp-panel' + (s.fainted ? ' fainted' : '');
+      const label = s.fainted ? T('tut.hp.fainted_flash') : hpStageLabel(s);
       panel.innerHTML =
         '<img class="poke-sprite tut-hp-panel-sprite" src="assets/charmander-front.png" alt="">' +
         '<div class="tut-hp-panel-track">' +
           '<div class="tut-hp-panel-fill ' + s.cls + '" style="width:' + s.pct + '%"></div>' +
         '</div>' +
-        '<div class="tut-hp-panel-label">' + s.label + '</div>';
+        '<div class="tut-hp-panel-label">' + label + '</div>';
       strip.appendChild(panel);
       if (i < allStages.length - 1) {
         const arrow = document.createElement('div');
         arrow.className = 'tut-hp-arrow';
         arrow.innerHTML =
-          '<div class="tut-hp-arrow-dmg">−1 HP</div>' +
+          '<div class="tut-hp-arrow-dmg">' + T('hp.damage_minus', { n: 1 }) + '</div>' +
           '<div class="tut-hp-arrow-line">→</div>';
         strip.appendChild(arrow);
       }
@@ -333,9 +311,7 @@
 
     const footnote = document.createElement('div');
     footnote.className = 'tut-footnote';
-    footnote.innerHTML =
-      'Each attack drops the bar by <b>0 to 3</b> buckets.  Past CRITICAL, the POKEMON faints.  ' +
-      'Stronger moves drop more — THUNDER can land a 3-bucket hit in one go.';
+    footnote.innerHTML = T('tut.hp.footnote');
     wrap.appendChild(footnote);
 
     host.appendChild(wrap);
@@ -354,16 +330,14 @@
       btn.className = 'move-btn';
       btn.type = 'button';
       btn.disabled = true;
-      btn.innerHTML = m.name + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
+      btn.innerHTML = T('move.' + m.id) + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
       menu.appendChild(btn);
     }
     host.appendChild(menu);
 
     const note = document.createElement('div');
     note.className = 'tut-footnote';
-    note.innerHTML =
-      'THUNDERBOLT is the reliable workhorse — solid PWR, never misses.<br>' +
-      'THUNDER hits harder but only lands 55% of the time — a gamble worth taking when CHARMANDER is already low.';
+    note.innerHTML = T('tut.moves.footnote');
     host.appendChild(note);
   }
 
@@ -392,7 +366,7 @@
       dwell: 1400, row: 0,
       enter(stage) {
         stage.classList.add('attack-pika');
-        spawnTurnFlash(stage, 'opp', '−1 HP', 'var(--cb-vermillion)');
+        spawnTurnFlash(stage, 'opp', T('hp.damage_minus', { n: 1 }), 'var(--cb-vermillion)');
       },
       leave(stage) { stage.classList.remove('attack-pika'); },
     },
@@ -400,7 +374,7 @@
       dwell: 1400, row: 1,
       enter(stage) {
         stage.classList.add('attack-charm');
-        spawnTurnFlash(stage, 'player', '−1 HP', 'var(--cb-vermillion)');
+        spawnTurnFlash(stage, 'player', T('hp.damage_minus', { n: 1 }), 'var(--cb-vermillion)');
       },
       leave(stage) { stage.classList.remove('attack-charm'); },
     },
@@ -462,8 +436,8 @@
       '<div class="grass-rim"></div>' +
       '<div class="platform opponent"></div>' +
       '<div class="platform player"></div>' +
-      '<div class="sprite-host opponent"><img class="poke-sprite" src="assets/charmander-front.png" alt="CHARMANDER"/></div>' +
-      '<div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="PIKACHU"/></div>';
+      '<div class="sprite-host opponent"><img class="poke-sprite" src="assets/charmander-front.png" alt="' + T('pokemon.charmander') + '"/></div>' +
+      '<div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="' + T('pokemon.pikachu') + '"/></div>';
 
     /* HP boxes — append to stage so the existing absolute positioning
        on .hp-box.opponent / .hp-box.player puts them in the right
@@ -474,11 +448,11 @@
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
     const charmHp = window.HPBar.mount(oppHpHost, {
-      name: 'CHARMANDER', side: 'opponent', level: 5,
+      name: T('pokemon.charmander'), side: 'opponent', level: 5,
       numBuckets: window.Battle.NUM_BUCKETS,
     });
     const pikaHp = window.HPBar.mount(playerHpHost, {
-      name: 'PIKACHU', side: 'player', level: 5,
+      name: T('pokemon.pikachu'), side: 'player', level: 5,
       numBuckets: window.Battle.NUM_BUCKETS,
     });
     charmHp.set(0);
@@ -490,9 +464,9 @@
     const seq = document.createElement('div');
     seq.className = 'tut-turn';
     const rows = [
-      { num: '1', who: 'PIKACHU',    action: 'You pick a move.  PIKACHU attacks first.' },
-      { num: '2', who: 'CHARMANDER', action: 'Wild CHARMANDER strikes back with EMBER.' },
-      { num: '3', who: '— — —',      action: 'Both HP bars update.  State has changed.' },
+      { num: '1', who: T('tut.turn.row1.who'), action: T('tut.turn.row1.action') },
+      { num: '2', who: T('tut.turn.row2.who'), action: T('tut.turn.row2.action') },
+      { num: '3', who: T('tut.turn.row3.who'), action: T('tut.turn.row3.action') },
     ];
     const rowNodes = [];
     for (const r of rows) {
@@ -510,8 +484,7 @@
 
     const note = document.createElement('div');
     note.className = 'tut-footnote';
-    note.textContent =
-      'PIKACHU is faster (base speed 90 vs 65), so it always moves first.';
+    note.textContent = T('tut.turn.footnote');
     host.appendChild(note);
 
     /* Kick off the loop with an HP context — bars drop a bucket per
@@ -533,9 +506,9 @@
       '<div class="tut-winlose-icon">' +
         '<img src="assets/charmander-front.png" class="poke-sprite tut-mini-sprite faint">' +
       '</div>' +
-      '<div class="tut-winlose-title">YOU WIN!</div>' +
-      '<div class="tut-winlose-reward">+10 reward</div>' +
-      '<div class="tut-winlose-detail">CHARMANDER fainted.  Episode ends.</div>';
+      '<div class="tut-winlose-title">'  + T('tut.winlose.win.title')  + '</div>' +
+      '<div class="tut-winlose-reward">' + T('tut.winlose.win.reward') + '</div>' +
+      '<div class="tut-winlose-detail">' + T('tut.winlose.win.detail') + '</div>';
     wrap.appendChild(wins);
 
     const loses = document.createElement('div');
@@ -544,18 +517,16 @@
       '<div class="tut-winlose-icon">' +
         '<img src="assets/pikachu-back.png" class="poke-sprite tut-mini-sprite faint">' +
       '</div>' +
-      '<div class="tut-winlose-title">YOU LOSE.</div>' +
-      '<div class="tut-winlose-reward">-10 reward</div>' +
-      '<div class="tut-winlose-detail">PIKACHU fainted.  Try again.</div>';
+      '<div class="tut-winlose-title">'  + T('tut.winlose.lose.title')  + '</div>' +
+      '<div class="tut-winlose-reward">' + T('tut.winlose.lose.reward') + '</div>' +
+      '<div class="tut-winlose-detail">' + T('tut.winlose.lose.detail') + '</div>';
     wrap.appendChild(loses);
 
     host.appendChild(wrap);
 
     const note = document.createElement('div');
     note.className = 'tut-footnote';
-    note.textContent =
-      'Each turn that does not end the battle costs -1 reward.  ' +
-      'Short, decisive battles are more rewarding than long grinds.';
+    note.textContent = T('tut.winlose.footnote');
     host.appendChild(note);
   }
 

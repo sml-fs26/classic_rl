@@ -41,7 +41,13 @@
   const N       = STATES.length;                       // 25
   const GAMMA   = 1;     // Undiscounted — every trajectory terminates (win/loss).
 
-  function bucketName(b) { return b >= NB ? 'FAINT' : BUCKETS[b].toUpperCase(); }
+  const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+  function bucketName(b) { return b >= NB ? T('hp.bucket.faint_short') : T('hp.bucket.' + BUCKETS[b]); }
+  function oppFormDisplay(form) { return T('pokemon.' + form); }
+  function oppMoveName(form) {
+    const id = (window.Battle.FORM_MOVE_NAME[form] || '').toLowerCase();
+    return T('move.' + id);
+  }
 
   /* Value iteration → Q* (same recipe as sceneDp). */
   function computeQstar() {
@@ -90,21 +96,18 @@
 
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'IF WE KNEW Q*, WE WOULD KNOW HOW TO PLAY OPTIMALLY';
+    heading.textContent = T('qstar.heading');
     root.appendChild(heading);
 
     const premise = document.createElement('div');
     premise.className = 'qstar-premise';
-    premise.innerHTML =
-      'In each state, the optimal play is to pick the action that achieves ' +
-      '<span class="qstar-q-star">max<sub>a</sub> Q*(s, a)</span>. ' +
-      'So if we had the Q*-table in hand, we would just argmax it.';
+    premise.innerHTML = T('qstar.premise');
     root.appendChild(premise);
 
     /* ---- Optimal-policy formula card ---- */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
-    fcard.innerHTML = '<div class="concept-formula-label">OPTIMAL POLICY</div>';
+    fcard.innerHTML = '<div class="concept-formula-label">' + T('qstar.formula.label') + '</div>';
     const f = document.createElement('div');
     fcard.appendChild(f);
     window.Katex.render(
@@ -113,7 +116,7 @@
     );
     const foot = document.createElement('div');
     foot.className = 'concept-formula-foot';
-    foot.textContent = 'In every state, pick the action with the highest Q*.';
+    foot.textContent = T('qstar.formula.foot');
     fcard.appendChild(foot);
     root.appendChild(fcard);
 
@@ -139,10 +142,10 @@
     stage.appendChild(oppHpHost);
     stage.appendChild(playerHpHost);
     const charmHp = window.HPBar.mount(oppHpHost, {
-      name: 'CHARMANDER', side: 'opponent', level: 5, numBuckets: NB,
+      name: T('pokemon.charmander'), side: 'opponent', level: 5, numBuckets: NB,
     });
     const pikaHp = window.HPBar.mount(playerHpHost, {
-      name: 'PIKACHU', side: 'player', level: 5, numBuckets: NB,
+      name: T('pokemon.pikachu'), side: 'player', level: 5, numBuckets: NB,
     });
     charmHp.set(0);
     pikaHp.set(0);
@@ -165,7 +168,7 @@
     /* ---- Closing question (bridge to sceneDp) ---- */
     const q = document.createElement('div');
     q.className = 'concept-key-question';
-    q.textContent = 'BUT HOW DO WE COMPUTE Q* ?';
+    q.textContent = T('qstar.bridge_q');
     root.appendChild(q);
 
     /* ---- Demo state machine ---- */
@@ -200,26 +203,30 @@
       if (form === lastOppForm) return;
       lastOppForm = form;
       oppSpriteEl.src = window.Battle.spriteForOpp(b);
-      oppSpriteEl.alt = window.Battle.displayNameForOpp(b);
-      if (charmHp && charmHp.setName) charmHp.setName(window.Battle.displayNameForOpp(b));
+      oppSpriteEl.alt = oppFormDisplay(form);
+      if (charmHp && charmHp.setName) charmHp.setName(oppFormDisplay(form));
     }
 
     function renderQPanel() {
       const base = stateIdx() * A;
-      const oppForm = window.Battle.displayNameForOpp(Math.min(NB - 1, charmBucket));
+      const oppForm = oppFormDisplay(window.Battle.formForOpp(Math.min(NB - 1, charmBucket)));
       let html =
-        '<div class="qstar-panel-title">STATE (YOUR=' + bucketName(pikaBucket) +
-        ', ' + oppForm + ' ' + bucketName(charmBucket) + ')</div>' +
+        '<div class="qstar-panel-title">' +
+          T('qstar.state_label', {
+            your: bucketName(pikaBucket),
+            oppName: oppForm,
+            opp: bucketName(charmBucket),
+          }) +
+        '</div>' +
         '<div class="qstar-rows">';
       for (let k = 0; k < A; k++) {
         const qv = qStar[base + k];
         const isArg = (k === argmaxA);
-        const move = window.Moves.MOVE_BY_ID[ACTIONS[k]];
         html += '<div class="qstar-row' + (isArg ? ' argmax' : '') + '">' +
                   '<span class="qstar-mark">' + (isArg ? '▶' : '') + '</span>' +
-                  '<span class="qstar-name">' + move.name + '</span>' +
+                  '<span class="qstar-name">' + T('move.' + ACTIONS[k]) + '</span>' +
                   '<span class="qstar-q">' + (qv >= 0 ? '+' : '') + qv.toFixed(2) + '</span>' +
-                  '<span class="qstar-tag">' + (isArg ? 'argmax · π*(s)' : '') + '</span>' +
+                  '<span class="qstar-tag">' + (isArg ? T('qstar.argmax_tag') : '') + '</span>' +
                 '</div>';
       }
       html += '</div>';
@@ -228,9 +235,9 @@
 
     function updateStatus(phaseLabel) {
       status.innerHTML =
-        '<span>TURN <b>' + turnIdx + '</b></span>' +
-        '<span>STATE <b>' + bucketName(pikaBucket) + ' / ' + bucketName(charmBucket) + '</b></span>' +
-        '<span>PHASE <b>' + phaseLabel + '</b></span>';
+        '<span>' + T('qstar.status.turn')  + ' <b>' + turnIdx + '</b></span>' +
+        '<span>' + T('qstar.status.state') + ' <b>' + bucketName(pikaBucket) + ' / ' + bucketName(charmBucket) + '</b></span>' +
+        '<span>' + T('qstar.status.phase') + ' <b>' + phaseLabel + '</b></span>';
     }
 
     function spawnFlash(side, text, color) {
@@ -256,7 +263,7 @@
       hideBanner();
       pickArgmax();
       renderQPanel();
-      updateStatus('SHOWING Q');
+      updateStatus(T('qstar.phase.showing'));
     }
 
     function step() {
@@ -276,18 +283,18 @@
           charmBucket = Math.min(NB, charmBucket + 1);
           charmHp.set(Math.min(charmBucket, NB - 1));
           refreshOppSprite();
-          spawnFlash('opp', '−1 HP', 'var(--cb-vermillion)');
+          spawnFlash('opp', T('hp.damage_minus', { n: 1 }), 'var(--cb-vermillion)');
           if (window.SFX) window.SFX.play('hit');
         }, 480);
         setTimeout(() => stage.classList.remove('qstar-attack'), 1100);
-        updateStatus('PIKA → ' + window.Moves.MOVE_BY_ID[ACTIONS[argmaxA]].name);
+        updateStatus(T('qstar.phase.pika_does', { move: T('move.' + ACTIONS[argmaxA]) }));
         dwell = 1400;
 
       } else if (phase === 'attack') {
         if (charmBucket >= NB) {
           phase = 'banner-win';
-          showBanner('✓ WIN  +10', 'win');
-          updateStatus('OPP FAINTED — WIN');
+          showBanner(T('qstar.banner.win'), 'win');
+          updateStatus(T('qstar.phase.opp_fainted'));
           if (window.SFX) window.SFX.play('win');
           dwell = 2600;
         } else {
@@ -299,24 +306,24 @@
           void stage.offsetWidth;
           stage.classList.add('qstar-counter');
           const oppForm = window.Battle.formForOpp(Math.min(NB - 1, charmBucket));
-          const counterName = window.Battle.FORM_MOVE_NAME[oppForm];
+          const counterName = oppMoveName(oppForm);
           if (window.SFX) window.SFX.play(COUNTER_SFX[oppForm]);
           setTimeout(() => {
             pikaBucket = Math.min(NB, pikaBucket + 1);
             pikaHp.set(Math.min(pikaBucket, NB - 1));
-            spawnFlash('pika', '−1 HP', 'var(--cb-vermillion)');
+            spawnFlash('pika', T('hp.damage_minus', { n: 1 }), 'var(--cb-vermillion)');
             if (window.SFX) window.SFX.play('hit');
           }, 480);
           setTimeout(() => stage.classList.remove('qstar-counter'), 1100);
-          updateStatus('CHARM → ' + counterName);
+          updateStatus(T('qstar.phase.charm_does', { move: counterName }));
           dwell = 1400;
         }
 
       } else if (phase === 'counter') {
         if (pikaBucket >= NB) {
           phase = 'banner-loss';
-          showBanner('✗ LOSS  −10', 'loss');
-          updateStatus('PIKA FAINTED — LOSS');
+          showBanner(T('qstar.banner.loss'), 'loss');
+          updateStatus(T('qstar.phase.pika_fainted'));
           if (window.SFX) window.SFX.play('loss');
           dwell = 2600;
         } else {
@@ -324,7 +331,7 @@
           phase = 'show';
           pickArgmax();
           renderQPanel();
-          updateStatus('SHOWING Q');
+          updateStatus(T('qstar.phase.showing'));
           dwell = 1800;
         }
 
@@ -345,7 +352,7 @@
     refreshOppSprite();
     pickArgmax();
     renderQPanel();
-    updateStatus('SHOWING Q');
+    updateStatus(T('qstar.phase.showing'));
     /* Kick off the loop. */
     step();
 

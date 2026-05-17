@@ -29,8 +29,9 @@
 
   const NB = window.Battle.NUM_BUCKETS;
   const BUCKETS = window.Battle.BUCKETS;
+  const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
-  function bucketName(b) { return b >= NB ? 'FAINT' : BUCKETS[b].toUpperCase(); }
+  function bucketName(b) { return b >= NB ? T('hp.bucket.faint_short') : T('hp.bucket.' + BUCKETS[b]); }
   function bucketClass(b) {
     if (b === 0) return '';
     if (b === 1) return 'b1';
@@ -39,7 +40,7 @@
     return 'b4';
   }
   function bucketPct(b) { return Math.max(0, (NB - b) * 100 / NB); }
-  function moveName(id) { return window.Moves.MOVE_BY_ID[id].name; }
+  function moveName(id) { return T('move.' + id); }
   function fmtSigned(v, dp) {
     const d = dp === undefined ? 2 : dp;
     return (v >= 0 ? '+' : '') + v.toFixed(d);
@@ -86,7 +87,7 @@
       '<div class="traj-box-label">r<sub>' + step + '</sub></div>' +
       '<div class="traj-box-reward-body">' + sign + turn.reward + '</div>';
     if (isTerminal) {
-      inner += '<div class="traj-box-terminal-tag">' + (turn.won ? '✓ WIN' : '✗ LOSS') + '</div>';
+      inner += '<div class="traj-box-terminal-tag">' + (turn.won ? T('terminal.win') : T('terminal.loss')) + '</div>';
     }
     rBox.innerHTML = inner;
     rBox.addEventListener('click', () => onSelect(step - 1));
@@ -130,13 +131,13 @@
 
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'OBJECTIVE';
+    heading.textContent = T('obj.heading');
     root.appendChild(heading);
 
     /* ---- G formula card ---- */
     const c1 = document.createElement('div');
     c1.className = 'concept-formula-card';
-    c1.innerHTML = '<div class="concept-formula-label">RETURN FROM TIME i</div>';
+    c1.innerHTML = '<div class="concept-formula-label">' + T('obj.g.label') + '</div>';
     const f1 = document.createElement('div');
     c1.appendChild(f1);
     window.Katex.render(
@@ -145,17 +146,14 @@
     );
     const foot1 = document.createElement('div');
     foot1.className = 'concept-formula-foot';
-    foot1.textContent = 'Sum of rewards from step i until the trajectory τ ends. ' +
-      'The return depends on which trajectory you played — different rolls of the dice, different G.';
+    foot1.textContent = T('obj.g.foot');
     c1.appendChild(foot1);
     root.appendChild(c1);
 
     /* ---- Concrete G illustration ---- */
     const illus = document.createElement('div');
     illus.className = 'g-illus';
-    illus.innerHTML =
-      '<div class="g-illus-label">ONE TRAJECTORY τ · click any <span class="g-r">r<sub>t</sub></span>' +
-      ' to recompute G<sub>t</sub>(τ)</div>';
+    illus.innerHTML = '<div class="g-illus-label">' + T('obj.illus.label') + '</div>';
     const rollout = document.createElement('div');
     rollout.className = 'traj-rollout g-illus-rollout';
     illus.appendChild(rollout);
@@ -181,7 +179,7 @@
     /* ---- Q* formula card ---- */
     const c2 = document.createElement('div');
     c2.className = 'concept-formula-card';
-    c2.innerHTML = '<div class="concept-formula-label">OPTIMAL ACTION-VALUE FUNCTION Q*</div>';
+    c2.innerHTML = '<div class="concept-formula-label">' + T('obj.qstar.label') + '</div>';
     const f2 = document.createElement('div');
     c2.appendChild(f2);
     window.Katex.render(
@@ -190,9 +188,7 @@
     );
     const foot2 = document.createElement('div');
     foot2.className = 'concept-formula-foot';
-    foot2.textContent =
-      'The expected return when you take action a in state s and then play optimally thereafter. ' +
-      'This is what the agent ultimately wants to know — once you have Q*, optimal play is just argmax_a Q*(s, a).';
+    foot2.textContent = T('obj.qstar.foot');
     c2.appendChild(foot2);
     root.appendChild(c2);
 
@@ -202,28 +198,22 @@
     variance.innerHTML =
       '<div class="g-variance-title">' +
         '<span class="g-variance-caret">▶</span> ' +
-        'Q* IS THE EXPECTED G — VARIANCE LIVES IN ONE TRAJECTORY' +
-        '<span class="g-variance-hint">(click to expand)</span>' +
+        T('obj.var.title') +
+        '<span class="g-variance-hint">' + T('obj.var.hint') + '</span>' +
       '</div>' +
       '<div class="g-variance-body">' +
-        '<div class="g-variance-explainer">' +
-          'G<sub>1</sub>(τ) is a <em>random variable</em>. Two rollouts from the same start can land far apart. ' +
-          '<b>Q*</b> is the maximum, over all policies, of the average G under that policy.  Pick a policy below, ' +
-          'press SAMPLE to draw 20 trajectories; each bar is one G<sub>1</sub>(τ).  The dashed line is the mean — an ' +
-          'estimate of Q under that policy.  <span class="g-r">Try different policies — different distribution, ' +
-          'different mean.</span>' +
-        '</div>' +
+        '<div class="g-variance-explainer">' + T('obj.var.explainer') + '</div>' +
         '<div class="g-variance-right">' +
           '<div class="g-variance-policy-row">' +
-            'POLICY:' +
-            '<button class="g-variance-policy" data-policy="quick_attack">QUICK</button>' +
-            '<button class="g-variance-policy active" data-policy="thunderbolt">BOLT</button>' +
-            '<button class="g-variance-policy" data-policy="thunder">THUN</button>' +
-            '<button class="g-variance-policy" data-policy="random">RANDOM</button>' +
+            T('obj.var.policy_label') +
+            '<button class="g-variance-policy" data-policy="quick_attack">' + T('obj.var.policy.quick')  + '</button>' +
+            '<button class="g-variance-policy active" data-policy="thunderbolt">' + T('obj.var.policy.bolt') + '</button>' +
+            '<button class="g-variance-policy" data-policy="thunder">' + T('obj.var.policy.thun') + '</button>' +
+            '<button class="g-variance-policy" data-policy="random">' + T('obj.var.policy.random') + '</button>' +
           '</div>' +
-          '<div class="g-variance-stats" id="g-variance-stats">N = 0 · mean — · range —</div>' +
+          '<div class="g-variance-stats" id="g-variance-stats">' + T('obj.var.stats_empty') + '</div>' +
           '<div class="g-variance-chart" id="g-variance-chart"></div>' +
-          '<button class="poke-btn" id="g-variance-sample">▶ SAMPLE 20 TRAJECTORIES</button>' +
+          '<button class="poke-btn" id="g-variance-sample">' + T('obj.var.sample_btn') + '</button>' +
         '</div>' +
       '</div>';
     root.appendChild(variance);
@@ -261,16 +251,19 @@
       const chart = document.getElementById('g-variance-chart');
       if (!chart || !stats) return;
       if (G_samples.length === 0) {
-        stats.innerHTML = 'N = 0 · mean — · range —';
-        chart.innerHTML = '<div class="g-variance-empty">(no samples yet — press SAMPLE to draw 20)</div>';
+        stats.innerHTML = T('obj.var.stats_empty');
+        chart.innerHTML = '<div class="g-variance-empty">' + T('obj.var.empty_chart') + '</div>';
         return;
       }
       const mean = G_samples.reduce((a, b) => a + b, 0) / G_samples.length;
       const lo = Math.min(...G_samples);
       const hi = Math.max(...G_samples);
-      stats.innerHTML =
-        'N = <b>' + G_samples.length + '</b> · mean <b>' + (mean >= 0 ? '+' : '') + mean.toFixed(2) + '</b> · range [<b>' +
-        (lo >= 0 ? '+' : '') + lo + '</b>, <b>' + (hi >= 0 ? '+' : '') + hi + '</b>]';
+      stats.innerHTML = T('obj.var.stats', {
+        n: G_samples.length,
+        mean: (mean >= 0 ? '+' : '') + mean.toFixed(2),
+        lo: (lo >= 0 ? '+' : '') + lo,
+        hi: (hi >= 0 ? '+' : '') + hi,
+      });
       /* Render each sample as a horizontal bar, ordered by G (descending),
          left-anchored, width proportional to |G|.  Positive = blue, negative = vermillion. */
       const sorted = G_samples.slice().sort((a, b) => b - a);
