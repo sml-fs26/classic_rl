@@ -41,10 +41,7 @@
        abstraction. */
     const markov = document.createElement('div');
     markov.className = 'sc0-mdp-markov';
-    markov.innerHTML =
-      '<b>MARKOV ASSUMPTION:</b> the next (state, reward) depends only on the <em>current</em> ' +
-      '(state, action), not the full history.  We assume it holds here.  Sleep counters, paralysis, and held items ' +
-      'would break it in a real Pokemon game — we abstract them away.';
+    markov.innerHTML = T('mdp.markov');
     wrap.appendChild(markov);
 
     /* The battle stage. Sprites are visible from step 0; HP bars + move
@@ -148,7 +145,7 @@
       stage.classList.add('sc0-attacking');
       const flash = document.createElement('div');
       flash.className = 'sc0-damage-flash';
-      flash.textContent = '−1 HP';
+      flash.textContent = T('hp.damage_minus', { n: 1 });
       stage.appendChild(flash);
       setTimeout(() => flash.remove(), 1100);
       setTimeout(() => stage.classList.remove('sc0-attacking'), 1100);

@@ -33,127 +33,57 @@
   const N       = STATES.length;
   const GAMMA   = 1;
 
+  const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+
   /* ---------- Step content (left column) ----------
      A through E4 carry text + KaTeX formulas.  F is the live demo
-     and uses the left column as the step-detail panel instead. */
+     and uses the left column as the step-detail panel instead.  The
+     `title` / `body` / `foot` strings live in i18n.js under
+     sd.step.<id>.* so the language toggle re-paints the card. */
   const STEPS = [
-    {
-      id: 'A',
-      title: 'A — WE WANT A TABLE OF Q*',
-      body:
-        'Aim: build a table <span class="sd-q-est">q[s, a]</span> that approximates the optimal action-value ' +
-        '<span class="sd-q">Q*(s, a)</span> at every state and action.',
-      latex: [
-        String.raw`\mathtt{q}[s, a] \;\approx\; Q^{\star}(s, a) \qquad \text{for all } s \in S,\; a \in A`,
-      ],
-    },
-    {
-      id: 'B',
-      title: 'B — INITIALISE THE TABLE',
-      body:
-        'We don\'t know <span class="sd-q">Q*</span> yet.  Seed every entry of <span class="sd-q-est">q</span> ' +
-        'to zero (or tiny noise so ties break randomly).',
-      latex: [
-        String.raw`\mathtt{q}[s, a] \;:=\; 0 \qquad \text{for all } (s, a)`,
-      ],
-    },
-    {
-      id: 'D',
-      title: 'D — PLAY THE GAME TO GENERATE A TRAJECTORY',
-      body:
-        'We don\'t have P.  We <em>do</em> get to play.  The world hands us a stream of ' +
-        '(state, action, reward, next state) tuples — pick the next action by ε-greedy on the <em>current</em> ' +
-        '<span class="sd-q-est">q</span>, and let the environment supply the rest.',
-      latex: [
-        String.raw`s_1 \;\xrightarrow{a_1}\; r_1 \;\xrightarrow{}\; s_2 \;\xrightarrow{a_2}\; r_2 \;\xrightarrow{}\; s_3 \;\xrightarrow{a_3}\; r_3 \;\xrightarrow{}\; \cdots`,
-      ],
-      foot: 'The second &laquo;A&raquo; in S-A-R-S-A is the action we pick at the next state — needed for the update on the previous step.',
-    },
-    {
-      id: 'E1',
-      title: 'E1 — REPLACE THE EXPECTATION WITH ONE SAMPLE',
-      body:
-        'By Bellman, <span class="sd-q">Q*(s, a)</span> is an expectation over the random next state and reward. ' +
-        'We don\'t get the expectation — we get one sample.  Drop the <span class="sd-q">E</span> and use it:',
-      latex: [
+    { id: 'A',  latex: [String.raw`\mathtt{q}[s, a] \;\approx\; Q^{\star}(s, a) \qquad \text{for all } s \in S,\; a \in A`] },
+    { id: 'B',  latex: [String.raw`\mathtt{q}[s, a] \;:=\; 0 \qquad \text{for all } (s, a)`] },
+    { id: 'D',  latex: [String.raw`s_1 \;\xrightarrow{a_1}\; r_1 \;\xrightarrow{}\; s_2 \;\xrightarrow{a_2}\; r_2 \;\xrightarrow{}\; s_3 \;\xrightarrow{a_3}\; r_3 \;\xrightarrow{}\; \cdots`],
+      hasFoot: true },
+    { id: 'E1', latex: [
         String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\!\left[\, R \;+\; Q^{\star}(S', A') \,\right]`,
         String.raw`\phantom{Q^{\star}(s, a)}\;\approx\; r \;+\; Q^{\star}(s', a')`,
-      ],
-      foot:
-        'One-sample Monte-Carlo estimate of the right-hand side. ' +
-        '<em>Subtle:</em> with A′ from our ε-greedy policy, the LHS is technically Q under the current policy ' +
-        '(not Q*); as ε → 0 the policy becomes greedy and q → Q*. This is what makes SARSA <em>on-policy</em>.',
-    },
-    {
-      id: 'E2',
-      title: 'E2 — NAME THE RIGHT-HAND SIDE «TARGET»',
-      body:
-        'We don\'t have <span class="sd-q">Q*</span> on the right either — only our table <span class="sd-q-est">q</span>. ' +
-        'Plug it in.  Call the resulting number the <b>target</b>: that\'s where we want <span class="sd-q-est">q[s, a]</span> to be.',
-      latex: [
+      ], hasFoot: true },
+    { id: 'E2', latex: [
         String.raw`\mathtt{target} \;:=\; r \;+\; \mathtt{q}[s', a']`,
         String.raw`\mathtt{q}[s, a] \;\stackrel{\text{want}}{=}\; \mathtt{target}`,
-      ],
-    },
-    {
-      id: 'E3',
-      title: 'E3 — MOVE q TOWARD THE TARGET (TWO CASES)',
-      body:
-        'If <span class="sd-q-est">q[s, a]</span> is <em>below</em> the target, nudge it <em>up</em>. ' +
-        'If it\'s <em>above</em>, nudge it <em>down</em>.  Step size <span class="sd-alpha">α ∈ (0, 1)</span> ' +
-        'is small enough not to overshoot.',
-      latex: [
-        String.raw`\begin{aligned}
+      ] },
+    { id: 'E3', latex: [String.raw`\begin{aligned}
           \text{if } \mathtt{q}[s, a] &< \mathtt{target}: && \mathtt{q}[s, a] \;\mathrel{+}=\; \alpha\,(\,\mathtt{target} - \mathtt{q}[s, a]\,) \\[4pt]
           \text{if } \mathtt{q}[s, a] &> \mathtt{target}: && \mathtt{q}[s, a] \;\mathrel{-}=\; \alpha\,(\,\mathtt{q}[s, a] - \mathtt{target}\,)
-        \end{aligned}`,
-      ],
-      foot: 'Same step size α in both cases.  Same magnitude of correction.  Only the sign differs — and α(target − q) already carries that sign for free.',
-    },
-    {
-      id: 'E4',
-      title: 'E4 — THE TWO CASES COLLAPSE INTO ONE LINE',
-      body:
-        'Flip the sign of the «above» case: <span class="sd-q-est">−α(q − target)</span> = <span class="sd-q-est">+α(target − q)</span>. ' +
-        'Both branches become the same update.  <b>This is SARSA.</b>',
-      latex: [
-        String.raw`\boxed{\;\mathtt{q}[s, a] \;\leftarrow\; \mathtt{q}[s, a] \;+\; \alpha\,\bigl(\,\mathtt{target} \;-\; \mathtt{q}[s, a]\,\bigr)\;}`,
-      ],
-      foot: 'TD error = target − current estimate.  Apply this once per (s, a, r, s′, a′) tuple as the agent plays.',
-    },
-    {
-      id: 'F',
-      title: 'F — SARSA ON ONE TRAJECTORY',
-      body: '',     /* Left column becomes the step-detail panel; no card body. */
-      latex: [],
-    },
-    {
-      id: 'G',
-      title: 'G — ONE LINE → Q-LEARNING (OFF-POLICY)',
-      body:
-        '<b>SARSA</b> targets <span class="sd-q-est">r + q[s′, <em>a′</em>]</span> — the action <em>actually taken</em> at s′ ' +
-        'under the current ε-greedy policy. <b>Q-learning</b> targets <span class="sd-q-est">r + max<sub>a′</sub> q[s′, a′]</span> — ' +
-        'the <em>best</em> action available at s′, regardless of what the policy picked. One operator changes: sampled → argmax. ' +
-        'Q-learning is <b>off-policy</b>: its target is independent of the behaviour policy.',
-      latex: [
+        \end{aligned}`], hasFoot: true },
+    { id: 'E4', latex: [String.raw`\boxed{\;\mathtt{q}[s, a] \;\leftarrow\; \mathtt{q}[s, a] \;+\; \alpha\,\bigl(\,\mathtt{target} \;-\; \mathtt{q}[s, a]\,\bigr)\;}`],
+      hasFoot: true },
+    { id: 'F',  latex: [],     /* Left column becomes the step-detail panel. */
+      noBody: true },
+    { id: 'G',  latex: [
         String.raw`\textbf{SARSA target:} \quad r \;+\; \mathtt{q}[s', \; a']`,
         String.raw`\textbf{Q-learning target:} \quad r \;+\; \max_{a'} \mathtt{q}[s', \; a']`,
-      ],
-      foot: 'As ε → 0 the policy becomes greedy and the two targets agree.  Otherwise they differ.',
-    },
+      ], hasFoot: true },
   ];
 
+  function stepTitle(step) { return T('sd.step.' + step.id + '.title'); }
+  function stepBody(step)  {
+    if (step.noBody) return '';
+    return T('sd.step.' + step.id + '.body');
+  }
+  function stepFoot(step)  {
+    if (!step.hasFoot) return '';
+    return T('sd.step.' + step.id + '.foot');
+  }
+
   /* ---------- Helpers ---------- */
-  function shortMove(id) {
-    if (id === 'quick_attack') return 'QUICK';
-    if (id === 'thunderbolt')  return 'BOLT';
-    if (id === 'thunder')      return 'THUN';
-    return id;
+  function shortMove(id) { return T('move.short.' + id); }
+  function fullMove(id)  { return T('move.' + id); }
+  function bucketName(b) {
+    const key = window.Battle.BUCKETS[b];
+    return key ? T('hp.bucket.' + key) : T('hp.bucket.fainted');
   }
-  function fullMove(id) {
-    return (window.Moves.MOVE_BY_ID[id] && window.Moves.MOVE_BY_ID[id].name) || id;
-  }
-  function bucketName(b) { return (window.Battle.BUCKETS[b] || 'fainted').toUpperCase(); }
   function bucketClass(b) {
     if (b === 0) return '';
     if (b === 1) return 'b1';
@@ -167,7 +97,7 @@
     return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2);
   }
   function stateLabel(s) {
-    if (s.terminal) return s.win ? 'WIN' : 'LOSS';
+    if (s.terminal) return s.win ? T('terminal.win') : T('terminal.loss');
     return bucketName(s.your) + ' / ' + bucketName(s.opp);
   }
 
@@ -217,16 +147,16 @@
        ========================================================== */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'DERIVING SARSA';
+    heading.textContent = T('sd.heading');
     root.appendChild(heading);
 
     const ctrls = document.createElement('div');
     ctrls.className = 'sd-controls';
     ctrls.innerHTML =
-      '<button class="poke-btn" id="sd-prev">◀ PREV</button>' +
-      '<button class="poke-btn" id="sd-next">NEXT ▶</button>' +
-      '<button class="poke-btn" id="sd-reset">RESET</button>' +
-      '<div class="sd-status">STEP <b id="sd-step-idx">1</b> / ' + STEPS.length + ' · <b id="sd-step-id">A</b></div>';
+      '<button class="poke-btn" id="sd-prev">'  + T('sd.btn.prev')  + '</button>' +
+      '<button class="poke-btn" id="sd-next">'  + T('sd.btn.next')  + '</button>' +
+      '<button class="poke-btn" id="sd-reset">' + T('sd.btn.reset') + '</button>' +
+      '<div class="sd-status">' + T('sd.status', { total: STEPS.length }) + '</div>';
     root.appendChild(ctrls);
 
     /* 2-column row: left = card content, right = persistent illustration. */
@@ -252,7 +182,7 @@
     right.appendChild(tapeWrap);
     const tapeTitle = document.createElement('div');
     tapeTitle.className = 'sd-f-tape-title';
-    tapeTitle.innerHTML = 'TRAJECTORY <span class="sd-f-tape-count" id="sd-f-tape-count"></span>';
+    tapeTitle.innerHTML = T('sd.tape.title') + ' <span class="sd-f-tape-count" id="sd-f-tape-count"></span>';
     tapeWrap.appendChild(tapeTitle);
     const tape = document.createElement('div');
     tape.className = 'sd-f-tape';
@@ -406,7 +336,8 @@
 
     function renderIllusTape(highlightIdx) {
       const n = illusTraj.length;
-      document.getElementById('sd-f-tape-count').textContent = n > 0 ? '· ' + n + ' transitions (illustration)' : '';
+      document.getElementById('sd-f-tape-count').textContent =
+        n > 0 ? T('sd.tape.illus_count', { n: n }) : '';
       let html = '';
       for (let i = 0; i < n; i++) {
         const t = illusTraj[i];
@@ -428,7 +359,7 @@
       const co = document.createElement('div');
       co.className = 'sd-cell-target-callout';
       co.innerHTML =
-        '<div class="sd-callout-title">TARGET</div>' +
+        '<div class="sd-callout-title">' + T('sd.target.label') + '</div>' +
         '<div class="sd-callout-eq">r + q[s′, a′]</div>' +
         '<div class="sd-callout-eq">= ' + fmt(t.r) + ' + +0.00</div>' +
         '<div class="sd-callout-val">= <b>' + fmt(target) + '</b></div>';
@@ -448,16 +379,18 @@
       const qPct = pctOf(0);
       const tgPct = pctOf(targetVal);
 
+      const titleStr = mode === 'two-arrow' ? T('sd.numline.two') : T('sd.numline.one');
+      const tgtLabel = T('sd.numline.tgt_label', { v: fmt(targetVal) });
       const html =
-        '<div class="sd-numline-title">' + (mode === 'two-arrow' ? 'TWO CASES — q vs target' : 'COLLAPSED — one update') + '</div>' +
+        '<div class="sd-numline-title">' + titleStr + '</div>' +
         '<div class="sd-numline-track">' +
           '<div class="sd-numline-axis"></div>' +
-          '<div class="sd-numline-dot q"     style="left:' + qPct  + '%"><div class="sd-numline-label">q = +0.00</div></div>' +
-          '<div class="sd-numline-dot tgt"   style="left:' + tgPct + '%"><div class="sd-numline-label">target = ' + fmt(targetVal) + '</div></div>' +
+          '<div class="sd-numline-dot q"     style="left:' + qPct  + '%"><div class="sd-numline-label">' + T('sd.numline.q_label') + '</div></div>' +
+          '<div class="sd-numline-dot tgt"   style="left:' + tgPct + '%"><div class="sd-numline-label">' + tgtLabel + '</div></div>' +
           (mode === 'two-arrow'
-            ? '<div class="sd-numline-arrow ' + (targetVal > 0 ? 'up'   : 'down') + '" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">α(target − q)</div>' +
-              '<div class="sd-numline-arrow ' + (targetVal > 0 ? 'down' : 'up')   + ' shadow" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">other case (sign-flipped)</div>'
-            : '<div class="sd-numline-arrow unified" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">α(target − q)</div>') +
+            ? '<div class="sd-numline-arrow ' + (targetVal > 0 ? 'up'   : 'down') + '" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">' + T('sd.numline.arrow') + '</div>' +
+              '<div class="sd-numline-arrow ' + (targetVal > 0 ? 'down' : 'up')   + ' shadow" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">' + T('sd.numline.other') + '</div>'
+            : '<div class="sd-numline-arrow unified" style="left:' + qPct + '%; width:' + Math.abs(tgPct - qPct) + '%">' + T('sd.numline.unified') + '</div>') +
         '</div>';
       numline.innerHTML = html;
     }
@@ -467,14 +400,14 @@
       qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
       tape.innerHTML = '';
       document.getElementById('sd-f-tape-count').textContent = '';
-      cap.textContent = '← THE TABLE WE WANT TO FILL.  EACH CELL = ONE (STATE, ACTION).';
+      cap.textContent = T('sd.illus.A');
     }
 
     function illusB() {
       qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
       tape.innerHTML = '';
       document.getElementById('sd-f-tape-count').textContent = '';
-      cap.textContent = '← INITIALISING q[s, a] := 0 FOR EVERY CELL';
+      cap.textContent = T('sd.illus.B');
       /* Stagger-flash +0.00 into each cell, then leave it visible. */
       const allCells = qHost.querySelectorAll('.q-cell');
       allCells.forEach((cell, idx) => {
@@ -493,7 +426,7 @@
       qHost.querySelectorAll('.q-val').forEach(v => v.textContent = '+0.00');
       renderIllusTape(-1);
       paintIllusTraj({});
-      cap.textContent = '← ONE SAMPLED TRAJECTORY.  ε-greedy ON THE CURRENT q (ALL ZERO ⇒ UNIFORM RANDOM).';
+      cap.textContent = T('sd.illus.D');
     }
 
     function illusE1() {
@@ -501,7 +434,7 @@
       qHost.querySelectorAll('.q-val').forEach(v => v.textContent = '+0.00');
       renderIllusTape(illusActiveIdx);
       paintIllusTraj({ ghost: true });
-      cap.textContent = '← THIS ONE SAMPLE IS WHAT WE USE INSTEAD OF THE EXPECTATION.';
+      cap.textContent = T('sd.illus.E1');
     }
 
     function illusE2() {
@@ -510,7 +443,7 @@
       renderIllusTape(illusActiveIdx);
       paintIllusTraj({ activeOnly: true });
       showTargetCallout();
-      cap.textContent = '← target = r + q[s′, a′].  q[s, a] WANTS TO BE THERE.';
+      cap.textContent = T('sd.illus.E2');
     }
 
     function illusE3() {
@@ -519,7 +452,7 @@
       renderIllusTape(illusActiveIdx);
       paintIllusTraj({ activeOnly: true });
       showNumLine('two-arrow');
-      cap.textContent = '↓ q SITS BELOW target HERE — NUDGE UP BY α(target − q).';
+      cap.textContent = T('sd.illus.E3');
     }
 
     function illusE4() {
@@ -528,7 +461,7 @@
       renderIllusTape(illusActiveIdx);
       paintIllusTraj({ activeOnly: true });
       showNumLine('one-arrow');
-      cap.textContent = '↓ ONE UNIFIED UPDATE — α(target − q) — ALREADY CARRIES THE RIGHT SIGN.';
+      cap.textContent = T('sd.illus.E4');
     }
 
     function illusF() {
@@ -544,7 +477,7 @@
       const pct = convergencePct();
       cap.innerHTML =
         '<div class="sd-conv-row">' +
-          '<span class="sd-conv-label">CLOSENESS TO Q* (DP ORACLE):</span>' +
+          '<span class="sd-conv-label">' + T('sd.conv.label') + '</span>' +
           '<span class="sd-conv-track"><span class="sd-conv-fill" style="width:' + pct.toFixed(1) + '%"></span></span>' +
           '<span class="sd-conv-val">' + pct.toFixed(0) + '%</span>' +
         '</div>';
@@ -554,7 +487,7 @@
       /* Q-learning extension step.  The Q-table on the right retains
          whatever state F left behind so the comparison feels like it
          continues from there. */
-      cap.textContent = '← SARSA targets the sampled a′; Q-LEARNING targets max over a′.  Same q, two different teachers.';
+      cap.textContent = T('sd.illus.G');
       qtbl.update(Q, { suppressFlash: true });
       renderFTape();
     }
@@ -566,7 +499,7 @@
     function tapeStateThumb(s) {
       if (s.terminal) {
         const kind = s.win ? 'win' : 'loss';
-        const label = s.win ? '✓ WIN' : '✗ LOSS';
+        const label = s.win ? T('terminal.win') : T('terminal.loss');
         return '<div class="sd-f-tape-state terminal ' + kind + '"><div class="sd-f-tape-banner">' + label + '</div></div>';
       }
       const oppSrc = window.Battle.spriteForOpp(s.opp, 'gen1');
@@ -584,8 +517,13 @@
 
     function renderFTape() {
       const n = fTraj.length;
-      document.getElementById('sd-f-tape-count').textContent =
-        n > 0 ? '· ' + n + ' transition' + (n === 1 ? '' : 's') + ', cursor at ' + Math.min(fCursor, n) : '';
+      if (n === 0) {
+        document.getElementById('sd-f-tape-count').textContent = '';
+      } else {
+        const key = n === 1 ? 'sd.tape.count_singular' : 'sd.tape.count_plural';
+        document.getElementById('sd-f-tape-count').textContent =
+          T(key, { n: n, cur: Math.min(fCursor, n) });
+      }
       let html = '';
       for (let i = 0; i < n; i++) {
         const t = fTraj[i];
@@ -611,19 +549,19 @@
       const epsPct = Math.round(eps * 100);
       return (
         '<div class="sd-f-ctrls-row">' +
-          '<button class="poke-btn" id="sd-f-play">' + (playing ? '⏸ PAUSE' : '▶ PLAY') + '</button>' +
-          '<button class="poke-btn" id="sd-f-step">▶ NEXT TRANSITION</button>' +
-          '<button class="poke-btn" id="sd-f-reroll">⟲ REROLL</button>' +
-          '<button class="poke-btn" id="sd-f-clear">CLEAR q</button>' +
-          '<div class="sd-f-speed">SPEED ' +
-            '<span class="sd-f-speed-label">SLOW</span>' +
+          '<button class="poke-btn" id="sd-f-play">'   + (playing ? T('sd.f.pause') : T('sd.f.play')) + '</button>' +
+          '<button class="poke-btn" id="sd-f-step">'   + T('sd.f.step_btn') + '</button>' +
+          '<button class="poke-btn" id="sd-f-reroll">' + T('sd.f.reroll')   + '</button>' +
+          '<button class="poke-btn" id="sd-f-clear">'  + T('sd.f.clear')    + '</button>' +
+          '<div class="sd-f-speed">' + T('sd.f.speed') + ' ' +
+            '<span class="sd-f-speed-label">' + T('sd.f.speed.slow') + '</span>' +
             '<input type="range" id="sd-f-speed-range" min="0" max="4" step="1" value="' + playSpeedLvl + '">' +
-            '<span class="sd-f-speed-label">FAST</span>' +
+            '<span class="sd-f-speed-label">' + T('sd.f.speed.fast') + '</span>' +
           '</div>' +
-          '<div class="sd-f-eps">ε <b id="sd-f-eps-val">' + eps.toFixed(2) + '</b>' +
+          '<div class="sd-f-eps">' + T('sd.f.eps') + ' <b id="sd-f-eps-val">' + eps.toFixed(2) + '</b>' +
             '<input type="range" id="sd-f-eps-range" min="0" max="100" step="5" value="' + epsPct + '">' +
           '</div>' +
-          '<div class="sd-f-alpha-fixed">α = <b>' + ALPHA.toFixed(2) + '</b></div>' +
+          '<div class="sd-f-alpha-fixed">' + T('sd.f.alpha', { a: ALPHA.toFixed(2) }) + '</div>' +
         '</div>'
       );
     }
@@ -654,22 +592,22 @@
     function renderFDetail() {
       const ctrls = fControlsHTML();
       const head =
-        '<div class="sd-card-num">STEP 8 / ' + STEPS.length + '</div>' +
-        '<div class="sd-card-title">F — SARSA ON ONE TRAJECTORY</div>' +
+        '<div class="sd-card-num">' + T('sd.f.step_label', { i: 8, total: STEPS.length }) + '</div>' +
+        '<div class="sd-card-title">' + T('sd.step.F.title') + '</div>' +
         ctrls;
 
       if (!fTraj.length || fCursor >= fTraj.length) {
         if (!fTraj.length) {
           left.innerHTML = head +
             '<div class="sd-f-detail">' +
-              '<div class="sd-f-detail-title">NO TRANSITIONS YET</div>' +
-              '<div class="sd-f-detail-body">Reroll to sample a trajectory.</div>' +
+              '<div class="sd-f-detail-title">' + T('sd.f.no_transitions') + '</div>' +
+              '<div class="sd-f-detail-body">' + T('sd.f.no_transitions.body') + '</div>' +
             '</div>';
         } else {
           left.innerHTML = head +
             '<div class="sd-f-detail">' +
-              '<div class="sd-f-detail-title">ALL ' + fTraj.length + ' TRANSITIONS APPLIED</div>' +
-              '<div class="sd-f-detail-body">PLAY auto-rerolls.  <span class="sd-q-est">q</span> is preserved, so the next trajectory builds on what we have.</div>' +
+              '<div class="sd-f-detail-title">' + T('sd.f.all_applied', { n: fTraj.length }) + '</div>' +
+              '<div class="sd-f-detail-body">' + T('sd.f.all_applied.body') + '</div>' +
             '</div>';
         }
         wireFControls();
@@ -685,14 +623,14 @@
       const qNew     = qCurrent + ALPHA * tdErr;
 
       const aStr   = fullMove(t.a);
-      const aNStr  = t.terminal ? '— (terminal)' : fullMove(t.aNext);
+      const aNStr  = t.terminal ? T('sd.f.terminal') : fullMove(t.aNext);
       const targetCalc = t.terminal
-        ? fmt(t.r) + ' &nbsp;&nbsp; (no bootstrap — next state terminal)'
+        ? T('sd.f.target_terminal', { r: fmt(t.r) })
         : fmt(t.r) + ' + ' + fmt(qNextEst) + ' = <b>' + fmt(target) + '</b>';
 
       left.innerHTML = head +
         '<div class="sd-f-detail">' +
-          '<div class="sd-f-detail-title">TRANSITION ' + (fCursor + 1) + ' / ' + fTraj.length + '</div>' +
+          '<div class="sd-f-detail-title">' + T('sd.f.transition_of', { i: fCursor + 1, n: fTraj.length }) + '</div>' +
           '<div class="sd-f-detail-body">' +
             '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">s</span> <span class="sd-f-row-rhs">' + stateLabel(t.s) + '</span></div>' +
             '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">a</span> <span class="sd-f-row-rhs">' + aStr + '</span></div>' +
@@ -700,12 +638,12 @@
             '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">s′</span> <span class="sd-f-row-rhs">' + stateLabel(t.sNext) + '</span></div>' +
             '<div class="sd-f-row-eq"><span class="sd-f-row-lhs">a′</span> <span class="sd-f-row-rhs">' + aNStr + '</span></div>' +
             '<div class="sd-f-divider"></div>' +
-            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">target = r + q[s′, a′]</span></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">' + T('sd.f.target_label') + '</span></div>' +
             '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + targetCalc + '</span></div>' +
             '<div class="sd-f-divider"></div>' +
-            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a]  was</span> <b>' + fmt(qCurrent) + '</b></div>' +
-            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">TD error = target − q[s, a]</span> = <b class="sd-f-td">' + fmt(tdErr) + '</b></div>' +
-            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">q[s, a] += α · (target − q[s, a])</span></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">' + T('sd.f.q_was') + '</span> <b>' + fmt(qCurrent) + '</b></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">' + T('sd.f.td_label') + '</span> = <b class="sd-f-td">' + fmt(tdErr) + '</b></div>' +
+            '<div class="sd-f-calc-line"><span class="sd-f-calc-label">' + T('sd.f.update_label') + '</span></div>' +
             '<div class="sd-f-calc-line"><span class="sd-f-calc-eq">= ' + fmt(qCurrent) + ' + ' + ALPHA.toFixed(2) + ' · ' + fmt(tdErr) + ' = <b class="sd-f-qnew">' + fmt(qNew) + '</b></span></div>' +
           '</div>' +
         '</div>';
@@ -761,7 +699,7 @@
     function playButton() { return document.getElementById('sd-f-play'); }
     function setPlayLabel(isPlay) {
       const b = playButton();
-      if (b) b.textContent = isPlay ? '⏸ PAUSE' : '▶ PLAY';
+      if (b) b.textContent = isPlay ? T('sd.f.pause') : T('sd.f.play');
     }
     function pausePlay() {
       if (playTimer) { clearTimeout(playTimer); playTimer = null; }
@@ -814,9 +752,9 @@
 
       /* Render the standard card on the left. */
       let html =
-        '<div class="sd-card-num">STEP ' + (cursor + 1) + ' / ' + STEPS.length + '</div>' +
-        '<div class="sd-card-title">' + step.title + '</div>' +
-        '<div class="sd-card-body">' + step.body + '</div>';
+        '<div class="sd-card-num">' + T('sd.f.step_label', { i: cursor + 1, total: STEPS.length }) + '</div>' +
+        '<div class="sd-card-title">' + stepTitle(step) + '</div>' +
+        '<div class="sd-card-body">' + stepBody(step) + '</div>';
       left.innerHTML = html;
 
       if (step.latex && step.latex.length) {
@@ -827,11 +765,12 @@
           window.Katex.render(f, box, true);
         }
       }
-      if (step.foot) {
+      const footText = stepFoot(step);
+      if (footText) {
         const foot = document.createElement('div');
         foot.className = 'concept-formula-foot';
         foot.style.marginTop = '6px';
-        foot.innerHTML = step.foot;
+        foot.innerHTML = footText;
         left.appendChild(foot);
       }
 

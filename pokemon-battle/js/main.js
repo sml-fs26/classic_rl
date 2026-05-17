@@ -164,6 +164,10 @@
     }, { once: true });
   }
 
+  /* I18N helper used throughout init() — falls back to the literal key
+     when the i18n module hasn't loaded (defensive, shouldn't happen). */
+  const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+
   function init() {
     if (!window.DATA) {
       console.error('DATA missing -- did data/datasets.js load?');
@@ -255,28 +259,29 @@
       if (!window.Trainer || window.Trainer.hasBeenAsked()) return;
       const modal = document.createElement('div');
       modal.className = 'trainer-name-modal';
+      const fallback = T('trainer.modal.placeholder');
       modal.innerHTML =
         '<div class="trainer-name-card">' +
-          '<div class="trainer-name-title">A NEW TRAINER!</div>' +
-          '<div class="trainer-name-prompt">What is your name?</div>' +
-          '<input id="trainer-name-input" type="text" maxlength="12" placeholder="TRAINER" autofocus>' +
+          '<div class="trainer-name-title">' + T('trainer.modal.title') + '</div>' +
+          '<div class="trainer-name-prompt">' + T('trainer.modal.prompt') + '</div>' +
+          '<input id="trainer-name-input" type="text" maxlength="12" placeholder="' + fallback + '" autofocus>' +
           '<div class="trainer-name-ctrls">' +
-            '<button class="poke-btn" id="trainer-name-ok">OK</button>' +
-            '<button class="poke-btn" id="trainer-name-skip">SKIP</button>' +
+            '<button class="poke-btn" id="trainer-name-ok">' + T('trainer.modal.ok') + '</button>' +
+            '<button class="poke-btn" id="trainer-name-skip">' + T('trainer.modal.skip') + '</button>' +
           '</div>' +
-          '<div class="trainer-name-hint">12 letters max. You can leave it blank.</div>' +
+          '<div class="trainer-name-hint">' + T('trainer.modal.hint') + '</div>' +
         '</div>';
       document.body.appendChild(modal);
       const inputEl = document.getElementById('trainer-name-input');
       const finish = (name) => {
-        if (window.Trainer) window.Trainer.setName(name || 'TRAINER');
+        if (window.Trainer) window.Trainer.setName(name || fallback);
         modal.remove();
       };
       document.getElementById('trainer-name-ok').addEventListener('click', () => finish(inputEl.value));
-      document.getElementById('trainer-name-skip').addEventListener('click', () => finish('TRAINER'));
+      document.getElementById('trainer-name-skip').addEventListener('click', () => finish(fallback));
       inputEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') finish(inputEl.value);
-        else if (e.key === 'Escape') finish('TRAINER');
+        else if (e.key === 'Escape') finish(fallback);
       });
       setTimeout(() => inputEl.focus(), 0);
     }
@@ -294,16 +299,18 @@
     snOverlay.hidden = true;
     snOverlay.innerHTML =
       '<div class="speaker-notes-card">' +
-        '<div class="speaker-notes-title">SPEAKER NOTES · press <kbd>n</kbd> to close</div>' +
+        '<div class="speaker-notes-title">' + T('speakerNotes.title') + '</div>' +
         '<div class="speaker-notes-content" id="speaker-notes-content"></div>' +
       '</div>';
     document.body.appendChild(snOverlay);
     let snVisible = false;
     function refreshSpeakerNotes() {
       const key = SCENES[current] && SCENES[current].key;
-      const html = (window.SpeakerNotes && window.SpeakerNotes.getNotes(key)) || '<em>(No notes for this scene yet.)</em>';
+      const html = (window.SpeakerNotes && window.SpeakerNotes.getNotes(key)) || ('<em>' + T('speakerNotes.empty') + '</em>');
       const target = document.getElementById('speaker-notes-content');
       if (target) target.innerHTML = html;
+      const titleEl = snOverlay.querySelector('.speaker-notes-title');
+      if (titleEl) titleEl.innerHTML = T('speakerNotes.title');
     }
     function toggleSpeakerNotes() {
       snVisible = !snVisible;
@@ -352,7 +359,7 @@
        the user (lecturer) doesn't wonder where the topbar went. */
     function toggleSlideMode() {
       const wasOn = document.body.classList.toggle('slide-mode');
-      if (wasOn) showSlideToast('SLIDE MODE · press ESC or F to exit');
+      if (wasOn) showSlideToast(T('slide.toast'));
     }
     function showSlideToast(msg) {
       let toast = document.getElementById('slide-toast');
@@ -375,7 +382,7 @@
     let qjVisible = false;
     function renderQuickJump() {
       const card = qjOverlay.querySelector('.centered-card');
-      let html = '<div class="centered-title">QUICK JUMP — number to go, ESC to cancel</div>';
+      let html = '<div class="centered-title">' + T('quickjump.title') + '</div>';
       html += '<div class="quick-jump-list">';
       for (let i = 0; i < SCENES.length; i++) {
         const key = i < 10 ? String((i + 1) % 10) : '';   /* 1..9, 0 = scene 10 (index 9) */
@@ -421,26 +428,30 @@
     helpOverlay.id = 'help-overlay';
     helpOverlay.className = 'centered-overlay';
     helpOverlay.hidden = true;
-    helpOverlay.innerHTML =
-      '<div class="centered-card help-card">' +
-        '<div class="centered-title">KEYBOARD SHORTCUTS</div>' +
-        '<div class="help-row"><kbd>→</kbd><kbd>←</kbd><span>navigate scenes (or step within a scene)</span></div>' +
-        '<div class="help-row"><kbd>↓</kbd><span>fast-fill the typewriter dialog</span></div>' +
-        '<div class="help-row"><kbd>n</kbd><span>speaker notes overlay (lecturer crib)</span></div>' +
-        '<div class="help-row"><kbd>f</kbd><span>slide mode (fullscreen-feel, hide topbar)</span></div>' +
-        '<div class="help-row"><kbd>g</kbd><span>quick-jump to any scene</span></div>' +
-        '<div class="help-row"><kbd>?</kbd><span>this help overlay</span></div>' +
-        '<div class="help-row"><kbd>t</kbd><span>cycle theme: light → dark → GB → CRT</span></div>' +
-        '<div class="help-row"><kbd>m</kbd><span>toggle music on / off</span></div>' +
-        '<div class="help-row"><kbd>Esc</kbd><span>close any overlay / leave slide mode</span></div>' +
-        '<div class="help-card-section">EASTER EGGS</div>' +
-        '<div class="help-row"><span class="help-mouse">🖱</span><span>click PIKACHU on the title screen — cheek-spark zap; ten clicks for the THUNDER cameo</span></div>' +
-        '<div class="help-row"><span class="help-mouse">🖱</span><span>click any Q-cell in scene 9 step F to see its Pokedex number</span></div>' +
-      '</div>';
+    function renderHelpOverlay() {
+      helpOverlay.innerHTML =
+        '<div class="centered-card help-card">' +
+          '<div class="centered-title">' + T('help.title') + '</div>' +
+          '<div class="help-row"><kbd>→</kbd><kbd>←</kbd><span>' + T('help.row.arrows') + '</span></div>' +
+          '<div class="help-row"><kbd>↓</kbd><span>' + T('help.row.down') + '</span></div>' +
+          '<div class="help-row"><kbd>n</kbd><span>' + T('help.row.n') + '</span></div>' +
+          '<div class="help-row"><kbd>f</kbd><span>' + T('help.row.f') + '</span></div>' +
+          '<div class="help-row"><kbd>g</kbd><span>' + T('help.row.g') + '</span></div>' +
+          '<div class="help-row"><kbd>?</kbd><span>' + T('help.row.help') + '</span></div>' +
+          '<div class="help-row"><kbd>t</kbd><span>' + T('help.row.t') + '</span></div>' +
+          '<div class="help-row"><kbd>m</kbd><span>' + T('help.row.m') + '</span></div>' +
+          '<div class="help-row"><kbd>Esc</kbd><span>' + T('help.row.esc') + '</span></div>' +
+          '<div class="help-card-section">' + T('help.section.eggs') + '</div>' +
+          '<div class="help-row"><span class="help-mouse">🖱</span><span>' + T('help.row.pika') + '</span></div>' +
+          '<div class="help-row"><span class="help-mouse">🖱</span><span>' + T('help.row.qcell') + '</span></div>' +
+        '</div>';
+    }
+    renderHelpOverlay();
     document.body.appendChild(helpOverlay);
     let helpVisible = false;
     function toggleHelpOverlay() {
       helpVisible = !helpVisible;
+      if (helpVisible) renderHelpOverlay();      /* re-paint with current language */
       helpOverlay.hidden = !helpVisible;
     }
 
@@ -469,7 +480,7 @@
       overlay.innerHTML =
         '<div class="boot-stack">' +
           '<div class="boot-logo">SML</div>' +
-          '<div class="boot-tag">A REINFORCEMENT-LEARNING ADVENTURE</div>' +
+          '<div class="boot-tag">' + T('boot.tag') + '</div>' +
         '</div>';
       document.body.appendChild(overlay);
       setTimeout(() => { if (window.SFX && window.SFX.isEnabled && window.SFX.isEnabled()) window.SFX.play('cursor'); }, 220);

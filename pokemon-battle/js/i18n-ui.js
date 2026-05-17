@@ -30,6 +30,18 @@
       const on = m.classList.contains('active');
       m.textContent = window.I18N.t(on ? 'music.on' : 'music.off');
     }
+    /* Generic pass over any element with a data-i18n attribute — used
+       by the topbar buttons (PREV / NEXT / theme) so per-element wiring
+       isn't needed. Skip the lang/music/brand nodes; those are handled
+       explicitly above so they can read state (lang.toggle, music on/off). */
+    function applyDataI18n() {
+      const nodes = document.querySelectorAll('[data-i18n]');
+      nodes.forEach((n) => {
+        const key = n.getAttribute('data-i18n');
+        if (!key) return;
+        n.textContent = window.I18N.t(key);
+      });
+    }
 
     /* Wire the click → flip lang. */
     btn.addEventListener('click', () => {
@@ -43,6 +55,7 @@
       applyLabel();
       applyBrand();
       applyMusicLabel();
+      applyDataI18n();
       if (window.PokeViz && typeof window.PokeViz.rebuildAll === 'function') {
         window.PokeViz.rebuildAll();
       }
@@ -52,6 +65,7 @@
     applyLabel();
     applyBrand();
     applyMusicLabel();
+    applyDataI18n();
   }
 
   if (document.readyState === 'loading') {

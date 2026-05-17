@@ -25,8 +25,9 @@
   const NB = window.Battle.NUM_BUCKETS;
   const BUCKETS = window.Battle.BUCKETS;
   const ACTIONS = window.Moves.MOVE_IDS;
+  const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
-  function bucketName(b) { return b >= NB ? 'FAINT' : BUCKETS[b].toUpperCase(); }
+  function bucketName(b) { return b >= NB ? T('hp.bucket.faint_short') : T('hp.bucket.' + BUCKETS[b]); }
   function bucketClass(b) {
     if (b === 0) return '';
     if (b === 1) return 'b1';
@@ -35,7 +36,7 @@
     return 'b4';
   }
   function bucketPct(b) { return Math.max(0, (NB - b) * 100 / NB); }
-  function moveName(id) { return window.Moves.MOVE_BY_ID[id].name; }
+  function moveName(id) { return T('move.' + id); }
 
   /* Render one turn as THREE boxes (sᵢ, aᵢ, rᵢ) wrapped in a .traj-group.
      `step` is the i-index; `sBefore` is the pre-action state; `aId` is
@@ -75,7 +76,7 @@
     aBox.style.animationDelay = '120ms';
     aBox.innerHTML =
       '<div class="traj-box-label">a<sub>' + step + '</sub></div>' +
-      '<div class="traj-box-action-body">' + (aId ? moveName(aId) : '—') + '</div>';
+      '<div class="traj-box-action-body">' + (aId ? moveName(aId) : T('battle.hud.dash')) + '</div>';
     group.appendChild(aBox);
 
     /* rᵢ — REWARD box. Terminal gets the colour-blind blue/vermillion
@@ -90,7 +91,7 @@
       '<div class="traj-box-label">r<sub>' + step + '</sub></div>' +
       '<div class="traj-box-reward-body">' + sign + r + '</div>';
     if (terminal) {
-      inner += '<div class="traj-box-terminal-tag">' + (won ? '✓ WIN' : '✗ LOSS') + '</div>';
+      inner += '<div class="traj-box-terminal-tag">' + (won ? T('terminal.win') : T('terminal.loss')) + '</div>';
     }
     rBox.innerHTML = inner;
     group.appendChild(rBox);
@@ -124,13 +125,13 @@
           '<div class="traj-box-side">' +
             '<img class="traj-box-sprite ' + (fainted ? 'fainted' : '') + '" src="' + spriteSrc + '" alt="">' +
             '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + cls + '" style="width:' + pct + '%"></div></div>' +
-            '<div class="traj-box-bucket">' + (fainted ? 'FAINT' : bucketName(bucket)) + '</div>' +
+            '<div class="traj-box-bucket">' + (fainted ? T('hp.bucket.faint_short') : bucketName(bucket)) + '</div>' +
           '</div>'
         );
       }
 
       sFinalBox.innerHTML =
-        '<div class="traj-box-label">s<sub>' + (step + 1) + '</sub> <span class="traj-box-terminal-mini">(terminal)</span></div>' +
+        '<div class="traj-box-label">s<sub>' + (step + 1) + '</sub> <span class="traj-box-terminal-mini">' + T('terminal.mini') + '</span></div>' +
         '<div class="traj-box-state-body">' +
           sideHtml('assets/pikachu-back.png',     pikaBucket,  pikaFainted) +
           sideHtml(window.Battle.spriteForOpp(Math.min(NB - 1, charmBucket)), charmBucket, charmFainted) +
@@ -149,13 +150,13 @@
 
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
-    heading.textContent = 'THE TRAJECTORY';
+    heading.textContent = T('traj.heading');
     root.appendChild(heading);
 
     /* Formula card */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
-    fcard.innerHTML = '<div class="concept-formula-label">TRAJECTORY (RANDOM VARIABLES)</div>';
+    fcard.innerHTML = '<div class="concept-formula-label">' + T('traj.formula.label') + '</div>';
     const fhost = document.createElement('div');
     fcard.appendChild(fhost);
     window.Katex.render(
@@ -164,7 +165,7 @@
     );
     const ffoot = document.createElement('div');
     ffoot.className = 'concept-formula-foot';
-    ffoot.textContent = 'sᵢ = state · aᵢ = PIKACHU\'s move · rᵢ = reward · sᵢ₊₁ = state AFTER aᵢ';
+    ffoot.textContent = T('traj.formula.foot');
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
@@ -177,10 +178,11 @@
     const ctrls = document.createElement('div');
     ctrls.className = 'traj-controls';
     ctrls.innerHTML =
-      '<button class="poke-btn" id="traj-step">▶ NEXT TURN</button>' +
-      '<button class="poke-btn" id="traj-play">▶▶ PLAY</button>' +
-      '<button class="poke-btn" id="traj-reset">RESET</button>' +
-      '<div class="traj-status">step <b id="traj-status-i">0</b> · <span id="traj-status-state">FULL / FULL</span></div>';
+      '<button class="poke-btn" id="traj-step">' + T('traj.btn.step')  + '</button>' +
+      '<button class="poke-btn" id="traj-play">' + T('traj.btn.play')  + '</button>' +
+      '<button class="poke-btn" id="traj-reset">' + T('traj.btn.reset') + '</button>' +
+      '<div class="traj-status">' + T('traj.status.step') + ' <b id="traj-status-i">0</b> · ' +
+        '<span id="traj-status-state">' + T('hp.bucket.full') + ' / ' + T('hp.bucket.full') + '</span></div>';
     root.appendChild(ctrls);
 
     /* ---- State ---- */
@@ -226,7 +228,7 @@
       document.getElementById('traj-status-i').textContent = String(stepIdx - 1);
       const stateEl = document.getElementById('traj-status-state');
       if (done) {
-        stateEl.textContent = 'EPISODE OVER';
+        stateEl.textContent = T('traj.status.over');
       } else {
         stateEl.textContent = bucketName(s.your) + ' / ' + bucketName(s.opp);
       }

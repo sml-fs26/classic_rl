@@ -10,7 +10,7 @@
 (function () {
   window.scenes = window.scenes || {};
 
-  const BUCKET_NAMES = ['FULL', 'HIGH', 'MID', 'LOW', 'CRITICAL', 'FAINTED'];
+  const BUCKET_KEYS = ['full', 'high', 'mid', 'low', 'critical', 'fainted'];
 
   /* Map Pikachu moves and opponent forms to SFX names. window.SFX is
      lazy-loaded — every call is guarded so this scene still works in a
@@ -116,26 +116,23 @@
 
     const hud = document.createElement('div');
     hud.className = 'hud-strip';
-    hud.innerHTML = `
-      <div class="hud-item"><div class="hud-label">TURN</div><div class="hud-val" id="sc1-turn">0</div></div>
-      <div class="hud-item"><div class="hud-label">LAST</div><div class="hud-val" id="sc1-last">—</div></div>
-      <div class="hud-item"><div class="hud-label">REWARD</div><div class="hud-val" id="sc1-rew">0</div></div>
-      <div class="hud-item"><div class="hud-label">STATE</div><div class="hud-val" id="sc1-state">FULL/FULL</div></div>
-    `;
+    hud.innerHTML =
+      '<div class="hud-item"><div class="hud-label">' + T('battle.hud.turn')   + '</div><div class="hud-val" id="sc1-turn">0</div></div>' +
+      '<div class="hud-item"><div class="hud-label">' + T('battle.hud.last')   + '</div><div class="hud-val" id="sc1-last">' + T('battle.hud.dash') + '</div></div>' +
+      '<div class="hud-item"><div class="hud-label">' + T('battle.hud.reward') + '</div><div class="hud-val" id="sc1-rew">0</div></div>' +
+      '<div class="hud-item"><div class="hud-label">' + T('battle.hud.state')  + '</div><div class="hud-val" id="sc1-state">' +
+        T('hp.bucket.full') + '/' + T('hp.bucket.full') + '</div></div>';
     rightCol.appendChild(hud);
 
     const resetBar = document.createElement('div');
     resetBar.className = 'poke-menu-row';
-    resetBar.innerHTML = '<button id="sc1-reset" type="button">RESTART BATTLE</button>';
+    resetBar.innerHTML = '<button id="sc1-reset" type="button">' + T('battle.restart') + '</button>';
     rightCol.appendChild(resetBar);
     resetBar.querySelector('#sc1-reset').addEventListener('click', () => resetBattle());
 
     const caption = document.createElement('div');
     caption.className = 'poke-caption';
-    caption.textContent =
-      'You are the policy. Each click is one action; the dice are the damage roll and the accuracy check. ' +
-      'The state is (your HP bucket, opp HP bucket) — five buckets each, twenty-five combinations. ' +
-      'HP is discretised: each move bumps the bar by 0, 1, 2, or 3 segments. The state the agent sees IS the state the world is in.';
+    caption.textContent = T('battle.caption');
     root.appendChild(caption);
 
     /* ---------- State ---------- */
@@ -171,9 +168,10 @@
       });
     }
 
+    function bucketName(b) { return T('hp.bucket.' + (BUCKET_KEYS[b] || 'fainted')); }
     function bucketState() {
-      if (state.terminal) return state.win ? 'WIN' : 'LOSS';
-      return BUCKET_NAMES[state.your] + '/' + BUCKET_NAMES[state.opp];
+      if (state.terminal) return state.win ? T('terminal.win') : T('terminal.loss');
+      return bucketName(state.your) + '/' + bucketName(state.opp);
     }
 
     function setBusy(b) {
@@ -187,7 +185,7 @@
       const stageRect = stage.getBoundingClientRect();
       const el = document.createElement('div');
       el.className = 'damage-flash';
-      el.textContent = '-' + delta + ' HP';
+      el.textContent = T('hp.damage_flash', { n: delta });
       el.style.left = (rect.left - stageRect.left + rect.width / 2 - 18) + 'px';
       el.style.top  = (rect.top  - stageRect.top  + 8) + 'px';
       if (color) el.style.color = color;
@@ -281,7 +279,7 @@
         const critical = log.oppDelta >= 3;     /* big damage rolls land as crits */
         showDamage(oppHostEl, log.oppDelta, critical ? '#FFD028' : undefined);
         if (critical) {
-          await dialogSay('A critical hit!');
+          await dialogSay(T('battle.critical_hit'));
           if (episode !== myEp) return;
         }
         await wait(critical ? 250 : 400);
@@ -393,7 +391,9 @@
 
     function finalizeTurn(out) {
       document.getElementById('sc1-turn').textContent = String(turn);
-      document.getElementById('sc1-last').textContent = window.Moves.MOVE_BY_ID[out.log.move].name + ' ' + (out.log.hit1 ? 'HIT' : 'MISS');
+      const moveLabel = T('move.' + out.log.move);
+      const hitLabel  = T(out.log.hit1 ? 'battle.hud.hit' : 'battle.hud.miss');
+      document.getElementById('sc1-last').textContent = moveLabel + ' ' + hitLabel;
       document.getElementById('sc1-rew').textContent = totalReward.toFixed(0);
       document.getElementById('sc1-state').textContent = bucketState();
       setBusy(false);
@@ -427,7 +427,7 @@
       if (oppHostClean) oppHostClean.classList.remove('sc1-evo-host');
       stage.classList.remove('sc1-evo-stage');
       document.getElementById('sc1-turn').textContent = '0';
-      document.getElementById('sc1-last').textContent = '—';
+      document.getElementById('sc1-last').textContent = T('battle.hud.dash');
       document.getElementById('sc1-rew').textContent = '0';
       document.getElementById('sc1-state').textContent = bucketState();
 
