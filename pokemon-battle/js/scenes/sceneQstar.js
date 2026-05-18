@@ -43,6 +43,14 @@
 
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
   function bucketName(b) { return b >= NB ? T('hp.bucket.faint_short') : T('hp.bucket.' + BUCKETS[b]); }
+  function bucketClass(b) {
+    if (b === 0) return '';
+    if (b === 1) return 'b1';
+    if (b === 2) return 'b2';
+    if (b === 3) return 'b3';
+    return 'b4';
+  }
+  function bucketPct(b) { return Math.max(0, (NB - b) * 100 / NB); }
   function oppFormDisplay(form) { return T('pokemon.' + form); }
   function oppMoveName(form) {
     const id = (window.Battle.FORM_MOVE_NAME[form] || '').toLowerCase();
@@ -209,28 +217,58 @@
 
     function renderQPanel() {
       const base = stateIdx() * A;
-      const oppForm = oppFormDisplay(window.Battle.formForOpp(Math.min(NB - 1, charmBucket)));
-      let html =
-        '<div class="qstar-panel-title">' +
-          T('qstar.state_label', {
-            your: bucketName(pikaBucket),
-            oppName: oppForm,
-            opp: bucketName(charmBucket),
-          }) +
-        '</div>' +
-        '<div class="qstar-rows">';
+      const oppB = Math.min(NB - 1, charmBucket);
+      const oppSprite = window.Battle.spriteForOpp(oppB);
+      const oppName   = window.Battle.displayNameForOpp(oppB);
+
+      /* Top of panel: state icon — two Pokemon sprites stacked under
+         segmented HP bars, labelled "state s".  Mirrors the q-cell
+         thumb used in scenes 7 and 9 so students see the same visual
+         vocabulary for "this is the state". */
+      const stateIcon =
+        '<div class="qstar-state-icon">' +
+          '<div class="qstar-state-label">' + T('qstar.state_s') + '</div>' +
+          '<div class="qstar-state-thumb">' +
+            '<div class="qstar-state-side player">' +
+              '<img class="qstar-state-sprite" src="assets/pikachu-back.png" alt="Pikachu">' +
+              '<div class="qstar-state-hp"><div class="qstar-state-hp-fill ' + bucketClass(pikaBucket) + '" style="width:' + bucketPct(pikaBucket) + '%"></div></div>' +
+              '<div class="qstar-state-bucket">' + bucketName(pikaBucket) + '</div>' +
+            '</div>' +
+            '<div class="qstar-state-side opponent">' +
+              '<img class="qstar-state-sprite" src="' + oppSprite + '" alt="' + oppName + '">' +
+              '<div class="qstar-state-hp"><div class="qstar-state-hp-fill ' + bucketClass(charmBucket) + '" style="width:' + bucketPct(charmBucket) + '%"></div></div>' +
+              '<div class="qstar-state-bucket">' + bucketName(charmBucket) + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      /* Below the icon: a 2-column table with action a on the left
+         and Q*(s, a) on the right.  Same column structure students
+         will see in scene 7 and 9 — establishing the visual
+         vocabulary here pays off there. */
+      let tableRows = '';
       for (let k = 0; k < A; k++) {
         const qv = qStar[base + k];
         const isArg = (k === argmaxA);
-        html += '<div class="qstar-row' + (isArg ? ' argmax' : '') + '">' +
-                  '<span class="qstar-mark">' + (isArg ? '▶' : '') + '</span>' +
-                  '<span class="qstar-name">' + T('move.' + ACTIONS[k]) + '</span>' +
-                  '<span class="qstar-q">' + (qv >= 0 ? '+' : '') + qv.toFixed(2) + '</span>' +
-                  '<span class="qstar-tag">' + (isArg ? T('qstar.argmax_tag') : '') + '</span>' +
-                '</div>';
+        const mark = isArg ? ' <span class="qstar-cell-mark">★</span>' : '';
+        tableRows +=
+          '<tr class="qstar-table-row' + (isArg ? ' argmax' : '') + '">' +
+            '<td class="qstar-table-action">' + T('move.' + ACTIONS[k]) + mark + '</td>' +
+            '<td class="qstar-table-q">' + (qv >= 0 ? '+' : '') + qv.toFixed(2) + '</td>' +
+          '</tr>';
       }
-      html += '</div>';
-      qPanel.innerHTML = html;
+      const table =
+        '<table class="qstar-table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th class="qstar-table-action">' + T('qstar.col.action') + '</th>' +
+              '<th class="qstar-table-q">' + T('qstar.col.qstar') + '</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' + tableRows + '</tbody>' +
+        '</table>';
+
+      qPanel.innerHTML = stateIcon + table;
     }
 
     function updateStatus(phaseLabel) {

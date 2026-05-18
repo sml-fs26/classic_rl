@@ -425,7 +425,8 @@
 .qstar-banner.win  { color: var(--cb-blue);      border-color: var(--cb-blue); }
 .qstar-banner.loss { color: var(--cb-vermillion); border-color: var(--cb-vermillion); }
 
-/* Q-panel — list of moves with the argmax row highlighted. */
+/* Q-panel — state icon on top, two-column (action a | Q*(s, a)) table below.
+   Mirrors the q-cell layout students will see in scenes 7 and 9. */
 .qstar-q-panel {
   background: var(--bg-strong);
   border: 4px solid var(--rule);
@@ -437,38 +438,102 @@
   font-family: 'Press Start 2P', monospace;
   color: var(--ink-on-box);
 }
-.qstar-panel-title {
-  font-size: 10px;
-  letter-spacing: 0.05em;
-  margin-bottom: 12px;
-  color: var(--ink-secondary);
-  text-align: center;
-}
-.qstar-rows {
+
+/* State icon — two stacked sprite + HP-bar slices, "state s" caption. */
+.qstar-state-icon {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-.qstar-row {
-  display: grid;
-  grid-template-columns: 14px 1fr 60px 1fr;
-  gap: 8px;
   align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
   padding: 8px 10px;
   background: var(--bg);
   border: 2px solid var(--ink);
-  font-size: 9px;
-  transition: background 200ms, box-shadow 200ms;
 }
-.qstar-row.argmax {
+.qstar-state-label {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--ink-secondary);
+  text-transform: lowercase;
+}
+.qstar-state-thumb {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.qstar-state-side {
+  display: grid;
+  grid-template-columns: 28px 1fr 56px;
+  gap: 8px;
+  align-items: center;
+}
+.qstar-state-sprite {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.qstar-state-hp {
+  height: 8px;
+  background: rgba(0,0,0,0.18);
+  border: 2px solid var(--ink);
+  box-sizing: border-box;
+  position: relative;
+}
+.qstar-state-hp-fill {
+  height: 100%;
+  background: #48C848;
+}
+.qstar-state-hp-fill.b1 { background: #88D848; }
+.qstar-state-hp-fill.b2 { background: #E8C828; }
+.qstar-state-hp-fill.b3 { background: #E89028; }
+.qstar-state-hp-fill.b4 { background: #E84828; }
+.qstar-state-bucket {
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  text-align: right;
+}
+
+/* Two-column Q-table (action a | Q*(s, a)). */
+.qstar-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+.qstar-table th {
+  font-weight: normal;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--ink);
+  text-align: left;
+}
+.qstar-table th.qstar-table-q {
+  text-align: right;
+}
+.qstar-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--rule);
+}
+.qstar-table tr:last-child td { border-bottom: none; }
+.qstar-table-action {
+  font-size: 9px;
+}
+.qstar-table-q {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+}
+.qstar-table-row.argmax td {
   background: rgba(248, 208, 40, 0.32);
   box-shadow: inset 0 0 0 2px var(--accent, #F8D028);
 }
-.qstar-row.argmax .qstar-tag { color: var(--pikachu-cheek, #C62828); }
-.qstar-mark { text-align: center; color: var(--pikachu-cheek); font-weight: bold; }
-.qstar-name { font-size: 9px; }
-.qstar-q    { text-align: right; font-variant-numeric: tabular-nums; font-size: 10px; }
-.qstar-tag  { font-size: 7px; letter-spacing: 0.04em; }
+.qstar-cell-mark {
+  color: var(--pikachu-cheek, #C62828);
+}
 
 .qstar-status {
   display: flex;
