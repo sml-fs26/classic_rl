@@ -10,8 +10,6 @@
 (function () {
   window.scenes = window.scenes || {};
 
-  const BUCKET_KEYS = ['full', 'high', 'mid', 'low', 'critical', 'fainted'];
-
   /* Map Pikachu moves and opponent forms to SFX names. window.SFX is
      lazy-loaded — every call is guarded so this scene still works in a
      build without sfx.js included. */
@@ -114,16 +112,6 @@
       moveBtns[m.id] = btn;
     }
 
-    const hud = document.createElement('div');
-    hud.className = 'hud-strip';
-    hud.innerHTML =
-      '<div class="hud-item"><div class="hud-label">' + T('battle.hud.turn')   + '</div><div class="hud-val" id="sc1-turn">0</div></div>' +
-      '<div class="hud-item"><div class="hud-label">' + T('battle.hud.last')   + '</div><div class="hud-val" id="sc1-last">' + T('battle.hud.dash') + '</div></div>' +
-      '<div class="hud-item"><div class="hud-label">' + T('battle.hud.reward') + '</div><div class="hud-val" id="sc1-rew">0</div></div>' +
-      '<div class="hud-item"><div class="hud-label">' + T('battle.hud.state')  + '</div><div class="hud-val" id="sc1-state">' +
-        T('hp.bucket.full') + '/' + T('hp.bucket.full') + '</div></div>';
-    rightCol.appendChild(hud);
-
     const resetBar = document.createElement('div');
     resetBar.className = 'poke-menu-row';
     resetBar.innerHTML = '<button id="sc1-reset" type="button">' + T('battle.restart') + '</button>';
@@ -166,12 +154,6 @@
         dialog.say(line);
         dialog.onDone(resolve);
       });
-    }
-
-    function bucketName(b) { return T('hp.bucket.' + (BUCKET_KEYS[b] || 'fainted')); }
-    function bucketState() {
-      if (state.terminal) return state.win ? T('terminal.win') : T('terminal.loss');
-      return bucketName(state.your) + '/' + bucketName(state.opp);
     }
 
     function setBusy(b) {
@@ -389,13 +371,7 @@
       finalizeTurn(out);
     }
 
-    function finalizeTurn(out) {
-      document.getElementById('sc1-turn').textContent = String(turn);
-      const moveLabel = T('move.' + out.log.move);
-      const hitLabel  = T(out.log.hit1 ? 'battle.hud.hit' : 'battle.hud.miss');
-      document.getElementById('sc1-last').textContent = moveLabel + ' ' + hitLabel;
-      document.getElementById('sc1-rew').textContent = totalReward.toFixed(0);
-      document.getElementById('sc1-state').textContent = bucketState();
+    function finalizeTurn(_out) {
       setBusy(false);
     }
 
@@ -426,10 +402,6 @@
       const oppHostClean = stage.querySelector('.sprite-host.opponent');
       if (oppHostClean) oppHostClean.classList.remove('sc1-evo-host');
       stage.classList.remove('sc1-evo-stage');
-      document.getElementById('sc1-turn').textContent = '0';
-      document.getElementById('sc1-last').textContent = T('battle.hud.dash');
-      document.getElementById('sc1-rew').textContent = '0';
-      document.getElementById('sc1-state').textContent = bucketState();
 
       /* ---- Wild-encounter intro setup ----
          Both sprite hosts start hidden (opacity 0). The opponent flashes

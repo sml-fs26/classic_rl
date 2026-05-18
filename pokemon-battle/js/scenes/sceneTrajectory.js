@@ -55,7 +55,7 @@
     sBox.className = 'traj-box traj-box-state';
     sBox.style.animationDelay = '0ms';
     sBox.innerHTML =
-      '<div class="traj-box-label">s<sub>' + step + '</sub></div>' +
+      '<div class="traj-box-label">S<sub>' + step + '</sub></div>' +
       '<div class="traj-box-state-body">' +
         '<div class="traj-box-side">' +
           '<img class="traj-box-sprite" src="assets/pikachu-back.png" alt="">' +
@@ -75,7 +75,7 @@
     aBox.className = 'traj-box traj-box-action';
     aBox.style.animationDelay = '120ms';
     aBox.innerHTML =
-      '<div class="traj-box-label">a<sub>' + step + '</sub></div>' +
+      '<div class="traj-box-label">A<sub>' + step + '</sub></div>' +
       '<div class="traj-box-action-body">' + (aId ? moveName(aId) : T('battle.hud.dash')) + '</div>';
     group.appendChild(aBox);
 
@@ -88,7 +88,7 @@
     rBox.style.animationDelay = '240ms';
     const sign = r >= 0 ? '+' : '';
     let inner =
-      '<div class="traj-box-label">r<sub>' + step + '</sub></div>' +
+      '<div class="traj-box-label">R<sub>' + step + '</sub></div>' +
       '<div class="traj-box-reward-body">' + sign + r + '</div>';
     if (terminal) {
       inner += '<div class="traj-box-terminal-tag">' + (won ? T('terminal.win') : T('terminal.loss')) + '</div>';
@@ -131,7 +131,7 @@
       }
 
       sFinalBox.innerHTML =
-        '<div class="traj-box-label">s<sub>' + (step + 1) + '</sub> <span class="traj-box-terminal-mini">' + T('terminal.mini') + '</span></div>' +
+        '<div class="traj-box-label">S<sub>' + (step + 1) + '</sub> <span class="traj-box-terminal-mini">' + T('terminal.mini') + '</span></div>' +
         '<div class="traj-box-state-body">' +
           sideHtml('assets/pikachu-back.png',     pikaBucket,  pikaFainted) +
           sideHtml(window.Battle.spriteForOpp(Math.min(NB - 1, charmBucket)), charmBucket, charmFainted) +
@@ -160,7 +160,7 @@
     const fhost = document.createElement('div');
     fcard.appendChild(fhost);
     window.Katex.render(
-      String.raw`\tau = (s_1, a_1, r_1, \; s_2, a_2, r_2, \; s_3, a_3, r_3, \; \dots)`,
+      String.raw`\tau = (S_1, A_1, R_1, \; S_2, A_2, R_2, \; S_3, A_3, R_3, \; \dots)`,
       fhost, true
     );
     const ffoot = document.createElement('div');

@@ -109,9 +109,8 @@
       'battle.what_will':     'What will PIKACHU do?',
       'battle.critical_hit':  'A critical hit!',
       'battle.caption':
-        'You are the policy. Each click is one action; the dice are the damage roll and the accuracy check. ' +
-        'The state is (your HP bucket, opp HP bucket) — five buckets each, twenty-five combinations. ' +
-        'HP is discretised: each move bumps the bar by 0, 1, 2, or 3 segments. The state the agent sees IS the state the world is in.',
+        'Click a move to attack.  Once you pick the move, the game rolls a damage die — different rolls can shrink the foe\'s HP bar by different amounts, ' +
+        'and a stronger move can fail to land at all.  The state of the battle is the pair (your HP, opponent HP), so the new state depends on how the roll comes out.',
       'battle.hud.turn':      'TURN',
       'battle.hud.last':      'LAST',
       'battle.hud.reward':    'REWARD',
@@ -142,7 +141,7 @@
       /* ---- Trajectory scene ---- */
       'traj.heading':         'THE TRAJECTORY',
       'traj.formula.label':   'TRAJECTORY (RANDOM VARIABLES)',
-      'traj.formula.foot':    'sᵢ = state · aᵢ = PIKACHU\'s move · rᵢ = reward · sᵢ₊₁ = state AFTER aᵢ',
+      'traj.formula.foot':    'Sᵢ = state · Aᵢ = PIKACHU\'s move · Rᵢ = reward · Sᵢ₊₁ = state AFTER Aᵢ',
       'traj.btn.step':        '▶ NEXT TURN',
       'traj.btn.play':        '▶▶ PLAY',
       'traj.btn.reset':       'RESET',
@@ -683,9 +682,9 @@
       'battle.what_will':     'ピカチュウは どう する？',
       'battle.critical_hit':  'きゅうしょに あたった！',
       'battle.caption':
-        'あなたが ほうさく（policy）。 クリックは こうどう、 サイコロは ダメージと めいちゅう。 ' +
-        'じょうたいは（じぶんの HPバケツ、 あいての HPバケツ）— それぞれ 5バケツ、 あわせて 25とおり。 ' +
-        'HPは とびとび： わざは 0〜3 バケツ さげる。 エージェントが みる じょうたいが せかい その もの。',
+        'わざを クリックして こうげき。 わざを えらぶと ゲームが ダメージの サイコロを ふる — ' +
+        'でた めに よって あいての HPバーが さがる はばが ちがう。 つよい わざは そもそも あたらない ことも ある。 ' +
+        'じょうたいは（じぶんの HP、 あいての HP）の くみ。 つぎの じょうたいは サイコロの けっか しだい。',
       'battle.hud.turn':      'ターン',
       'battle.hud.last':      'さいご',
       'battle.hud.reward':    'ほうしゅう',
@@ -714,7 +713,7 @@
 
       'traj.heading':         'きせき τ',
       'traj.formula.label':   'きせき（かくりつへんすう）',
-      'traj.formula.foot':    'sᵢ = じょうたい · aᵢ = ピカチュウの わざ · rᵢ = ほうしゅう · sᵢ₊₁ = aᵢの あとの じょうたい',
+      'traj.formula.foot':    'Sᵢ = じょうたい · Aᵢ = ピカチュウの わざ · Rᵢ = ほうしゅう · Sᵢ₊₁ = Aᵢの あとの じょうたい',
       'traj.btn.step':        '▶ つぎの ターン',
       'traj.btn.play':        '▶▶ さいせい',
       'traj.btn.reset':       'リセット',

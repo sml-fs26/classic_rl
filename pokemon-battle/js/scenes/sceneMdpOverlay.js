@@ -34,16 +34,6 @@
     heading.textContent = T('mdp.heading');
     wrap.appendChild(heading);
 
-    /* Markov-assumption sidebar — a small line under the heading
-       calling out the assumption explicitly so students don't take
-       it for granted.  Mentions where the assumption breaks (sleep
-       counters, paralysis, items) so we're honest about the
-       abstraction. */
-    const markov = document.createElement('div');
-    markov.className = 'sc0-mdp-markov';
-    markov.innerHTML = T('mdp.markov');
-    wrap.appendChild(markov);
-
     /* The battle stage. Sprites are visible from step 0; HP bars + move
        menu are gated by .show classes that we toggle in applyStep. */
     const stage = document.createElement('div');
