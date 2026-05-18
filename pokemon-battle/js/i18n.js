@@ -448,20 +448,12 @@
 
       'tut.step.moves.title':    'Pick a move',
       'tut.step.moves.dialog':
-        "Three moves to pick from.  Read them left to right: weak but reliable → " +
-        "strong but risky.  THUNDER hits hardest but lands only ~half the time.  " +
-        "And here is the twist: as your foe evolves mid-battle, the damage of each move shifts.  " +
-        "What works on CHARMANDER may fail on CHARMELEON.",
+        "Three moves to pick from.  Read them from left to right: weak but reliable, strong but risky.  " +
+        "THUNDER hits hardest but lands only half the time.  " +
+        "And here is the twist: as your foe evolves mid-battle, the damage of each move also changes.",
       'tut.moves.axis.l':        '← WEAK · RELIABLE',
       'tut.moves.axis.m':        'DAMAGE ↑   ACCURACY ↓',
       'tut.moves.axis.r':        'STRONG · RISKY →',
-      'tut.moves.eff.dmg':       '{lo}–{hi} DMG',
-      'tut.moves.eff.super':     'SUPER',
-      'tut.moves.eff.resist':    'RESIST',
-      'tut.moves.footnote':
-        'CHARMELEON <b>resists</b> THUNDERBOLT.  ' +
-        'CHARIZARD takes <b>super</b> damage from QUICK ATTACK.  ' +
-        'The best move depends on the form you face — PIKACHU must learn that.',
 
       'tut.step.turn.title':     'How a turn flows',
       'tut.step.turn.dialog':
@@ -1015,20 +1007,12 @@
 
       'tut.step.moves.title':    'わざを えらぶ',
       'tut.step.moves.dialog':
-        'わざは 3つ。 ひだりから みぎへ よむ: よわいが あたる → つよいが あぶない。  ' +
-        'かみなりが もっとも つよいが、 あたるのは およそ はんぶん。  ' +
-        'そして どんでんがえし: あいてが しんかすると わざの ダメージが かわる。  ' +
-        'ヒトカゲに きいた こうげきが、 リザードには きかない ことが ある。',
+        'わざは 3つ。 ひだりから みぎへ よむ： よわいが あたる、 つよいが あぶない。  ' +
+        'かみなりが もっとも つよいが、 あたるのは はんぶん だけ。  ' +
+        'そして どんでんがえし： あいてが しんかすると わざの ダメージも かわる。',
       'tut.moves.axis.l':        '← よわい · あたる',
       'tut.moves.axis.m':        'ダメージ ↑   めいちゅう ↓',
       'tut.moves.axis.r':        'つよい · あぶない →',
-      'tut.moves.eff.dmg':       '{lo}〜{hi} ダメージ',
-      'tut.moves.eff.super':     'こうかバツグン',
-      'tut.moves.eff.resist':    'いまひとつ',
-      'tut.moves.footnote':
-        'リザードは 10まんボルトに <b>たいせい</b>。  ' +
-        'リザードンは でんこうせっかで <b>こうかバツグン</b>。  ' +
-        'さいぜんの わざは あいての すがたに よる — ピカチュウは それを まなぶ。',
 
       'tut.step.turn.title':     '1ターンの ながれ',
       'tut.step.turn.dialog':
