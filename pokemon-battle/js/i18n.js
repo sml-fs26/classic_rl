@@ -277,45 +277,47 @@
       'sd.btn.reset':         'RESET',
       'sd.status':            'STEP <b id="sd-step-idx">1</b> / {total} · <b id="sd-step-id">A</b>',
 
-      'sd.step.A.title':      'A — WE WANT A TABLE OF Q*',
+      'sd.step.A.title':      'WE WANT A TABLE OF Q*',
       'sd.step.A.body':
         'Aim: build a table <span class="sd-q-est">q[s, a]</span> that approximates the optimal action-value ' +
         '<span class="sd-q">Q*(s, a)</span> at every state and action.',
-      'sd.step.B.title':      'B — INITIALISE THE TABLE',
+      'sd.step.B.title':      'INITIALISE THE TABLE',
       'sd.step.B.body':
         'We don\'t know <span class="sd-q">Q*</span> yet.  Seed every entry of <span class="sd-q-est">q</span> ' +
         'to zero (or tiny noise so ties break randomly).',
-      'sd.step.D.title':      'D — PLAY THE GAME TO GENERATE A TRAJECTORY',
+      'sd.step.D.title':      'PLAY THE GAME TO GENERATE A TRAJECTORY',
       'sd.step.D.body':
         'We don\'t have P.  We <em>do</em> get to play.  The world hands us a stream of ' +
-        '(state, action, reward, next state) tuples — pick the next action by ε-greedy on the <em>current</em> ' +
-        '<span class="sd-q-est">q</span>, and let the environment supply the rest.',
-      'sd.step.D.foot':       'The second &laquo;A&raquo; in S-A-R-S-A is the action we pick at the next state — needed for the update on the previous step.',
-      'sd.step.E1.title':     'E1 — REPLACE THE EXPECTATION WITH ONE SAMPLE',
+        '(state, action, reward, next state) tuples — we pick the next action ' +
+        '(either at random, or optimally on the <em>current</em> <span class="sd-q-est">q</span>) ' +
+        'and let the environment supply the rest.',
+      'sd.step.D.foot':
+        'When picking the next action: with a certain probability we choose a <em>random</em> action ' +
+        '(to encourage exploration); otherwise we pick the <em>best</em> action according to ' +
+        '<span class="sd-q-est">q</span>.',
+      'sd.step.E1.title':     'REPLACE THE EXPECTATION WITH ONE SAMPLE',
       'sd.step.E1.body':
         'By Bellman, <span class="sd-q">Q*(s, a)</span> is an expectation over the random next state and reward. ' +
         'We don\'t get the expectation — we get one sample.  Drop the <span class="sd-q">E</span> and use it:',
       'sd.step.E1.foot':
-        'One-sample Monte-Carlo estimate of the right-hand side. ' +
-        '<em>Subtle:</em> with A′ from our ε-greedy policy, the LHS is technically Q under the current policy ' +
-        '(not Q*); as ε → 0 the policy becomes greedy and q → Q*. This is what makes SARSA <em>on-policy</em>.',
-      'sd.step.E2.title':     'E2 — NAME THE RIGHT-HAND SIDE «TARGET»',
+        'One sample estimate of the right-hand side.',
+      'sd.step.E2.title':     'NAME THE RIGHT-HAND SIDE «TARGET»',
       'sd.step.E2.body':
         'We don\'t have <span class="sd-q">Q*</span> on the right either — only our table <span class="sd-q-est">q</span>. ' +
         'Plug it in.  Call the resulting number the <b>target</b>: that\'s where we want <span class="sd-q-est">q[s, a]</span> to be.',
-      'sd.step.E3.title':     'E3 — MOVE q TOWARD THE TARGET (TWO CASES)',
+      'sd.step.E3.title':     'MOVE q TOWARD THE TARGET (TWO CASES)',
       'sd.step.E3.body':
         'If <span class="sd-q-est">q[s, a]</span> is <em>below</em> the target, nudge it <em>up</em>. ' +
         'If it\'s <em>above</em>, nudge it <em>down</em>.  Step size <span class="sd-alpha">α ∈ (0, 1)</span> ' +
         'is small enough not to overshoot.',
       'sd.step.E3.foot':      'Same step size α in both cases.  Same magnitude of correction.  Only the sign differs — and α(target − q) already carries that sign for free.',
-      'sd.step.E4.title':     'E4 — THE TWO CASES COLLAPSE INTO ONE LINE',
+      'sd.step.E4.title':     'THE TWO CASES COLLAPSE INTO ONE LINE',
       'sd.step.E4.body':
         'Flip the sign of the «above» case: <span class="sd-q-est">−α(q − target)</span> = <span class="sd-q-est">+α(target − q)</span>. ' +
         'Both branches become the same update.  <b>This is SARSA.</b>',
       'sd.step.E4.foot':      'TD error = target − current estimate.  Apply this once per (s, a, r, s′, a′) tuple as the agent plays.',
-      'sd.step.F.title':      'F — SARSA ON ONE TRAJECTORY',
-      'sd.step.G.title':      'G — ONE LINE → Q-LEARNING (OFF-POLICY)',
+      'sd.step.F.title':      'SARSA ON ONE TRAJECTORY',
+      'sd.step.G.title':      'ONE LINE → Q-LEARNING (OFF-POLICY)',
       'sd.step.G.body':
         '<b>SARSA</b> targets <span class="sd-q-est">r + q[s′, <em>a′</em>]</span> — the action <em>actually taken</em> at s′ ' +
         'under the current ε-greedy policy. <b>Q-learning</b> targets <span class="sd-q-est">r + max<sub>a′</sub> q[s′, a′]</span> — ' +
@@ -325,7 +327,7 @@
 
       'sd.illus.A':           '← THE TABLE WE WANT TO FILL.  EACH CELL = ONE (STATE, ACTION).',
       'sd.illus.B':           '← INITIALISING q[s, a] := 0 FOR EVERY CELL',
-      'sd.illus.D':           '← ONE SAMPLED TRAJECTORY.  ε-greedy ON THE CURRENT q (ALL ZERO ⇒ UNIFORM RANDOM).',
+      'sd.illus.D':           '← ONE SAMPLED TRAJECTORY.  NEXT ACTIONS PICKED RANDOMLY OR BY BEST q (ALL ZERO ⇒ UNIFORM RANDOM).',
       'sd.illus.E1':          '← THIS ONE SAMPLE IS WHAT WE USE INSTEAD OF THE EXPECTATION.',
       'sd.illus.E2':          '← target = r + q[s′, a′].  q[s, a] WANTS TO BE THERE.',
       'sd.illus.E3':          '↓ q SITS BELOW target HERE — NUDGE UP BY α(target − q).',
@@ -821,47 +823,48 @@
       'sd.btn.reset':         'リセット',
       'sd.status':            'ステップ <b id="sd-step-idx">1</b> / {total} · <b id="sd-step-id">A</b>',
 
-      'sd.step.A.title':      'A — Q*の ひょうが ほしい',
+      'sd.step.A.title':      'Q*の ひょうが ほしい',
       'sd.step.A.body':
         'もくひょう： すべての じょうたいと こうどうで、 さいてき こうどうかち ' +
         '<span class="sd-q">Q*(s, a)</span>に ちかい ひょう ' +
         '<span class="sd-q-est">q[s, a]</span>を つくる。',
-      'sd.step.B.title':      'B — ひょうの しょきか',
+      'sd.step.B.title':      'ひょうの しょきか',
       'sd.step.B.body':
         '<span class="sd-q">Q*</span>は まだ しらない。 <span class="sd-q-est">q</span>の ' +
         'すべての ますを ゼロに する（または ちいさい ノイズで タイを ランダムに）。',
-      'sd.step.D.title':      'D — ゲームで きせきを つくる',
+      'sd.step.D.title':      'ゲームで きせきを つくる',
       'sd.step.D.body':
         'Pは ない。 でも あそべる。 せかいは（じょうたい、 こうどう、 ほうしゅう、 つぎの じょうたい）の ' +
-        'ながれを くれる — つぎの こうどうは いまの <span class="sd-q-est">q</span>に たいする ' +
-        'ε-greedyで えらび、 のこりは かんきょうに まかせる。',
-      'sd.step.D.foot':       'S-A-R-S-A の 2つめの &laquo;A&raquo;は つぎの じょうたいで えらぶ こうどう — まえの ステップの こうしんに ひつよう。',
-      'sd.step.E1.title':     'E1 — きたいちを 1つの サンプルで おきかえる',
+        'ながれを くれる — つぎの こうどうは（ランダムに、 もしくは いまの ' +
+        '<span class="sd-q-est">q</span>に たいして さいてきに）えらび、 のこりは かんきょうに まかせる。',
+      'sd.step.D.foot':
+        'つぎの こうどうを えらぶ とき： ある かくりつで <em>ランダムな</em> こうどう ' +
+        '（たんさくを うながす ため）。 そうでなければ <span class="sd-q-est">q</span>に したがって ' +
+        '<em>さいぜん</em>の こうどうを えらぶ。',
+      'sd.step.E1.title':     'きたいちを 1つの サンプルで おきかえる',
       'sd.step.E1.body':
         'ベルマンより、 <span class="sd-q">Q*(s, a)</span>は つぎの じょうたいと ほうしゅうの きたいち。 ' +
         'きたいちは えられない — 1つの サンプルが えられる。 <span class="sd-q">E</span>を おとして つかう：',
       'sd.step.E1.foot':
-        'みぎがわの 1サンプル モンテカルロ みつもり。 ' +
-        '<em>びみょう：</em> A′を ε-greedyから えらぶと、 ひだりがわは いまの ほうさくの もとでの Q ' +
-        '（Q* ではない）。 ε → 0 で ほうさくは greedyに なり、 q → Q*。 これが SARSAを <em>on-policy</em>に する。',
-      'sd.step.E2.title':     'E2 — みぎがわを「ターゲット」と なづける',
+        'みぎがわの 1サンプル みつもり。',
+      'sd.step.E2.title':     'みぎがわを「ターゲット」と なづける',
       'sd.step.E2.body':
         'みぎがわにも <span class="sd-q">Q*</span>は ない — ひょう <span class="sd-q-est">q</span>だけ。 ' +
         'いれて けいさん。 でた かずを <b>ターゲット</b>と よぶ： <span class="sd-q-est">q[s, a]</span>が ' +
         'むかいたい ばしょ。',
-      'sd.step.E3.title':     'E3 — qを ターゲットへ うごかす（2つの ばあい）',
+      'sd.step.E3.title':     'qを ターゲットへ うごかす（2つの ばあい）',
       'sd.step.E3.body':
         '<span class="sd-q-est">q[s, a]</span>が ターゲットの <em>した</em>なら <em>うえ</em>に おす。 ' +
         '<em>うえ</em>なら <em>した</em>に おす。 ステップサイズ <span class="sd-alpha">α ∈ (0, 1)</span>は ' +
         'こえ ない くらい ちいさい。',
       'sd.step.E3.foot':      'どちらの ばあいも おなじ ステップサイズ α。 おなじ ほせいの おおきさ。 ふごうだけ ちがう — α(target − q)が もう その ふごうを もっている。',
-      'sd.step.E4.title':     'E4 — 2つの ばあいが 1ぎょうに たたまる',
+      'sd.step.E4.title':     '2つの ばあいが 1ぎょうに たたまる',
       'sd.step.E4.body':
         '「うえ」の ばあいの ふごうを はんてん： <span class="sd-q-est">−α(q − target)</span> = ' +
         '<span class="sd-q-est">+α(target − q)</span>。 りょうほうとも おなじ こうしん。 <b>これが SARSA。</b>',
       'sd.step.E4.foot':      'TD ごさ = ターゲット − いまの みつもり。 エージェントが あそぶ たびに、 (s, a, r, s′, a′) ごとに 1かい てきよう。',
-      'sd.step.F.title':      'F — ひとつの きせきの うえで SARSA',
-      'sd.step.G.title':      'G — 1ぎょうで Q-learning（オフポリシー）',
+      'sd.step.F.title':      'ひとつの きせきの うえで SARSA',
+      'sd.step.G.title':      '1ぎょうで Q-learning（オフポリシー）',
       'sd.step.G.body':
         '<b>SARSA</b>の ターゲットは <span class="sd-q-est">r + q[s′, <em>a′</em>]</span> — いまの ε-greedyで ' +
         's′で <em>じっさいに とった</em> こうどう。 <b>Q-learning</b>の ターゲットは ' +
@@ -872,7 +875,7 @@
 
       'sd.illus.A':           '← うめたい ひょう。 セル = 1つの（じょうたい, こうどう）。',
       'sd.illus.B':           '← q[s, a] := 0 で すべての セルを しょきか',
-      'sd.illus.D':           '← サンプルした 1つの きせき。 いまの qに ε-greedy（ぜんぶ 0 ⇒ いちようランダム）。',
+      'sd.illus.D':           '← サンプルした 1つの きせき。 つぎの こうどうは ランダム または いまの qで さいぜん（ぜんぶ 0 ⇒ いちようランダム）。',
       'sd.illus.E1':          '← この 1サンプルを きたいちの かわりに つかう。',
       'sd.illus.E2':          '← ターゲット = r + q[s′, a′]。 q[s, a]は そこに いきたい。',
       'sd.illus.E3':          '↓ ここでは qが ターゲットより した — α(target − q)で うえに おす。',
