@@ -301,13 +301,116 @@
   line-height: 1;
 }
 
-/* ---------- Step 3 — move buttons ---------- */
+/* ---------- Step 4 — pick a move ----------
+   Three layers stacked vertically:
+     .tut-move-menu    the 3 disabled move buttons
+     .tut-move-axis    a left/centre/right strip naming the gradient
+     .tut-eff-grid     a 3×3 form-vs-move damage table showing how
+                       effectiveness shifts as the opponent evolves.
+   The grid uses --hp-bN tokens so SUPER / RESIST shading re-tints
+   under GB / CRT themes alongside the rest of the viz. */
+.tut-move-demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 720px;
+  margin: 0 auto;
+}
 .tut-move-menu {
   max-width: 640px;
   margin: 0 auto;
+  width: 100%;
 }
 .tut-move-menu .move-btn {
   cursor: default;
+  opacity: 0.95;
+}
+.tut-move-axis {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #585858;
+  padding: 4px 6px;
+  border-top: 1px dashed var(--rule);
+  border-bottom: 1px dashed var(--rule);
+}
+.tut-move-axis .ax-l { text-align: left; }
+.tut-move-axis .ax-m { text-align: center; color: var(--pikachu-cheek); }
+.tut-move-axis .ax-r { text-align: right; }
+
+.tut-eff-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  padding: 6px;
+}
+.tut-eff-row {
+  display: grid;
+  grid-template-columns: 110px repeat(3, 1fr);
+  gap: 4px;
+}
+.tut-eff-cell {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--card);
+  color: var(--ink);
+  min-height: 34px;
+  border: 1px solid var(--rule);
+}
+.tut-eff-corner {
+  background: transparent;
+  border: none;
+}
+.tut-eff-headcell {
+  background: transparent;
+  border: none;
+  color: #585858;
+  font-size: 7px;
+  letter-spacing: 0.5px;
+}
+.tut-eff-rowhead {
+  background: transparent;
+  border: 1px dashed var(--rule);
+  flex-direction: row;
+  gap: 6px;
+  font-size: 7px;
+  justify-content: flex-start;
+  padding-left: 6px;
+}
+.tut-eff-sprite {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+.tut-eff-dmg {
+  flex-direction: column;
+  gap: 2px;
+}
+.tut-eff-dmg.super {
+  background: var(--hp-b0, #6CB44C);
+  color: #181818;
+  border-color: #2c3a16;
+}
+.tut-eff-dmg.resisted {
+  background: var(--hp-b4, #B8503C);
+  color: #ffffff;
+  border-color: #421f15;
+}
+.tut-eff-dmg-tag {
+  font-size: 6px;
+  letter-spacing: 0.5px;
   opacity: 0.95;
 }
 

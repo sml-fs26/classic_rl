@@ -321,8 +321,19 @@
   }
 
   function renderStepMoves(host) {
-    /* Replica of the move menu from scene 1.  Buttons are visually faithful
-       but disabled — no click action. */
+    /* Step 4 has three layers:
+         1. The move buttons (replica of scene 1, disabled).
+         2. An axis strip under them that makes the left-right gradient
+            (more damage / less reliable) explicit.
+         3. A 3×3 form-vs-move effectiveness grid showing how the SAME
+            move's damage range shifts as the opponent evolves
+            (CHARMANDER → CHARMELEON → CHARIZARD).  This is the lesson
+            students need before they can grok why Q* must depend on
+            state, not just on the move. */
+    const wrap = document.createElement('div');
+    wrap.className = 'tut-move-demo';
+
+    /* 1. Move menu (no PWR/ACC strip — moveSubHtml now returns just the type pill). */
     const menu = document.createElement('div');
     menu.className = 'move-menu tut-move-menu';
     for (const m of window.Moves.MOVES) {
@@ -333,7 +344,69 @@
       btn.innerHTML = T('move.' + m.id) + '<span class="move-sub">' + window.Moves.moveSubHtml(m.id) + '</span>';
       menu.appendChild(btn);
     }
-    host.appendChild(menu);
+    wrap.appendChild(menu);
+
+    /* 2. Gradient axis — three labels aligned to the three buttons. */
+    const axis = document.createElement('div');
+    axis.className = 'tut-move-axis';
+    axis.innerHTML =
+      '<span class="ax-l">' + T('tut.moves.axis.l') + '</span>' +
+      '<span class="ax-m">' + T('tut.moves.axis.m') + '</span>' +
+      '<span class="ax-r">' + T('tut.moves.axis.r') + '</span>';
+    wrap.appendChild(axis);
+
+    /* 3. Form-vs-move effectiveness grid. */
+    const FORM_IDS = ['charmander', 'charmeleon', 'charizard'];
+    const MOVE_LIST = window.Moves.MOVES;
+
+    /* Pre-compute the CHARMANDER baseline damage range per move so we
+       can flag SUPER / RESISTED cells relative to it. */
+    const baseMax = {};
+    for (const mv of MOVE_LIST) {
+      const d = window.Battle.hitDamageDist('charmander', mv.id);
+      baseMax[mv.id] = d[d.length - 1][0];
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'tut-eff-grid';
+
+    /* Header row — empty corner + 3 move-name headers. */
+    const head = document.createElement('div');
+    head.className = 'tut-eff-row';
+    head.innerHTML =
+      '<div class="tut-eff-cell tut-eff-corner"></div>' +
+      MOVE_LIST.map(m =>
+        '<div class="tut-eff-cell tut-eff-headcell">' + T('move.' + m.id) + '</div>'
+      ).join('');
+    grid.appendChild(head);
+
+    for (const fid of FORM_IDS) {
+      const row = document.createElement('div');
+      row.className = 'tut-eff-row';
+      let html =
+        '<div class="tut-eff-cell tut-eff-rowhead">' +
+          '<img class="tut-eff-sprite" src="assets/' + fid + '-front.png" alt="">' +
+          '<span>' + T('pokemon.' + fid) + '</span>' +
+        '</div>';
+      for (const mv of MOVE_LIST) {
+        const dist = window.Battle.hitDamageDist(fid, mv.id);
+        const lo = dist[0][0], hi = dist[dist.length - 1][0];
+        let cls = '', tagKey = '';
+        if (hi > baseMax[mv.id])      { cls = 'super';    tagKey = 'tut.moves.eff.super';  }
+        else if (hi < baseMax[mv.id]) { cls = 'resisted'; tagKey = 'tut.moves.eff.resist'; }
+        const dmgText = T('tut.moves.eff.dmg', { lo: lo, hi: hi });
+        html +=
+          '<div class="tut-eff-cell tut-eff-dmg ' + cls + '">' +
+            '<div class="tut-eff-dmg-num">' + dmgText + '</div>' +
+            (tagKey ? '<div class="tut-eff-dmg-tag">' + T(tagKey) + '</div>' : '') +
+          '</div>';
+      }
+      row.innerHTML = html;
+      grid.appendChild(row);
+    }
+    wrap.appendChild(grid);
+
+    host.appendChild(wrap);
 
     const note = document.createElement('div');
     note.className = 'tut-footnote';

@@ -812,7 +812,7 @@ html, body {
 }
 .move-btn .move-stats {
   display: flex;
-  flex-wrap: wrap;            /* type-pill + PWR + ACC may wrap on narrow viewports */
+  flex-wrap: wrap;            /* just the type pill now (PWR/ACC retired) */
   gap: 2px 8px;
   align-items: center;
 }

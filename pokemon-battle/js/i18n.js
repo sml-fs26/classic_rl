@@ -428,11 +428,20 @@
 
       'tut.step.moves.title':    'Pick a move',
       'tut.step.moves.dialog':
-        "PWR is how strong the move feels.  ACC is the real chance it lands.  " +
-        "Higher PWR usually means lower ACC — that's the trade-off PIKACHU has to learn.",
+        "Three moves to pick from.  Read them left to right: weak but reliable → " +
+        "strong but risky.  THUNDER hits hardest but lands only ~half the time.  " +
+        "And here is the twist: as your foe evolves mid-battle, the damage of each move shifts.  " +
+        "What works on CHARMANDER may fail on CHARMELEON.",
+      'tut.moves.axis.l':        '← WEAK · RELIABLE',
+      'tut.moves.axis.m':        'DAMAGE ↑   ACCURACY ↓',
+      'tut.moves.axis.r':        'STRONG · RISKY →',
+      'tut.moves.eff.dmg':       '{lo}–{hi} DMG',
+      'tut.moves.eff.super':     'SUPER',
+      'tut.moves.eff.resist':    'RESIST',
       'tut.moves.footnote':
-        'THUNDERBOLT is the reliable workhorse — solid PWR, never misses.<br>' +
-        'THUNDER hits harder but only lands 55% of the time — a gamble worth taking when CHARMANDER is already low.',
+        'CHARMELEON <b>resists</b> THUNDERBOLT.  ' +
+        'CHARIZARD takes <b>super</b> damage from QUICK ATTACK.  ' +
+        'The best move depends on the form you face — PIKACHU must learn that.',
 
       'tut.step.turn.title':     'How a turn flows',
       'tut.step.turn.dialog':
@@ -967,11 +976,20 @@
 
       'tut.step.moves.title':    'わざを えらぶ',
       'tut.step.moves.dialog':
-        'PWRは わざの つよさの かんじ。 ACCは ほんとうに あたる かくりつ。  ' +
-        'PWRが たかいほど ACCは ひくい こと が おおい — ピカチュウは その トレードオフを まなぶ。',
+        'わざは 3つ。 ひだりから みぎへ よむ: よわいが あたる → つよいが あぶない。  ' +
+        'かみなりが もっとも つよいが、 あたるのは およそ はんぶん。  ' +
+        'そして どんでんがえし: あいてが しんかすると わざの ダメージが かわる。  ' +
+        'ヒトカゲに きいた こうげきが、 リザードには きかない ことが ある。',
+      'tut.moves.axis.l':        '← よわい · あたる',
+      'tut.moves.axis.m':        'ダメージ ↑   めいちゅう ↓',
+      'tut.moves.axis.r':        'つよい · あぶない →',
+      'tut.moves.eff.dmg':       '{lo}〜{hi} ダメージ',
+      'tut.moves.eff.super':     'こうかバツグン',
+      'tut.moves.eff.resist':    'いまひとつ',
       'tut.moves.footnote':
-        '10まんボルトは たよれる はたらきもの — PWRが しっかり、 はずれない。<br>' +
-        'かみなりは つよいが 55%の めいちゅう — ヒトカゲが もう ひくい ときに かける かち。',
+        'リザードは 10まんボルトに <b>たいせい</b>。  ' +
+        'リザードンは でんこうせっかで <b>こうかバツグン</b>。  ' +
+        'さいぜんの わざは あいての すがたに よる — ピカチュウは それを まなぶ。',
 
       'tut.step.turn.title':     '1ターンの ながれ',
       'tut.step.turn.dialog':

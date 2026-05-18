@@ -1,27 +1,22 @@
 /* Pokemon move definitions — the action space of Pikachu's MDP.
  *
- * IMPORTANT: the displayed `power` field is decorative — chosen for Pokemon-
- * canon recognisability — and is NOT what drives damage in the discrete MDP.
- * The actual damage is a per-move bucket-drop distribution defined in
- * `battle.js` (HIT_DAMAGE_DIST). `accuracy` IS real and used as the hit prob.
+ * The `power` field is retained internally for Pokemon-canon flavour but is
+ * NO LONGER surfaced on the move buttons — the on-screen PWR/ACC strip used
+ * to confuse students because the numbers don't drive the MDP. The actual
+ * damage is a per-move bucket-drop distribution defined in `battle.js`
+ * (HIT_DAMAGE_BY_FORM). `accuracy` IS real and used as the hit probability.
  *
- *   id           power  acc   ON HIT: bucket-drop distribution (in battle.js)
- *   quick_attack  55   1.00   Δ0 55% / Δ1 45%   — E[Δ|hit] = 0.45  (too weak alone)
- *   thunderbolt   80   1.00   Δ1 50% / Δ2 50%   — E[Δ|hit] = 1.50  (reliable workhorse)
- *   thunder      150   0.55   Δ2 50% / Δ3 50%   — E[Δ|hit] = 2.50 (E[Δ] = 1.38, gamble)
+ *   id           acc    base bucket-drop (CHARMANDER form)
+ *   quick_attack 1.00   Δ0 55% / Δ1 45%     (weak but always lands)
+ *   thunderbolt  1.00   Δ1 50% / Δ2 50%     (reliable workhorse)
+ *   thunder      0.55   Δ2 50% / Δ3 50%     (risky power play)
  *
- * Three moves, kept lean: the trio (weak/reliable/gamble) gives the
- * triangle students need for the exploit-vs-explore lesson without
- * cluttering the Q-table.
+ * The ordering left→right in the menu is intentional: increasing damage,
+ * decreasing reliability. The tutorial (step 4) communicates this via
+ * a small axis label + the 3×3 form-effectiveness grid below it.
  *
- * Opponent move (Charmander):
- *   ember         80   1.00   Δ0 20% / Δ1 55% / Δ2 25%  (~0.55 buckets/turn)
- *
- * The discrepancy between PWR and bucket-drop is intentional: the on-screen
- * PWR/ACC strip preserves the Gen-1 Pokemon vibe, and a second line
- * ("ON HIT: Δ1 70% · Δ2 30%") surfaces what the MDP actually does so
- * students can reason about the algorithm without being misled by flavour
- * numbers. See `moveSubHtml()` below. */
+ * Opponent move (CHARMANDER baseline):
+ *   ember         1.00   Δ0 20% / Δ1 55% / Δ2 25%  (~0.55 buckets/turn) */
 (function () {
   const MOVES = [
     { id: 'quick_attack', name: 'QUICK ATTACK', power: 55,  accuracy: 1.00, type: 'normal'   },
@@ -69,8 +64,9 @@
      Pure ASCII so every character stays inside Press Start 2P's glyph set
      (Δ falls back to the system font and looks misaligned).
 
-     This line tells the truth about the MDP. The PWR/ACC strip above is the
-     Pokemon-canon flavour; this one is what the agent actually faces. */
+     This helper is kept on the module for any future widget that wants
+     to surface the actual MDP distribution; the live move buttons no
+     longer show it (the tutorial step-4 grid carries that lesson now). */
   function dropPatternStr(moveId) {
     const dist = window.Battle && window.Battle.HIT_DAMAGE_DIST && window.Battle.HIT_DAMAGE_DIST[moveId];
     if (!dist || !dist.length) return '';
@@ -80,20 +76,18 @@
     return prefix + 'DROPS ' + parts.join(' / ');
   }
 
-  /* Render the full inner-HTML of a move button: name + type-pill + PWR
-     + ACC. Standard Gen-1 flavour line, nothing more — the per-move
-     bucket-drop distribution is an MDP detail that confuses students
-     when shown next to the move button; the dynamics still hold
-     underneath. Both scene 1 (live battle) and the tutorial's step-4
-     demo call this so any change propagates to both without drift. */
+  /* Render the move-button sub-line — just the type pill now. The old
+     PWR/ACC strip was dropped: the numbers were flavour, not MDP truth,
+     and they cluttered the choice without informing it. The rightward
+     ordering (weak/reliable → strong/risky) and the form-dependent
+     effectiveness are taught explicitly in tutorial step 4. Both
+     scene 1 and the tutorial reuse this so any change propagates. */
   function moveSubHtml(moveId) {
     const m = MOVE_BY_ID[moveId];
     if (!m) return '';
     return (
       '<span class="move-stats">' +
         '<span class="type-pill ' + m.type + '">' + typeIconSvg(m.type) + ' ' + m.type + '</span>' +
-        '<span>PWR ' + m.power + '</span>' +
-        '<span>ACC ' + Math.round(m.accuracy * 100) + '%</span>' +
       '</span>'
     );
   }
