@@ -160,14 +160,21 @@
 
   function renderStepBattleScreen(host) {
     /* Clone of the scene-1 battle stage layout, but with callout labels
-       pointing at each part.  No interaction. */
+       pointing at each part.  No interaction.
+
+       Staggered reveal: PIKACHU + its HP fade in immediately; the wild
+       CHARMANDER + its HP follow ~900 ms later.  This gives students a
+       beat to register the player's side ("that's you") before the
+       opponent appears ("here comes the foe").  The stagger is driven
+       by the .tut-stage-stage2 CSS class which delays a fade-in
+       animation; prefers-reduced-motion users get an instant render. */
     const stage = document.createElement('div');
     stage.className = 'battle-stage tut-stage';
     stage.innerHTML =
       '<div class="grass-rim"></div>' +
       '<div class="platform opponent"></div>' +
       '<div class="platform player"></div>' +
-      '<div class="sprite-host opponent"></div>' +
+      '<div class="sprite-host opponent tut-stage-stage2"></div>' +
       '<div class="sprite-host player"></div>';
     host.appendChild(stage);
 
@@ -184,16 +191,19 @@
     window.HPBar.mount(playerHpHost, {
       name: T('pokemon.pikachu'),    side: 'player',   level: 5, numBuckets: window.Battle.NUM_BUCKETS,
     });
+    /* HPBar.mount overwrites host.className, so add the stagger class here. */
+    oppHpHost.classList.add('tut-stage-stage2');
 
     /* Callout overlay layer.  Pure CSS-positioned labels (no SVG arrows —
-       the dotted-border + text strip is enough at this scale). */
+       the dotted-border + text strip is enough at this scale).  Opponent
+       callouts ride the same .tut-stage-stage2 delay as the sprite/HP. */
     const callouts = document.createElement('div');
     callouts.className = 'tut-callouts';
     callouts.innerHTML =
-      '<div class="tut-callout c-pika">'    + T('tut.callout.you')      + '</div>' +
-      '<div class="tut-callout c-charm">'   + T('tut.callout.wild')     + '</div>' +
-      '<div class="tut-callout c-pikahp">'  + T('tut.callout.your_hp')  + '</div>' +
-      '<div class="tut-callout c-charmhp">' + T('tut.callout.their_hp') + '</div>';
+      '<div class="tut-callout c-pika">'                       + T('tut.callout.you')      + '</div>' +
+      '<div class="tut-callout c-charm tut-stage-stage2">'     + T('tut.callout.wild')     + '</div>' +
+      '<div class="tut-callout c-pikahp">'                     + T('tut.callout.your_hp')  + '</div>' +
+      '<div class="tut-callout c-charmhp tut-stage-stage2">'   + T('tut.callout.their_hp') + '</div>';
     stage.appendChild(callouts);
   }
 
@@ -554,11 +564,6 @@
     }
     wrap.appendChild(seq);
     host.appendChild(wrap);
-
-    const note = document.createElement('div');
-    note.className = 'tut-footnote';
-    note.textContent = T('tut.turn.footnote');
-    host.appendChild(note);
 
     /* Kick off the loop with an HP context — bars drop a bucket per
        attack and reset when both hit CRITICAL. */

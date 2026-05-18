@@ -423,8 +423,7 @@
       'tut.hp.watch':            'WATCH CHARMANDER TAKE A HIT',
       'tut.hp.fainted_flash':    'FAINTED!',
       'tut.hp.footnote':
-        'Each attack drops the bar by <b>0 to 3</b> buckets.  Past CRITICAL, the POKEMON faints.  ' +
-        'Stronger moves drop more — THUNDER can land a 3-bucket hit in one go.',
+        'Each attack drops the bar by <b>0 to 3</b> buckets.  Past CRITICAL, the POKEMON faints.',
 
       'tut.step.moves.title':    'Pick a move',
       'tut.step.moves.dialog':
@@ -445,16 +444,14 @@
 
       'tut.step.turn.title':     'How a turn flows',
       'tut.step.turn.dialog':
-        "Your PIKACHU is faster, so it moves first.  Then the wild " +
-        "CHARMANDER strikes back with EMBER.  One turn — both actions.",
+        "A turn flows like this: PIKACHU picks an attack, " +
+        "then the wild CHARMANDER strikes back.  Then it repeats.",
       'tut.turn.row1.who':       'PIKACHU',
       'tut.turn.row1.action':    'You pick a move.  PIKACHU attacks first.',
       'tut.turn.row2.who':       'CHARMANDER',
       'tut.turn.row2.action':    'Wild CHARMANDER strikes back with EMBER.',
       'tut.turn.row3.who':       '— — —',
       'tut.turn.row3.action':    'Both HP bars update.  State has changed.',
-      'tut.turn.footnote':
-        'PIKACHU is faster (base speed 90 vs 65), so it always moves first.',
 
       'tut.step.winlose.title':  'Win, lose, and reward',
       'tut.step.winlose.dialog':
@@ -971,8 +968,7 @@
       'tut.hp.watch':            'ヒトカゲが ダメージを うけるのを みて',
       'tut.hp.fainted_flash':    'ひんし！',
       'tut.hp.footnote':
-        'こうげきは バーを <b>0〜3</b> バケツ さげる。 ピンチを こえると ポケモンは ひんし。 ' +
-        'つよい わざは おおく さげる — かみなりは いっぱつで 3バケツも ある。',
+        'こうげきは バーを <b>0〜3</b> バケツ さげる。 ピンチを こえると ポケモンは ひんし。',
 
       'tut.step.moves.title':    'わざを えらぶ',
       'tut.step.moves.dialog':
@@ -993,16 +989,14 @@
 
       'tut.step.turn.title':     '1ターンの ながれ',
       'tut.step.turn.dialog':
-        'きみの ピカチュウの ほうが はやい ので さきに うごく。 そのあと やせいの ' +
-        'ヒトカゲが ひのこで はんげき。 1ターン — りょうほうの こうどう。',
+        '1ターンの ながれ： ピカチュウが わざを えらび、 ' +
+        'そのあと やせいの ヒトカゲが はんげき。 これが くりかえす。',
       'tut.turn.row1.who':       'ピカチュウ',
       'tut.turn.row1.action':    'わざを えらぶ。 ピカチュウが さきに こうげき。',
       'tut.turn.row2.who':       'ヒトカゲ',
       'tut.turn.row2.action':    'やせいの ヒトカゲは ひのこで はんげき。',
       'tut.turn.row3.who':       '— — —',
       'tut.turn.row3.action':    'りょうほうの HPバーが こうしん。 じょうたいが かわった。',
-      'tut.turn.footnote':
-        'ピカチュウは はやい（すばやさ 90 vs 65）ので、 いつも さきに うごく。',
 
       'tut.step.winlose.title':  'かち、 まけ、 ほうしゅう',
       'tut.step.winlose.dialog':

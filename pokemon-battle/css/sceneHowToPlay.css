@@ -125,6 +125,22 @@
 .tut-callout.c-pikahp  { right: 4%; bottom: 4%; }
 .tut-callout.c-charmhp { left: 4%;  top: 4%; }
 
+/* Staggered reveal — opponent sprite / HP / callouts fade in ~900 ms
+   after the player's side so the student sees "you" first, then "the
+   foe arrives".  Applied to .sprite-host.opponent, the opponent
+   .hp-box, and the c-charm / c-charmhp callouts. */
+@keyframes tut-stage-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.tut-stage-stage2 {
+  opacity: 0;
+  animation: tut-stage-fade-in 540ms ease-out 900ms forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tut-stage-stage2 { opacity: 1; animation: none; }
+}
+
 /* ---------- Step 2 — HP buckets (animated demo + comic strip) ---------- */
 .tut-hp-demo {
   display: flex;
