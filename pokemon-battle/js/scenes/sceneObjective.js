@@ -183,7 +183,7 @@
     const f2 = document.createElement('div');
     c2.appendChild(f2);
     window.Katex.render(
-      String.raw`Q^{\star}(s, a) \;=\; \max_{\pi}\; \mathbb{E}_{\tau \sim \pi}\!\left[\, G_i(\tau) \;\middle|\; s_i = s,\; a_i = a \,\right]`,
+      String.raw`Q^{\star}(s, a) \;=\; \max\; \mathbb{E}\!\left[\, G_i(\tau) \,\right]`,
       f2, true
     );
     const foot2 = document.createElement('div');
@@ -209,7 +209,6 @@
             '<button class="g-variance-policy" data-policy="quick_attack">' + T('obj.var.policy.quick')  + '</button>' +
             '<button class="g-variance-policy active" data-policy="thunderbolt">' + T('obj.var.policy.bolt') + '</button>' +
             '<button class="g-variance-policy" data-policy="thunder">' + T('obj.var.policy.thun') + '</button>' +
-            '<button class="g-variance-policy" data-policy="random">' + T('obj.var.policy.random') + '</button>' +
           '</div>' +
           '<div class="g-variance-stats" id="g-variance-stats">' + T('obj.var.stats_empty') + '</div>' +
           '<div class="g-variance-chart" id="g-variance-chart"></div>' +
@@ -221,8 +220,8 @@
     let variancePolicy = 'thunderbolt';
     const ACTIONS_LOCAL = window.Moves.MOVE_IDS;
 
-    /* Sample one trajectory under the current policy from FULL/FULL.
-       'random' picks a uniform action each turn; named moves repeat. */
+    /* Sample one trajectory from FULL/FULL using the selected action
+       at every step (no policy machinery yet). */
     let varianceRngSeed = 20260516;
     function sampleOneG() {
       varianceRngSeed = (varianceRngSeed + 1013904223) | 0;
@@ -230,9 +229,7 @@
       let state = window.Battle.initialState();
       let G = 0;
       for (let t = 0; t < 30; t++) {
-        const action = (variancePolicy === 'random')
-          ? ACTIONS_LOCAL[Math.floor(rng.next() * ACTIONS_LOCAL.length)]
-          : variancePolicy;
+        const action = variancePolicy;
         const out = window.Battle.sample(state, action, rng);
         G += out.reward;
         state = out.sNext;
@@ -284,8 +281,9 @@
     }
     document.getElementById('g-variance-sample').addEventListener('click', () => drawSamples(20));
 
-    /* Policy-selector buttons: clicking one switches the policy and
-       resets the samples (since they're conditioned on the policy). */
+    /* Action-selector buttons: clicking one switches the action used
+       at every step and resets the samples (since they're conditioned
+       on the chosen action).  The data-policy attr is a legacy name. */
     variance.querySelectorAll('.g-variance-policy').forEach((btn) => {
       btn.addEventListener('click', () => {
         const p = btn.getAttribute('data-policy');

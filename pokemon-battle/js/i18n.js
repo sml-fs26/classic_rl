@@ -161,19 +161,18 @@
       'obj.qstar.foot':
         'The expected return when you take action a in state s and then play optimally thereafter. ' +
         'This is what the agent ultimately wants to know — once you have Q*, optimal play is just argmax_a Q*(s, a).',
-      'obj.var.title':        'Q* IS THE EXPECTED G — VARIANCE LIVES IN ONE TRAJECTORY',
+      'obj.var.title':        'Q* IS THE MAXIMUM AVERAGE G — VARIANCE LIVES IN ONE TRAJECTORY',
       'obj.var.hint':         '(click to expand)',
       'obj.var.explainer':
-        'G<sub>1</sub>(τ) is a <em>random variable</em>. Two rollouts from the same start can land far apart. ' +
-        '<b>Q*</b> is the maximum, over all policies, of the average G under that policy.  Pick a policy below, ' +
-        'press SAMPLE to draw 20 trajectories; each bar is one G<sub>1</sub>(τ).  The dashed line is the mean — an ' +
-        'estimate of Q under that policy.  <span class="g-r">Try different policies — different distribution, ' +
-        'different mean.</span>',
-      'obj.var.policy_label': 'POLICY:',
+        'G<sub>i</sub>(τ) is a <em>random variable</em>. Two rollouts from the same start can land far apart.  ' +
+        '<b>Q*</b> is the maximum, over all possible choices of actions at each state, of the average G.  ' +
+        'Pick an action below and press SAMPLE to draw 20 trajectories using only that action — each bar is one G, one τ.  ' +
+        'The dashed line is the mean — an estimate of Q under the trajectories that arise from that chosen action.  ' +
+        '<span class="g-r">Try different actions — different distribution, different mean.</span>',
+      'obj.var.policy_label': 'ACTION:',
       'obj.var.policy.quick': 'QUICK',
       'obj.var.policy.bolt':  'BOLT',
       'obj.var.policy.thun':  'THUN',
-      'obj.var.policy.random':'RANDOM',
       'obj.var.stats_empty':  'N = 0 · mean — · range —',
       'obj.var.stats':        'N = <b>{n}</b> · mean <b>{mean}</b> · range [<b>{lo}</b>, <b>{hi}</b>]',
       'obj.var.empty_chart':  '(no samples yet — press SAMPLE to draw 20)',
@@ -731,19 +730,19 @@
       'obj.qstar.foot':
         'じょうたい sで こうどう aを とり、 そのあと さいてきに あそんだ ときの きたい リターン。 ' +
         'エージェントが しりたい もの — Q*が あれば、 さいてきな あそびは argmax_a Q*(s, a) だけ。',
-      'obj.var.title':        'Q*は Gの きたいち — ひとつの きせきには ぶれが ある',
+      'obj.var.title':        'Q*は さいだいの へいきん G — ひとつの きせきには ぶれが ある',
       'obj.var.hint':         '（クリックで ひらく）',
       'obj.var.explainer':
-        'G<sub>1</sub>(τ)は <em>かくりつへんすう</em>。 おなじ スタートからの ふたつの ロールアウトでも ' +
-        'おおきく ばらける。 <b>Q*</b>は すべての ほうさくの なかで、 その ほうさくの もとでの Gの ' +
-        'へいきんの さいだい。 したで ほうさくを えらび、 SAMPLEを おして 20の きせきを ひく。 ' +
-        'ぼうは ひとつの G<sub>1</sub>(τ)。 てんせんは へいきん — その ほうさくの もとでの Qの ' +
-        'みつもり。 <span class="g-r">ちがう ほうさく → ちがう ぶんぷ、 ちがう へいきん。</span>',
-      'obj.var.policy_label': 'ほうさく：',
+        'G<sub>i</sub>(τ)は <em>かくりつへんすう</em>。 おなじ スタートからの ふたつの ロールアウトでも ' +
+        'おおきく ばらける。 <b>Q*</b>は すべての じょうたいでの こうどうの えらびかたの なかで、 ' +
+        'へいきん Gの さいだい。 したで こうどうを えらび、 SAMPLEを おして その こうどう だけを ' +
+        'つかった 20の きせきを ひく — ぼうは ひとつの G、 ひとつの τ。 てんせんは へいきん — ' +
+        'その えらんだ こうどうから うまれる きせきの もとでの Qの みつもり。 ' +
+        '<span class="g-r">ちがう こうどう → ちがう ぶんぷ、 ちがう へいきん。</span>',
+      'obj.var.policy_label': 'こうどう：',
       'obj.var.policy.quick': 'でんこう',
       'obj.var.policy.bolt':  'ボルト',
       'obj.var.policy.thun':  'かみなり',
-      'obj.var.policy.random':'ランダム',
       'obj.var.stats_empty':  'N = 0 · へいきん — · はんい —',
       'obj.var.stats':        'N = <b>{n}</b> · へいきん <b>{mean}</b> · はんい [<b>{lo}</b>, <b>{hi}</b>]',
       'obj.var.empty_chart':  '（まだ サンプル なし — SAMPLEで 20こ ひく）',
