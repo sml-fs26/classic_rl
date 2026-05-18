@@ -44,7 +44,7 @@
       'scene.trajectory': 'The trajectory',
       'scene.objective':  'Return & Q*',
       'scene.qstar':      'π* from Q',
-      'scene.dp':         'Filling Q with DP',
+      'scene.dp':         'Filling Q* with DP',
       'scene.whyNotDp':   "Why DP doesn't scale",
       'scene.sarsaDerive':'Deriving SARSA',
       'scene.recap':      "You've trained PIKACHU.",
@@ -202,10 +202,10 @@
       'qstar.phase.pika_fainted': 'PIKA FAINTED — LOSS',
 
       /* ---- DP scene ---- */
-      'dp.heading':           'FILLING Q WITH DYNAMIC PROGRAMMING',
+      'dp.heading':           'FILLING Q* WITH DYNAMIC PROGRAMMING',
       'dp.premise':
         '<strong>If we know P</strong> &mdash; the full transition table for ' +
-        'every (s, a, s\') &mdash; <strong>we can compute Q here using dynamic programming!</strong> ' +
+        'every (s, a, r, s\') &mdash; <strong>we can compute Q* here using dynamic programming!</strong> ' +
         'Bellman\'s equation is a recursive definition of Q*; sweep it to a fixed point ' +
         'and we have the optimal action-value for every state.',
       'dp.formula.label':     'BELLMAN OPTIMALITY EQUATION',
@@ -222,7 +222,7 @@
       'dp.phase.charizard.n3':    '<b>Q*(s, QUICK) = +10</b> for every cell in these two columns.',
       'dp.phase.crit.title':      'YOUR=CRITICAL row — losing positions',
       'dp.phase.crit.n1':         'PIKACHU at CRITICAL means any counter-attack faints us. Most cells in this row are losing.',
-      'dp.phase.crit.n2':         'Q tells you the expected loss — useful even when there is no winning move.',
+      'dp.phase.crit.n2':         'Q* tells you the expected loss — useful even when there is no winning move.',
       'dp.phase.detail.title':    'DETAIL — (FULL, MID, THUNDER)',
       'dp.phase.charmeleon.title':'CHARMELEON column — THUNDER reigns',
       'dp.phase.charmeleon.n1':   'CHARMELEON\'s hardened hide <b>resists THUNDERBOLT</b> (0-1 dmg, fizzles).',
@@ -233,7 +233,7 @@
       'dp.phase.charmander.n3':   'THUNDER keeps the same 2-3 dmg through every form — sometimes worth its 55% accuracy.',
       'dp.phase.done.title':      'Q* CONVERGED.',
       'dp.phase.done.n1':         'All three Pikachu moves earn their place: QUICK against Charizard, THUNDER against Charmeleon, a mix in Charmander territory.',
-      'dp.phase.done.n2':         'But this required <i>P(s′ | s, a)</i> for every transition, plus one Bellman backup per cell.',
+      'dp.phase.done.n2':         'But this required <i>P(s′, r | s, a)</i> for every transition, plus one Bellman backup per cell.',
       'dp.phase.done.n3':         'In real games neither is available — sample-based methods come next.',
       'dp.detail.title':          'Q*(YOUR={your}, OPP={opp}, {move})',
       'dp.detail.narration':
@@ -623,7 +623,7 @@
       'scene.trajectory': 'きせき τ',
       'scene.objective':  'リターン と Q*',
       'scene.qstar':      'Qから π*へ',
-      'scene.dp':         'DPで Qを うめる',
+      'scene.dp':         'DPで Q*を うめる',
       'scene.whyNotDp':   'なぜ DPは スケールしない？',
       'scene.sarsaDerive':'SARSAの みちびき',
       'scene.recap':      'ピカチュウは そだった！',
@@ -770,10 +770,10 @@
       'qstar.phase.charm_does': 'ヒトカゲ → {move}',
       'qstar.phase.pika_fainted': 'ピカ ひんし — まけ',
 
-      'dp.heading':           'DPで Qを うめる',
+      'dp.heading':           'DPで Q*を うめる',
       'dp.premise':
-        '<strong>Pが わかれば</strong>、 つまり すべての (s, a, s′) の せんいかくりつが あれば、 ' +
-        '<strong>DP（どうてきけいかくほう） で Qを ここで けいさんできる！</strong> ' +
+        '<strong>Pが わかれば</strong>、 つまり すべての (s, a, r, s′) の せんいかくりつが あれば、 ' +
+        '<strong>DP（どうてきけいかくほう） で Q*を ここで けいさんできる！</strong> ' +
         'ベルマンの しきは Q*の さいきてきな ていぎ。 ふどうてんまで かいて うめれば、 ' +
         'すべての じょうたいの さいてき こうどうかちが えられる。',
       'dp.formula.label':     'ベルマン さいてきせいの しき',
@@ -790,7 +790,7 @@
       'dp.phase.charizard.n3':    'この ふたつの れつの すべての セルで <b>Q*(s, でんこう) = +10</b>。',
       'dp.phase.crit.title':      'じぶん＝ピンチの れつ — まけの じょうたい',
       'dp.phase.crit.n1':         'ピカチュウが ピンチだと、 あいての はんげきで ひんし。 この れつは ほとんど まけ。',
-      'dp.phase.crit.n2':         'Qは きたい される そんしつを おしえて くれる — かちの てが なくても やくに たつ。',
+      'dp.phase.crit.n2':         'Q*は きたい される そんしつを おしえて くれる — かちの てが なくても やくに たつ。',
       'dp.phase.detail.title':    'くわしく — (まんたん, なかほど, かみなり)',
       'dp.phase.charmeleon.title':'リザードの れつ — かみなりが しはい',
       'dp.phase.charmeleon.n1':   'リザードの かたい はだは <b>10まんボルトを はじく</b>（0-1 ダメージ）。',
@@ -801,7 +801,7 @@
       'dp.phase.charmander.n3':   'かみなりは どの すがたにも 2-3 ダメージ — めいちゅう 55%でも うつ かちが ある。',
       'dp.phase.done.title':      'Q* しゅうそく。',
       'dp.phase.done.n1':         'ピカチュウの 3つの わざ それぞれに ばしょが ある： リザードンに でんこう、 リザードに かみなり、 ヒトカゲでは まぜる。',
-      'dp.phase.done.n2':         'しかし これには すべての せんいの <i>P(s′ | s, a)</i> と、 セルごとに ひとつの ベルマン こうしんが ひつよう。',
+      'dp.phase.done.n2':         'しかし これには すべての せんいの <i>P(s′, r | s, a)</i> と、 セルごとに ひとつの ベルマン こうしんが ひつよう。',
       'dp.phase.done.n3':         'ほんとうの ゲームでは どちらも ない — つぎは サンプルに もとづく ほうほう。',
       'dp.detail.title':          'Q*（じぶん={your}, あいて={opp}, {move}）',
       'dp.detail.narration':

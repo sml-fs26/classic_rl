@@ -1,4 +1,4 @@
-/* Scene — filling Q with dynamic programming.
+/* Scene — filling Q* with dynamic programming.
  *
  *   We compute Q*(s, a) for the 25-state battle MDP using value iteration
  *   (offline, once at mount), then STEP through 6 phases of pedagogical
@@ -317,7 +317,7 @@
     const fhost = document.createElement('div');
     fcard.appendChild(fhost);
     window.Katex.render(
-      String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\!\left[\, R \;+\; \max_{a'} Q^{\star}(S', a') \;\middle|\; S = s,\; A = a \,\right]`,
+      String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\!\left[\, R \;+\; \max_{a'} Q^{\star}(S', a') \,\right]`,
       fhost, true
     );
     root.appendChild(fcard);
