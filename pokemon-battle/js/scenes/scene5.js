@@ -1,9 +1,9 @@
 /* Scene 5 — "You've trained PIKACHU."
  *
- * Six recap cards in Pokemon-dialog-box style, one per prior viz (anymal,
- * casino, spooky, darts, sarsa-cliffwalk, snakes-ladders), each citing the
- * piece that became the corresponding part of this battle. Closes with a
- * one-line where-this-goes-next caption.
+ * Hall of Fame recap.  One card per badge (MDP, RETURN, Q*, DP, SARSA);
+ * each card carries a distinctive Gen-1 styled glyph that recalls the
+ * concept from earlier scenes, plus a short recap paragraph.  The page
+ * speaks to *this* student via the trainer card above the recap row.
  */
 (function () {
   window.scenes = window.scenes || {};
@@ -21,6 +21,94 @@
   ];
 
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+
+  /* ---------- Per-badge visual glyphs ----------
+     Each builder returns an HTML string for the .sc5-card-visual slot.
+     Glyphs are deliberately small (≤ ~150 px tall) and use Press Start
+     2P + retro chips so they read as "miniature reminders" of the
+     full visuals from earlier scenes — not as new content. */
+
+  function visualMdp() {
+    /* 4-tile strip: S / A / P / R. Each tile pairs the letter with a
+       one-line concrete instance from this battle so the abstraction
+       lands. */
+    const tiles = [
+      { letter: 'S', mini: 'HP × HP' },
+      { letter: 'A', mini: 'QA / TB / TH' },
+      { letter: 'P', mini: 'DAMAGE ROLL' },
+      { letter: 'R', mini: '−1 / +10 / −10' },
+    ];
+    return (
+      '<div class="sc5-mdp-strip">' +
+        tiles.map(t =>
+          '<div class="sc5-mdp-tile">' +
+            '<div class="sc5-mdp-letter">' + t.letter + '</div>' +
+            '<div class="sc5-mdp-mini">' + t.mini + '</div>' +
+          '</div>'
+        ).join('') +
+      '</div>'
+    );
+  }
+
+  function visualReturn() {
+    /* Reward tape: −1 → −1 → −1 → +10  ⇒  G = +7.  Closes with the
+       formal sum so students see the link between concrete and
+       symbolic. */
+    return (
+      '<div class="sc5-rtn-tape">' +
+        '<span class="sc5-rtn-r">−1</span>' +
+        '<span class="sc5-rtn-arrow">→</span>' +
+        '<span class="sc5-rtn-r">−1</span>' +
+        '<span class="sc5-rtn-arrow">→</span>' +
+        '<span class="sc5-rtn-r">−1</span>' +
+        '<span class="sc5-rtn-arrow">→</span>' +
+        '<span class="sc5-rtn-r sc5-rtn-final">+10</span>' +
+        '<span class="sc5-rtn-sum">⇒ G = +7</span>' +
+      '</div>' +
+      '<div class="sc5-rtn-formula">G<sub>i</sub>(τ) = r<sub>i</sub> + r<sub>i+1</sub> + …</div>'
+    );
+  }
+
+  function visualQstar() {
+    /* Three action cells with one starred (the argmax).  Mirrors the
+       per-state Q-row students saw in scene 6. */
+    return (
+      '<div class="sc5-qstar-row">' +
+        '<div class="sc5-qstar-cell"><span class="sc5-qstar-name">QA</span><span class="sc5-qstar-val">+1.2</span></div>' +
+        '<div class="sc5-qstar-cell sc5-qstar-best"><span class="sc5-qstar-name">TB</span><span class="sc5-qstar-val">+3.8 ★</span></div>' +
+        '<div class="sc5-qstar-cell"><span class="sc5-qstar-name">TH</span><span class="sc5-qstar-val">+2.5</span></div>' +
+      '</div>' +
+      '<div class="sc5-qstar-formula">π*(s) = argmax<sub>a</sub> Q*(s, a)</div>'
+    );
+  }
+
+  function visualDp() {
+    /* Bellman expansion: a Q-cell branches into hit / miss children
+       (echoes the per-cell breakdown table in scene 7). */
+    return (
+      '<div class="sc5-dp-root">Q*(s, a)</div>' +
+      '<div class="sc5-dp-tree">' +
+        '<div class="sc5-dp-branch">hit  →  r + Q*(s′, a′)</div>' +
+        '<div class="sc5-dp-branch">miss →  r + Q*(s, a′)</div>' +
+      '</div>'
+    );
+  }
+
+  function visualSarsa() {
+    /* The S-A-R-S-A tuple as five colored chips, followed by the
+       SARSA update.  Echoes the trajectory tape + update line from
+       scene 9 step F. */
+    return (
+      '<div class="sc5-sarsa-tape">' +
+        '<span class="sc5-sarsa-chip k-s">s</span>' +
+        '<span class="sc5-sarsa-chip k-a">a</span>' +
+        '<span class="sc5-sarsa-chip k-r">r</span>' +
+        '<span class="sc5-sarsa-chip k-s">s′</span>' +
+        '<span class="sc5-sarsa-chip k-a">a′</span>' +
+      '</div>' +
+      '<div class="sc5-sarsa-update">q[s, a] += α (r + q[s′, a′] − q[s, a])</div>'
+    );
+  }
 
   function fmtDate(ts) {
     if (!ts) return T('recap.trainer.dash');
@@ -128,42 +216,46 @@
     wrap.className = 'sc5-grid';
     root.appendChild(wrap);
 
-    let cardIdx = 0;
-    for (const card of window.DATA.recap) {
+    /* Five badge recaps.  Each entry maps to a trainer-badge key
+       (mdp, return, qstar, dp, sarsa) so the card header re-uses the
+       same colour as the topbar pip — visual continuity between
+       "you earned this" and "here is what it meant".  The visual()
+       builder returns the distinctive glyph for that concept. */
+    const BADGE_RECAPS = [
+      { key: 'mdp',    label: TRAINER_BADGE_META[0].label, visual: visualMdp    },
+      { key: 'return', label: TRAINER_BADGE_META[1].label, visual: visualReturn },
+      { key: 'qstar',  label: TRAINER_BADGE_META[2].label, visual: visualQstar  },
+      { key: 'dp',     label: TRAINER_BADGE_META[3].label, visual: visualDp     },
+      { key: 'sarsa',  label: TRAINER_BADGE_META[4].label, visual: visualSarsa  },
+    ];
+
+    BADGE_RECAPS.forEach((b, i) => {
       const box = document.createElement('div');
-      box.className = 'poke-box sc5-card';
-      box.style.setProperty('--i', String(cardIdx));
-      cardIdx++;
-      const hueChip = document.createElement('span');
-      hueChip.className = 'hue-chip hue-' + card.hue;
-      hueChip.textContent = card.from;
-      box.appendChild(hueChip);
-      const title = document.createElement('div');
-      title.className = 'sc5-title';
-      title.textContent = card.title;
-      box.appendChild(title);
-      const sym = document.createElement('div');
-      sym.className = 'poke-formula sc5-formula';
-      window.Katex.render(card.symbol, sym, true);
-      box.appendChild(sym);
+      box.className = 'poke-box sc5-card sc5-card-' + b.key;
+      box.style.setProperty('--i', String(i));
+
+      const head = document.createElement('div');
+      head.className = 'sc5-card-head';
+      head.innerHTML =
+        '<div class="sc5-card-badge ' + b.key + ' earned">' +
+          '<span class="sc5-card-badge-mark">★</span>' +
+          '<span class="sc5-card-badge-label">' + b.label + '</span>' +
+        '</div>' +
+        '<div class="sc5-card-title">' + T('recap.card.' + b.key + '.title') + '</div>';
+      box.appendChild(head);
+
+      const vis = document.createElement('div');
+      vis.className = 'sc5-card-visual sc5-vis-' + b.key;
+      vis.innerHTML = b.visual();
+      box.appendChild(vis);
+
       const cap = document.createElement('div');
       cap.className = 'sc5-caption';
-      cap.textContent = card.caption;
+      cap.innerHTML = T('recap.card.' + b.key + '.text');
       box.appendChild(cap);
-      const anchor = document.createElement('div');
-      anchor.className = 'sc5-anchor';
-      anchor.textContent = card.anchor;
-      box.appendChild(anchor);
-      wrap.appendChild(box);
-    }
 
-    const closer = document.createElement('div');
-    closer.className = 'poke-box sc5-closer';
-    closer.style.setProperty('--i', String(cardIdx));
-    closer.innerHTML =
-      '<span class="hue-chip hue-poke">' + T('recap.closer.label') + '</span>' +
-      '<div class="sc5-closer-text">' + T('recap.closer.text') + '</div>';
-    root.appendChild(closer);
+      wrap.appendChild(box);
+    });
 
     const footnote = document.createElement('div');
     footnote.className = 'footnote';

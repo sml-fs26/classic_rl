@@ -245,23 +245,51 @@
   0%   { opacity: 0; transform: translateY(10px) scale(0.96); }
   100% { opacity: 1; transform: translateY(0)    scale(1);    }
 }
-.sc5-card .hue-chip { align-self: flex-start; margin-bottom: 4px; }
-.sc5-card .sc5-title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  color: var(--ink-on-box);
+/* Card header — badge tile + title in one row.  Badge tile reuses the
+   concept-colour scheme from .sc5-tc-badge so the recap card visually
+   matches the topbar/trainer-card pip. */
+.sc5-card .sc5-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 2px;
 }
-.sc5-card .poke-formula.sc5-formula {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 4px 0;
-  margin: 0;
-  text-align: left;
-  display: block;
+.sc5-card .sc5-card-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 44px;
+  padding: 4px 2px;
+  border: 2px solid var(--ink);
+  background: #BBB;
+  color: var(--ink);
+  font-family: 'Press Start 2P', monospace;
+  flex-shrink: 0;
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.18);
 }
-.sc5-card .poke-formula.sc5-formula .katex { font-size: 13px; }
+.sc5-card .sc5-card-badge.mdp.earned    { background: #D55E00; color: #FFFFFF; }
+.sc5-card .sc5-card-badge.return.earned { background: #0072B2; color: #FFFFFF; }
+.sc5-card .sc5-card-badge.qstar.earned  { background: var(--pikachu-yellow); color: var(--ink-on-box); }
+.sc5-card .sc5-card-badge.dp.earned     { background: #009E73; color: #FFFFFF; }
+.sc5-card .sc5-card-badge.sarsa.earned  { background: #CC79A7; color: #FFFFFF; }
+.sc5-card .sc5-card-badge-mark  { font-size: 12px; line-height: 1; }
+.sc5-card .sc5-card-badge-label { font-size: 8px; letter-spacing: 0.04em; margin-top: 2px; }
+.sc5-card .sc5-card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--ink-on-box);
+}
+
+/* Visual slot — small Gen-1-styled glyph specific to each badge. */
+.sc5-card .sc5-card-visual {
+  margin: 4px 0 2px;
+  padding: 6px 4px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+}
 .sc5-card .sc5-caption {
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
@@ -269,31 +297,165 @@
   color: var(--ink-on-box);
   margin-top: 2px;
 }
-.sc5-card .sc5-anchor {
+
+/* ---- MDP glyph: 4-tile strip ---- */
+.sc5-mdp-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+}
+.sc5-mdp-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 2px;
+  background: var(--card);
+  border: 1px solid var(--ink);
+  text-align: center;
+}
+.sc5-mdp-letter {
   font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  color: #6B6B6B;
-  letter-spacing: 0.5px;
-  margin-top: auto;
-  padding-top: 6px;
+  font-size: 14px;
+  color: var(--pikachu-cheek);
+  line-height: 1;
+}
+.sc5-mdp-mini {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: var(--ink-on-box);
+  letter-spacing: 0.04em;
 }
 
-.sc5-closer {
-  background: var(--pikachu-yellow);
-  margin-top: 4px;
-  padding: 10px 14px;
-  box-shadow:
-    inset 0 0 0 2px var(--pikachu-yellow),
-    inset 0 0 0 4px var(--inner-highlight),
-    inset 0 0 0 6px var(--pikachu-yellow);
-  animation: sc5-card-enter 520ms cubic-bezier(.2, .8, .3, 1) backwards;
-  animation-delay: calc(var(--i, 5) * 180ms + 220ms);
-}
-.sc5-closer .hue-chip { background: var(--ink-on-box); color: var(--pikachu-yellow); margin-bottom: 6px; display: inline-block; }
-.sc5-closer-text {
+/* ---- RETURN glyph: reward tape + sum ---- */
+.sc5-rtn-tape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex-wrap: wrap;
   font-family: 'Press Start 2P', monospace;
-  font-size: 8.5px;
-  line-height: 1.6;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+.sc5-rtn-r {
+  display: inline-block;
+  padding: 3px 5px;
+  background: var(--card);
+  border: 1px solid var(--ink);
+}
+.sc5-rtn-r.sc5-rtn-final {
+  background: #009E73;
+  color: #FFFFFF;
+}
+.sc5-rtn-arrow { color: #888; }
+.sc5-rtn-sum {
+  margin-left: 4px;
+  color: var(--pikachu-cheek);
+}
+.sc5-rtn-formula {
+  margin-top: 6px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+
+/* ---- Q* glyph: three action cells, one starred ---- */
+.sc5-qstar-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+}
+.sc5-qstar-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 2px;
+  background: var(--card);
+  border: 1px solid var(--ink);
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  text-align: center;
+}
+.sc5-qstar-cell.sc5-qstar-best {
+  background: var(--pikachu-yellow);
+  color: var(--ink-on-box);
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px #B89020;
+}
+.sc5-qstar-name {
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+.sc5-qstar-val {
+  font-size: 10px;
+  margin-top: 2px;
+}
+.sc5-qstar-formula {
+  margin-top: 6px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+
+/* ---- DP glyph: root Q-cell + two Bellman branches ---- */
+.sc5-dp-root {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+  padding: 4px 6px;
+  background: var(--pikachu-yellow);
+  border: 1px solid var(--ink);
+  margin: 0 auto 4px;
+  display: inline-block;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.sc5-dp-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.sc5-dp-branch {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  padding: 4px 6px;
+  background: var(--card);
+  border-left: 3px solid #009E73;
+}
+
+/* ---- SARSA glyph: 5-chip tuple + update ---- */
+.sc5-sarsa-tape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.sc5-sarsa-chip {
+  display: inline-block;
+  min-width: 24px;
+  padding: 4px 6px;
+  border: 1px solid var(--ink);
+  background: var(--card);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+  text-align: center;
+}
+.sc5-sarsa-chip.k-s { background: #FBE7C0; }
+.sc5-sarsa-chip.k-a { background: #C9E7F4; }
+.sc5-sarsa-chip.k-r { background: #F4C9C9; }
+.sc5-sarsa-update {
+  margin-top: 6px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
   color: var(--ink-on-box);
 }
 
@@ -301,8 +463,7 @@
   .sc5-scene::before,
   .sc5-hof-banner,
   .sc5-hof-banner .sc5-star,
-  .sc5-card,
-  .sc5-closer {
+  .sc5-card {
     animation: none;
   }
 }

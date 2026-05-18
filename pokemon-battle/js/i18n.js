@@ -376,8 +376,7 @@
 
       /* ---- Scene 5 (Hall of Fame) ---- */
       'recap.hof':            'HALL OF FAME',
-      'recap.sub':
-        'The five RL pieces are the same five pieces that fit Snakes & Ladders. Two cultural artefacts, one curriculum.',
+      'recap.sub':            'One short recap per badge — the five pieces of RL you just earned.',
       'recap.trainer.champion':    'POKEMON CHAMPION',
       'recap.trainer.in_progress': 'TRAINER IN PROGRESS',
       'recap.trainer.locked':      'LOCKED',
@@ -385,13 +384,33 @@
       'recap.trainer.stats_base':  '<b>{earned} / {total}</b> badges',
       'recap.trainer.stats_since': ' · since <b>{date}</b>',
       'recap.trainer.stats_crowned':' · crowned <b>{date}</b>',
-      'recap.closer.label':        'WHERE THIS GOES NEXT',
-      'recap.closer.text':
-        'Bigger problems scale the same five pieces. Real Pokemon AIs — type matching, team building, Z-Move selection — ' +
-        'use the same MDP / Bellman / SARSA bones. So do robots, recommender systems, and game-playing agents at the ' +
-        'frontier. You now know the bones.',
       'recap.footnote':            'Press <kbd>PREV</kbd> or left-arrow to revisit the SARSA derivation.',
       'recap.trainer.fallback':    'TRAINER',
+
+      'recap.card.mdp.title':      'MDP — THE FOUR-PART FRAME',
+      'recap.card.mdp.text':
+        'The battle is a 4-tuple. <b>States</b> are HP-bucket pairs. <b>Actions</b> are PIKACHU\'s three moves. ' +
+        '<b>P</b> samples the next state from a damage roll. <b>Rewards</b>: −1 per turn, +10 on win, −10 on faint.',
+
+      'recap.card.return.title':   'RETURN — THE SUM THAT MATTERS',
+      'recap.card.return.text':
+        'The return from step i is the sum of all rewards that follow.  Long battles burn turns; quick wins return more.  ' +
+        'RL maximises this number — not any single hit.',
+
+      'recap.card.qstar.title':    'Q* — THE OPTIMAL ACTION-VALUE',
+      'recap.card.qstar.text':
+        'Q*(s, a) is the highest expected return starting from s, taking action a, then playing optimally.  ' +
+        'The argmax over actions recovers the optimal policy π*.',
+
+      'recap.card.dp.title':       'DP — FILL Q* BY BELLMAN BACKUPS',
+      'recap.card.dp.text':
+        'If P is known, Q* satisfies the Bellman equation: each cell equals the expected reward plus the next cell\'s value.  ' +
+        'Sweep the table until nothing moves.',
+
+      'recap.card.sarsa.title':    'SARSA — LEARN Q* WITHOUT P',
+      'recap.card.sarsa.text':
+        'Play.  From each (s, a, r, s′, a′) tuple, nudge q[s, a] toward r + q[s′, a′].  Step size α controls the lurch.  ' +
+        'Over many trajectories, q converges to Q*.',
 
       /* ---- Tutorial scene ---- */
       'tut.skip':                'SKIP TUTORIAL →',
@@ -923,8 +942,7 @@
       'sd.f.update_label':    'q[s, a] += α · (target − q[s, a])',
 
       'recap.hof':            'でんどう いり',
-      'recap.sub':
-        '5つの RLの ぶひんは ヘビと はしご に あう 5つと おなじ。 ぶんかが ちがう、 カリキュラムは おなじ。',
+      'recap.sub':            'バッジ ごとに みじかい ふくしゅう — きみが えた RLの 5つの ぶひん。',
       'recap.trainer.champion':    'ポケモン チャンピオン',
       'recap.trainer.in_progress': 'しゅぎょうちゅう',
       'recap.trainer.locked':      'みかいほう',
@@ -932,13 +950,33 @@
       'recap.trainer.stats_base':  '<b>{earned} / {total}</b> バッジ',
       'recap.trainer.stats_since': ' · <b>{date}</b>から',
       'recap.trainer.stats_crowned':' · <b>{date}</b>に たいかん',
-      'recap.closer.label':        'つぎは どこへ',
-      'recap.closer.text':
-        'おおきな もんだいでは おなじ 5つの ぶひんが スケール する。 ほんものの ポケモン AI — タイプあいしょう、 ' +
-        'パーティへんせい、 Z-ワザの せんたく — も おなじ MDP / ベルマン / SARSAの ほね。 ' +
-        'ロボットも、 すすめ システムも、 さいぜんせんの ゲーム AIも おなじ。 きみは もう ほねを しっている。',
       'recap.footnote':            '<kbd>まえ</kbd>か ひだりやじるしで SARSAの みちびきを みなおせる。',
       'recap.trainer.fallback':    'トレーナー',
+
+      'recap.card.mdp.title':      'MDP — 4ぶの くみ',
+      'recap.card.mdp.text':
+        'たたかいは 4タプル。 <b>じょうたい</b>は HPバケツの ペア。 <b>こうどう</b>は ピカチュウの 3つの わざ。 ' +
+        '<b>P</b>は ダメージで つぎの じょうたいを サンプリング。 <b>ほうしゅう</b>： まいターン −1、 かちで +10、 ひんしで −10。',
+
+      'recap.card.return.title':   'りえき — たいせつな ごうけい',
+      'recap.card.return.text':
+        'ステップ iからの りえきは あとに つづく ほうしゅうの ごうけい。 ながい たたかいは ターンを くらう、 ' +
+        'はやい かちほど りえきは おおきい。 RLは この かずを さいだいか する — ひとつの こうげき では ない。',
+
+      'recap.card.qstar.title':    'Q* — さいてき こうどうかち',
+      'recap.card.qstar.text':
+        'Q*(s, a)は sから aを とり、 そのあと さいてきに あそんだ ときの りえきの きたいち。 ' +
+        'こうどうの argmaxで さいてき ほうさく π*が もどる。',
+
+      'recap.card.dp.title':       'DP — ベルマンで Q*を うめる',
+      'recap.card.dp.text':
+        'Pが しれて いれば、 Q*は ベルマンしき を みたす： かく ますは「きたい ほうしゅう ＋ つぎの ますの ち」。 ' +
+        'うごかなく なるまで ひょうを なめる。',
+
+      'recap.card.sarsa.title':    'SARSA — Pを しらなくても Q*を まなぶ',
+      'recap.card.sarsa.text':
+        'あそぶ。 (s, a, r, s′, a′)の くみ ごとに q[s, a]を r + q[s′, a′] に ちかづける。 ' +
+        'ステップサイズ αが うごく はばを きめる。 たくさんの きせきで qは Q*に しゅうそく する。',
 
       'tut.skip':                'チュートリアル スキップ →',
       'tut.go_to_battle':        'たたかいへ →',
