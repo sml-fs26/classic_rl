@@ -584,7 +584,7 @@ html, body {
 .hp-bar-fill[data-bucket="2"] { width: 60%;  background: var(--hp-b2, #E8C828); }
 .hp-bar-fill[data-bucket="3"] { width: 40%;  background: var(--hp-b3, #E89028); }
 .hp-bar-fill[data-bucket="4"] { width: 20%;  background: var(--hp-b4, #E84828); }
-.hp-bar-fill[data-bucket="5"] { width: 0%;   background: var(--hp-b4, #E84828); }
+.hp-bar-fill[data-bucket="5"] { width: 0;   background: var(--hp-b4, #E84828); }
 /* Tick marks at the bucket boundaries — makes the discretisation
    readable even in a still screenshot. */
 .hp-bar-tick {

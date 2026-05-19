@@ -8,13 +8,13 @@ Curriculum slot: viz #6 of 6 — the **integrative review**. Teaches every conce
 
 Viz 1-5 each isolate one piece:
 
-| Viz | Carries |
-|---|---|
-| 1 ANYmal | `⟨S, A, P, R⟩` |
-| 2 Casino | ε-greedy on `\hat{\mu}(a)` |
+| Viz            | Carries                               |
+|----------------|---------------------------------------|
+| 1 ANYmal       | `⟨S, A, P, R⟩`                        |
+| 2 Casino       | ε-greedy on `\hat{\mu}(a)`            |
 | 3 Spooky House | Bellman + γ on a *no-cycle* gridworld |
-| 4 Darts | Robbins-Monro under noise |
-| 5 SARSA | The fusion on cliff-walk |
+| 4 Darts        | Robbins-Monro under noise             |
+| 5 SARSA        | The fusion on cliff-walk              |
 
 The student arrives at viz #6 with all five pieces *separately* understood. The job here is to **show all of them living together on one game they have played since childhood**. The artefact is the board itself — no metaphor strain, no abstract grid.
 
@@ -41,27 +41,27 @@ Standard 10×10 boustrophedon: 1–10 left-to-right on the bottom row, 11–20 r
 
 ## 4. Driving model
 
-| Scene | Mode |
-|---|---|
-| 0 | static (title + MDP frame mapping) |
-| 1 | manual (click a die, animate roll) |
-| 2 | autoplay (value iteration sweep, scrubber) |
-| 3 | direct interaction (γ slider; V re-computes live) |
-| 4 | autoplay scrubber (precomputed SARSA training) |
-| 5 | static (recap) |
+| Scene | Mode                                              |
+|-------|---------------------------------------------------|
+| 0     | static (title + MDP frame mapping)                |
+| 1     | manual (click a die, animate roll)                |
+| 2     | autoplay (value iteration sweep, scrubber)        |
+| 3     | direct interaction (γ slider; V re-computes live) |
+| 4     | autoplay scrubber (precomputed SARSA training)    |
+| 5     | static (recap)                                    |
 
 `&run` triggers Play on autoplay scenes; `&instant` skips opacity transitions.
 
 ## 5. Scene list (6 scenes, click-step)
 
-| # | Title | What the student sees and does | Step engine? |
-|---|---|---|---|
-| 0 | **A children's game is an MDP** | Title card. Full 10×10 board with snakes (red curves) and ladders (green lines) drawn on top. Below the board: a 5-row mapping table — each row names one tuple element of the MDP and points (with a small line) to the corresponding element on the board (S = squares, A = the three dice, P = ladders+snakes+die outcomes, R = "−1 per turn, 0 at 100", γ = "your patience"). KaTeX teaser: *"We've taught these five things. Here they all are in one game."* | No |
-| 1 | **Roll a die** | The board, with a small ANYmal-red token at square 1. Three big die buttons under the board: `d4`, `d6`, `d8`. Click a die → roll animation (~400 ms), the rolled face highlights, the token slides to the new square (curved arc), if a snake/ladder is triggered the token glides along it. HUD shows: turn, current square, total reward `R = -turn`. Step engine: ← rewind to previous turn (reset+replay), → replay forward; at head, → advances scene. Caption: *"Pick a die at each turn. Notice that the 'right' die depends on where you are."* | Yes |
-| 2 | **Bellman, but for cycles** | The board with `V(s)` slots on every square (initially blank). Above the board: KaTeX `V(s) = \max_d \{ -1 + γ \cdot \mathbb{E}_{r \sim d}[V(s')] \}` where `s' = \text{apply chute or ladder to } s + r` (with stay-if-overshoot). Below: a "Run value iteration" button + iteration counter + speed slider. Click Run → iteration `k = 1, 2, …` propagates from square 100 outward. Each iteration step: V values flash on cells that changed; small Δ-value chip shows max |ΔV| across the board. Convergence after ~30-50 iterations (max-ΔV < 1e-3). After convergence: argmax die per square renders as a small `d4`/`d6`/`d8` badge on each cell. Caption: *"Spooky House solved this in one sweep — no cycles. Snakes & Ladders has cycles. So we iterate until V stops changing."* | Yes (iteration scrubber) |
-| 3 | **γ as risk preference** | Same board, V-table visible from scene 2. γ slider: 0.70 → 0.99 (default 0.95). On any change: V re-converges live (small precompute table — γ values pre-baked at 7 grid points; intermediate γ snaps to nearest). Watch the per-square optimal die badges shift as γ changes. Annotation strip below: "% of squares preferring d4 / d6 / d8" updates with γ. Caption: *"Lower γ = greedy in time = safer dice (smaller variance). Higher γ = patient = jumpy dice that occasionally pay off big."* | Yes (slider) |
+| # | Title                            | What the student sees and does                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Step engine?   |
+|---|----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| 0 | **A children's game is an MDP**  | Title card. Full 10×10 board with snakes (red curves) and ladders (green lines) drawn on top. Below the board: a 5-row mapping table — each row names one tuple element of the MDP and points (with a small line) to the corresponding element on the board (S = squares, A = the three dice, P = ladders+snakes+die outcomes, R = "−1 per turn, 0 at 100", γ = "your patience"). KaTeX teaser: *"We've taught these five things. Here they all are in one game."*                                                                                                                                                                                      | No             |
+| 1 | **Roll a die**                   | The board, with a small ANYmal-red token at square 1. Three big die buttons under the board: `d4`, `d6`, `d8`. Click a die → roll animation (~400 ms), the rolled face highlights, the token slides to the new square (curved arc), if a snake/ladder is triggered the token glides along it. HUD shows: turn, current square, total reward `R = -turn`. Step engine: ← rewind to previous turn (reset+replay), → replay forward; at head, → advances scene. Caption: *"Pick a die at each turn. Notice that the 'right' die depends on where you are."*                                                                                                | Yes            |
+| 2 | **Bellman, but for cycles**      | The board with `V(s)` slots on every square (initially blank). Above the board: KaTeX `V(s) = \max_d \{ -1 + γ \cdot \mathbb{E}_{r \sim d}[V(s')] \}` where `s' = \text{apply chute or ladder to } s + r` (with stay-if-overshoot). Below: a "Run value iteration" button + iteration counter + speed slider. Click Run → iteration `k = 1, 2, …` propagates from square 100 outward. Each iteration step: V values flash on cells that changed; small Δ-value chip shows max                                                                                                                                                                           | ΔV             | across the board. Convergence after ~30-50 iterations (max-ΔV < 1e-3). After convergence: argmax die per square renders as a small `d4`/`d6`/`d8` badge on each cell. Caption: *"Spooky House solved this in one sweep — no cycles. Snakes & Ladders has cycles. So we iterate until V stops changing."* | Yes (iteration scrubber) |
+| 3 | **γ as risk preference**         | Same board, V-table visible from scene 2. γ slider: 0.70 → 0.99 (default 0.95). On any change: V re-converges live (small precompute table — γ values pre-baked at 7 grid points; intermediate γ snaps to nearest). Watch the per-square optimal die badges shift as γ changes. Annotation strip below: "% of squares preferring d4 / d6 / d8" updates with γ. Caption: *"Lower γ = greedy in time = safer dice (smaller variance). Higher γ = patient = jumpy dice that occasionally pay off big."*                                                                                                                                                    | Yes (slider)   |
 | 4 | **SARSA learns it from scratch** | Board + side panel. The agent has *no access to V* — only the SARSA update with ε-greedy on Q. Autoplay scrubber over precomputed snapshots `[0, 1, 5, 25, 100, 500, 2000]`. At each snapshot: per-square argmax die badges from current Q, color-coded by which die. Side panel: when you click any square, shows that square's three Q-values as a small bar chart + numerical row. Bottom: learning curve (turns-to-goal per episode), with current snapshot highlighted. ε slider (default 0.10), α slider (default 0.10). Caption: *"Same algorithm from cliff-walk. The Bellman recursion is implicit — we don't compute V; we sample-update Q."* | Yes (scrubber) |
-| 5 | **All five pieces in one game** | Five recap cards in a row, each tinted with the corresponding viz's hue and pointing at a specific moment in this viz: **MDP** (ANYmal-red — points at scene 0's mapping), **ε-greedy** (Casino-blue — points at scene 4's ε slider), **Bellman + γ** (Spooky-purple — points at scene 2's iteration & scene 3's slider), **Robbins-Monro** (Darts-amber — points at scene 4's α slider, with caption *"the SARSA update IS Robbins-Monro on a TD target"*), **SARSA** (cliff-red — points at scene 4's Q-table). Closing line: *"Other RL methods — Q-learning, function approximation, deep RL — are extensions of these five ideas."* | No |
+| 5 | **All five pieces in one game**  | Five recap cards in a row, each tinted with the corresponding viz's hue and pointing at a specific moment in this viz: **MDP** (ANYmal-red — points at scene 0's mapping), **ε-greedy** (Casino-blue — points at scene 4's ε slider), **Bellman + γ** (Spooky-purple — points at scene 2's iteration & scene 3's slider), **Robbins-Monro** (Darts-amber — points at scene 4's α slider, with caption *"the SARSA update IS Robbins-Monro on a TD target"*), **SARSA** (cliff-red — points at scene 4's Q-table). Closing line: *"Other RL methods — Q-learning, function approximation, deep RL — are extensions of these five ideas."*                | No             |
 
 ## 6. Pitfalls & invariants
 

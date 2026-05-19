@@ -193,11 +193,7 @@
   left: 30%; right: 30%;
   top: 35%;
   height: 30%;
-  background:
-    radial-gradient(circle, var(--vfx-ember-a) 0 3px, transparent 4px) 20% 30%/12px 12px,
-    radial-gradient(circle, var(--vfx-ember-b) 0 2px, transparent 3px) 50% 50%/10px 10px,
-    radial-gradient(circle, var(--vfx-ember-c) 0 3px, transparent 4px) 80% 70%/14px 14px;
-  background-repeat: no-repeat, no-repeat, no-repeat;
+  background: radial-gradient(circle, var(--vfx-ember-a) 0 3px, transparent 4px) radial-gradient(circle, var(--vfx-ember-b) 0 2px, transparent 3px) radial-gradient(circle, var(--vfx-ember-c) 0 3px, transparent 4px) no-repeat, no-repeat, no-repeat 20% 30% 50% 50% 80% 70%;
   animation: sc1-ember 520ms ease-out;
 }
 @keyframes sc1-ember {

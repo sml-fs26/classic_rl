@@ -25,12 +25,12 @@ Snakes & Ladders (viz #6) replayed them on an abstract board. Pokemon battles re
 
 **Action** `a`: choose one of 4 Pikachu moves.
 
-| Move | Power | Accuracy | Note |
-|---|---|---|---|
-| Quick Attack | 40 | 100% | priority — always strikes first |
-| Thunderbolt | 90 | 100% | reliable workhorse |
-| Iron Tail | 75 | 75% | medium-risk |
-| Thunder | 110 | 70% | high risk, high reward |
+| Move         | Power | Accuracy | Note                            |
+|--------------|-------|----------|---------------------------------|
+| Quick Attack | 40    | 100%     | priority — always strikes first |
+| Thunderbolt  | 90    | 100%     | reliable workhorse              |
+| Iron Tail    | 75    | 75%      | medium-risk                     |
+| Thunder      | 110   | 70%      | high risk, high reward          |
 
 **Opponent AI:** Charmander uses **Ember** every turn (40 power, 100% acc). Fully deterministic. Keeps the lesson on Pikachu's decisions, not on outwitting an opponent.
 
@@ -160,27 +160,27 @@ Press Start 2P is © Cody "CodeMan38" Boisclair under the SIL Open Font License 
 
 ## 5. Driving model
 
-| Scene | Mode |
-|---|---|
-| 0 | static (title screen → MDP frame mapping) |
-| 1 | manual (full battle, click-to-attack) |
-| 2 | autoplay (value iteration over the 9-state grid) |
-| 3 | direct (γ slider; policy re-renders) |
-| 4 | autoplay scrubber (precomputed SARSA training) |
-| 5 | static (recap) |
+| Scene | Mode                                             |
+|-------|--------------------------------------------------|
+| 0     | static (title screen → MDP frame mapping)        |
+| 1     | manual (full battle, click-to-attack)            |
+| 2     | autoplay (value iteration over the 9-state grid) |
+| 3     | direct (γ slider; policy re-renders)             |
+| 4     | autoplay scrubber (precomputed SARSA training)   |
+| 5     | static (recap)                                   |
 
 `&run` triggers Play; `&instant` skips fades.
 
 ## 6. Scene list (6 scenes, click-step)
 
-| # | Title | What the student sees and does | Step engine? |
-|---|---|---|---|
-| 0 | **POKEMON** (title) | Classic title-screen aesthetic: pixel-art "POKEMON" wordmark (rendered as styled `<h1>`, not a copyrighted logo image), "Press START to begin" subtitle, animated Pikachu sprite blinking. Click "START" or press → to dissolve to the MDP-frame overlay: a sliding panel that names S/A/P/R/γ over the battle screen. KaTeX teaser: *"You've played this game. Today you'll see why it's a Markov decision process."* | No |
-| 1 | **A wild CHARMANDER appeared!** | Full battle screen — sky/grass background, Pikachu back-sprite lower-left, Charmander front-sprite upper-right, HP boxes for both, dialog box at bottom. Dialog typewriter-types: *"A wild CHARMANDER appeared!"* → *"Go, PIKACHU!"* → 4-move menu fades in. Click a move → dialog *"PIKACHU used THUNDERBOLT!"* → Charmander sprite shakes → damage number rises → HP bar drains → opponent counter-attack (Ember) → Pikachu sprite shakes → HP bar drains. Repeat until one faints. HUD: turn count, last-move result. Step engine: ← rewind to previous turn, → replay/advance scene. | Yes |
-| 2 | **Value iteration** | Compact 3×3 state grid (rows = your HP bucket: full/mid/low; cols = opp HP bucket). Each cell shows V(state) (initially 0). "Run value iteration" button + iteration counter + max-ΔV chip. Click Run → V values propagate cell-by-cell, max-ΔV drops, convergence at ~20-30 iterations. After convergence: each cell shows V + the optimal-move name. Caption: *"For each (your HP, opp HP) combo, what's the best move? Bellman iteration tells you."* Pokemon-styled: cells are little dialog-box panels with Press Start 2P numbers. | Yes (iteration scrubber) |
-| 3 | **γ as patience** | Same 3×3 state grid, plus a γ slider styled as a Pokemon menu option (`▶ γ: 0.90`). Drag slider → V re-converges (from precomputed grid of 7 γ values, snapped). Watch the optimal-move-per-state shift. Caption: *"γ low (impatient) → Thunder, big risk. γ high (patient) → Thunderbolt, slow steady wins."* Annotation strip below: distribution of moves across the 9 states at current γ. | Yes (slider; values snap to precomputed grid) |
-| 4 | **SARSA learns it** | Battle screen + side panel. Pikachu plays battles autonomously (precomputed). Scrubber over episodes `[0, 1, 5, 25, 100, 500, 2000]`. **Below the battle:** the literal 9×4 Q-table as numbers (row = state, col = move). Updated cells flash with a Pokemon yellow border. Below the table: learning curve (win rate per 100 episodes) styled as a pixel-graph in a black-bordered box. Side card: ε and α as Pokemon menu items (`▶ ε: 0.10`, `▶ α: 0.10`). Caption: *"Same algorithm as cliff-walk and Snakes & Ladders. No Bellman shortcut. Just sample-update."* | Yes (scrubber) |
-| 5 | **You've trained PIKACHU.** | Five recap cards, each Pokemon-style dialog boxes pointing back to the prior viz:<br>• **MDP** (ANYmal-red box icon) — "the battle is a 5-tuple"<br>• **ε-greedy** (Casino-blue) — "scene 4's ε is straight from the Casino"<br>• **Bellman + γ** (Spooky-purple) — "scene 2 + 3, same recursion as Spooky House"<br>• **Robbins-Monro** (Darts-amber) — "scene 4's α is the RM step"<br>• **SARSA** (cliff-red) — "the same TD update everywhere"<br>Closing line: *"Other RL methods scale this. Pokemon AI in real games does too — Z-Move selection, EV-spread tuning, all of it."* | No |
+| # | Title                           | What the student sees and does                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Step engine?                                  |
+|---|---------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| 0 | **POKEMON** (title)             | Classic title-screen aesthetic: pixel-art "POKEMON" wordmark (rendered as styled `<h1>`, not a copyrighted logo image), "Press START to begin" subtitle, animated Pikachu sprite blinking. Click "START" or press → to dissolve to the MDP-frame overlay: a sliding panel that names S/A/P/R/γ over the battle screen. KaTeX teaser: *"You've played this game. Today you'll see why it's a Markov decision process."*                                                                                                                                                                   | No                                            |
+| 1 | **A wild CHARMANDER appeared!** | Full battle screen — sky/grass background, Pikachu back-sprite lower-left, Charmander front-sprite upper-right, HP boxes for both, dialog box at bottom. Dialog typewriter-types: *"A wild CHARMANDER appeared!"* → *"Go, PIKACHU!"* → 4-move menu fades in. Click a move → dialog *"PIKACHU used THUNDERBOLT!"* → Charmander sprite shakes → damage number rises → HP bar drains → opponent counter-attack (Ember) → Pikachu sprite shakes → HP bar drains. Repeat until one faints. HUD: turn count, last-move result. Step engine: ← rewind to previous turn, → replay/advance scene. | Yes                                           |
+| 2 | **Value iteration**             | Compact 3×3 state grid (rows = your HP bucket: full/mid/low; cols = opp HP bucket). Each cell shows V(state) (initially 0). "Run value iteration" button + iteration counter + max-ΔV chip. Click Run → V values propagate cell-by-cell, max-ΔV drops, convergence at ~20-30 iterations. After convergence: each cell shows V + the optimal-move name. Caption: *"For each (your HP, opp HP) combo, what's the best move? Bellman iteration tells you."* Pokemon-styled: cells are little dialog-box panels with Press Start 2P numbers.                                                 | Yes (iteration scrubber)                      |
+| 3 | **γ as patience**               | Same 3×3 state grid, plus a γ slider styled as a Pokemon menu option (`▶ γ: 0.90`). Drag slider → V re-converges (from precomputed grid of 7 γ values, snapped). Watch the optimal-move-per-state shift. Caption: *"γ low (impatient) → Thunder, big risk. γ high (patient) → Thunderbolt, slow steady wins."* Annotation strip below: distribution of moves across the 9 states at current γ.                                                                                                                                                                                           | Yes (slider; values snap to precomputed grid) |
+| 4 | **SARSA learns it**             | Battle screen + side panel. Pikachu plays battles autonomously (precomputed). Scrubber over episodes `[0, 1, 5, 25, 100, 500, 2000]`. **Below the battle:** the literal 9×4 Q-table as numbers (row = state, col = move). Updated cells flash with a Pokemon yellow border. Below the table: learning curve (win rate per 100 episodes) styled as a pixel-graph in a black-bordered box. Side card: ε and α as Pokemon menu items (`▶ ε: 0.10`, `▶ α: 0.10`). Caption: *"Same algorithm as cliff-walk and Snakes & Ladders. No Bellman shortcut. Just sample-update."*                   | Yes (scrubber)                                |
+| 5 | **You've trained PIKACHU.**     | Five recap cards, each Pokemon-style dialog boxes pointing back to the prior viz:<br>• **MDP** (ANYmal-red box icon) — "the battle is a 5-tuple"<br>• **ε-greedy** (Casino-blue) — "scene 4's ε is straight from the Casino"<br>• **Bellman + γ** (Spooky-purple) — "scene 2 + 3, same recursion as Spooky House"<br>• **Robbins-Monro** (Darts-amber) — "scene 4's α is the RM step"<br>• **SARSA** (cliff-red) — "the same TD update everywhere"<br>Closing line: *"Other RL methods scale this. Pokemon AI in real games does too — Z-Move selection, EV-spread tuning, all of it."*  | No                                            |
 
 ## 7. Pitfalls and invariants
 
