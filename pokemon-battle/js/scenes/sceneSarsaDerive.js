@@ -230,7 +230,7 @@
     let playing       = false;
     let playTimer     = null;
     let playSpeedLvl  = 2;     /* default = middle (= ~700 ms) */
-    const SPEED_MS    = [1400, 1000, 700, 450, 250];
+    const SPEED_MS    = [700, 500, 350, 225, 125];
 
     /* DP-computed Q* — the ground truth.  Used by the convergence
        indicator in the F step to show how close our SARSA q is to
@@ -545,14 +545,14 @@
     function fControlsHTML() {
       /* The F-step controls live on the left, alongside the step-detail
          panel.  Speed slider is 0..4; α is fixed at 0.20; ε is a live
-         slider 0..1 so students discover the exploration tradeoff. */
+         slider 0..1 so students discover the exploration tradeoff.
+         REROLL / CLEAR-q dropped — PLAY auto-rerolls and student-driven
+         reset comes from the scene-level RESET button. */
       const epsPct = Math.round(eps * 100);
       return (
         '<div class="sd-f-ctrls-row">' +
           '<button class="poke-btn" id="sd-f-play">'   + (playing ? T('sd.f.pause') : T('sd.f.play')) + '</button>' +
           '<button class="poke-btn" id="sd-f-step">'   + T('sd.f.step_btn') + '</button>' +
-          '<button class="poke-btn" id="sd-f-reroll">' + T('sd.f.reroll')   + '</button>' +
-          '<button class="poke-btn" id="sd-f-clear">'  + T('sd.f.clear')    + '</button>' +
           '<div class="sd-f-speed">' + T('sd.f.speed') + ' ' +
             '<span class="sd-f-speed-label">' + T('sd.f.speed.slow') + '</span>' +
             '<input type="range" id="sd-f-speed-range" min="0" max="4" step="1" value="' + playSpeedLvl + '">' +
@@ -571,10 +571,6 @@
       if (play) play.addEventListener('click', togglePlay);
       const step = document.getElementById('sd-f-step');
       if (step) step.addEventListener('click', () => { pausePlay(); applyCurrentFUpdate(); });
-      const rer = document.getElementById('sd-f-reroll');
-      if (rer) rer.addEventListener('click', () => { pausePlay(); fReroll(); });
-      const clr = document.getElementById('sd-f-clear');
-      if (clr) clr.addEventListener('click', () => { pausePlay(); fClearQ(); fReroll(); });
       const spd = document.getElementById('sd-f-speed-range');
       if (spd) spd.addEventListener('input', (e) => {
         playSpeedLvl = Math.max(0, Math.min(4, parseInt(e.target.value, 10) || 2));
@@ -684,13 +680,6 @@
       fCursor = 0;
       qtbl.update(Q, { suppressFlash: true });
       renderFTape();
-      renderFDetail();
-      renderConvergence();
-    }
-
-    function fClearQ() {
-      Q = window.SARSA.makeQ();
-      qtbl.update(Q, { suppressFlash: true });
       renderFDetail();
       renderConvergence();
     }

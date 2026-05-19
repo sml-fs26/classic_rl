@@ -292,7 +292,7 @@
         '(either at random, or optimally on the <em>current</em> <span class="sd-q-est">q</span>) ' +
         'and let the environment supply the rest.',
       'sd.step.D.foot':
-        'When picking the next action: with a certain probability we choose a <em>random</em> action ' +
+        'When picking the next action: with a certain probability <span class="sd-alpha">ε</span> we choose a <em>random</em> action ' +
         '(to encourage exploration); otherwise we pick the <em>best</em> action according to ' +
         '<span class="sd-q-est">q</span>.',
       'sd.step.E1.title':     'REPLACE THE EXPECTATION WITH ONE SAMPLE',
@@ -352,8 +352,6 @@
       'sd.f.play':            '▶ PLAY',
       'sd.f.pause':           '⏸ PAUSE',
       'sd.f.step_btn':        '▶ NEXT TRANSITION',
-      'sd.f.reroll':          '⟲ REROLL',
-      'sd.f.clear':           'CLEAR q',
       'sd.f.speed':           'SPEED',
       'sd.f.speed.slow':      'SLOW',
       'sd.f.speed.fast':      'FAST',
@@ -362,7 +360,7 @@
 
       'sd.f.step_label':      'STEP {i} / {total}',
       'sd.f.no_transitions':  'NO TRANSITIONS YET',
-      'sd.f.no_transitions.body': 'Reroll to sample a trajectory.',
+      'sd.f.no_transitions.body': 'Press PLAY to sample a trajectory.',
       'sd.f.all_applied':     'ALL {n} TRANSITIONS APPLIED',
       'sd.f.all_applied.body':'PLAY auto-rerolls.  <span class="sd-q-est">q</span> is preserved, so the next trajectory builds on what we have.',
       'sd.f.transition_of':   'TRANSITION {i} / {n}',
@@ -585,7 +583,7 @@
           '<li>A-D: setup.  We don\'t have P; we play; we get tuples.</li>' +
           '<li>E1: replace expectation with one sample.  <i>Subtle</i>: with A′ from the ε-greedy policy this is technically Qᵖⁱ, not Q*.  As ε → 0 it converges to Q*.  This is what makes SARSA <b>on-policy</b>.</li>' +
           '<li>E2: name the target.  E3: two cases, nudge up or down.  E4: collapse.  The α(target − q) operator already carries the sign.</li>' +
-          '<li>F: live demo.  PLAY auto-advances at the speed-slider cadence; REROLL keeps q; CLEAR q resets.  α is fixed at 0.20.</li>' +
+          '<li>F: live demo.  PLAY auto-advances at the speed-slider cadence and auto-rerolls at the end of each trajectory; q is preserved across trajectories.  α is fixed at 0.20.</li>' +
           '<li>If a student asks "what about off-policy?" — that\'s Q-learning: replace q[s′, a′] with max<sub>a′</sub> q[s′, a′].  One line.</li>' +
         '</ul>',
       'notes.scene5':
@@ -851,7 +849,7 @@
         'ながれを くれる — つぎの こうどうは（ランダムに、 もしくは いまの ' +
         '<span class="sd-q-est">q</span>に たいして さいてきに）えらび、 のこりは かんきょうに まかせる。',
       'sd.step.D.foot':
-        'つぎの こうどうを えらぶ とき： ある かくりつで <em>ランダムな</em> こうどう ' +
+        'つぎの こうどうを えらぶ とき： ある かくりつ <span class="sd-alpha">ε</span> で <em>ランダムな</em> こうどう ' +
         '（たんさくを うながす ため）。 そうでなければ <span class="sd-q-est">q</span>に したがって ' +
         '<em>さいぜん</em>の こうどうを えらぶ。',
       'sd.step.E1.title':     'きたいちを 1つの サンプルで おきかえる',
@@ -913,8 +911,6 @@
       'sd.f.play':            '▶ さいせい',
       'sd.f.pause':           '⏸ ていし',
       'sd.f.step_btn':        '▶ つぎの せんい',
-      'sd.f.reroll':          '⟲ ふりなおし',
-      'sd.f.clear':           'q を けす',
       'sd.f.speed':           'はやさ',
       'sd.f.speed.slow':      'おそい',
       'sd.f.speed.fast':      'はやい',
@@ -923,7 +919,7 @@
 
       'sd.f.step_label':      'ステップ {i} / {total}',
       'sd.f.no_transitions':  'まだ せんいが ない',
-      'sd.f.no_transitions.body': 'ふりなおして きせきを サンプル。',
+      'sd.f.no_transitions.body': 'さいせいを おして きせきを サンプル。',
       'sd.f.all_applied':     'すべての {n}せんいを てきよう ずみ',
       'sd.f.all_applied.body':'さいせいで じどう ふりなおし。 <span class="sd-q-est">q</span>は のこる ので、 つぎの きせきは これまでの うえに のる。',
       'sd.f.transition_of':   'せんい {i} / {n}',
@@ -1143,7 +1139,7 @@
           '<li>A〜D： じゅんび。 Pは ない； あそぶ； タプルが えられる。</li>' +
           '<li>E1： きたいちを 1サンプルで おきかえ。 <i>びみょう</i>： A′を ε-greedyから とると、 これは Qᵖⁱで あって Q* ではない。 ε → 0で Q*に しゅうそく。 これが SARSAを <b>on-policy</b>に する。</li>' +
           '<li>E2： ターゲットを なづける。 E3： 2つの ばあい、 うえ か した に おす。 E4： まとめる。 α(target − q)が ふごうを もっている。</li>' +
-          '<li>F： ライブ デモ。 さいせいで スピード スライダーの はやさで じどう しんこう； ふりなおしで qは のこる； q を けすで リセット。 αは 0.20 こてい。</li>' +
+          '<li>F： ライブ デモ。 さいせいで スピード スライダーの はやさで じどう しんこう。 きせきが おわると じどうで ふりなおし； qは そのまま のこる。 αは 0.20 こてい。</li>' +
           '<li>「オフポリシーは？」 と きかれたら、 それは Q-learning： q[s′, a′]を max<sub>a′</sub> q[s′, a′]に かえる。 1ぎょう。</li>' +
         '</ul>',
       'notes.scene5':
