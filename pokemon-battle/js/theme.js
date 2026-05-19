@@ -1,10 +1,13 @@
-/* Theme toggle. Three modes — light, dark, and gb (Game Boy DMG green).
-   Persists to localStorage; 't' shortcut cycles mid-lecture.
-   Hash override via #theme=light|dark|gb for headless verification. */
+/* Theme toggle. Two modes — light (Pokémon paper, default) and crt
+   (retro black + orange neon).  Persists to localStorage; 't'
+   shortcut toggles mid-lecture.  Hash override via
+   #theme=light|crt for headless verification.  Legacy 'dark' / 'gb'
+   values fall back to 'light' so old localStorage entries still
+   resolve safely. */
 (function () {
   const STORAGE_KEY = 'pokemon-battle.theme';
   const root = document.documentElement;
-  const THEMES = ['light', 'dark', 'gb', 'crt'];
+  const THEMES = ['light', 'crt'];
 
   function apply(theme) {
     if (THEMES.indexOf(theme) < 0) theme = 'light';
@@ -23,7 +26,7 @@
   }
 
   function readHashTheme() {
-    const m = (window.location.hash || '').match(/[#&?]theme=(light|dark|gb|crt)/);
+    const m = (window.location.hash || '').match(/[#&?]theme=(light|crt)/);
     return m ? m[1] : null;
   }
 
