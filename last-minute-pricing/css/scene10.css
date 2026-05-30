@@ -1,0 +1,228 @@
+/* Scene 10 -- Why DP does not scale.
+   A two-panel card: (a) you rarely know P, (b) the board explodes. KaTeX-light,
+   minimal text, in the retro-pixel idiom. All colour from shared CSS tokens. */
+
+.scene10 {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.s10-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  margin: 4px 0 2px;
+  color: var(--ink);
+}
+
+.s10-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink-secondary);
+  margin: 0 2px;
+  max-width: 96ch;
+}
+.s10-lede b { color: var(--ink); }
+
+/* ---- Two-panel grid ---- */
+.s10-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+.s10-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.s10-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.s10-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: var(--lever-ink);
+  background: var(--pikachu-cheek);
+  border: 2px solid var(--rule);
+  padding: 3px 6px;
+}
+.s10-panel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+}
+
+/* shared body / foot text */
+.s10-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+  margin: 0;
+}
+.s10-body b { color: var(--pikachu-cheek); }
+.s10-panel-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.75;
+  color: var(--ink-secondary);
+  border-top: 2px dashed var(--inner-highlight);
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+/* ---- (a) hidden-P formula ---- */
+.s10-formula {
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  padding: 10px 12px;
+  text-align: center;
+}
+.s10-formula .katex-display { margin: 0; }
+.s10-formula .katex { color: var(--ink); }
+.s10-formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  color: var(--ink-secondary);
+  margin-bottom: 8px;
+}
+
+/* unknowable-factor chips */
+.s10-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.s10-chip {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  padding: 5px 8px;
+  box-shadow: 2px 2px 0 var(--inner-highlight);
+}
+
+/* ---- (b) the exploding multiplication ---- */
+.s10-explode {
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  padding: 10px;
+}
+.s10-explode-factors {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+.s10-factor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 64px;
+  flex: 1 1 64px;
+}
+.s10-factor-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--hue-ghost);
+  font-variant-numeric: tabular-nums;
+}
+.s10-factor-lab {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--ink-secondary);
+}
+.s10-times {
+  align-self: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+/* toy vs real comparison */
+.s10-compare {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+.s10-cmp-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.s10-cmp-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.s10-cmp-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.s10-cmp-toy { border-color: var(--lever-standard-rule); }
+.s10-cmp-toy .s10-cmp-num { color: var(--lever-standard); }
+.s10-cmp-real { border-color: var(--pikachu-cheek); }
+.s10-cmp-big {
+  font-size: 16px;
+  color: var(--pikachu-cheek);
+}
+.s10-cmp-big sup { font-size: 9px; }
+.s10-cmp-equals {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  text-align: right;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+/* ---- verdict banner ---- */
+.s10-verdict {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  padding: 14px;
+  color: var(--pikachu-cheek);
+  border: 3px solid var(--pikachu-cheek);
+  background: var(--bg-strong);
+}
+
+/* ---- bridge to SARSA ---- */
+.s10-bridge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  margin: 0 2px;
+  max-width: 96ch;
+}
+.s10-bridge b { color: var(--ink); }
+
+/* ---- responsive: stack the two panels ---- */
+@media (max-width: 860px) {
+  .s10-grid { grid-template-columns: 1fr; }
+}

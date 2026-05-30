@@ -1,0 +1,157 @@
+/* Scene 9 -- Fill Q* by dynamic programming.
+   Reuses the QTable pricing board; sits beside a side narration panel and
+   below the Bellman card + a sticky STEP / RUN ALL / RESET control bar. The
+   board fills column by column (right to left); locked cells animate in,
+   unsolved cells dim. All colour comes from the shared CSS tokens. */
+
+.scene9 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.s9-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  margin: 4px 0 2px;
+  color: var(--ink);
+}
+
+.s9-lede,
+.s9-premise {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  margin: 0 2px;
+  max-width: 96ch;
+}
+.s9-lede b, .s9-premise b { color: var(--ink); }
+.s9-premise { margin-bottom: 4px; }
+
+/* ---- Bellman card (compact, leaves room for the board) ---- */
+.s9-formula-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 8px 16px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  text-align: center;
+  color: var(--ink-on-box);
+}
+.s9-formula-card .katex-display { margin: 0; }
+.s9-formula-card .katex { color: var(--ink-on-box); }
+.s9-formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  margin-bottom: 4px;
+}
+
+/* ---- Sticky controls bar ---- */
+.s9-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: var(--bg);
+  padding: 8px 6px;
+  margin: 0 -6px;
+  border-bottom: 2px solid var(--rule);
+}
+.s9-controls { gap: 8px; margin: 0; }
+.s9-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.s9-status b { color: var(--pikachu-cheek); }
+
+/* ---- Board + side panel ---- */
+.s9-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 14px;
+  align-items: start;
+}
+.s9-q { max-width: 900px; min-width: 0; }
+
+.s9-panel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  line-height: 1.7;
+  position: sticky;
+  top: 60px;
+  align-self: start;
+}
+.s9-panel-title {
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.s9-panel-body { line-height: 1.85; }
+.s9-panel-body b { color: var(--ink-on-box); }
+.s9-panel-foot {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px solid var(--rule);
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+
+/* ---- Compact the board so controls + grid + panel fit one viewport ---- */
+.scene9 .q-cell      { padding: 3px 4px 4px; gap: 2px; }
+.scene9 .q-shelf     { transform: scale(0.92); }
+.scene9 .q-bars      { gap: 1px; }
+.scene9 .q-bar-row   { font-size: 6.5px; padding: 0 2px; }
+.scene9 .q-label     { font-size: 6px; }
+.scene9 .q-val       { font-size: 6.5px; }
+.scene9 .q-col-head  { font-size: 7px; }
+.scene9 .q-row-head  { font-size: 7px; }
+
+/* ---- Fill states ---- */
+.scene9 .q-cell.s9-pending { opacity: 0.32; }
+.scene9 .q-cell.s9-just-locked {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: -3px;
+  z-index: 3;
+  animation: s9-lock-in 760ms ease-out;
+}
+@keyframes s9-lock-in {
+  0%   { box-shadow: inset 0 0 0 200px rgba(248, 208, 40, 0.5); }
+  100% { box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene9 .q-cell.s9-just-locked { animation: none; }
+}
+
+/* ---- Bridge footer ---- */
+.s9-bridge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.85;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+.s9-bridge b { color: var(--ink); }
+
+/* ---- Responsive: stack the board + panel ---- */
+@media (max-width: 860px) {
+  .s9-row { grid-template-columns: minmax(0, 1fr); }
+  .s9-q { max-width: none; }
+  .s9-panel { position: static; max-height: none; }
+}

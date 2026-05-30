@@ -1,0 +1,290 @@
+/* Scene 8 -- Bellman: today vs tomorrow.
+   The Bellman optimality equation as a formula card + a plain-English read +
+   a worked last-day backup the learner drives lever by lever. All colour
+   comes from the shared CSS tokens so the CRT retint is automatic. */
+
+.scene8 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.s8-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  margin: 4px 0 2px;
+  color: var(--ink);
+}
+
+.s8-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  margin: 0 2px 4px;
+  max-width: 92ch;
+}
+.s8-lede b { color: var(--ink); }
+
+/* ---- Bellman formula card ---- */
+.s8-formula-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 18px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  text-align: center;
+  color: var(--ink-on-box);
+}
+.s8-formula-card .katex-display { margin: 0; }
+.s8-formula-card .katex { color: var(--ink-on-box); }
+.s8-formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  margin-bottom: 8px;
+}
+
+/* ---- Two-column body ---- */
+.s8-body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+/* (a) "read it like a manager" */
+.s8-read-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 10px;
+}
+.s8-read-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.s8-read-list li {
+  position: relative;
+  padding-left: 18px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+.s8-read-list b { color: var(--ink-on-box); }
+.s8-read-list i { font-style: normal; color: var(--ink-secondary); }
+.s8-bullet {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--rule);
+}
+.s8-bullet-lhs { background: var(--pikachu-cheek); }
+.s8-bullet-r   { background: var(--lever-standard); }
+.s8-bullet-max { background: var(--hue-ghost); }
+.s8-bullet-exp { background: var(--hue-casino); }
+
+/* (b) worked backup */
+.s8-worked {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.s8-worked-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.s8-worked-top {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.s8-worked-card { flex: 0 0 auto; margin-right: 4px; }
+.s8-worked-sub { flex: 1 1 auto; min-width: 0; padding-left: 6px; border-left: 2px solid var(--inner-highlight); }
+.s8-worked-state {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  color: var(--ink);
+  margin-bottom: 8px;
+  letter-spacing: 0.03em;
+}
+.s8-worked-lastday {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+}
+.s8-worked-lastday b { color: var(--ink); }
+.s8-worked-lastday i { font-style: normal; color: var(--pikachu-cheek); }
+
+.s8-reduced {
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 8px 10px;
+  text-align: center;
+}
+.s8-reduced .katex-display { margin: 0; }
+.s8-reduced .katex { color: var(--ink-on-box); font-size: 14px; }
+
+.s8-pick-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  margin-top: 2px;
+}
+
+/* ---- lever picker (chunky price tags as buttons) ---- */
+.s8-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.s8-lever {
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  border-width: 3px;
+  border-style: solid;
+  padding: 7px 10px;
+  font-size: 9px;
+  color: var(--lever-ink);
+  letter-spacing: 0.04em;
+}
+.s8-lever .lever-price { font-size: 8px; opacity: 0.92; }
+.s8-lever:hover { filter: brightness(1.08); }
+.s8-lever.is-active {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ---- calculation panel ---- */
+.s8-calc {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  line-height: 1.6;
+  min-height: 64px;
+}
+.s8-calc-empty {
+  color: var(--ink-secondary);
+  font-size: 8px;
+  text-align: center;
+  padding: 14px 4px;
+  letter-spacing: 0.04em;
+}
+.s8-calc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--rule);
+}
+.s8-calc-tag {
+  border-width: 2px;
+  border-style: solid;
+  padding: 4px 7px;
+  font-size: 8px;
+  color: var(--lever-ink);
+}
+.s8-calc-tag .lever-price { font-size: 7px; opacity: 0.9; }
+.s8-calc-demand {
+  font-size: 7px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.s8-calc-terms { display: flex; flex-direction: column; }
+.s8-calc-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--inner-highlight);
+  font-size: 7.5px;
+  line-height: 1.7;
+}
+.s8-calc-line:last-child { border-bottom: none; }
+.s8-term-val {
+  color: var(--lever-standard);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.s8-calc-total {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 2px solid var(--rule);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.s8-calc-sum { font-size: 8px; color: var(--ink-on-box); }
+.s8-calc-future { font-size: 7px; color: var(--ink-secondary); }
+.s8-calc-amount {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--pikachu-cheek);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- verdict (revealed after all three backups) ---- */
+.s8-verdict {
+  display: none;
+  border: 3px solid var(--pikachu-cheek);
+  background: var(--bg-strong);
+  padding: 10px 12px;
+}
+.s8-verdict.is-shown { display: block; }
+.s8-verdict-line {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+  margin-bottom: 8px;
+}
+.s8-verdict-line b { color: var(--pikachu-cheek); }
+.s8-verdict-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.s8-verdict-tag {
+  border-width: 2px;
+  border-style: solid;
+  padding: 5px 8px;
+  font-size: 8px;
+  color: var(--lever-ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+  opacity: 0.62;
+}
+.s8-verdict-tag.is-best { opacity: 1; outline: 2px solid var(--ink); outline-offset: 1px; }
+
+/* ---- bridge footer ---- */
+.s8-bridge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.85;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+.s8-bridge b { color: var(--ink); }
+
+/* ---- responsive: stack the two columns ---- */
+@media (max-width: 860px) {
+  .s8-body { grid-template-columns: minmax(0, 1fr); }
+}
