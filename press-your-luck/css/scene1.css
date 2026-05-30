@@ -1,1 +1,300 @@
-/* scene1.css - per-scene styles (empty stub) */
+/* scene1.css - Tutorial (how to play). All colours resolve from the
+   shared --c-roll / --c-hold / --chip-* / --stand-* / --ink / --rule tokens
+   so the CRT theme retints automatically. */
+
+.s1-tut { max-width: 1000px; margin: 0 auto; }
+
+/* ---- top bar: step counter + SKIP ---- */
+.s1-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.s1-step-counter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+}
+.s1-skip {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 6px 10px;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 2px var(--inner-highlight), 2px 2px 0 0 rgba(0,0,0,0.18);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.s1-skip:hover { background: var(--pikachu-yellow); color: var(--rule); }
+
+.s1-section-title { font-size: 13px; letter-spacing: 2px; margin-bottom: 10px; }
+
+/* ---- demo area (per step) ---- */
+.s1-demo {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+}
+
+/* Shared: a "blown-up" table card. We scale from the top-left and RESERVE
+   the scaled footprint with explicit width/height so the scaled art never
+   overlaps neighbouring text (transform: scale alone ignores layout). The
+   inner .table-card is pinned to a fixed base width so the standing badge
+   does not stretch to fill the flex row. */
+.s1-card-xl { flex: 0 0 auto; width: 234px; height: 195px; }    /* 156 x 130 @ 1.5 */
+.s1-card-xl .table-card { width: 156px; }
+.s1-card-xl > .table-card { transform: scale(1.5); transform-origin: top left; }
+
+/* ---- step 1: welcome ---- */
+.s1-welcome {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.s1-welcome-text { max-width: 360px; }
+.s1-welcome-big {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  color: var(--c-roll);
+  letter-spacing: 2px;
+  line-height: 1.5;
+  text-shadow: 2px 2px 0 var(--rule);
+  margin-bottom: 14px;
+}
+.s1-welcome-small {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+/* ---- steps 2 & 3: a single focused card + callouts / legend ---- */
+.s1-focus {
+  display: flex;
+  align-items: center;
+  gap: 44px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* callouts (step 2) */
+.s1-callouts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 320px;
+}
+.s1-callout {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  border-left-width: 8px;
+  padding: 8px 10px;
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+}
+.s1-callout.c-pot { border-left-color: var(--chip-on); }
+.s1-callout.c-danger { border-left-color: var(--chip-danger); color: var(--chip-danger); }
+
+/* standing legend (step 3) */
+.s1-stand-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.s1-stand-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+  padding: 6px 10px;
+  border: 3px solid transparent;
+  background: transparent;
+  opacity: 0.55;
+  transition: opacity 0.2s steps(3);
+}
+.s1-stand-row .s1-swatch {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--rule);
+  flex: 0 0 auto;
+}
+.s1-stand-row.s-behind .s1-swatch { background: var(--stand-behind); }
+.s1-stand-row.s-even   .s1-swatch { background: var(--stand-even); }
+.s1-stand-row.s-ahead  .s1-swatch { background: var(--stand-ahead); }
+.s1-stand-row.active {
+  opacity: 1;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border-color: var(--rule);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+}
+.s1-stand-row.s-behind.active { color: var(--stand-behind); }
+.s1-stand-row.s-even.active   { color: var(--stand-even); }
+.s1-stand-row.s-ahead.active  { color: var(--stand-ahead); }
+
+/* ---- step 4: levers + die ---- */
+.s1-levers-demo {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.s1-lever-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.s1-lever-btn {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  row-gap: 2px;
+  align-items: center;
+  min-width: 230px;
+  padding: 10px 14px;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight), 3px 3px 0 0 var(--rule);
+  font-family: 'Press Start 2P', monospace;
+}
+.s1-lever-btn.lever-roll { border-left: 10px solid var(--c-roll); }
+.s1-lever-btn.lever-hold { border-left: 10px solid var(--c-hold); }
+.s1-lever-ic {
+  grid-row: 1 / span 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--rule);
+}
+.s1-lever-btn.lever-roll .s1-lever-ic { background: var(--c-roll); color: var(--c-roll-ink); }
+.s1-lever-btn.lever-hold .s1-lever-ic { background: var(--c-hold); color: var(--c-hold-ink); }
+.s1-lever-name { font-size: 13px; letter-spacing: 1px; color: var(--ink-on-box); }
+.s1-lever-btn.lever-roll .s1-lever-name { color: var(--c-roll); }
+.s1-lever-btn.lever-hold .s1-lever-name { color: var(--c-hold); }
+.s1-lever-sub { font-size: 7px; color: var(--ink-secondary); letter-spacing: 0.5px; }
+
+.s1-die-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.s1-die-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: center;
+  letter-spacing: 0.5px;
+  max-width: 120px;
+  line-height: 1.6;
+}
+
+/* ---- step 5: the demo turn ---- */
+.s1-demo-turn {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.s1-demo-intro {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  text-align: center;
+  max-width: 64ch;
+}
+.s1-demo-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  border: 4px solid var(--rule);
+  background: var(--bg);
+  box-shadow: inset 0 0 0 3px var(--inner-highlight);
+  min-height: 150px;
+  width: 100%;
+}
+.s1-demo-card { flex: 0 0 auto; }
+.s1-demo-card .table-card { width: 150px; }
+.s1-demo-die { display: inline-flex; align-items: center; }
+.s1-demo-bank { align-self: center; }
+
+.s1-demo-ctrls { display: flex; gap: 12px; }
+.s1-demo-play {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--c-roll-ink);
+  background: var(--c-roll);
+  border: 4px solid var(--rule);
+  padding: 10px 18px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.25), 3px 3px 0 0 var(--rule);
+  text-transform: uppercase;
+}
+.s1-demo-play:hover:not(:disabled) { filter: brightness(1.08); }
+.s1-demo-play:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.s1-demo-takeaway {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink);
+  text-align: center;
+  max-width: 66ch;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  border-top-width: 6px;
+  border-top-color: var(--chip-on);
+  padding: 10px 14px;
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+}
+
+/* ---- dialog + nav hint ---- */
+.s1-dialog { margin-top: 8px; }
+.s1-nav-hint {
+  margin-top: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+.s1-nav-hint kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 1px 4px;
+  color: var(--ink-on-box);
+}
+
+@media (max-width: 820px) {
+  .s1-welcome, .s1-focus, .s1-levers-demo { gap: 24px; }
+  .s1-card-xl { width: 195px; height: 163px; }      /* 156 x 130 @ 1.25 */
+  .s1-card-xl > .table-card { transform: scale(1.25); }
+  .s1-demo-stage { gap: 22px; }
+}
