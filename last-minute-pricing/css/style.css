@@ -1,0 +1,2134 @@
+/* Pokemon battle — viz #7 of the SML reinforcement-learning curriculum.
+   Second integrative review.  Same lesson as Snakes & Ladders, retold on a
+   Gen-1 Pokemon Red/Blue battle screen.  The editorial cream/serif palette of
+   the rest of the curriculum is deliberately overridden here per the user's
+   request; the SKILL §10 anticipates this exit.  The cross-viz hue identities
+   (anymal-red, casino-blue, ghost-purple, star-amber, door-green) are kept as
+   per-component accent tokens so the scene-5 recap can still cite them. */
+
+/* ---------- Press Start 2P ---------- */
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('../assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+  font-display: block;  /* pixel font: do NOT flash fallback serif first */
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ---------- Tokens ---------- */
+:root,
+:root[data-theme="light"] {
+  /* Battle screen — Day */
+  --sky-top:        #9CC8E8;
+  --sky-bottom:     #C0DEF0;
+  --grass:          #5BA85B;
+  --grass-rim:      #3A8A3A;
+
+  /* Page chrome */
+  --bg:             #E8E0CC;     /* warm grey-cream, NES "shell" */
+  --bg-strong:      #F8F4E4;     /* lighter, for dialog boxes */
+  --ink:            #181818;
+  --ink-secondary:  #585858;
+  --rule:           #181818;     /* hard black for Pokemon borders */
+  --card-bg:        #FFFFFF;
+  --inner-highlight:#404040;     /* the secondary inner border line */
+  --pikachu-yellow: #F8D028;
+  --pikachu-cheek:  #E84828;
+  --charmander-orange:#F58030;
+  --hp-green:       #48C848;
+  --hp-yellow:      #E8C828;
+  --hp-red:         #E84828;
+  --damage-text:    #F8F8F8;
+  --damage-stroke:  #181818;
+  --ink-on-box:     #181818;     /* ink on Pokemon-white boxes (always dark) */
+
+  /* Colour-blind-safe semantic palette (Okabe-Ito). Use these — not the
+     hp-green / hp-red brand tokens — wherever colour carries meaning
+     (heatmap, win/lose, positive/negative delta). Pair with a label or
+     icon for redundancy. See teaching-viz SKILL §Colour-blind safety. */
+  --cb-blue:             #0072B2;
+  --cb-blue-light:       #B6D9EB;
+  --cb-vermillion:       #D55E00;
+  --cb-vermillion-light: #F4D2B0;
+  --cb-bluish-green:     #009E73;
+  --cb-yellow:           #F0E442;
+  --cb-orange:           #E69F00;
+  --cb-sky:              #56B4E9;
+  --cb-purple:           #CC79A7;
+
+  /* Cross-viz hue identities (kept for scene-5 recap chips) */
+  --hue-anymal:  #B8323A;     /* red — MDP */
+  --hue-casino:  #2F6CB1;     /* blue — ε-greedy */
+  --hue-ghost:   #7A5C8C;     /* purple — Bellman */
+  --hue-star:    #C08A3E;     /* amber — Robbins-Monro */
+  --hue-door:    #4A8B6B;     /* green — SARSA */
+  --hue-snakes:  #C8902C;     /* gold — Snakes & Ladders sibling */
+
+  /* HP-bar bucket fill tokens — overridable per theme. */
+  --hp-b0: #48C848;
+  --hp-b1: #88D848;
+  --hp-b2: #E8C828;
+  --hp-b3: #E89028;
+  --hp-b4: #E84828;
+
+  /* ---- Price-lever colour tokens (Last-Minute Pricing) ----
+     PREMIUM deep-blue, STANDARD amber/gold, FIRE-SALE burnt-orange.
+     Used wherever a lever carries meaning (price tags, the optimal-policy
+     overlay, +$ flashes). Each token has a fill, a darker rule/edge, and a
+     soft tint for backgrounds. CRT retints them all to the amber palette. */
+  --lever-premium:        #2F6CB1;   /* deep blue */
+  --lever-premium-rule:   #1C4B82;
+  --lever-premium-tint:   #D9E6F2;
+  --lever-standard:       #C08A3E;   /* amber / gold */
+  --lever-standard-rule:  #8C6224;
+  --lever-standard-tint:  #F2E6CC;
+  --lever-firesale:       #A8421C;   /* burnt orange / vermillion */
+  --lever-firesale-rule:  #7A2E12;
+  --lever-firesale-tint:  #F2D5C6;
+  --lever-ink:            #FFFFFF;   /* text on a saturated lever tag */
+
+  /* The perishable thing: ticket sprite tokens. */
+  --ticket-fill:   #F0C24A;   /* a live ticket (warm gold) */
+  --ticket-edge:   #181818;
+  --ticket-gone:   #B8B0A0;   /* a sold / crumbled ticket (greyed) */
+  --ticket-gone-edge: #6E665A;
+  --pip-on:        #181818;   /* a day still on the clock */
+  --pip-off:       #C8C0AC;   /* a day already spent */
+  --midnight-bg:   #2A2418;   /* the dark MIDNIGHT gutter (d=0) */
+
+  /* Battle-VFX colour tokens — used by the scene 1 attack overlays.
+     Each theme overrides these so the lightning bolt / ember / rage
+     aura match the palette. */
+  --vfx-bolt:    #FFD028;     /* THUNDERBOLT SVG stroke */
+  --vfx-bolt-hl: #FFFFFF;     /* THUNDERBOLT inner highlight stroke */
+  --vfx-bolt-glow: rgba(255, 208, 40, 0.95);
+  --vfx-ember-a: rgba(248, 128, 48, 0.95);
+  --vfx-ember-b: rgba(232,  80, 24, 0.85);
+  --vfx-ember-c: rgba(248, 168, 64, 0.95);
+  --vfx-flame-a: rgba(248,  96, 24, 0.9);
+  --vfx-flame-b: rgba(252, 168, 32, 0.95);
+  --vfx-flame-c: rgba(255, 220, 64, 0.95);
+  --vfx-flame-d: rgba(255, 220, 64, 0.0);
+  --vfx-rage:    rgba(232, 40, 40, 0.7);
+}
+
+:root[data-theme="crt"] {
+  /* Amber-phosphor CRT terminal — dark background, warm-amber text.
+     Distinct from the GB green theme.  Pairs with the scanlines +
+     vignette + phosphor-glow rules at the bottom of this file. */
+  --sky-top:        #1a0d05;
+  --sky-bottom:     #2a160a;
+  --grass:          #382010;
+  --grass-rim:      #1a0d05;
+
+  --bg:             #0a0500;
+  --bg-strong:      #1a0d05;
+  --ink:            #FFB350;     /* amber phosphor on the page chrome */
+  --ink-on-box:     #FFB350;
+  --ink-secondary:  #8B6030;
+  --rule:           #FF9020;
+  --card-bg:        #1a0d05;
+  --inner-highlight:#5A3010;
+  --pikachu-yellow: #FFC060;
+  --pikachu-cheek:  #FF6020;
+  --charmander-orange:#FF8030;
+  --hp-green:       #FFB350;
+  --hp-yellow:      #FFB350;
+  --hp-red:         #FF6020;
+  --damage-text:    #FFB350;
+  --damage-stroke:  #0a0500;
+
+  --hue-anymal:  #FF6020;
+  --hue-casino:  #FFB350;
+  --hue-ghost:   #FF9050;
+  --hue-star:    #FFC060;
+  --hue-door:    #FF9020;
+  --hue-snakes:  #FFA040;
+
+  --cb-blue:             #FFB350;
+  --cb-blue-light:       #5A3010;
+  --cb-vermillion:       #FF6020;
+  --cb-vermillion-light: #5A3010;
+  --cb-bluish-green:     #FFB350;
+  --cb-yellow:           #FFC060;
+  --cb-orange:           #FF8030;
+  --cb-sky:              #FFB350;
+  --cb-purple:           #FF9050;
+
+  /* HP-bar buckets — amber gradient under CRT. */
+  --hp-b0: #FFC060;
+  --hp-b1: #FFB350;
+  --hp-b2: #FF9020;
+  --hp-b3: #FF7010;
+  --hp-b4: #FF4010;
+
+  /* Price-lever tokens retinted to the amber-phosphor CRT palette. The
+     three levers stay distinguishable by brightness (PREMIUM brightest,
+     FIRE-SALE deepest) since hue collapses to amber under CRT. */
+  --lever-premium:        #FFC868;
+  --lever-premium-rule:   #B07020;
+  --lever-premium-tint:   #3A2410;
+  --lever-standard:       #FF9828;
+  --lever-standard-rule:  #A85810;
+  --lever-standard-tint:  #2E1C0A;
+  --lever-firesale:       #FF5C18;
+  --lever-firesale-rule:  #8A2E08;
+  --lever-firesale-tint:  #2A1206;
+  --lever-ink:            #1a0d05;
+
+  --ticket-fill:   #FFC060;
+  --ticket-edge:   #0a0500;
+  --ticket-gone:   #5A3010;
+  --ticket-gone-edge: #2A1606;
+  --pip-on:        #FFB350;
+  --pip-off:       #5A3010;
+  --midnight-bg:   #1a0d05;
+
+  /* Battle VFX — all amber/orange so the THUNDERBOLT / EMBER /
+     RAGE overlays stay inside the CRT palette. */
+  --vfx-bolt:    #FFC060;
+  --vfx-bolt-hl: #FFE090;
+  --vfx-bolt-glow: rgba(255, 192, 96, 0.95);
+  --vfx-ember-a: rgba(255, 144, 32, 0.95);
+  --vfx-ember-b: rgba(255,  96, 32, 0.85);
+  --vfx-ember-c: rgba(255, 180, 64, 0.95);
+  --vfx-flame-a: rgba(255, 112, 32, 0.9);
+  --vfx-flame-b: rgba(255, 168, 48, 0.95);
+  --vfx-flame-c: rgba(255, 220, 96, 0.95);
+  --vfx-flame-d: rgba(255, 220, 96, 0.0);
+  --vfx-rage:    rgba(255, 96, 32, 0.7);
+}
+
+/* CRT scanlines + vignette overlays — only active under the CRT
+   theme.  Pointer-events: none on both so clicks pass through.  */
+:root[data-theme="crt"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9991;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.0) 0px,
+    rgba(0, 0, 0, 0.0) 2px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  mix-blend-mode: multiply;
+}
+:root[data-theme="crt"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9992;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+/* Phosphor glow on text in the CRT theme. */
+:root[data-theme="crt"] body,
+:root[data-theme="crt"] .scene-title,
+:root[data-theme="crt"] .topbar,
+:root[data-theme="crt"] .poke-section-title,
+:root[data-theme="crt"] .concept-heading {
+  text-shadow: 0 0 6px rgba(255, 180, 80, 0.55);
+}
+/* Sprites washed amber for CRT. */
+:root[data-theme="crt"] .poke-sprite,
+:root[data-theme="crt"] .traj-box-sprite,
+:root[data-theme="crt"] .q-thumb-sprite,
+:root[data-theme="crt"] .sd-f-tape-sprite,
+:root[data-theme="crt"] .sc0-bn-sprite {
+  filter: grayscale(1) sepia(1) saturate(5) hue-rotate(-10deg) contrast(1.05) brightness(0.95);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Press Start 2P', "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  -webkit-font-smoothing: none;  /* keep pixel font crisp */
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg);
+  border-bottom: 4px solid var(--rule);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.topbar .brand {
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink);
+  font-size: 9px;
+}
+.topbar .scene-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 0 20px;
+}
+.topbar .right-cluster { display: flex; gap: 6px; align-items: center; }
+
+.theme-toggle, .pager-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  padding: 5px 8px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 #BBB6A2;
+}
+.theme-toggle:hover, .pager-btn:hover {
+  background: var(--pikachu-yellow);
+}
+.pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* MUSIC button — same chrome as THEME but with an "on" state. */
+.music-toggle.active {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+  box-shadow: inset 2px 2px 0 0 #B89020;
+}
+
+.dot-pager { display: flex; gap: 4px; align-items: center; }
+.dot-pager .dot {
+  width: 10px; height: 10px;
+  background: var(--ink-secondary);
+  border: 2px solid var(--rule);
+  padding: 0;
+  cursor: pointer;
+}
+.dot-pager .dot.active { background: var(--pikachu-yellow); }
+.dot-pager .dot:hover { background: var(--pikachu-cheek); }
+
+/* ---------- Stage / scene engine ---------- */
+.stage {
+  position: relative;
+  max-width: 1100px;
+  margin: 16px auto 32px;
+  padding: 0 20px;
+  min-height: calc(100vh - 130px);
+}
+.scene {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+  left: 0;
+  right: 0;
+}
+
+/* ---------- Pokemon dialog box ----------
+   The iconic look: thick black outer border + thin inner-highlight rectangle.
+   We render the inner highlight with stacked inset box-shadows. */
+.poke-box {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 16px;
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  position: relative;
+}
+.poke-box.tight { padding: 10px 12px; font-size: 10px; }
+
+.poke-box .triangle {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid var(--ink);
+  animation: blink 0.9s steps(2, end) infinite;
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ---------- Headings ---------- */
+.poke-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 38px;
+  color: var(--pikachu-yellow);
+  text-shadow:
+    2px 0 0 var(--ink),
+    -2px 0 0 var(--ink),
+    0 2px 0 var(--ink),
+    0 -2px 0 var(--ink),
+    2px 2px 0 var(--ink),
+    -2px -2px 0 var(--ink),
+    -2px 2px 0 var(--ink),
+    2px -2px 0 var(--ink),
+    4px 4px 0 var(--charmander-orange);
+  margin: 0 0 18px;
+  letter-spacing: 6px;
+}
+.poke-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+.poke-section-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.poke-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin: 8px 4px 0;
+  max-width: 76ch;
+}
+
+/* ---------- Pokemon sprite ----------
+   Hard rule: image-rendering: pixelated must apply on both the <img> tag and
+   any wrapper that scales. */
+.poke-sprite {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+  display: block;
+  /* Idle breathing — 1.5 px vertical bob on a 2.4s cycle. The
+     animation property is replaced wholesale by .shake / .faint when
+     those classes are added, so it cleanly pauses during damage and
+     KO animations. */
+  animation: poke-breathe 2.4s ease-in-out infinite;
+}
+
+/* Grass tufts at the platform rim — 5 chunky pixel tufts that sway on
+   staggered cycles.  Lives inside .grass-rim so it sits at the right
+   vertical position automatically.  prefers-reduced-motion disables. */
+.grass-tufts {
+  position: absolute;
+  inset: -14px 0 auto 0;        /* lift above the rim */
+  height: 14px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6%;
+  pointer-events: none;
+  z-index: 2;
+}
+.grass-tuft {
+  width: 14px;
+  height: 14px;
+  background: var(--grass-rim);
+  clip-path: polygon(
+    20% 100%,  0%  35%, 18% 55%,
+    35% 0%,   45% 50%, 50% 25%,
+    55% 50%,  65% 0%,  82% 55%,
+    100% 35%, 80% 100%
+  );
+  transform-origin: 50% 100%;
+  animation: grass-sway 4.0s ease-in-out infinite alternate;
+}
+.grass-tuft:nth-child(2) { animation-delay: -0.7s; animation-duration: 4.4s; }
+.grass-tuft:nth-child(3) { animation-delay: -1.5s; animation-duration: 3.6s; }
+.grass-tuft:nth-child(4) { animation-delay: -2.1s; animation-duration: 4.8s; }
+.grass-tuft:nth-child(5) { animation-delay: -0.3s; animation-duration: 4.2s; }
+@keyframes grass-sway {
+  0%   { transform: rotate(-5deg); }
+  100% { transform: rotate(5deg);  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grass-tuft { animation: none; }
+}
+@keyframes poke-breathe {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .poke-sprite { animation: none; }
+}
+.poke-sprite.shake {
+  animation: poke-shake 320ms steps(1, end);
+}
+@keyframes poke-shake {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-6px, 0); }
+  25%  { transform: translate(6px, 0); }
+  40%  { transform: translate(-5px, 0); }
+  55%  { transform: translate(5px, 0); }
+  70%  { transform: translate(-3px, 0); }
+  85%  { transform: translate(3px, 0); }
+  100% { transform: translate(0, 0); }
+}
+.poke-sprite.faint {
+  animation: poke-faint 600ms ease-in forwards;
+}
+@keyframes poke-faint {
+  0%   { transform: translateY(0); opacity: 1; filter: brightness(1); }
+  100% { transform: translateY(48px); opacity: 0; filter: brightness(0); }
+}
+
+/* ---------- Battle stage ---------- */
+.battle-stage {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 5 / 3;
+  margin: 0 auto;
+  background:
+    linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 65%, var(--grass) 65%, var(--grass) 100%);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  overflow: hidden;
+  font-family: 'Press Start 2P', monospace;
+}
+.battle-stage .grass-rim {
+  position: absolute;
+  left: 0; right: 0;
+  top: 65%;
+  height: 4px;
+  background: var(--grass-rim);
+}
+.battle-stage .platform {
+  position: absolute;
+  width: 38%;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--grass-rim);
+  opacity: 0.65;
+}
+.battle-stage .platform.player   { left: 6%;  bottom: 14%; }
+.battle-stage .platform.opponent { right: 6%; top: 35%;    }
+
+.battle-stage .sprite-host {
+  position: absolute;
+}
+.battle-stage .sprite-host.player {
+  left: 10%;
+  bottom: 16%;
+  width: 30%;
+}
+.battle-stage .sprite-host.opponent {
+  right: 10%;
+  top: 12%;
+  width: 22%;
+}
+.battle-stage .sprite-host img {
+  width: 100%;
+  height: auto;
+  /* feet rest on platform: the platform is at the host's bottom */
+  transform: translateY(0);
+}
+
+/* Stars for night sky */
+.battle-stage.night::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 35% 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 12%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 60% 22%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 78% 8%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 38% 32%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 90% 30%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 8% 25%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 48% 8%, #fff 1px, transparent 1px),
+    radial-gradient(1px 1px at 72% 38%, #fff 1px, transparent 1px);
+  pointer-events: none;
+}
+
+/* HP box — sits floating over the battle */
+.hp-box {
+  position: absolute;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 6px 10px 6px 12px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  min-width: 160px;
+}
+.hp-box.player   { right: 4%; bottom: 6%;   }
+.hp-box.opponent { left:  4%; top: 6%;      }
+
+.hp-box .row1 {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+.hp-box .name { color: var(--ink-on-box); }
+.hp-box .lvl { color: var(--ink-on-box); }
+
+.hp-bar-row {
+  display: flex; align-items: center; gap: 6px;
+}
+.hp-bar-row .hp-label {
+  font-size: 8px;
+  color: var(--pikachu-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+}
+.hp-bar-track {
+  flex: 1 1 auto;
+  height: 9px;
+  background: #585858;
+  border: 2px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.hp-bar-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: #48C848;     /* default = full */
+  width: 100%;
+  transition: width 1100ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
+}
+/* Discrete bucket fill — 5 buckets + fainted. Width snaps to 100/80/60/
+   40/20/0%, color phases green → light-green → yellow → orange → red. */
+.hp-bar-fill[data-bucket="0"] { width: 100%; background: var(--hp-b0, #48C848); }
+.hp-bar-fill[data-bucket="1"] { width: 80%;  background: var(--hp-b1, #88D848); }
+.hp-bar-fill[data-bucket="2"] { width: 60%;  background: var(--hp-b2, #E8C828); }
+.hp-bar-fill[data-bucket="3"] { width: 40%;  background: var(--hp-b3, #E89028); }
+.hp-bar-fill[data-bucket="4"] { width: 20%;  background: var(--hp-b4, #E84828); }
+.hp-bar-fill[data-bucket="5"] { width: 0%;   background: var(--hp-b4, #E84828); }
+/* Tick marks at the bucket boundaries — makes the discretisation
+   readable even in a still screenshot. */
+.hp-bar-tick {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(0,0,0,0.45);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hp-box .row3 {
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+
+/* Damage flash number */
+.damage-flash {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  color: var(--damage-text);
+  -webkit-text-stroke: 2px var(--damage-stroke);
+  text-stroke: 2px var(--damage-stroke);
+  pointer-events: none;
+  animation: dmg-rise 700ms ease-out forwards;
+}
+@keyframes dmg-rise {
+  0%   { transform: translateY(8px); opacity: 0; }
+  20%  { transform: translateY(0);   opacity: 1; }
+  80%  { transform: translateY(-24px); opacity: 1; }
+  100% { transform: translateY(-32px); opacity: 0; }
+}
+
+/* ---------- Move menu (scene 1) ---------- */
+.move-menu {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px 12px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+}
+.move-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: transparent;
+  border: 0;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 10px;
+  color: var(--ink-on-box);
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  text-transform: uppercase;
+}
+.move-btn::before {
+  content: '\25B6 ';
+  visibility: hidden;
+  color: var(--ink-on-box);
+}
+.move-btn:hover::before, .move-btn:focus::before, .move-btn.selected::before {
+  visibility: visible;
+}
+.move-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.move-btn:disabled::before { visibility: hidden; }
+.move-btn .move-sub {
+  font-size: 8px;
+  color: #585858;
+  letter-spacing: 0.5px;
+  text-transform: none;
+  display: flex;
+  flex-direction: column;     /* two rows: .move-stats then .move-drop */
+  gap: 3px;
+}
+.move-btn .move-stats {
+  display: flex;
+  flex-wrap: wrap;            /* just the type pill now (PWR/ACC retired) */
+  gap: 2px 8px;
+  align-items: center;
+}
+.move-btn .move-drop {
+  font-size: 8px;
+  color: var(--pikachu-cheek);
+  letter-spacing: 0.5px;
+}
+.move-btn:disabled .move-drop { color: #888; }
+.move-btn .type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 4px;
+  border: 1px solid var(--rule);
+  font-size: 7px;
+  text-transform: uppercase;
+}
+.type-pill.electric { background: #F8D028; color: #181818; }
+.type-pill.normal   { background: #C8C0B0; color: #181818; }
+.type-pill.steel    { background: #B0B0C0; color: #181818; }
+.type-pill.fire     { background: #F58030; color: #181818; }
+
+/* ---------- Pokemon-styled "menu option" rows (for sliders / params) ---------- */
+.poke-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink);
+}
+.poke-menu-row::before {
+  content: '\25B6';
+  color: var(--pikachu-yellow);
+  -webkit-text-stroke: 0.5px var(--ink);
+  margin-right: 4px;
+}
+.poke-menu-row input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 140px;
+  height: 8px;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.poke-menu-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  margin-top: 0;
+  cursor: pointer;
+}
+.poke-menu-row input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  cursor: pointer;
+}
+.poke-menu-row output, .poke-menu-row .val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  min-width: 56px;
+  color: var(--ink);
+}
+.poke-menu-row button {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 4px 8px;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 #BBB6A2;
+}
+.poke-menu-row button:hover { background: var(--pikachu-yellow); }
+.poke-menu-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- KaTeX wrapper ---------- */
+.poke-formula {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 10px 14px;
+  margin: 10px auto;
+  display: inline-block;
+  font-family: "KaTeX_Main", "Iowan Old Style", Georgia, serif;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.poke-formula .katex { color: var(--ink-on-box); font-size: 16px; }
+
+/* ---------- Scenes layout helpers ---------- */
+.scene-pad {
+  padding: 12px 4px 24px;
+}
+.scene-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.scene-row.center { justify-content: center; }
+.scene-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+/* ---------- Cross-viz hue chip ---------- */
+.hue-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.hue-chip.hue-anymal { background: var(--hue-anymal); color: #fff; }
+.hue-chip.hue-casino { background: var(--hue-casino); color: #fff; }
+.hue-chip.hue-ghost  { background: var(--hue-ghost);  color: #fff; }
+.hue-chip.hue-star   { background: var(--hue-star);   color: #181818; }
+.hue-chip.hue-door   { background: var(--hue-door);   color: #fff; }
+.hue-chip.hue-snakes { background: var(--hue-snakes); color: #181818; }
+.hue-chip.hue-poke   { background: var(--pikachu-yellow); color: #181818; }
+
+/* ---------- N×N state grid for VI / γ scenes (NB = 5 for buckets) ----------
+   Rows use `auto` (not `1fr`) — the grid has no explicit container height, so
+   `1fr` would collapse to zero and let .state-cell's min-height fight the
+   track sizing. `auto` lets each row sit at its content height. */
+.state-grid {
+  display: grid;
+  grid-template-columns: 64px repeat(var(--nb, 5), minmax(0, 1fr));
+  grid-template-rows: 28px repeat(var(--nb, 5), auto);
+  gap: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  max-width: 760px;
+}
+.state-grid .axis-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+.state-grid .axis-label.col {
+  letter-spacing: 0.5px;
+}
+.state-grid .axis-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-secondary);
+  font-size: 7px;
+  text-align: center;
+  line-height: 1.3;
+}
+.state-grid .row-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--ink);
+  letter-spacing: 0.5px;
+}
+.state-grid .state-cell {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 78px;
+  position: relative;
+  box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight);
+  color: var(--ink-on-box);
+}
+.state-cell .v-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--ink-on-box);
+}
+.state-cell .v-move {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--charmander-orange);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.state-cell.flash {
+  animation: cell-flash 700ms ease-out;
+}
+@keyframes cell-flash {
+  0%   { box-shadow: 0 0 0 4px var(--pikachu-yellow), inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight); }
+  100% { box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight); }
+}
+
+/* ---------- Scene 2 (value iteration) clarity redesign ----------
+   Adds: narrator dialog + Bellman-above + two-column grid/inspector +
+   heat-map cell colours + terminal strips + inspector panel. */
+
+.sc2-narrator      { margin: 0 0 10px; }
+.sc2-formula       { margin: 0 0 10px; padding: 8px 14px; }
+.sc2-hud           { margin: 0 0 12px; }
+
+.sc2-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  margin-bottom: 14px;
+  align-items: start;
+}
+.sc2-grid-block {
+  min-width: 0;                   /* let the grid shrink inside flex/grid */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sc2-ctrl { margin-bottom: 10px; }
+
+/* ---------- Axis sprite decorations (scenes 2, 3) ----------
+   Pikachu sits to the LEFT of the grid (rows vary your HP).
+   Charmander sits ABOVE the grid (columns vary opp HP).
+   Both are framed as Pokemon dialog boxes so they match the rest of the UI. */
+.vi-axis-top {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+.vi-axis-leftpad { width: 96px; flex-shrink: 0; }   /* matches the .side panel below */
+.vi-axis-row     { display: flex; align-items: stretch; gap: 6px; }
+.vi-axis-pokemon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  color: var(--ink-on-box);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  flex: 1;
+}
+.vi-axis-pokemon.side {
+  flex: 0 0 96px;
+  flex-direction: column;
+  padding: 8px 4px;
+  text-align: center;
+  gap: 6px;
+}
+.vi-axis-sprite {
+  width: 52px;
+  height: 52px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.vi-axis-pokemon.side .vi-axis-sprite { width: 56px; height: 56px; }
+.vi-axis-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  letter-spacing: 0.5px;
+  line-height: 1.55;
+}
+
+/* Extended grid: 64px row-label column + 5 state cells + 56px WIN strip;
+   28px col-label row + 5 state rows + 32px LOSS strip. */
+.sc2-state-grid {
+  grid-template-columns: 64px repeat(var(--nb, 5), minmax(0, 1fr)) 56px;
+  grid-template-rows:    28px repeat(var(--nb, 5), auto)            32px;
+}
+
+/* Terminal strips on the right (WIN +10) and bottom (LOSS −10). */
+.terminal-hdr,
+.terminal-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  text-align: center;
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight);
+}
+.terminal-hdr        { font-size: 7px; line-height: 1.3; }
+.terminal-strip      { font-size: 9px; font-weight: bold; }
+.terminal-hdr.win,
+.terminal-strip.win  { background: var(--hp-green); color: #FFFFFF; }
+.terminal-hdr.loss,
+.terminal-strip.loss { background: var(--hp-red);   color: #FFFFFF; }
+.terminal-corner     { background: transparent; }
+
+/* Heat-map: cell background scales with V. The .v-val/.v-move text colour
+   adjusts so it stays readable on each tint. */
+.state-cell.v-pos-strong { background: #5BA85B; color: #FFFFFF; }
+.state-cell.v-pos-strong .v-val  { color: #FFFFFF; }
+.state-cell.v-pos-strong .v-move { color: #F8D028; }
+
+.state-cell.v-pos-mid    { background: #C8E8C8; }
+.state-cell.v-pos-mid    .v-val  { color: #181818; }
+.state-cell.v-pos-mid    .v-move { color: #2A6A2A; }
+
+.state-cell.v-neutral    { background: var(--bg-strong); }
+
+.state-cell.v-neg-mid    { background: #F8C8C0; }
+.state-cell.v-neg-mid    .v-val  { color: #181818; }
+.state-cell.v-neg-mid    .v-move { color: #962a1a; }
+
+.state-cell.v-neg-strong { background: #E84828; color: #FFFFFF; }
+.state-cell.v-neg-strong .v-val  { color: #FFFFFF; }
+.state-cell.v-neg-strong .v-move { color: #F8D028; }
+
+/* Clickable cells get a subtle hover + selected highlight. */
+.state-cell.clickable {
+  cursor: pointer;
+  transition: transform 80ms ease-out;
+}
+.state-cell.clickable:hover {
+  transform: scale(1.04);
+  z-index: 1;
+}
+.state-cell.selected {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: -3px;
+  z-index: 2;
+}
+
+/* START badge on the (FULL, FULL) cell — the state every battle begins at. */
+.state-cell.start-state { position: relative; }
+.state-cell.start-state::after {
+  content: 'START';
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  background: var(--pikachu-yellow);
+  color: #181818;
+  padding: 2px 4px;
+  border: 2px solid var(--rule);
+  letter-spacing: 0.5px;
+  z-index: 3;
+  white-space: nowrap;
+}
+
+/* ---------- Inspector panel ---------- */
+.vi-inspector {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  line-height: 1.55;
+}
+.vi-inspector .ins-placeholder {
+  color: var(--ink-secondary);
+  text-align: center;
+  padding: 28px 8px;
+  line-height: 1.8;
+  font-size: 9px;
+}
+.vi-inspector .ins-state-label {
+  font-size: 10px;
+  color: var(--ink-on-box);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+.vi-inspector .ins-current-v {
+  margin-bottom: 10px;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+.vi-inspector .ins-num {
+  font-size: 14px;
+  color: var(--pikachu-cheek);
+}
+.vi-inspector .ins-explain {
+  font-size: 8px;
+  color: var(--ink-secondary);
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+.vi-inspector .ins-explain .mono {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+.vi-inspector .ins-moves {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.vi-inspector .ins-move-row {
+  display: grid;
+  grid-template-columns: 1fr auto 52px;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 7px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.vi-inspector .ins-move-row.argmax {
+  background: rgba(72, 200, 72, 0.18);
+  border-color: var(--hp-green);
+}
+.vi-inspector .ins-move-name { font-size: 8px; }
+.vi-inspector .ins-move-q    { font-size: 10px; color: var(--ink-on-box); justify-self: end; }
+.vi-inspector .ins-arg-arrow { font-size: 7px; color: #2A6A2A; }
+.vi-inspector .ins-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px solid var(--rule);
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+}
+
+/* ---------- Q-table render (scene 4) ---------- */
+.qtable-host {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px 12px;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  overflow-x: auto;
+}
+.qtable-host table { border-collapse: collapse; }
+.qtable-host th, .qtable-host td {
+  padding: 3px 6px;
+  border: 1px solid var(--inner-highlight);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+}
+.qtable-host th {
+  background: var(--pikachu-yellow);
+  color: #181818;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 7px;
+}
+.qtable-host td.state-head {
+  text-align: left;
+  background: #ECE5C8;
+  font-size: 7px;
+  text-transform: uppercase;
+  min-width: 88px;
+}
+.qtable-host td.argmax {
+  background: #FFF1AE;
+  font-weight: 700;
+}
+.qtable-host td.flash {
+  animation: qcell-flash 700ms ease-out;
+}
+@keyframes qcell-flash {
+  0%   { box-shadow: inset 0 0 0 2px var(--pikachu-yellow); background: #FFF1AE; }
+  100% { box-shadow: inset 0 0 0 0 var(--pikachu-yellow); }
+}
+
+/* ---------- Learning curve (scene 4) ---------- */
+.learning-curve {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 10px;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.learning-curve .lc-svg { width: 100%; height: auto; display: block; }
+.learning-curve .lc-raw { fill: none; stroke: #888; stroke-width: 0.8; opacity: 0.5; }
+.learning-curve .lc-smooth { fill: none; stroke: var(--charmander-orange); stroke-width: 1.6; }
+.learning-curve .lc-cursor { stroke: var(--ink-on-box); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
+.learning-curve .lc-cursor-marker { fill: var(--pikachu-yellow); stroke: var(--ink-on-box); stroke-width: 0.8; }
+.learning-curve .lc-grid { stroke: var(--inner-highlight); stroke-width: 0.5; stroke-dasharray: 2 3; opacity: 0.4; }
+.learning-curve .lc-tick-label, .learning-curve .lc-axis-label {
+  fill: var(--ink-on-box);
+  font-size: 7px;
+  font-family: 'Press Start 2P', monospace;
+}
+.learning-curve .lc-axis-label { font-size: 8px; }
+
+/* ---------- Scrubber ---------- */
+.scrubber {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  flex-wrap: wrap;
+}
+.scrubber input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1 1 auto;
+  min-width: 120px;
+  height: 8px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  margin: 0;
+}
+.scrubber input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+}
+.scrubber input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+}
+.scrubber .scr-label {
+  min-width: 110px;
+  font-size: 9px;
+}
+.scrubber .scr-snapshots { display: flex; gap: 4px; flex-wrap: wrap; }
+.scrubber .scr-snap {
+  cursor: pointer;
+  padding: 2px 5px;
+  border: 2px solid var(--rule);
+  background: #ECE5C8;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+}
+.scrubber .scr-snap.active {
+  background: var(--pikachu-yellow);
+}
+
+/* ---------- HUD strip (scene 1) ---------- */
+.hud-strip {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  flex-wrap: wrap;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  color: var(--ink-on-box);
+}
+.hud-strip .hud-item { display: flex; flex-direction: column; gap: 2px; }
+.hud-strip .hud-label {
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #585858;
+}
+.hud-strip .hud-val {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+  font-size: 11px;
+}
+
+/* ---------- Footnote ---------- */
+.footnote {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 6px;
+  margin-top: 14px;
+  text-align: right;
+}
+.footnote kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  border: 1px solid var(--rule);
+  padding: 0 4px;
+  background: var(--bg-strong);
+  color: var(--ink);
+}
+
+/* ---------- Component colour spans ---------- */
+.comp-mdp     { color: var(--hue-anymal); }
+.comp-eps     { color: var(--hue-casino); }
+.comp-bellman { color: var(--hue-ghost); }
+.comp-rm      { color: var(--hue-star); }
+.comp-door    { color: var(--hue-door); }
+.comp-poke    { color: var(--pikachu-yellow); -webkit-text-stroke: 0.5px var(--ink); }
+
+/* MDP-frame overlay (scene 0) */
+.mdp-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #181818;
+}
+.mdp-overlay .mdp-tag {
+  position: absolute;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  padding: 3px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 2px 2px 0 0 var(--ink);
+  pointer-events: auto;
+}
+
+/* ============================================================
+   Japanese "flavor mode" — body.lang-jp swaps the primary font
+   to DotGothic16 (a bitmap-style Japanese font from Google Fonts)
+   so the kana glyphs match the chiptune pixel-art feel of the
+   English Press-Start-2P text. Press Start 2P stays as a fallback
+   for Latin glyphs nested inside Japanese strings (e.g. "10まんボルト",
+   "SML · ポケモン", "Q*"), giving us bitmap consistency on both sides.
+
+   DotGothic16 is also listed as a tail fallback even in EN mode so
+   the language-toggle button's "日本語" label renders cleanly without
+   falling back to a system font. ============================ */
+body.lang-jp,
+body.lang-jp button,
+body.lang-jp input,
+body.lang-jp .scene,
+body.lang-jp .topbar {
+  font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace;
+}
+body.lang-jp .scene {
+  /* DotGothic16 is denser per glyph than Press Start 2P. Add a touch
+     of letter-spacing so kana don't run together at small sizes. */
+  letter-spacing: 0.02em;
+}
+/* Even in EN mode, allow Japanese glyphs (only the lang-toggle label
+   right now) to fall through to DotGothic16 rather than the OS default. */
+.theme-toggle, .pager-btn, .topbar .brand, .scene-title {
+  font-family: 'Press Start 2P', 'DotGothic16', 'Courier New', monospace;
+}
+
+/* ============================================================
+   Scene 1 — wild-encounter intro
+   ----------------------------------------------------------------
+   The cascade hides both sprite hosts on reset, flashes the
+   opponent into view ("A wild CHARMANDER appeared!"), then arcs
+   a Pokeball in from off-screen-left onto the player platform,
+   pops it open, and materializes Pikachu in its place ("Go!
+   PIKACHU!"). All animations are opacity- and filter-based on
+   the sprite hosts so they DO NOT conflict with the
+   .poke-sprite breathing/shake/faint transform animations that
+   live on the inner <img>. The Pokeball is its own absolute
+   element layered above the platform.
+   ============================================================ */
+
+/* Initial hidden state for sprite hosts — opacity only, no
+   transform/display so the inner sprite's breathing keyframes
+   keep running unmolested. */
+.sc1-hidden {
+  opacity: 0;
+}
+
+/* Opponent wild-appears: a fast white-flash that brings the
+   host from invisible+overbright down to fully visible at
+   normal brightness. Filter + opacity only — no transform. */
+.sc1-wild-appear {
+  animation: sc1-wild-appear 500ms steps(8, end) forwards;
+}
+@keyframes sc1-wild-appear {
+  0%   { opacity: 0; filter: brightness(6) contrast(0.4); }
+  20%  { opacity: 1; filter: brightness(4) contrast(0.6); }
+  60%  { opacity: 1; filter: brightness(2) contrast(0.9); }
+  100% { opacity: 1; filter: brightness(1) contrast(1); }
+}
+
+/* Player materialize: similar opacity+filter flash for the
+   Pikachu reveal that follows the Pokeball pop. */
+.sc1-materialize {
+  animation: sc1-materialize 360ms steps(6, end) forwards;
+}
+@keyframes sc1-materialize {
+  0%   { opacity: 0; filter: brightness(4) contrast(0.5); }
+  30%  { opacity: 1; filter: brightness(3) contrast(0.7); }
+  100% { opacity: 1; filter: brightness(1) contrast(1); }
+}
+
+/* Pokeball arcing onto the player platform. The ball is its
+   own element appended to .battle-stage; it lives above the
+   platforms but below the HP boxes (z-index: 6). The arc keyframe
+   uses left/bottom percentages so it scales with the stage,
+   plus rotation for the spinning ball feel. */
+.sc1-pokeball {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  z-index: 6;
+  pointer-events: none;
+  left: -20%;
+  bottom: -20%;
+}
+.sc1-pokeball svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.sc1-pokeball-arc {
+  animation: sc1-pokeball-arc 620ms cubic-bezier(0.3, 0.05, 0.55, 1) forwards;
+}
+@keyframes sc1-pokeball-arc {
+  0%   { left: -20%; bottom: -20%; transform: rotate(0deg);   }
+  40%  { left:   2%; bottom:  45%; transform: rotate(360deg); }
+  65%  { left:  18%; bottom:  60%; transform: rotate(540deg); }
+  100% { left:  22%; bottom:  22%; transform: rotate(720deg); }
+}
+.sc1-pokeball-open {
+  left: 22%;
+  bottom: 22%;
+  animation: sc1-pokeball-open 280ms ease-out forwards;
+}
+@keyframes sc1-pokeball-open {
+  0%   { transform: scale(1)   rotate(720deg); opacity: 1; }
+  100% { transform: scale(2.4) rotate(720deg); opacity: 0; }
+}
+
+/* Reduced motion — collapse the cascade to a simple opacity
+   reveal. Pokeball is invisible (the materialize alone reads
+   as "appears"). */
+@media (prefers-reduced-motion: reduce) {
+  .sc1-hidden {
+    opacity: 0;
+    transition: opacity 200ms linear;
+  }
+  .sc1-wild-appear,
+  .sc1-materialize {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transition: opacity 200ms linear;
+  }
+  .sc1-pokeball,
+  .sc1-pokeball-arc,
+  .sc1-pokeball-open {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ============================================================
+   Gen-1 rotating-hex scene transition
+   ----------------------------------------------------------------
+   A full-viewport overlay shaped as a 6-point hexagon (extended
+   beyond the viewport so the shape fully covers the screen at
+   scale 1) animates from scale 1 / rotate 0 down to scale 0 /
+   rotate 180, opacity fading at the tail.  The new scene is
+   already mounted underneath; the overlay just gates the reveal.
+   pointer-events: none keeps the underlying scene interactive.
+   Fires only on entry to the three battle-flavored scenes
+   (scene1, sceneSarsaDerive, sceneQstar) — see playSceneTransition
+   in main.js.
+   ============================================================ */
+.scene-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  pointer-events: none;
+  clip-path: polygon(
+    50% -50%,
+    130% 25%,
+    130% 75%,
+    50% 150%,
+    -30% 75%,
+    -30% 25%
+  );
+  transform-origin: 50% 50%;
+  animation: scene-trans-hex 700ms cubic-bezier(.42, 0, .58, 1) forwards;
+}
+@keyframes scene-trans-hex {
+  0%   { transform: scale(1) rotate(0deg);     opacity: 1; }
+  70%  {                                       opacity: 1; }
+  100% { transform: scale(0) rotate(180deg);   opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-transition { display: none; }
+}
+
+/* ============================================================
+   Speaker-notes overlay (press `n`)
+   ----------------------------------------------------------------
+   Fixed in the bottom-right of the viewport.  Lecturer-facing crib
+   sheet keyed by the current scene.  Hidden by default.
+   ============================================================ */
+.speaker-notes-overlay[hidden] { display: none; }
+.speaker-notes-overlay {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9990;
+  width: 500px;
+  max-width: calc(100vw - 36px);
+  pointer-events: none;
+}
+.speaker-notes-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  padding: 14px 18px 16px;
+  max-height: 75vh;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+.speaker-notes-title {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 10px;
+  border-bottom: 2px solid var(--rule);
+  padding-bottom: 6px;
+}
+.speaker-notes-title kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 1px 5px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-on-box);
+}
+.speaker-notes-content h3 {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--pikachu-cheek);
+  margin: 0 0 8px;
+}
+.speaker-notes-content p { margin: 4px 0 8px; }
+.speaker-notes-content ul {
+  margin: 4px 0 6px;
+  padding-left: 14px;
+  list-style: square;
+}
+.speaker-notes-content li { margin: 4px 0; }
+.speaker-notes-content kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  padding: 1px 4px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.speaker-notes-content b { color: var(--pikachu-cheek); }
+.speaker-notes-content em { color: var(--cb-blue); font-style: normal; }
+
+/* ============================================================
+   Trainer badges in the topbar
+   ----------------------------------------------------------------
+   Five concept badges (MDP, RTN, Q*, DP, SAR) sit between the
+   dot-pager and the music toggle.  Grey when unearned, glowing
+   yellow when earned.  Awarded on first visit to each concept
+   scene; persisted via window.Trainer / localStorage.
+   ============================================================ */
+.trainer-badges {
+  display: flex;
+  gap: 4px;
+  margin: 0 6px;
+  align-items: center;
+}
+.trainer-badge {
+  width: 30px;
+  height: 22px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  opacity: 0.4;
+  transition: opacity 200ms, background 200ms, color 200ms;
+}
+.trainer-badge.earned {
+  background: var(--pikachu-yellow);
+  color: var(--ink-on-box);
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px var(--inner-highlight);
+}
+.trainer-badge.mdp.earned    { background: #D55E00; color: #fff; }   /* MDP — red-orange */
+.trainer-badge.return.earned { background: #0072B2; color: #fff; }   /* RTN — blue */
+.trainer-badge.qstar.earned  { background: var(--pikachu-yellow); }
+.trainer-badge.dp.earned     { background: #009E73; color: #fff; }   /* DP — green */
+.trainer-badge.sarsa.earned  { background: #CC79A7; color: #fff; }   /* SAR — purple */
+
+@keyframes trainer-badge-flash {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 var(--pikachu-yellow); }
+  40%  { transform: scale(1.3);  box-shadow: 0 0 0 8px var(--pikachu-yellow); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 transparent; }
+}
+.trainer-badge.flashing {
+  animation: trainer-badge-flash 1.0s ease-out;
+  z-index: 4;
+  position: relative;
+}
+@media (prefers-reduced-motion: reduce) {
+  .trainer-badge.flashing { animation: none; }
+}
+
+/* ============================================================
+   Trainer-name modal — first-visit prompt
+   ============================================================ */
+.trainer-name-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9995;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.trainer-name-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  padding: 22px 26px;
+  width: 340px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  text-align: center;
+}
+.trainer-name-title {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 10px;
+}
+.trainer-name-prompt {
+  font-size: 9px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.trainer-name-card input[type="text"] {
+  width: 100%;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  text-align: center;
+  letter-spacing: 0.08em;
+  padding: 8px;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-on-box);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.trainer-name-ctrls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.trainer-name-hint {
+  font-size: 7px;
+  color: var(--ink-secondary);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   Slide mode (`f` hotkey)
+   ----------------------------------------------------------------
+   Hides the topbar and stretches the scene container.  ESC exits.
+   ============================================================ */
+body.slide-mode .topbar { display: none; }
+body.slide-mode .stage  { padding: 12px 18px; }
+
+/* ============================================================
+   Centered overlays — shared by quick-jump (`g`) and help (`?`)
+   ============================================================ */
+.centered-overlay[hidden] { display: none; }
+.centered-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9994;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+}
+.centered-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  padding: 18px 22px;
+  min-width: 420px;
+  max-width: 80vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.centered-title {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  text-align: center;
+  margin-bottom: 14px;
+  border-bottom: 2px solid var(--rule);
+  padding-bottom: 8px;
+}
+.centered-card kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  padding: 2px 6px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-on-box);
+  display: inline-block;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* Quick-jump list */
+.quick-jump-card { min-width: 480px; }
+.quick-jump-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.quick-jump-row {
+  display: grid;
+  grid-template-columns: 30px 40px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms;
+}
+.quick-jump-row:hover { background: var(--pikachu-yellow); }
+.quick-jump-row.current { background: var(--pikachu-yellow); box-shadow: inset 0 0 0 2px var(--pikachu-cheek); }
+.qj-num    { color: var(--ink-secondary); font-size: 8px; }
+.qj-title  { color: var(--ink-on-box); }
+.qj-key-empty { display: inline-block; min-width: 18px; }
+
+/* Help-overlay rows */
+.help-card .help-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.15);
+}
+.help-card .help-row:last-child { border-bottom: none; }
+.help-card-section {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--pikachu-cheek);
+  margin: 12px 0 6px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+}
+.help-mouse {
+  display: inline-block;
+  text-align: center;
+  font-size: 14px;
+  min-width: 28px;
+}
+
+/* Slide-mode toast — bottom-right, fades in/out, ~2.4 s. */
+.slide-toast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 99990;
+  background: var(--pikachu-yellow);
+  color: var(--ink-on-box);
+  border: 3px solid var(--rule);
+  padding: 8px 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.20);
+  pointer-events: none;
+  animation: slide-toast-life 2.4s ease-out forwards;
+}
+@keyframes slide-toast-life {
+  0%   { opacity: 0; transform: translateX(20px); }
+  10%  { opacity: 1; transform: translateX(0); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(20px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide-toast { animation: none; }
+}
+
+/* ============================================================
+   Boot-up animation — Game Boy-style "Nintendo" splash
+   ----------------------------------------------------------------
+   Drops "SML" from the top, lingers, fades out.  ~1.5 s total.
+   Fires once per browser session (sessionStorage flag).
+   ============================================================ */
+.boot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.boot-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: boot-drop 700ms cubic-bezier(.4, 1.8, .6, 1) 60ms backwards;
+}
+.boot-logo {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 64px;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+}
+.boot-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  animation: boot-tag-in 320ms ease-out 520ms backwards;
+}
+.boot-overlay.boot-fade {
+  opacity: 0;
+  transition: opacity 320ms ease-out;
+}
+@keyframes boot-drop {
+  0%   { transform: translateY(-220px); opacity: 0; }
+  60%  { transform: translateY(8px);    opacity: 1; }
+  100% { transform: translateY(0);      opacity: 1; }
+}
+@keyframes boot-tag-in {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .boot-stack { animation: none; }
+  .boot-tag   { animation: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). The pixel-font chrome packs brand + title + ~7 buttons
+   into one flex row at desktop; on a phone the row overflows and the
+   scene-title gets squeezed into a vertical column. Below 720px the
+   topbar collapses to three wrapping rows:
+     row 1 — brand
+     row 2 — PREV + dot-pager + NEXT  (primary navigation, big taps)
+     row 3 — trainer-badges            (full-width, centered)
+     row 4 — music + lang + theme     (secondary toggles, compact)
+   The trainer-badges row forces a wrap via `flex: 1 1 100%`, which pushes
+   the three secondary toggles to a fresh row beneath it. The scene-title
+   is hidden — every scene already opens with its own H2 — and per-scene
+   responsive rules (sd-row, sd-f-row, tut-welcome, Q-table scroll) live
+   alongside their desktop rules in the scene CSS files.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .topbar {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 8px;
+    row-gap: 10px;
+  }
+  .topbar .scene-title { display: none; }
+  .topbar .brand { flex: 1 1 auto; font-size: 10px; }
+
+  /* Right cluster spans full width below the brand and wraps its own
+     children into the three rows described above. */
+  .topbar .right-cluster {
+    flex: 0 0 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* Row 2 — primary pager controls get the iOS-tappable size. */
+  .topbar .right-cluster #prev-btn,
+  .topbar .right-cluster #next-btn {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 10px;
+  }
+  .topbar .right-cluster .dot-pager {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  .dot-pager .dot { width: 12px; height: 12px; }
+
+  /* Row 3 — trainer badges, forced to their own full-width row. */
+  .topbar .right-cluster .trainer-badges {
+    flex: 1 1 100%;
+    margin: 0;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  /* Row 4 — secondary toggles. Compact (these are tapped once per
+     session, not primary actions) so the three fit on one row. */
+  .topbar .right-cluster #theme-toggle,
+  .topbar .right-cluster #music-toggle,
+  .topbar .right-cluster #lang-toggle {
+    min-height: 30px;
+    padding: 6px 10px;
+    font-size: 8px;
+  }
+
+  .stage {
+    padding: 0 12px;
+    margin: 12px auto 24px;
+    min-height: calc(100dvh - 220px);
+  }
+  .scene { left: 12px; right: 12px; }
+  .scene.active { left: 0; right: 0; }
+
+  /* Cards/scene-row helpers: two-column scene-rows fall back to stack. */
+  .scene-row { gap: 12px; }
+  .scene-pad { padding: 8px 0 18px; }
+}
+
+/* ============================================================
+   Last-Minute Pricing — shelf-card state-icon, lever tags,
+   concept-badge row, and the foundation stub card.
+   (Pricing-specific additions to the reskinned Pokemon chrome.)
+   ============================================================ */
+
+/* ---- The recurring shelf-card state-icon ---- */
+.shelf-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--card-bg);
+  border: 3px solid var(--rule);
+  box-shadow: 4px 4px 0 var(--rule);
+  image-rendering: pixelated;
+}
+.shelf-card[data-lever="premium"]  { border-color: var(--lever-premium-rule);  box-shadow: 4px 4px 0 var(--lever-premium-rule); }
+.shelf-card[data-lever="standard"] { border-color: var(--lever-standard-rule); box-shadow: 4px 4px 0 var(--lever-standard-rule); }
+.shelf-card[data-lever="firesale"] { border-color: var(--lever-firesale-rule); box-shadow: 4px 4px 0 var(--lever-firesale-rule); }
+
+.shelf-body { display: flex; align-items: flex-end; gap: 12px; }
+
+.shelf-stack { display: flex; flex-direction: column; gap: 3px; justify-content: flex-end; }
+.shelf-slot  { width: 48px; height: 18px; display: block; }
+.shelf-ticket { width: 100%; height: 100%; display: block; }
+.shelf-ticket.is-gone { opacity: 0.55; }
+
+.shelf-ribbon { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.shelf-pips   { display: flex; gap: 3px; }
+.shelf-pip    { width: 14px; height: 16px; display: block; }
+.shelf-pip.is-off { opacity: 0.6; }
+.shelf-midnight {
+  width: 100%;
+  height: 6px;
+  background: var(--midnight-bg);
+  border: 2px solid var(--rule);
+  margin-top: 2px;
+}
+
+.shelf-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  text-align: center;
+  white-space: nowrap;
+}
+.shelf-card.is-terminal .shelf-caption { color: var(--ink); }
+.shelf-card.is-soldout  { opacity: 0.92; }
+
+/* size variants */
+.shelf-sm .shelf-slot { width: 30px; height: 11px; }
+.shelf-sm .shelf-pip  { width: 9px; height: 11px; }
+.shelf-sm .shelf-caption { font-size: 7px; }
+.shelf-lg .shelf-slot { width: 64px; height: 24px; }
+.shelf-lg .shelf-pip  { width: 18px; height: 20px; }
+.shelf-lg .shelf-caption { font-size: 10px; }
+
+/* ---- Price-lever tag (a chunky coloured price button/label) ---- */
+.lever-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--lever-ink);
+  background: var(--lever-standard);
+  border: 3px solid var(--lever-standard-rule);
+  box-shadow: 3px 3px 0 var(--lever-standard-rule);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.lever-tag .lever-price { font-size: 9px; opacity: 0.92; }
+.lever-tag[data-lever="premium"]  { background: var(--lever-premium);  border-color: var(--lever-premium-rule);  box-shadow: 3px 3px 0 var(--lever-premium-rule); }
+.lever-tag[data-lever="standard"] { background: var(--lever-standard); border-color: var(--lever-standard-rule); box-shadow: 3px 3px 0 var(--lever-standard-rule); }
+.lever-tag[data-lever="firesale"] { background: var(--lever-firesale); border-color: var(--lever-firesale-rule); box-shadow: 3px 3px 0 var(--lever-firesale-rule); }
+
+/* policy-overlay cell tints (the three coloured regions) */
+.lever-fill-premium  { background: var(--lever-premium);  color: var(--lever-ink); }
+.lever-fill-standard { background: var(--lever-standard); color: var(--lever-ink); }
+.lever-fill-firesale { background: var(--lever-firesale); color: var(--lever-ink); }
+.lever-tint-premium  { background: var(--lever-premium-tint); }
+.lever-tint-standard { background: var(--lever-standard-tint); }
+.lever-tint-firesale { background: var(--lever-firesale-tint); }
+
+/* ---- Concept-badge row (topbar progress: MDP POLICY RETURN Q* DP SARSA) ---- */
+.concept-badges { display: flex; gap: 4px; align-items: center; }
+.concept-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  line-height: 1;
+  padding: 4px 5px;
+  border: 2px solid var(--ink-secondary);
+  color: var(--ink-secondary);
+  background: transparent;
+  opacity: 0.5;
+  letter-spacing: 0.5px;
+  transition: opacity 0.2s, color 0.2s, border-color 0.2s, background 0.2s;
+}
+.concept-badge.earned {
+  opacity: 1;
+  color: var(--lever-ink);
+  background: var(--lever-standard);
+  border-color: var(--lever-standard-rule);
+}
+.concept-badge.flashing { animation: badge-flash 1.1s ease-out; }
+@keyframes badge-flash {
+  0%, 100% { box-shadow: 0 0 0 0 var(--lever-standard); }
+  35%      { box-shadow: 0 0 0 4px var(--lever-standard); }
+}
+
+/* ---- Foundation stub card (replaced by real scenes downstream) ---- */
+.stub-card {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 28px 26px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: 6px 6px 0 var(--rule);
+  text-align: center;
+}
+.stub-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+.stub-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+.stub-note {
+  font-size: 11px;
+  color: var(--ink-secondary);
+  line-height: 1.7;
+}
+.lang-jp .stub-title, .lang-jp .stub-note, .lang-jp .shelf-caption,
+.lang-jp .lever-tag, .lang-jp .concept-badge {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}

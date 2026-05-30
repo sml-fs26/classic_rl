@@ -1,0 +1,312 @@
+/* Shared base styling for the Q-table widget mounted by qtable.js.
+ * Previously lived inside scene4.css; promoted here so the DP scene
+ * and the SARSA-derivation F-widget continue to render after scene4
+ * was removed. */
+
+.qtable-host {
+  display: block;
+}
+
+.q-col-heads {
+  display: grid;
+  grid-template-columns: 70px repeat(var(--nb, 5), minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary, #6b6b6b);
+}
+.q-corner-head {
+  font-size: 7px;
+  color: var(--ink-secondary, #6b6b6b);
+  align-self: end;
+  padding-bottom: 2px;
+}
+.q-col-head {
+  text-align: center;
+  align-self: end;
+  padding-bottom: 2px;
+}
+
+.q-grid {
+  display: grid;
+  grid-template-columns: 70px repeat(var(--nb, 5), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--nb, 5), auto);
+  gap: 6px;
+}
+
+.q-cell {
+  position: relative;
+  background: var(--bg-strong, #F8F8F8);
+  border: 3px solid var(--ink, #000);
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18);
+  padding: 4px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box, #000);
+  overflow: hidden;
+  transition: opacity 200ms;
+}
+.q-cell.unvisited { opacity: 0.62; }
+
+/* Pokedex-style header bar at the top of each Q-cell.  Each cell IS a
+   Pokedex entry: a 3-digit Nº, a state-as-species name, and a star
+   marker that fades in once the cell has been visited (Q-values
+   non-zero).  Sits flush with the cell's top edge inside the existing
+   3px border. */
+.q-pokedex-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin: -4px -6px 2px;
+  padding: 2px 5px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box, #000);
+  background: var(--pikachu-yellow, #F8D028);
+  border-bottom: 2px solid var(--ink, #000);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.q-pokedex-header .q-dex-num {
+  font-weight: bold;
+  color: var(--pikachu-cheek, #C62828);
+  flex: 0 0 auto;
+}
+.q-pokedex-header .q-dex-state {
+  flex: 1 1 auto;
+  text-align: right;
+  opacity: 0.78;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+/* Visited cells get a tiny star next to their Nº — the Pokedex
+   "OWNED" indicator.  Unvisited cells stay un-starred. */
+.q-cell:not(.unvisited) .q-pokedex-header .q-dex-num::after {
+  content: ' ★';
+  color: var(--pikachu-cheek, #C62828);
+}
+
+/* First-visit "REGISTERED!" flash — a yellow box-shadow ring that
+   pulses around the cell at the moment the agent first lands a
+   non-zero Q.  Pairs with the existing 'REGISTERED!' toast spawned
+   by qtable.js's spawnAwake. */
+@keyframes q-pokedex-register {
+  0%   { box-shadow: 0 0 0 0 var(--pikachu-yellow, #F8D028),
+                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
+                     2px 2px 0 0 rgba(0,0,0,0.18); }
+  50%  { box-shadow: 0 0 0 6px var(--pikachu-yellow, #F8D028),
+                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
+                     2px 2px 0 0 rgba(0,0,0,0.18); }
+  100% { box-shadow: 0 0 0 0 transparent,
+                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
+                     2px 2px 0 0 rgba(0,0,0,0.18); }
+}
+.q-cell.q-just-registered {
+  animation: q-pokedex-register 1.05s ease-out;
+  z-index: 4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .q-cell.q-just-registered { animation: none; }
+}
+
+.q-row-head {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary, #6b6b6b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.q-thumb {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  align-items: end;
+  padding-bottom: 5px;
+  border-bottom: 2px solid rgba(0,0,0,0.16);
+}
+.q-thumb-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.q-thumb-sprite {
+  width: 34px;
+  height: 34px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.q-thumb-hp-bg {
+  width: 100%;
+  height: 5px;
+  background: rgba(0,0,0,0.16);
+  border: 1px solid var(--ink, #000);
+  box-sizing: border-box;
+}
+.q-thumb-hp-fill {
+  height: 100%;
+  background: #48C848;
+  transition: width 200ms;
+}
+.q-thumb-hp-fill.b1 { background: #88D848; }
+.q-thumb-hp-fill.b2 { background: #E8C828; }
+.q-thumb-hp-fill.b3 { background: #E89028; }
+.q-thumb-hp-fill.b4 { background: #E84828; }
+
+.q-bars { display: flex; flex-direction: column; gap: 2px; }
+.q-bar-row {
+  display: grid;
+  grid-template-columns: 9px 36px 1fr;
+  gap: 4px;
+  align-items: center;
+  font-size: 7px;
+  padding: 1px 3px;
+  border-radius: 1px;
+}
+.q-mark { width: 9px; text-align: center; color: var(--pikachu-cheek, #C62828); font-weight: bold; }
+.q-label { font-size: 7px; letter-spacing: 0.04em; }
+.q-val { font-size: 8px; text-align: right; font-variant-numeric: tabular-nums; }
+.q-bar-row.argmax {
+  background: rgba(248, 208, 40, 0.32);
+  box-shadow: inset 0 0 0 1px var(--accent, #F8D028);
+}
+.q-bar-row.argmax .q-val,
+.q-bar-row.argmax .q-label { font-weight: bold; }
+.q-bar-row.argmax .q-val { color: var(--ink-on-box, #000); }
+
+/* Argmax-flip flash — fires when a cell's argmax move changes. */
+@keyframes q-argmax-flip {
+  0%   { box-shadow: 0 0 0 3px var(--accent, #F8D028), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+  100% { box-shadow: 0 0 0 0 transparent, inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+}
+.q-cell.argmax-flip { animation: q-argmax-flip 1.0s ease-out; }
+
+/* Floating delta indicators (per-step change). */
+@keyframes q-delta-rise {
+  0%   { opacity: 0; transform: translateY(2px); }
+  18%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-22px); }
+}
+.q-delta {
+  position: absolute;
+  right: 5px;
+  top: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  pointer-events: none;
+  animation: q-delta-rise 1.2s ease-out forwards;
+  text-shadow: 1px 1px 0 #FFF, -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF;
+  z-index: 5;
+  letter-spacing: 0.02em;
+}
+.q-delta.pos { color: var(--cb-blue); }
+.q-delta.neg { color: var(--cb-vermillion); }
+.q-delta.awake { color: #B7791F; }
+
+/* Argmax-distribution strip below the grid. */
+.q-freq-strip {
+  margin-top: 14px;
+  background: var(--bg-strong, #F8F8F8);
+  border: 3px solid var(--ink, #000);
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18);
+  padding: 8px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box, #000);
+}
+.q-freq-title { font-size: 8px; letter-spacing: 0.05em; margin-bottom: 8px; text-transform: uppercase; }
+.q-freq-row {
+  display: grid;
+  grid-template-columns: 48px 1fr 24px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 7px;
+}
+.q-freq-label { letter-spacing: 0.04em; }
+.q-freq-track {
+  height: 10px;
+  background: rgba(0,0,0,0.16);
+  border: 1px solid var(--ink, #000);
+  position: relative;
+  box-sizing: border-box;
+}
+.q-freq-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0%;
+  background: var(--accent, #F8D028);
+  transition: width 240ms;
+}
+.q-freq-val { text-align: right; font-variant-numeric: tabular-nums; }
+
+.q-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary, #6b6b6b);
+}
+.q-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.q-legend-bar {
+  display: inline-block;
+  width: 24px;
+  height: 7px;
+  border: 1px solid var(--ink, #000);
+  background: #B0B0B0;
+  box-sizing: border-box;
+}
+.q-legend-bar.argmax { background: var(--accent, #F8D028); }
+
+/* Q-cell heatmap (max-Q over the moves → coloured cell background).
+   Diverging encoding via the colour-blind-safe blue ↔ vermillion ramp. */
+.q-cell.heat-zero        { background: var(--bg-strong); }
+.q-cell.heat-pos-strong  { background: var(--cb-blue); color: #FFFFFF; }
+.q-cell.heat-pos-mid     { background: var(--cb-blue-light); }
+.q-cell.heat-neutral     { background: var(--bg-strong); }
+.q-cell.heat-neg-mid     { background: var(--cb-vermillion-light); }
+.q-cell.heat-neg-strong  { background: var(--cb-vermillion); color: #FFFFFF; }
+.q-cell.heat-pos-strong .q-thumb-hp-bg,
+.q-cell.heat-neg-strong .q-thumb-hp-bg {
+  background: rgba(0,0,0,0.32);
+}
+.q-cell.heat-pos-strong .q-bar-row.argmax,
+.q-cell.heat-neg-strong .q-bar-row.argmax {
+  background: rgba(255,255,255,0.32);
+  box-shadow: inset 0 0 0 1px #FFFFFF;
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile (≤ 720px). The Q-table is the main reading surface for SARSA/DP
+   scenes; shrinking 5 columns × 5 rows × ~6 sub-bars each to fit a 390px
+   phone makes labels and bar fills illegible. Instead, keep the desktop
+   sizing and let the user pan horizontally inside .qtable-host. The
+   wider min-width matches scenes that show the full 5×5 grid; .sd-scene
+   uses the already-tighter q-bar layout so a smaller floor is fine.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .qtable-host {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .qtable-host .q-col-heads,
+  .qtable-host .q-grid { min-width: 540px; }
+  .sd-scene .qtable-host .q-col-heads,
+  .sd-scene .qtable-host .q-grid { min-width: 420px; }
+}
