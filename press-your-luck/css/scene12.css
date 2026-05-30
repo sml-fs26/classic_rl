@@ -1,1 +1,366 @@
-/* scene12.css - per-scene styles (empty stub) */
+/* Scene 12 - Recap. Six concept cards in the table-card visual language,
+   plus a closing boardroom line. */
+
+.sc12-scene { position: relative; isolation: isolate; }
+
+/* Banner - chunky bordered title bar. */
+.sc12-banner {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  letter-spacing: 0.10em;
+  text-align: center;
+  padding: 9px 14px;
+  margin: 2px auto 8px;
+  max-width: 34ch;
+  color: var(--ink-on-box);
+  background: var(--pikachu-yellow);
+  border: 3px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--pikachu-yellow),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--pikachu-yellow),
+    3px 3px 0 0 rgba(0, 0, 0, 0.20);
+  text-shadow: 2px 2px 0 var(--bg-strong);
+  animation: sc12-banner-pop 480ms ease-out 60ms backwards;
+}
+.sc12-banner .sc12-star {
+  display: inline-block;
+  color: var(--c-roll);
+  margin: 0 6px;
+  animation: sc12-star-spin 2.4s ease-in-out infinite;
+}
+.sc12-banner .sc12-star:last-child { animation-delay: -1.2s; }
+@keyframes sc12-banner-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes sc12-star-spin {
+  0%, 100% { transform: rotate(-12deg) scale(1); }
+  50%      { transform: rotate(12deg) scale(1.2); }
+}
+
+.sc12-sub {
+  text-align: center;
+  margin: 0 auto 10px;
+  max-width: 78ch;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+/* Card grid. */
+.sc12-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+@media (max-width: 1080px) {
+  .sc12-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .sc12-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.sc12-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 11px 13px;
+  min-height: 0;
+  animation: sc12-card-enter 520ms cubic-bezier(.2, .8, .3, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 150ms + 220ms);
+}
+@keyframes sc12-card-enter {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Card head: concept badge + title. */
+.sc12-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.sc12-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  min-height: 46px;
+  padding: 4px 2px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  flex-shrink: 0;
+  box-shadow: inset -2px -2px 0 0 rgba(0, 0, 0, 0.18);
+}
+/* Concept colours drawn from the lever / standing tokens so the recap reads
+   in the same palette as the rest of the deck. */
+.sc12-badge-mdp    { background: var(--c-roll);       color: var(--c-roll-ink); }
+.sc12-badge-policy { background: var(--stand-even);   color: var(--bg-strong); }
+.sc12-badge-return { background: var(--chip-on);      color: var(--rule); }
+.sc12-badge-qstar  { background: var(--pikachu-yellow); color: var(--ink-on-box); }
+.sc12-badge-dp     { background: var(--c-hold);       color: var(--c-hold-ink); }
+.sc12-badge-sarsa  { background: var(--stand-ahead);  color: var(--bg-strong); }
+.sc12-badge-mark   { font-size: 12px; line-height: 1; }
+.sc12-badge-label  { font-size: 8px; letter-spacing: 0.04em; margin-top: 2px; }
+
+.sc12-card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--ink-on-box);
+}
+
+/* Visual slot - the table-voice glyph. */
+.sc12-card-visual {
+  margin: 4px 0 2px;
+  padding: 8px 6px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  box-shadow: inset 0 0 0 1px var(--inner-highlight);
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.sc12-glyph-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.sc12-card-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.6;
+  color: var(--ink-on-box);
+  margin-top: 2px;
+}
+.sc12-card-ref {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: auto;
+  padding-top: 4px;
+  text-align: right;
+}
+
+/* ======================= shared glyph tokens ======================= */
+/* Lever-tinted cells reused across the POLICY + DP glyphs. */
+.sc12-cell-roll { background: var(--c-roll); color: var(--c-roll-ink); }
+.sc12-cell-hold { background: var(--c-hold); color: var(--c-hold-ink); }
+/* Standing-tinted labels. */
+.sc12-stand-behind { color: var(--stand-behind); }
+.sc12-stand-even   { color: var(--stand-even); }
+.sc12-stand-ahead  { color: var(--stand-ahead); }
+
+/* ---- MDP glyph: 4-tile strip (pot / standing / die / payoff) ---- */
+.sc12-mdp-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.sc12-mdp-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  padding: 4px 2px;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  min-height: 52px;
+}
+.sc12-tile-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5.5px;
+  color: var(--ink-secondary);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.sc12-mini-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: flex-end;
+}
+.sc12-chip {
+  width: 14px;
+  height: 4px;
+  background: var(--chip-off);
+  border: 1px solid var(--rule);
+}
+.sc12-chip.on { background: var(--chip-on); box-shadow: 0 0 3px var(--chip-on-hi); }
+.sc12-chip.on.danger { background: var(--chip-danger); box-shadow: 0 0 3px var(--chip-danger-hi); }
+.sc12-mini-stand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 18px;
+}
+.sc12-mini-bar { height: 4px; border: 1px solid var(--rule); display: block; }
+.sc12-mini-bar-you { width: 100%; background: var(--stand-ahead); }
+.sc12-mini-bar-riv { width: 55%; background: var(--stand-track); }
+.sc12-mdp-die {
+  /* the Die widget mounts here; constrain its size */
+  transform: scale(0.66);
+  transform-origin: center;
+}
+.sc12-mdp-payoff {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  background: var(--chip-on);
+  border: 1px solid var(--rule);
+  padding: 3px 4px;
+  color: var(--rule);
+}
+
+/* ---- POLICY glyph: 2x2 lever map ---- */
+.sc12-pol-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.sc12-pol-cell {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  text-align: center;
+  padding: 8px 4px;
+  border: 2px solid var(--rule);
+  letter-spacing: 0.04em;
+}
+
+/* ---- RETURN glyph: tape + equation ---- */
+.sc12-rtn-tape {
+  justify-content: center;
+  padding: 6px 8px;
+  flex-wrap: nowrap;
+}
+.sc12-rtn-eq {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* ---- Q* glyph: same pot, lever flips on standing ---- */
+.sc12-q-wrap { display: flex; flex-direction: column; gap: 4px; }
+.sc12-q-pot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: center;
+  letter-spacing: 0.06em;
+}
+.sc12-q-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 3px;
+  align-items: stretch;
+}
+.sc12-q-stand {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.04em;
+}
+.sc12-q-lever {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 4px 3px;
+  border: 1px solid var(--rule);
+  text-align: center;
+  background: var(--card-bg);
+  font-variant-numeric: tabular-nums;
+}
+.sc12-q-roll { color: var(--c-roll); }
+.sc12-q-hold { color: var(--c-hold); }
+.sc12-q-lever.sc12-q-best.sc12-q-roll { background: var(--c-roll); color: var(--c-roll-ink); font-weight: bold; }
+.sc12-q-lever.sc12-q-best.sc12-q-hold { background: var(--c-hold); color: var(--c-hold-ink); font-weight: bold; }
+
+/* ---- DP glyph: climbing staircase seam ---- */
+.sc12-dp-wrap { display: flex; flex-direction: column; gap: 3px; }
+.sc12-dp-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+.sc12-dp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 14px;
+  gap: 3px;
+}
+.sc12-dp-cell { border: 1px solid var(--rule); }
+
+/* ---- SARSA glyph: tuple chips + KaTeX update ---- */
+.sc12-sarsa-tape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.sc12-sarsa-chip {
+  display: inline-block;
+  min-width: 22px;
+  padding: 4px 5px;
+  border: 1px solid var(--rule);
+  background: var(--card-bg);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  text-align: center;
+}
+.sc12-sarsa-chip.k-s { background: var(--chip-on); color: var(--rule); }
+.sc12-sarsa-chip.k-a { background: var(--c-hold-soft); color: var(--ink-on-box); }
+.sc12-sarsa-chip.k-r { background: var(--c-roll-soft); color: var(--ink-on-box); }
+.sc12-sarsa-update {
+  margin-top: 7px;
+  text-align: center;
+}
+.sc12-sarsa-update .katex { color: var(--ink-on-box); font-size: 11px; }
+
+/* ---- closing boardroom line ---- */
+.sc12-closing {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+  text-align: center;
+  max-width: 84ch;
+  margin: 6px auto 4px;
+  padding: 12px 16px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  animation: sc12-card-enter 520ms ease-out 1100ms backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc12-banner,
+  .sc12-banner .sc12-star,
+  .sc12-card,
+  .sc12-closing {
+    animation: none;
+  }
+}
