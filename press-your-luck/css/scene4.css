@@ -1,1 +1,158 @@
-/* scene4.css - per-scene styles (empty stub) */
+/* scene4.css - "Policy" (a rule from states to actions).
+   Layout: the pi:S->A formula card on top, then a two-column body with the
+   6x3 board (painted by the active hand-policy) on the left and the playbook
+   picker + description + framing card on the right. All colours resolve from
+   the shared tokens in css/style.css so the CRT theme retints for free. */
+
+.sc4-scene { padding-top: 8px; }
+.sc4-heading { margin-bottom: 4px; }
+.sc4-lead { margin: 0 4px 10px; max-width: 90ch; }
+
+/* ---------- pi: S -> A formula card ---------- */
+.sc4-formula {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 8px 14px;
+  margin: 0 0 12px;
+  text-align: center;
+}
+.sc4-formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.6px;
+  color: var(--ink-secondary);
+  margin-bottom: 4px;
+}
+.sc4-formula-host .katex { color: var(--ink-on-box); font-size: 16px; }
+.sc4-formula-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  margin-top: 4px;
+}
+
+/* ---------- two-column body ---------- */
+.sc4-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+.sc4-left { flex: 0 0 auto; min-width: 0; }
+.sc4-right {
+  flex: 1 1 320px;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Board: lean on the qtable.css cell styling; just give it breathing room.
+   A small zoom shrinks the whole 6x3 grid (and collapses its layout box, unlike
+   transform:scale) so all six pot-bucket rows fit one 900px-tall viewport. */
+.sc4-board { margin-bottom: 10px; zoom: 0.82; }
+
+/* Compact the shared board so all 6 pot-bucket rows fit one 900px-tall
+   viewport without scrolling (this scene shows the whole map at once).
+   Scoped to .sc4-scene so the DP / SARSA scenes keep the taller default. */
+.sc4-scene .pyl-cell { min-height: 70px; padding: 4px; gap: 3px; }
+.sc4-scene .pyl-lever-row { padding: 0 3px; }
+.sc4-scene .pyl-board-grid, .sc4-scene .pyl-board-cols { gap: 5px; }
+
+/* Legend chips. */
+.sc4-legend { display: flex; flex-wrap: wrap; gap: 10px; }
+.sc4-legend-chip {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  padding: 5px 9px;
+  border: 2px solid var(--rule);
+  box-shadow: 2px 2px 0 0 rgba(0,0,0,0.2);
+}
+.sc4-chip-roll { background: var(--c-roll); color: var(--c-roll-ink); }
+.sc4-chip-hold { background: var(--c-hold); color: var(--c-hold-ink); }
+
+/* ---------- playbook picker ---------- */
+.sc4-pick-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  color: var(--ink);
+  border-bottom: 3px solid var(--rule);
+  padding-bottom: 6px;
+}
+.sc4-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.sc4-pick-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  padding: 8px 10px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.18);
+}
+.sc4-pick-btn:hover { background: var(--pikachu-yellow); color: var(--ink); }
+.sc4-pick-btn.sc4-pick-active {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+  box-shadow: inset 2px 2px 0 0 rgba(0,0,0,0.25);
+}
+
+/* Active-policy description. */
+.sc4-desc { font-size: 10px; line-height: 1.8; }
+.sc4-desc-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--ink-on-box);
+  margin-bottom: 8px;
+}
+.sc4-desc-body { color: var(--ink-on-box); }
+
+/* Flat-seam callout (shown on the always-hold-at-20 map). */
+.sc4-flat-note {
+  display: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+  color: var(--ink);
+  padding: 6px 8px;
+  border: 2px dashed var(--rule);
+  background: var(--bg-strong);
+}
+.sc4-flat-note.show { display: block; }
+
+/* The framing card that closes the scene. */
+.sc4-frame {
+  border: 3px solid var(--rule);
+  background: var(--card-bg);
+  box-shadow: 3px 3px 0 0 rgba(0,0,0,0.18);
+  padding: 12px 14px;
+  border-left: 6px solid var(--pikachu-yellow);
+}
+.sc4-frame-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.sc4-frame-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+}
+
+.sc4-foot { margin-top: 16px; }
+
+@media (max-width: 880px) {
+  .sc4-left { flex: 1 1 100%; }
+  .sc4-board { overflow-x: auto; }
+}
