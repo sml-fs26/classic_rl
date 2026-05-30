@@ -1,0 +1,5 @@
+# Per-run captures and diff artefacts — not committed.  Baselines
+# (tests/shots/baseline/*.png) ARE committed once you've run
+# scripts/regress-screenshots.sh --baseline on a known-good main.
+shots/current/*.png
+shots/diff/*.txt
