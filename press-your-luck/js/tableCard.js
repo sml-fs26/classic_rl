@@ -22,7 +22,13 @@
  *         opts.showVals -> print numeric pot / scores under the art
  *     card.set({ pot, potBucket, my, riv, standing, target })
  *         Any of potBucket / standing may be omitted and is derived from
- *         pot / (my,riv) via window.Pig when present.
+ *         pot / (my,riv) via window.Pig when present. Clears any collapse.
+ *     card.pop(potBucket?)  -> light up to `potBucket` (default: current+1)
+ *         and play the chip-pop on the newly lit top row (THE ROLL, 2-6).
+ *     card.collapse()       -> grey + slide the lit chips away (THE BUST, 1);
+ *         leaves the meter showing an empty pot. Returns after the CSS anim.
+ *     card.rows             -> the chip-row elements by bucket (1..NB-1)
+ *     card.meter, card.badge
  *     card.el  -> the root element
  */
 (function () {
@@ -95,6 +101,9 @@
     function tagYou() { return window.I18N ? window.I18N.t('vocab.you') : 'YOU'; }
     function tagRiv() { return window.I18N ? window.I18N.t('vocab.rival') : 'RIVAL'; }
 
+    let curBucket = 0;
+    let lastMy = 0, lastRiv = 0;
+
     function set(s) {
       s = s || {};
       const target = s.target || (window.Pig ? window.Pig.TARGET : 50);
@@ -103,7 +112,10 @@
       const my = s.my != null ? s.my : 0;
       const riv = s.riv != null ? s.riv : 0;
       const st = s.standing != null ? s.standing : standingOf(my, riv);
+      lastMy = my; lastRiv = riv;
 
+      meter.classList.remove('tc-pot-collapse');
+      curBucket = pb;
       /* Light the bottom `pb` chip rows. */
       for (let b = 1; b < POT_BUCKETS; b++) {
         if (rows[b]) rows[b].classList.toggle('tc-chip-on', b <= pb);
@@ -129,8 +141,54 @@
       if (o.showVals) host.classList.add('tc-show-vals');
     }
 
+    function reducedMotion() {
+      return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    /* THE ROLL (2-6): light up to `toBucket` (default one above current) and
+       pop the newly lit top chip. */
+    function pop(toBucket) {
+      meter.classList.remove('tc-pot-collapse');
+      const tgt = toBucket != null ? toBucket : Math.min(POT_BUCKETS - 1, curBucket + 1);
+      for (let b = 1; b < POT_BUCKETS; b++) {
+        if (rows[b]) rows[b].classList.toggle('tc-chip-on', b <= tgt);
+      }
+      meter.classList.toggle('tc-pot-danger', tgt >= DANGER_BUCKET);
+      const top = rows[tgt];
+      if (top && !reducedMotion()) {
+        top.classList.remove('tc-chip-pop');
+        void top.offsetWidth;
+        top.classList.add('tc-chip-pop');
+        setTimeout(() => top.classList.remove('tc-chip-pop'), 340);
+      }
+      curBucket = tgt;
+    }
+
+    /* THE BUST (1): grey + slide the lit chips away, then settle to empty. */
+    function collapse() {
+      return new Promise((resolve) => {
+        if (reducedMotion() || curBucket <= 0) {
+          set({ pot: 0, potBucket: 0, my: lastMy, riv: lastRiv });
+          resolve();
+          return;
+        }
+        meter.classList.add('tc-pot-collapse');
+        setTimeout(() => {
+          meter.classList.remove('tc-pot-collapse');
+          for (let b = 1; b < POT_BUCKETS; b++) {
+            if (rows[b]) rows[b].classList.remove('tc-chip-on');
+          }
+          meter.classList.remove('tc-pot-danger');
+          meterLabel.textContent = (window.Pig && window.Pig.POT_BUCKET_LABELS)
+            ? window.Pig.POT_BUCKET_LABELS[0] : '0';
+          curBucket = 0;
+          resolve();
+        }, 420);
+      });
+    }
+
     set({ pot: 0, my: 0, riv: 0 });
-    return { el: host, set, rows, meter, badge };
+    return { el: host, set, pop, collapse, rows, meter, badge };
   }
 
   window.TableCard = { mount, bucketOf, standingOf };

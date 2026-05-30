@@ -18,12 +18,6 @@
 /* ---------- Tokens ---------- */
 :root,
 :root[data-theme="light"] {
-  /* Battle screen — Day */
-  --sky-top:        #9CC8E8;
-  --sky-bottom:     #C0DEF0;
-  --grass:          #5BA85B;
-  --grass-rim:      #3A8A3A;
-
   /* Page chrome */
   --bg:             #E8E0CC;     /* warm grey-cream, NES "shell" */
   --bg-strong:      #F8F4E4;     /* lighter, for dialog boxes */
@@ -64,28 +58,6 @@
   --hue-door:    #4A8B6B;     /* green — SARSA */
   --hue-snakes:  #C8902C;     /* gold — Snakes & Ladders sibling */
 
-  /* HP-bar bucket fill tokens — overridable per theme. */
-  --hp-b0: #48C848;
-  --hp-b1: #88D848;
-  --hp-b2: #E8C828;
-  --hp-b3: #E89028;
-  --hp-b4: #E84828;
-
-  /* Battle-VFX colour tokens — used by the scene 1 attack overlays.
-     Each theme overrides these so the lightning bolt / ember / rage
-     aura match the palette. */
-  --vfx-bolt:    #FFD028;     /* THUNDERBOLT SVG stroke */
-  --vfx-bolt-hl: #FFFFFF;     /* THUNDERBOLT inner highlight stroke */
-  --vfx-bolt-glow: rgba(255, 208, 40, 0.95);
-  --vfx-ember-a: rgba(248, 128, 48, 0.95);
-  --vfx-ember-b: rgba(232,  80, 24, 0.85);
-  --vfx-ember-c: rgba(248, 168, 64, 0.95);
-  --vfx-flame-a: rgba(248,  96, 24, 0.9);
-  --vfx-flame-b: rgba(252, 168, 32, 0.95);
-  --vfx-flame-c: rgba(255, 220, 64, 0.95);
-  --vfx-flame-d: rgba(255, 220, 64, 0.0);
-  --vfx-rage:    rgba(232, 40, 40, 0.7);
-
   /* ===== Press Your Luck lever + state-icon tokens (light) ===== */
   /* ROLL = the "push" lever (burnt orange / vermillion). */
   --c-roll:        #C2541E;
@@ -112,11 +84,6 @@
   /* Amber-phosphor CRT terminal — dark background, warm-amber text.
      Distinct from the GB green theme.  Pairs with the scanlines +
      vignette + phosphor-glow rules at the bottom of this file. */
-  --sky-top:        #1a0d05;
-  --sky-bottom:     #2a160a;
-  --grass:          #382010;
-  --grass-rim:      #1a0d05;
-
   --bg:             #0a0500;
   --bg-strong:      #1a0d05;
   --ink:            #FFB350;     /* amber phosphor on the page chrome */
@@ -151,34 +118,13 @@
   --cb-sky:              #FFB350;
   --cb-purple:           #FF9050;
 
-  /* HP-bar buckets — amber gradient under CRT. */
-  --hp-b0: #FFC060;
-  --hp-b1: #FFB350;
-  --hp-b2: #FF9020;
-  --hp-b3: #FF7010;
-  --hp-b4: #FF4010;
-
-  /* Battle VFX — all amber/orange so the THUNDERBOLT / EMBER /
-     RAGE overlays stay inside the CRT palette. */
-  --vfx-bolt:    #FFC060;
-  --vfx-bolt-hl: #FFE090;
-  --vfx-bolt-glow: rgba(255, 192, 96, 0.95);
-  --vfx-ember-a: rgba(255, 144, 32, 0.95);
-  --vfx-ember-b: rgba(255,  96, 32, 0.85);
-  --vfx-ember-c: rgba(255, 180, 64, 0.95);
-  --vfx-flame-a: rgba(255, 112, 32, 0.9);
-  --vfx-flame-b: rgba(255, 168, 48, 0.95);
-  --vfx-flame-c: rgba(255, 220, 96, 0.95);
-  --vfx-flame-d: rgba(255, 220, 96, 0.0);
-  --vfx-rage:    rgba(255, 96, 32, 0.7);
-
   /* ===== Press Your Luck lever + state-icon tokens (CRT retint) ===== */
   /* Both levers retint into the amber/orange phosphor palette but stay
      distinguishable: ROLL hotter orange, HOLD cooler amber. */
   --c-roll:        #FF6A1E;
   --c-roll-soft:   #5A3010;
   --c-roll-ink:    #1a0d05;
-  --c-hold:        #FFB350;
+  --c-hold:        #FFC76E;
   --c-hold-soft:   #3A2008;
   --c-hold-ink:    #1a0d05;
   --chip-on:       #FFA838;
@@ -229,15 +175,6 @@
 :root[data-theme="crt"] .concept-heading {
   text-shadow: 0 0 6px rgba(255, 180, 80, 0.55);
 }
-/* Sprites washed amber for CRT. */
-:root[data-theme="crt"] .poke-sprite,
-:root[data-theme="crt"] .traj-box-sprite,
-:root[data-theme="crt"] .q-thumb-sprite,
-:root[data-theme="crt"] .sd-f-tape-sprite,
-:root[data-theme="crt"] .sc0-bn-sprite {
-  filter: grayscale(1) sepia(1) saturate(5) hue-rotate(-10deg) contrast(1.05) brightness(0.95);
-}
-
 * { box-sizing: border-box; }
 
 html, body {
@@ -417,326 +354,6 @@ html, body {
   margin: 8px 4px 0;
   max-width: 76ch;
 }
-
-/* ---------- Pokemon sprite ----------
-   Hard rule: image-rendering: pixelated must apply on both the <img> tag and
-   any wrapper that scales. */
-.poke-sprite {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  image-rendering: -moz-crisp-edges;
-  -ms-interpolation-mode: nearest-neighbor;
-  display: block;
-  /* Idle breathing — 1.5 px vertical bob on a 2.4s cycle. The
-     animation property is replaced wholesale by .shake / .faint when
-     those classes are added, so it cleanly pauses during damage and
-     KO animations. */
-  animation: poke-breathe 2.4s ease-in-out infinite;
-}
-
-/* Grass tufts at the platform rim — 5 chunky pixel tufts that sway on
-   staggered cycles.  Lives inside .grass-rim so it sits at the right
-   vertical position automatically.  prefers-reduced-motion disables. */
-.grass-tufts {
-  position: absolute;
-  inset: -14px 0 auto 0;        /* lift above the rim */
-  height: 14px;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 6%;
-  pointer-events: none;
-  z-index: 2;
-}
-.grass-tuft {
-  width: 14px;
-  height: 14px;
-  background: var(--grass-rim);
-  clip-path: polygon(
-    20% 100%,  0%  35%, 18% 55%,
-    35% 0%,   45% 50%, 50% 25%,
-    55% 50%,  65% 0%,  82% 55%,
-    100% 35%, 80% 100%
-  );
-  transform-origin: 50% 100%;
-  animation: grass-sway 4.0s ease-in-out infinite alternate;
-}
-.grass-tuft:nth-child(2) { animation-delay: -0.7s; animation-duration: 4.4s; }
-.grass-tuft:nth-child(3) { animation-delay: -1.5s; animation-duration: 3.6s; }
-.grass-tuft:nth-child(4) { animation-delay: -2.1s; animation-duration: 4.8s; }
-.grass-tuft:nth-child(5) { animation-delay: -0.3s; animation-duration: 4.2s; }
-@keyframes grass-sway {
-  0%   { transform: rotate(-5deg); }
-  100% { transform: rotate(5deg);  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .grass-tuft { animation: none; }
-}
-@keyframes poke-breathe {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-1.5px); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .poke-sprite { animation: none; }
-}
-.poke-sprite.shake {
-  animation: poke-shake 320ms steps(1, end);
-}
-@keyframes poke-shake {
-  0%   { transform: translate(0, 0); }
-  10%  { transform: translate(-6px, 0); }
-  25%  { transform: translate(6px, 0); }
-  40%  { transform: translate(-5px, 0); }
-  55%  { transform: translate(5px, 0); }
-  70%  { transform: translate(-3px, 0); }
-  85%  { transform: translate(3px, 0); }
-  100% { transform: translate(0, 0); }
-}
-.poke-sprite.faint {
-  animation: poke-faint 600ms ease-in forwards;
-}
-@keyframes poke-faint {
-  0%   { transform: translateY(0); opacity: 1; filter: brightness(1); }
-  100% { transform: translateY(48px); opacity: 0; filter: brightness(0); }
-}
-
-/* ---------- Battle stage ---------- */
-.battle-stage {
-  position: relative;
-  width: 100%;
-  max-width: 640px;
-  aspect-ratio: 5 / 3;
-  margin: 0 auto;
-  background:
-    linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 65%, var(--grass) 65%, var(--grass) 100%);
-  border: 4px solid var(--rule);
-  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
-  overflow: hidden;
-  font-family: 'Press Start 2P', monospace;
-}
-.battle-stage .grass-rim {
-  position: absolute;
-  left: 0; right: 0;
-  top: 65%;
-  height: 4px;
-  background: var(--grass-rim);
-}
-.battle-stage .platform {
-  position: absolute;
-  width: 38%;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--grass-rim);
-  opacity: 0.65;
-}
-.battle-stage .platform.player   { left: 6%;  bottom: 14%; }
-.battle-stage .platform.opponent { right: 6%; top: 35%;    }
-
-.battle-stage .sprite-host {
-  position: absolute;
-}
-.battle-stage .sprite-host.player {
-  left: 10%;
-  bottom: 16%;
-  width: 30%;
-}
-.battle-stage .sprite-host.opponent {
-  right: 10%;
-  top: 12%;
-  width: 22%;
-}
-.battle-stage .sprite-host img {
-  width: 100%;
-  height: auto;
-  /* feet rest on platform: the platform is at the host's bottom */
-  transform: translateY(0);
-}
-
-/* Stars for night sky */
-.battle-stage.night::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 35% 0;
-  background-image:
-    radial-gradient(1px 1px at 20% 12%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 60% 22%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 78% 8%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 38% 32%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 90% 30%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 8% 25%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 48% 8%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 72% 38%, #fff 1px, transparent 1px);
-  pointer-events: none;
-}
-
-/* HP box — sits floating over the battle */
-.hp-box {
-  position: absolute;
-  background: var(--bg-strong);
-  border: 3px solid var(--rule);
-  padding: 6px 10px 6px 12px;
-  box-shadow:
-    inset 0 0 0 2px var(--bg-strong),
-    inset 0 0 0 4px var(--inner-highlight);
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  color: var(--ink-on-box);
-  min-width: 160px;
-}
-.hp-box.player   { right: 4%; bottom: 6%;   }
-.hp-box.opponent { left:  4%; top: 6%;      }
-
-.hp-box .row1 {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
-}
-.hp-box .name { color: var(--ink-on-box); }
-.hp-box .lvl { color: var(--ink-on-box); }
-
-.hp-bar-row {
-  display: flex; align-items: center; gap: 6px;
-}
-.hp-bar-row .hp-label {
-  font-size: 8px;
-  color: var(--pikachu-yellow);
-  -webkit-text-stroke: 0.5px var(--ink);
-}
-.hp-bar-track {
-  flex: 1 1 auto;
-  height: 9px;
-  background: #585858;
-  border: 2px solid var(--rule);
-  position: relative;
-  overflow: hidden;
-}
-.hp-bar-fill {
-  position: absolute;
-  top: 0; left: 0; bottom: 0;
-  background: #48C848;     /* default = full */
-  width: 100%;
-  transition: width 1100ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
-}
-/* Discrete bucket fill — 5 buckets + fainted. Width snaps to 100/80/60/
-   40/20/0%, color phases green → light-green → yellow → orange → red. */
-.hp-bar-fill[data-bucket="0"] { width: 100%; background: var(--hp-b0, #48C848); }
-.hp-bar-fill[data-bucket="1"] { width: 80%;  background: var(--hp-b1, #88D848); }
-.hp-bar-fill[data-bucket="2"] { width: 60%;  background: var(--hp-b2, #E8C828); }
-.hp-bar-fill[data-bucket="3"] { width: 40%;  background: var(--hp-b3, #E89028); }
-.hp-bar-fill[data-bucket="4"] { width: 20%;  background: var(--hp-b4, #E84828); }
-.hp-bar-fill[data-bucket="5"] { width: 0%;   background: var(--hp-b4, #E84828); }
-/* Tick marks at the bucket boundaries — makes the discretisation
-   readable even in a still screenshot. */
-.hp-bar-tick {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 1px;
-  background: rgba(0,0,0,0.45);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.hp-box .row3 {
-  margin-top: 4px;
-  display: flex;
-  justify-content: flex-end;
-  font-size: 9px;
-  color: var(--ink-on-box);
-}
-
-/* Damage flash number */
-.damage-flash {
-  position: absolute;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 22px;
-  color: var(--damage-text);
-  -webkit-text-stroke: 2px var(--damage-stroke);
-  text-stroke: 2px var(--damage-stroke);
-  pointer-events: none;
-  animation: dmg-rise 700ms ease-out forwards;
-}
-@keyframes dmg-rise {
-  0%   { transform: translateY(8px); opacity: 0; }
-  20%  { transform: translateY(0);   opacity: 1; }
-  80%  { transform: translateY(-24px); opacity: 1; }
-  100% { transform: translateY(-32px); opacity: 0; }
-}
-
-/* ---------- Move menu (scene 1) ---------- */
-.move-menu {
-  background: var(--bg-strong);
-  border: 4px solid var(--rule);
-  padding: 10px 12px;
-  box-shadow:
-    inset 0 0 0 2px var(--bg-strong),
-    inset 0 0 0 4px var(--inner-highlight);
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  color: var(--ink-on-box);
-}
-.move-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  background: transparent;
-  border: 0;
-  padding: 4px 6px;
-  font: inherit;
-  font-size: 10px;
-  color: var(--ink-on-box);
-  cursor: pointer;
-  text-align: left;
-  position: relative;
-  text-transform: uppercase;
-}
-.move-btn::before {
-  content: '\25B6 ';
-  visibility: hidden;
-  color: var(--ink-on-box);
-}
-.move-btn:hover::before, .move-btn:focus::before, .move-btn.selected::before {
-  visibility: visible;
-}
-.move-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.move-btn:disabled::before { visibility: hidden; }
-.move-btn .move-sub {
-  font-size: 8px;
-  color: #585858;
-  letter-spacing: 0.5px;
-  text-transform: none;
-  display: flex;
-  flex-direction: column;     /* two rows: .move-stats then .move-drop */
-  gap: 3px;
-}
-.move-btn .move-stats {
-  display: flex;
-  flex-wrap: wrap;            /* just the type pill now (PWR/ACC retired) */
-  gap: 2px 8px;
-  align-items: center;
-}
-.move-btn .move-drop {
-  font-size: 8px;
-  color: var(--pikachu-cheek);
-  letter-spacing: 0.5px;
-}
-.move-btn:disabled .move-drop { color: #888; }
-.move-btn .type-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 1px 4px;
-  border: 1px solid var(--rule);
-  font-size: 7px;
-  text-transform: uppercase;
-}
-.type-pill.electric { background: #F8D028; color: #181818; }
-.type-pill.normal   { background: #C8C0B0; color: #181818; }
-.type-pill.steel    { background: #B0B0C0; color: #181818; }
-.type-pill.fire     { background: #F58030; color: #181818; }
 
 /* ---------- Pokemon-styled "menu option" rows (for sliders / params) ---------- */
 .poke-menu-row {
@@ -948,132 +565,6 @@ html, body {
 }
 .sc2-ctrl { margin-bottom: 10px; }
 
-/* ---------- Axis sprite decorations (scenes 2, 3) ----------
-   Pikachu sits to the LEFT of the grid (rows vary your HP).
-   Charmander sits ABOVE the grid (columns vary opp HP).
-   Both are framed as Pokemon dialog boxes so they match the rest of the UI. */
-.vi-axis-top {
-  display: flex;
-  align-items: stretch;
-  gap: 6px;
-}
-.vi-axis-leftpad { width: 96px; flex-shrink: 0; }   /* matches the .side panel below */
-.vi-axis-row     { display: flex; align-items: stretch; gap: 6px; }
-.vi-axis-pokemon {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 12px;
-  background: var(--bg-strong);
-  border: 4px solid var(--rule);
-  color: var(--ink-on-box);
-  box-shadow:
-    inset 0 0 0 2px var(--bg-strong),
-    inset 0 0 0 4px var(--inner-highlight),
-    inset 0 0 0 6px var(--bg-strong);
-  flex: 1;
-}
-.vi-axis-pokemon.side {
-  flex: 0 0 96px;
-  flex-direction: column;
-  padding: 8px 4px;
-  text-align: center;
-  gap: 6px;
-}
-.vi-axis-sprite {
-  width: 52px;
-  height: 52px;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-}
-.vi-axis-pokemon.side .vi-axis-sprite { width: 56px; height: 56px; }
-.vi-axis-text {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--ink-on-box);
-  letter-spacing: 0.5px;
-  line-height: 1.55;
-}
-
-/* Extended grid: 64px row-label column + 5 state cells + 56px WIN strip;
-   28px col-label row + 5 state rows + 32px LOSS strip. */
-.sc2-state-grid {
-  grid-template-columns: 64px repeat(var(--nb, 5), minmax(0, 1fr)) 56px;
-  grid-template-rows:    28px repeat(var(--nb, 5), auto)            32px;
-}
-
-/* Terminal strips on the right (WIN +10) and bottom (LOSS −10). */
-.terminal-hdr,
-.terminal-strip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Press Start 2P', monospace;
-  text-align: center;
-  border: 3px solid var(--rule);
-  box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight);
-}
-.terminal-hdr        { font-size: 7px; line-height: 1.3; }
-.terminal-strip      { font-size: 9px; font-weight: bold; }
-.terminal-hdr.win,
-.terminal-strip.win  { background: var(--hp-green); color: #FFFFFF; }
-.terminal-hdr.loss,
-.terminal-strip.loss { background: var(--hp-red);   color: #FFFFFF; }
-.terminal-corner     { background: transparent; }
-
-/* Heat-map: cell background scales with V. The .v-val/.v-move text colour
-   adjusts so it stays readable on each tint. */
-.state-cell.v-pos-strong { background: #5BA85B; color: #FFFFFF; }
-.state-cell.v-pos-strong .v-val  { color: #FFFFFF; }
-.state-cell.v-pos-strong .v-move { color: #F8D028; }
-
-.state-cell.v-pos-mid    { background: #C8E8C8; }
-.state-cell.v-pos-mid    .v-val  { color: #181818; }
-.state-cell.v-pos-mid    .v-move { color: #2A6A2A; }
-
-.state-cell.v-neutral    { background: var(--bg-strong); }
-
-.state-cell.v-neg-mid    { background: #F8C8C0; }
-.state-cell.v-neg-mid    .v-val  { color: #181818; }
-.state-cell.v-neg-mid    .v-move { color: #962a1a; }
-
-.state-cell.v-neg-strong { background: #E84828; color: #FFFFFF; }
-.state-cell.v-neg-strong .v-val  { color: #FFFFFF; }
-.state-cell.v-neg-strong .v-move { color: #F8D028; }
-
-/* Clickable cells get a subtle hover + selected highlight. */
-.state-cell.clickable {
-  cursor: pointer;
-  transition: transform 80ms ease-out;
-}
-.state-cell.clickable:hover {
-  transform: scale(1.04);
-  z-index: 1;
-}
-.state-cell.selected {
-  outline: 3px solid var(--pikachu-yellow);
-  outline-offset: -3px;
-  z-index: 2;
-}
-
-/* START badge on the (FULL, FULL) cell — the state every battle begins at. */
-.state-cell.start-state { position: relative; }
-.state-cell.start-state::after {
-  content: 'START';
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 6px;
-  background: var(--pikachu-yellow);
-  color: #181818;
-  padding: 2px 4px;
-  border: 2px solid var(--rule);
-  letter-spacing: 0.5px;
-  z-index: 3;
-  white-space: nowrap;
-}
-
 /* ---------- Inspector panel ---------- */
 .vi-inspector {
   font-family: 'Press Start 2P', monospace;
@@ -1142,51 +633,6 @@ html, body {
   font-size: 8px;
   line-height: 1.7;
   color: var(--ink-on-box);
-}
-
-/* ---------- Q-table render (scene 4) ---------- */
-.qtable-host {
-  background: var(--bg-strong);
-  border: 4px solid var(--rule);
-  padding: 10px 12px;
-  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--ink-on-box);
-  overflow-x: auto;
-}
-.qtable-host table { border-collapse: collapse; }
-.qtable-host th, .qtable-host td {
-  padding: 3px 6px;
-  border: 1px solid var(--inner-highlight);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  min-width: 48px;
-}
-.qtable-host th {
-  background: var(--pikachu-yellow);
-  color: #181818;
-  text-align: center;
-  text-transform: uppercase;
-  font-size: 7px;
-}
-.qtable-host td.state-head {
-  text-align: left;
-  background: #ECE5C8;
-  font-size: 7px;
-  text-transform: uppercase;
-  min-width: 88px;
-}
-.qtable-host td.argmax {
-  background: #FFF1AE;
-  font-weight: 700;
-}
-.qtable-host td.flash {
-  animation: qcell-flash 700ms ease-out;
-}
-@keyframes qcell-flash {
-  0%   { box-shadow: inset 0 0 0 2px var(--pikachu-yellow); background: #FFF1AE; }
-  100% { box-shadow: inset 0 0 0 0 var(--pikachu-yellow); }
 }
 
 /* ---------- Learning curve (scene 4) ---------- */
@@ -1369,151 +815,6 @@ body.lang-jp .scene {
    right now) to fall through to DotGothic16 rather than the OS default. */
 .theme-toggle, .pager-btn, .topbar .brand, .scene-title {
   font-family: 'Press Start 2P', 'DotGothic16', 'Courier New', monospace;
-}
-
-/* ============================================================
-   Scene 1 — wild-encounter intro
-   ----------------------------------------------------------------
-   The cascade hides both sprite hosts on reset, flashes the
-   opponent into view ("A wild CHARMANDER appeared!"), then arcs
-   a Pokeball in from off-screen-left onto the player platform,
-   pops it open, and materializes Pikachu in its place ("Go!
-   PIKACHU!"). All animations are opacity- and filter-based on
-   the sprite hosts so they DO NOT conflict with the
-   .poke-sprite breathing/shake/faint transform animations that
-   live on the inner <img>. The Pokeball is its own absolute
-   element layered above the platform.
-   ============================================================ */
-
-/* Initial hidden state for sprite hosts — opacity only, no
-   transform/display so the inner sprite's breathing keyframes
-   keep running unmolested. */
-.sc1-hidden {
-  opacity: 0;
-}
-
-/* Opponent wild-appears: a fast white-flash that brings the
-   host from invisible+overbright down to fully visible at
-   normal brightness. Filter + opacity only — no transform. */
-.sc1-wild-appear {
-  animation: sc1-wild-appear 500ms steps(8, end) forwards;
-}
-@keyframes sc1-wild-appear {
-  0%   { opacity: 0; filter: brightness(6) contrast(0.4); }
-  20%  { opacity: 1; filter: brightness(4) contrast(0.6); }
-  60%  { opacity: 1; filter: brightness(2) contrast(0.9); }
-  100% { opacity: 1; filter: brightness(1) contrast(1); }
-}
-
-/* Player materialize: similar opacity+filter flash for the
-   Pikachu reveal that follows the Pokeball pop. */
-.sc1-materialize {
-  animation: sc1-materialize 360ms steps(6, end) forwards;
-}
-@keyframes sc1-materialize {
-  0%   { opacity: 0; filter: brightness(4) contrast(0.5); }
-  30%  { opacity: 1; filter: brightness(3) contrast(0.7); }
-  100% { opacity: 1; filter: brightness(1) contrast(1); }
-}
-
-/* Pokeball arcing onto the player platform. The ball is its
-   own element appended to .battle-stage; it lives above the
-   platforms but below the HP boxes (z-index: 6). The arc keyframe
-   uses left/bottom percentages so it scales with the stage,
-   plus rotation for the spinning ball feel. */
-.sc1-pokeball {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  z-index: 6;
-  pointer-events: none;
-  left: -20%;
-  bottom: -20%;
-}
-.sc1-pokeball svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.sc1-pokeball-arc {
-  animation: sc1-pokeball-arc 620ms cubic-bezier(0.3, 0.05, 0.55, 1) forwards;
-}
-@keyframes sc1-pokeball-arc {
-  0%   { left: -20%; bottom: -20%; transform: rotate(0deg);   }
-  40%  { left:   2%; bottom:  45%; transform: rotate(360deg); }
-  65%  { left:  18%; bottom:  60%; transform: rotate(540deg); }
-  100% { left:  22%; bottom:  22%; transform: rotate(720deg); }
-}
-.sc1-pokeball-open {
-  left: 22%;
-  bottom: 22%;
-  animation: sc1-pokeball-open 280ms ease-out forwards;
-}
-@keyframes sc1-pokeball-open {
-  0%   { transform: scale(1)   rotate(720deg); opacity: 1; }
-  100% { transform: scale(2.4) rotate(720deg); opacity: 0; }
-}
-
-/* Reduced motion — collapse the cascade to a simple opacity
-   reveal. Pokeball is invisible (the materialize alone reads
-   as "appears"). */
-@media (prefers-reduced-motion: reduce) {
-  .sc1-hidden {
-    opacity: 0;
-    transition: opacity 200ms linear;
-  }
-  .sc1-wild-appear,
-  .sc1-materialize {
-    animation: none;
-    opacity: 1;
-    filter: none;
-    transition: opacity 200ms linear;
-  }
-  .sc1-pokeball,
-  .sc1-pokeball-arc,
-  .sc1-pokeball-open {
-    animation: none;
-    opacity: 0;
-  }
-}
-
-/* ============================================================
-   Gen-1 rotating-hex scene transition
-   ----------------------------------------------------------------
-   A full-viewport overlay shaped as a 6-point hexagon (extended
-   beyond the viewport so the shape fully covers the screen at
-   scale 1) animates from scale 1 / rotate 0 down to scale 0 /
-   rotate 180, opacity fading at the tail.  The new scene is
-   already mounted underneath; the overlay just gates the reveal.
-   pointer-events: none keeps the underlying scene interactive.
-   Fires only on entry to the three battle-flavored scenes
-   (scene1, sceneSarsaDerive, sceneQstar) — see playSceneTransition
-   in main.js.
-   ============================================================ */
-.scene-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: var(--bg);
-  pointer-events: none;
-  clip-path: polygon(
-    50% -50%,
-    130% 25%,
-    130% 75%,
-    50% 150%,
-    -30% 75%,
-    -30% 25%
-  );
-  transform-origin: 50% 50%;
-  animation: scene-trans-hex 700ms cubic-bezier(.42, 0, .58, 1) forwards;
-}
-@keyframes scene-trans-hex {
-  0%   { transform: scale(1) rotate(0deg);     opacity: 1; }
-  70%  {                                       opacity: 1; }
-  100% { transform: scale(0) rotate(180deg);   opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .scene-transition { display: none; }
 }
 
 /* ============================================================
@@ -2105,6 +1406,144 @@ body.slide-mode .stage  { padding: 12px 18px; }
 @media (prefers-reduced-motion: reduce) {
   .pyl-die-leap { animation: none; }
 }
+
+/* Screen-shake: the die adds this to its shake target on a bust (a 1).
+   Scenes can also add it directly to feel the felt-bust. */
+.pyl-screen-shake { animation: pyl-screen-shake 0.42s steps(2, end); }
+@keyframes pyl-screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  12% { transform: translate(-5px, 1px); }
+  28% { transform: translate(5px, -1px); }
+  44% { transform: translate(-4px, 2px); }
+  60% { transform: translate(4px, -1px); }
+  76% { transform: translate(-2px, 1px); }
+  88% { transform: translate(2px, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pyl-screen-shake { animation: none; }
+}
+
+/* ---- pot-meter dynamics (THE ROLL): a freshly-lit chip pops; a bust
+   collapses + greys the whole stack. Scenes drive these classes on the
+   TableCard's .tc-chip-row / .tc-pot-meter (exposed via card.rows / .meter). */
+.tc-chip-row.tc-chip-pop { animation: pyl-chip-pop 0.32s cubic-bezier(.3,1.6,.5,1); }
+@keyframes pyl-chip-pop {
+  0%   { transform: scaleX(0.2); filter: brightness(1.8); }
+  60%  { transform: scaleX(1.12); filter: brightness(1.4); }
+  100% { transform: scaleX(1); filter: brightness(1); }
+}
+.tc-pot-meter.tc-pot-collapse .tc-chip-row.tc-chip-on {
+  animation: pyl-chip-collapse 0.4s ease-in forwards;
+}
+@keyframes pyl-chip-collapse {
+  0%   { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(14px); filter: grayscale(1) brightness(0.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tc-chip-row.tc-chip-pop,
+  .tc-pot-meter.tc-pot-collapse .tc-chip-row.tc-chip-on { animation: none; }
+}
+
+/* Flying "+N" chip the pot-pop sends onto the stack. Scenes spawn a
+   .pyl-fly-chip element near the die and let it arc to the meter. */
+.pyl-fly-chip {
+  position: absolute;
+  z-index: 40;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--chip-on-hi);
+  background: var(--chip-on);
+  border: 2px solid var(--rule);
+  padding: 2px 5px;
+  pointer-events: none;
+  text-shadow: 1px 1px 0 var(--rule);
+  animation: pyl-fly-chip 0.55s ease-out forwards;
+}
+@keyframes pyl-fly-chip {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.7); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-26px) scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) { .pyl-fly-chip { animation: none; opacity: 0; } }
+
+/* ---- banked-score counter: the mono "what you've locked in" readout that
+   HOLD slides chips into. Big tabular digits in a chunky bordered box. */
+.pyl-bank {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 12px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight), 2px 2px 0 0 rgba(0,0,0,0.18);
+  font-family: 'Press Start 2P', monospace;
+}
+.pyl-bank-label {
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.pyl-bank-num {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+  letter-spacing: 1px;
+}
+.pyl-bank.pyl-bank-you .pyl-bank-num { color: var(--c-roll); }
+.pyl-bank.pyl-bank-riv .pyl-bank-num { color: var(--ink-secondary); }
+/* The "chunk" tick when a HOLD banks the pot. */
+.pyl-bank.pyl-bank-chunk { animation: pyl-bank-chunk 0.3s ease-out; }
+@keyframes pyl-bank-chunk {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); box-shadow: 0 0 0 4px var(--chip-on), inset 0 0 0 2px var(--inner-highlight); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .pyl-bank.pyl-bank-chunk { animation: none; } }
+
+/* ---- return tape: the running G_t = win/lose-from-here strip beneath the
+   board. A row of step cells (situation -> lever -> reward) the trajectory /
+   return scenes lay out left to right. */
+.pyl-return-tape {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+.pyl-tape-label {
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  align-self: center;
+  margin-right: 4px;
+  text-transform: uppercase;
+}
+.pyl-tape-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 30px;
+  padding: 3px 4px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.pyl-tape-step .pyl-tape-lever { font-size: 7px; letter-spacing: 0.5px; }
+.pyl-tape-step.pyl-tape-roll .pyl-tape-lever { color: var(--c-roll); }
+.pyl-tape-step.pyl-tape-hold .pyl-tape-lever { color: var(--c-hold); }
+.pyl-tape-step .pyl-tape-r { font-size: 8px; color: var(--ink-secondary); font-variant-numeric: tabular-nums; }
+.pyl-tape-step.pyl-tape-bust { border-color: var(--chip-danger); }
+.pyl-tape-step.pyl-tape-bust .pyl-tape-lever { color: var(--chip-danger); }
+.pyl-tape-step.pyl-tape-terminal { background: var(--chip-on); color: var(--rule); }
+.pyl-tape-step.pyl-tape-terminal .pyl-tape-r { color: var(--rule); font-weight: bold; }
 
 /* ---- one-time intro modal ---- */
 .pyl-intro-modal {
