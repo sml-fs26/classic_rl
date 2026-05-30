@@ -129,6 +129,12 @@
       }
     }
 
+    /* Guard: some scene builders overwrite root.className (e.g.
+       root.className = 'scene-pad ...'), clobbering the engine's 'scene'
+       class. That drops the node out of the absolute/opacity overlay so
+       scenes render in normal flow and stack. Re-assert it. */
+    if (sceneNodes[idx]) sceneNodes[idx].classList.add('scene');
+
     current = idx;
     if (window.Music && SCENES[idx].music) {
       try { window.Music.setTrack(SCENES[idx].music); } catch (e) {}
