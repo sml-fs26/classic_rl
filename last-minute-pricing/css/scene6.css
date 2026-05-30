@@ -1,0 +1,222 @@
+/* ============================================================
+   Scene 6 -- Return to the deadline (the return G and its spread).
+   Re-declares the shared concept-scene chrome (identical to scenes 5/7,
+   so harmless if multiple load) then the scene-6 histogram.
+   ============================================================ */
+
+/* ---- Shared concept-scene chrome ---- */
+.concept-scene { max-width: 1000px; margin: 0 auto; }
+.concept-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px; line-height: 1.4; color: var(--ink); margin: 6px 0 12px;
+}
+.lang-jp .concept-heading { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.concept-lede {
+  font-size: 11px; line-height: 1.85; color: var(--ink);
+  max-width: 760px; margin: 0 0 16px;
+}
+.concept-lede b { color: var(--lever-standard); }
+.lang-jp .concept-lede { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.concept-note {
+  font-size: 10px; line-height: 1.85; color: var(--ink-secondary);
+  max-width: 820px; margin: 14px 0 0; padding: 10px 12px;
+  border-left: 4px solid var(--lever-standard); background: var(--bg-strong);
+}
+.concept-note b { color: var(--ink); }
+.lang-jp .concept-note { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.concept-formula-card {
+  background: var(--bg-strong); border: 4px solid var(--rule);
+  box-shadow: 6px 6px 0 var(--rule); padding: 14px 18px 12px;
+  margin: 0 0 16px; text-align: center;
+}
+.concept-formula-label {
+  font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--ink-secondary); margin-bottom: 10px;
+}
+.lang-jp .concept-formula-label { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.concept-formula-card .katex { color: var(--ink-on-box); font-size: 18px; }
+.concept-formula-foot {
+  font-size: 9.5px; line-height: 1.8; color: var(--ink-secondary);
+  margin: 10px auto 0; max-width: 680px;
+}
+.lang-jp .concept-formula-foot { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+/* ============================================================
+   Scene-6 specifics.
+   ============================================================ */
+
+/* Scene 6 is content-dense (formula + setup + histogram + notes); tighten
+   the shared chrome vertically so the controls stay above the fold at
+   1400x900. */
+.scene6.concept-scene { margin-top: 0; }
+.scene6 .concept-lede { margin-bottom: 12px; }
+.scene6 .concept-formula-card { padding: 12px 18px 10px; margin-bottom: 14px; }
+.scene6 .concept-formula-foot { font-size: 9px; line-height: 1.7; }
+
+/* ---- The fixed-experiment setup ---- */
+.scene6 .s6-setup {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: 3px 3px 0 var(--rule);
+  padding: 10px 14px;
+  margin: 0 0 14px;
+}
+.scene6 .s6-setup-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--ink-secondary); margin-bottom: 10px;
+}
+.lang-jp .scene6 .s6-setup-label { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.scene6 .s6-setup-row {
+  display: flex; align-items: center; gap: 26px; flex-wrap: wrap;
+}
+.scene6 .s6-mini-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 8px;
+}
+.lang-jp .scene6 .s6-mini-label { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.scene6 .s6-from, .scene6 .s6-pull { display: flex; flex-direction: column; }
+.scene6 .s6-picker { display: flex; flex-direction: column; gap: 8px; }
+.scene6 .s6-lever-btn {
+  cursor: pointer;
+  border-width: 3px;
+  opacity: 0.5;
+  filter: saturate(0.7);
+  transition: opacity 0.12s, filter 0.12s, transform 0.06s;
+  justify-content: center;
+  min-width: 132px;
+}
+.scene6 .s6-lever-btn:hover { opacity: 0.85; }
+.scene6 .s6-lever-btn.is-active {
+  opacity: 1; filter: none;
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ---- Histogram ---- */
+.scene6 .s6-hist-wrap {
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  box-shadow: inset 0 0 0 2px var(--bg), inset 0 0 0 4px var(--inner-highlight);
+  padding: 12px 16px 10px;
+}
+.scene6 .s6-hist-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 8px;
+}
+.scene6 .s6-hist-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink);
+}
+.scene6 .s6-stats {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; color: var(--ink-secondary); font-variant-numeric: tabular-nums;
+}
+.lang-jp .scene6 .s6-hist-title, .lang-jp .scene6 .s6-stats {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+.scene6 .s6-hist {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 14px;
+  height: 158px;
+  padding: 6px 8px 0;
+  border-bottom: 3px solid var(--rule);
+}
+.scene6 .s6-bin {
+  flex: 1 1 0;
+  max-width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+.scene6 .s6-bar-track {
+  width: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: flex-end;
+  min-height: 0;
+}
+.scene6 .s6-bar {
+  width: 100%;
+  min-height: 3px;
+  border: 2px solid var(--rule);
+  border-bottom: none;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  transition: height 0.25s ease-out;
+}
+.scene6 .s6-bar-count {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--lever-ink);
+  margin-top: 4px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+}
+.scene6 .s6-bin-x {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink);
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.scene6 .s6-bin-frac {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  margin-top: 2px;
+}
+
+/* the mean marker (a vertical tick + tag floating over the bars) */
+.scene6 .s6-mean {
+  position: absolute;
+  top: -2px;
+  bottom: 0;
+  width: 0;
+  border-left: 2px dashed var(--ink);
+  pointer-events: none;
+  z-index: 4;
+}
+.scene6 .s6-mean-tag {
+  position: absolute;
+  top: -2px;
+  left: 4px;
+  white-space: nowrap;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink);
+  background: var(--bg-strong);
+  border: 1px solid var(--ink);
+  padding: 2px 4px;
+}
+.lang-jp .scene6 .s6-bin-x, .lang-jp .scene6 .s6-mean-tag,
+.lang-jp .scene6 .s6-bin-frac {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+.scene6 .s6-hist-x {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+.lang-jp .scene6 .s6-hist-x { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+.scene6 .s6-controls { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 0; }
+.scene6 .s6-take { border-left-color: var(--lever-premium); }
+
+@media (max-width: 720px) {
+  .concept-heading { font-size: 14px; }
+  .scene6 .s6-hist { height: 170px; gap: 8px; }
+}

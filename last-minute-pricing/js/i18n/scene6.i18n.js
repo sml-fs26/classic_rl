@@ -1,14 +1,110 @@
-/* scene6 i18n fragment. Registers this scene's strings into the i18n core.
+/* scene6 (Return to the deadline) i18n fragment.
    English is the source of truth; the Japanese mirror gives parity. */
 (function () {
   window.I18N.register({
     en: {
-      'scene6.title': "Return to the deadline",
-      'scene6.stub':  'Foundation stub. The real scene 6 is built by a downstream agent.',
+      'scene6.title': 'Return to the deadline',
+
+      'scene6.lede':
+        'Do not judge a lever by one good night. The <b>return</b> is the ' +
+        'total cash a run brings in from a chosen point to the deadline, and ' +
+        'it is a <b>random number</b>: run the same opening many times and the ' +
+        'payoff lands all over a range.',
+
+      'scene6.formula.label': 'RETURN FROM A POINT',
+      'scene6.formula.foot':
+        'The total revenue collected from day i onward, summed to midnight ' +
+        '(no discount, the clock does the work). A different run gives a ' +
+        'different G.',
+
+      /* the fixed experiment setup */
+      'scene6.setup.label': 'FIX ONE SITUATION AND ONE LEVER, THEN RUN IT MANY TIMES',
+      'scene6.setup.from':  'FROM',
+      'scene6.setup.pull':  'PULL',
+
+      /* lever picker */
+      'scene6.pick.label': 'LEVER:',
+
+      /* histogram */
+      'scene6.hist.title':  'WHERE THE RETURN G LANDS',
+      'scene6.hist.x':      'return G ($)',
+      'scene6.hist.y':      'runs',
+      'scene6.hist.empty':  'press RUN to stack up returns',
+
+      /* stats line */
+      'scene6.stats':       '{n} runs · mean {mean} · range {lo} to {hi}',
+      'scene6.stats.empty': 'no runs yet',
+      'scene6.mean.tag':    'mean',
+
+      /* controls */
+      'scene6.btn.run':   'RUN 50 MORE',
+      'scene6.btn.reset': 'CLEAR',
+
+      /* per-lever takeaways */
+      'scene6.take.premium':
+        'PREMIUM here is a coin-flip: one buyer at most, so the run brings $5 ' +
+        'or, more often, nothing. High ceiling, lots of zeros.',
+      'scene6.take.standard':
+        'STANDARD clears a unit or two most nights: the return clusters in the ' +
+        'middle, rarely zero, rarely high.',
+      'scene6.take.firesale':
+        'FIRE-SALE almost always moves stock before midnight: the return ' +
+        'clusters higher and tighter. Lower ceiling, far less risk.',
+
+      'scene6.spread.note':
+        'Same situation, same lever, yet the payoff is a spread, not a single ' +
+        'number. That spread is the risk you carry into the deadline.',
     },
     jp: {
-      'scene6.title': "しめきりまでの リターン",
-      'scene6.stub':  'どだいの スタブ。 ほんとうの シーン 6 は あとで つくられます。',
+      'scene6.title': 'しめきりまでの リターン',
+
+      'scene6.lede':
+        'レバーを 1かいの あたりで きめては いけません。 ' +
+        '<b>リターン</b> は えらんだ じてんから しめきりまでに ' +
+        'はいる うりあげの ごうけい で、 ' +
+        '<b>ランダムな すうち</b> です： おなじ スタートを なんども ' +
+        'やると、 もうけは ひろい はんいに ちらばります。',
+
+      'scene6.formula.label': 'ある じてん からの リターン',
+      'scene6.formula.foot':
+        'i にちめ いこうに あつめた うりあげの ごうけい、 ' +
+        'まよなか まで（わりびきなし、 とけいが やくわり）。 ' +
+        'ランが ちがえば G も ちがいます。',
+
+      'scene6.setup.label': 'じょうきょうと レバーを 1つ ずつ きめ、 なんども はしらせる',
+      'scene6.setup.from':  'スタート',
+      'scene6.setup.pull':  'ひく',
+
+      'scene6.pick.label': 'レバー：',
+
+      'scene6.hist.title':  'リターン G の ちらばり',
+      'scene6.hist.x':      'リターン G ($)',
+      'scene6.hist.y':      'ラン すう',
+      'scene6.hist.empty':  'ラン を おして リターンを つみあげる',
+
+      'scene6.stats':       '{n} ラン · へいきん {mean} · はんい {lo}〜{hi}',
+      'scene6.stats.empty': 'まだ ラン なし',
+      'scene6.mean.tag':    'へいきん',
+
+      'scene6.btn.run':   '50かい はしらせる',
+      'scene6.btn.reset': 'クリア',
+
+      'scene6.take.premium':
+        'ここでの プレミアム は コインの うらおもて： ' +
+        'かい ては おおくて 1にん、 ランは $5 か、 ' +
+        'おおくは ゼロ。 てんじょうは たかいが ゼロも おおい。',
+      'scene6.take.standard':
+        'スタンダード は たいてい 1〜2こ うれる： ' +
+        'リターンは まんなかに あつまり、 ゼロも たかねも まれ。',
+      'scene6.take.firesale':
+        'おおやすうり は まよなか まえに ほぼ かならず ' +
+        'うりさばく： リターンは たかめに かたく あつまる。 ' +
+        'てんじょうは ひくいが リスクは ずっと ちいさい。',
+
+      'scene6.spread.note':
+        'おなじ じょうきょう、 おなじ レバー でも もうけは ' +
+        'ひとつの すうちでは なく ちらばり です。 ' +
+        'その ちらばりが しめきりへ もちこむ リスク です。',
     },
   });
 })();
