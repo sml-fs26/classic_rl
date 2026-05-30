@@ -282,18 +282,30 @@
     const SPEED_MS    = [620, 420, 280, 160, 80];
     const GAMES_PER_TICK = [1, 1, 2, 4, 8];  // grind faster at higher speeds
 
-    /* Pre-sampled single game for step 2's tape (fixed seed -> stable). */
+    /* Pre-sampled single game for step 2's tape (fixed seed -> stable).
+       We train a throwaway table to a sensible policy, then roll games
+       until we hit one that READS well as a teaching example: a short mix
+       of ROLLs that ends on a winning HOLD (the satisfying bank-to-win), so
+       the tape shows ROLL -> ... -> HOLD +1 rather than a degenerate string
+       of holds-at-empty-pot. */
     let sampleTape = null;
     function ensureSampleTape() {
       if (sampleTape) return sampleTape;
       const r = Pig.makeRng(20260201);
-      /* Train a throwaway table a little so the sampled game is a realistic
-         mix of rolls/holds rather than all-roll from a zero table. */
       const q = makeQ();
-      const sctx = { eps0: 0.30, games: 0, visits: new Float64Array(N * A) };
-      for (let i = 0; i < 80; i++) { trainEpisode(q, sctx, r); sctx.games++; }
-      const res = trainEpisode(q, { eps0: 0.30 }, r, { learn: false });
-      sampleTape = res;
+      const sctx = { eps0: 0.25, games: 0, visits: new Float64Array(N * A) };
+      for (let i = 0; i < 600; i++) { trainEpisode(q, sctx, r); sctx.games++; }
+      let best = null;
+      for (let tries = 0; tries < 400; tries++) {
+        const res = trainEpisode(q, { eps0: 0.12 }, r, { learn: false });
+        const rolls = res.tape.filter(t => t.lever === 'roll' && !t.bust).length;
+        const len = res.tape.length;
+        /* Prefer a winning game of a digestible length with a couple rolls. */
+        if (res.win && rolls >= 2 && len >= 3 && len <= 9) { best = res; break; }
+        if (!best && res.win && len <= 11) best = res;     // fallback: any short win
+        if (!best && len <= 9) best = res;                 // last resort
+      }
+      sampleTape = best || trainEpisode(q, { eps0: 0.12 }, r, { learn: false });
       return sampleTape;
     }
 
