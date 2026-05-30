@@ -1,1 +1,264 @@
-/* scene5.css - per-scene styles (empty stub) */
+/* scene5.css - THE TRAJECTORY (Press Your Luck).
+ *
+ * The rollout tape: per MY-turn, three boxes (S_i mini table-card,
+ * A_i lever, R_i reward) in a tight .traj-group; the rival's whole turn
+ * is one compact interlude box. Reuses the table-card tokens (--chip-*,
+ * --stand-*, --c-roll/--c-hold) so the state-icon stays consistent.
+ */
+
+/* ---- Rollout panel ---- */
+.pyl-traj-rollout {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  gap: 18px;                 /* wide gap between turn groups / interludes */
+  padding: 14px 12px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  min-height: 188px;
+}
+
+/* One turn = three tight boxes. */
+.pyl-traj-rollout .traj-group {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.pyl-traj-rollout .traj-box {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 8px 8px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  border-left-width: 5px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  animation: pyl-traj-pop 280ms ease-out backwards;
+}
+@keyframes pyl-traj-pop {
+  0%   { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pyl-traj-rollout .traj-box { animation: none; }
+}
+
+.pyl-traj-rollout .traj-box-label {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+.pyl-traj-rollout .traj-box-label sub { font-size: 7px; vertical-align: baseline; }
+
+/* S_i - state box: left-border in the ROLL (push) hue; holds a mini card. */
+.pyl-traj-rollout .traj-box-state { border-left-color: var(--c-roll); min-width: 142px; }
+
+/* A_i - lever box: left-border tinted by the chosen lever. */
+.pyl-traj-rollout .traj-box-action { min-width: 86px; }
+.pyl-traj-rollout .traj-box-action.traj-act-roll { border-left-color: var(--c-roll); }
+.pyl-traj-rollout .traj-box-action.traj-act-hold { border-left-color: var(--c-hold); }
+.pyl-traj-rollout .traj-box-action-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.pyl-traj-rollout .traj-act-roll .traj-box-action-body { color: var(--c-roll); }
+.pyl-traj-rollout .traj-act-hold .traj-box-action-body { color: var(--c-hold); }
+.pyl-traj-rollout .traj-bust-flag {
+  font-size: 7px;
+  color: var(--chip-danger);
+  letter-spacing: 0.06em;
+}
+
+/* R_i - reward box: big number, 0 until the terminal +1. */
+.pyl-traj-rollout .traj-box-reward {
+  min-width: 56px;
+  align-items: center;
+  border-left-color: var(--ink-secondary);
+}
+.pyl-traj-rollout .traj-box-reward-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.pyl-traj-rollout .traj-box-reward.win {
+  border-color: var(--cb-blue);
+  border-left-color: var(--cb-blue);
+  background: rgba(0, 114, 178, 0.10);
+}
+.pyl-traj-rollout .traj-box-reward.win .traj-box-reward-body { color: var(--cb-blue); font-size: 18px; }
+.pyl-traj-rollout .traj-box-reward.loss {
+  border-color: var(--cb-vermillion);
+  border-left-color: var(--cb-vermillion);
+  background: rgba(213, 94, 0, 0.10);
+}
+.pyl-traj-rollout .traj-box-reward.loss .traj-box-reward-body { color: var(--cb-vermillion); font-size: 18px; }
+.pyl-traj-rollout .traj-box-terminal-tag {
+  font-size: 8px;
+  margin-top: 4px;
+  letter-spacing: 0.06em;
+}
+.pyl-traj-rollout .traj-box-reward.win  .traj-box-terminal-tag { color: var(--cb-blue); }
+.pyl-traj-rollout .traj-box-reward.loss .traj-box-terminal-tag { color: var(--cb-vermillion); }
+
+/* Closing S_T box (terminal). */
+.pyl-traj-rollout .traj-box-state-final.win {
+  border-color: var(--cb-blue);
+  border-left-color: var(--cb-blue);
+  background: rgba(0, 114, 178, 0.07);
+}
+.pyl-traj-rollout .traj-box-state-final.loss {
+  border-color: var(--cb-vermillion);
+  border-left-color: var(--cb-vermillion);
+  background: rgba(213, 94, 0, 0.07);
+}
+.pyl-traj-rollout .traj-box-terminal-mini {
+  font-size: 6px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+}
+
+/* The rival's interlude box (its whole fixed-rule turn collapsed). */
+.pyl-traj-rollout .traj-box-rival {
+  border-left-color: var(--ink-secondary);
+  border-style: dashed;
+  min-width: 110px;
+  background: var(--bg-strong);
+  justify-content: flex-start;
+}
+.pyl-traj-rollout .traj-rival-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.pyl-traj-rollout .traj-rival-note {
+  font-size: 7px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+
+/* ---- Mini table-card inside an S_i box ----
+   A compact pot-meter (left) + standing badge (right). Reuses the
+   .tc-* tokens; we only resize for the tape. */
+.traj-mini-card {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  padding: 2px 0 0;
+  flex: 1;
+}
+.traj-mini-card .tc-pot-meter {
+  display: flex;
+  flex-direction: column-reverse;   /* bucket 1 at the bottom */
+  justify-content: flex-end;
+  gap: 2px;
+  width: 26px;
+}
+.traj-mini-card .tc-chip-row {
+  height: 7px;
+  border: 1px solid var(--rule);
+  background: var(--chip-off);
+}
+.traj-mini-card .tc-chip-row.tc-chip-on {
+  background: var(--chip-on);
+  box-shadow: inset 0 0 0 1px var(--chip-on-hi);
+}
+.traj-mini-card .tc-chip-row.tc-chip-danger.tc-chip-on {
+  background: var(--chip-danger);
+  box-shadow: inset 0 0 0 1px var(--chip-danger-hi);
+}
+.traj-mini-card .tc-pot-label {
+  order: 99;
+  font-size: 6px;
+  text-align: center;
+  color: var(--ink-secondary);
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+.traj-mini-card .tc-standing-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  justify-content: center;
+}
+.traj-mini-card .tc-bar-row {
+  display: grid;
+  grid-template-columns: 30px 1fr 18px;
+  gap: 4px;
+  align-items: center;
+}
+.traj-mini-card .tc-bar-tag {
+  font-size: 5.5px;
+  color: var(--ink-secondary);
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.traj-mini-card .tc-bar-track {
+  height: 7px;
+  background: var(--stand-track, rgba(0,0,0,0.18));
+  border: 1px solid var(--rule);
+  display: block;
+}
+.traj-mini-card .tc-bar-fill { display: block; height: 100%; min-width: 1px; }
+/* Tint the bars by standing (matches the full table-card). */
+.traj-mini-card.tc-stand-behind .tc-bar-fill { background: var(--stand-behind); }
+.traj-mini-card.tc-stand-even   .tc-bar-fill { background: var(--stand-even); }
+.traj-mini-card.tc-stand-ahead  .tc-bar-fill { background: var(--stand-ahead); }
+.traj-mini-card .tc-fill-riv { opacity: 0.55; }
+.traj-mini-card .tc-bar-num { font-size: 6px; text-align: right; font-variant-numeric: tabular-nums; }
+.traj-mini-card .tc-standing-tag {
+  font-size: 6px;
+  text-align: center;
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+.traj-mini-card.tc-stand-behind .tc-standing-tag { color: var(--stand-behind); }
+.traj-mini-card.tc-stand-even   .tc-standing-tag { color: var(--stand-even); }
+.traj-mini-card.tc-stand-ahead  .tc-standing-tag { color: var(--stand-ahead); }
+
+/* Tiny inline die in the rival interlude (3x3 pips, face = 5). */
+.traj-die-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 5px);
+  grid-template-rows: repeat(3, 5px);
+  gap: 2px;
+  padding: 3px;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+}
+.traj-die-mini .dp { width: 5px; height: 5px; border-radius: 50%; background: transparent; }
+.traj-die-mini .dp.on { background: var(--ink-on-box); }
+
+/* ---- Controls / status / caption ---- */
+.traj-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.traj-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  margin-left: auto;
+}
+.traj-status b { color: var(--pikachu-cheek); }
+.pyl-traj-caption { max-width: 92ch; }

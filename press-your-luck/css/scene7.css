@@ -1,1 +1,177 @@
-/* scene7.css - per-scene styles (empty stub) */
+/* scene7.css - THE OPTIMAL ACTION-VALUE Q* (Press Your Luck).
+ *
+ * Hold pot=18, flip the standing: the table-card retints, and the
+ * two-column (lever | Q*) table re-stars its argmax. The star moves
+ * across the standing axis - the twist, drawn.
+ */
+
+/* ---- Standing selector ---- */
+.qs-sel-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+}
+.qs-sel-prompt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+.qs-sel-btns { display: flex; gap: 8px; }
+.qs-sel { opacity: 0.55; }
+.qs-sel.active { opacity: 1; box-shadow: inset 0 0 0 2px var(--inner-highlight), 0 0 0 3px var(--pikachu-yellow); }
+/* Tint each standing button with its standing colour so the dial reads. */
+.qs-sel-behind.active { border-color: var(--stand-behind); }
+.qs-sel-even.active   { border-color: var(--stand-even); }
+.qs-sel-ahead.active  { border-color: var(--stand-ahead); }
+
+/* ---- The Q* demo: table-card | two-column table ---- */
+.qs-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.qs-card-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+}
+.qs-state-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+.qs-card-host {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+}
+.qs-card-host .table-card { transform: scale(1.15); }
+.qs-card-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  text-align: center;
+  margin-top: 8px;
+}
+.qs-card-caption b { color: var(--pikachu-cheek); }
+
+/* ---- Two-column (lever a | Q*(s, a)) table ---- */
+.qs-table-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  justify-content: center;
+}
+.qs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.qs-table th {
+  font-weight: normal;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: var(--ink-secondary);
+  padding: 8px 10px;
+  border-bottom: 3px solid var(--rule);
+  text-align: left;
+}
+.qs-table th.qs-row-q { text-align: right; }
+.qs-table td {
+  padding: 14px 12px;
+  border-bottom: 2px solid var(--rule);
+  font-size: 13px;
+}
+.qs-table tbody tr:last-child td { border-bottom: none; }
+.qs-row-action { letter-spacing: 0.04em; }
+.qs-row-q {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+}
+
+/* Lever tint on the action label (ROLL orange, HOLD blue). */
+.qs-row-roll .qs-row-action { color: var(--c-roll); }
+.qs-row-hold .qs-row-action { color: var(--c-hold); }
+
+/* The argmax row: tinted by its lever + a star. */
+.qs-row.qs-argmax.qs-row-roll td {
+  background: var(--c-roll-soft);
+  box-shadow: inset 4px 0 0 0 var(--c-roll);
+}
+.qs-row.qs-argmax.qs-row-hold td {
+  background: var(--c-hold-soft);
+  box-shadow: inset 4px 0 0 0 var(--c-hold);
+}
+.qs-row.qs-argmax .qs-row-action,
+.qs-row.qs-argmax .qs-row-q { color: var(--rule); font-weight: bold; }
+.qs-star {
+  margin-left: 8px;
+  color: var(--pikachu-cheek);
+  font-size: 13px;
+}
+.qs-row.qs-argmax .qs-star { color: var(--rule); }
+
+.qs-gap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* ---- Verdict line ---- */
+.qs-verdict {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.7;
+  letter-spacing: 0.03em;
+  padding: 12px 16px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+}
+.qs-verdict-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  margin-right: 6px;
+  border: 2px solid var(--rule);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+.qs-verdict-roll { border-color: var(--c-roll); }
+.qs-verdict-roll .qs-verdict-tag { background: var(--c-roll); color: var(--c-roll-ink); border-color: var(--c-roll); }
+.qs-verdict-hold { border-color: var(--c-hold); }
+.qs-verdict-hold .qs-verdict-tag { background: var(--c-hold); color: var(--c-hold-ink); border-color: var(--c-hold); }
+
+/* ---- Mobile ---- */
+@media (max-width: 720px) {
+  .qs-demo { grid-template-columns: minmax(0, 1fr); }
+}
