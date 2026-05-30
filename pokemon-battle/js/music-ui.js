@@ -14,7 +14,8 @@
   const KEY = 'pokeviz-music';
 
   function setLabel(btn, on) {
-    btn.textContent = on ? '♪ MUSIC ON' : '♪ MUSIC OFF';
+    const i18n = window.I18N;
+    btn.textContent = i18n ? i18n.t(on ? 'music.on' : 'music.off') : (on ? '♪ MUSIC ON' : '♪ MUSIC OFF');
     btn.classList.toggle('active', on);
   }
 

@@ -246,7 +246,7 @@
 .q-freq-fill {
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 0%;
+  width: 0;
   background: var(--accent, #F8D028);
   transition: width 240ms;
 }

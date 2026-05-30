@@ -17,12 +17,12 @@ These two pivots together shrink the build (one precompute pass instead of two, 
 
 The previous four viz each contributed one component of the SARSA update:
 
-| Viz | Concept | Symbol → SARSA chunk |
-|---|---|---|
-| ANYmal | The MDP frame | `⟨S, A, P, R⟩` → the `(s, a)` indexing |
-| Casino | ε-greedy on `\hat{\mu}(a)` | the action selection that picks `a'` |
-| Spooky House | Bellman + γ | `r + γ Q(s', a')` (the TD target) |
-| Darts | Robbins-Monro under noise | `α (target − estimate)` (the update form) |
+| Viz          | Concept                    | Symbol → SARSA chunk                      |
+|--------------|----------------------------|-------------------------------------------|
+| ANYmal       | The MDP frame              | `⟨S, A, P, R⟩` → the `(s, a)` indexing    |
+| Casino       | ε-greedy on `\hat{\mu}(a)` | the action selection that picks `a'`      |
+| Spooky House | Bellman + γ                | `r + γ Q(s', a')` (the TD target)         |
+| Darts        | Robbins-Monro under noise  | `α (target − estimate)` (the update form) |
 
 **SARSA is the union.** Its update rule
 
@@ -40,14 +40,14 @@ By the end the student should be able to:
 
 ## 2. Driving model
 
-| Scene | Mode |
-|---|---|
-| 0 | static |
-| 1 | static (KaTeX) |
-| 2 | manual stepping |
-| 3 | autoplay scrubber over precomputed snapshots |
-| 4 | autoplay (final-state policy walk) |
-| 5 | static |
+| Scene | Mode                                         |
+|-------|----------------------------------------------|
+| 0     | static                                       |
+| 1     | static (KaTeX)                               |
+| 2     | manual stepping                              |
+| 3     | autoplay scrubber over precomputed snapshots |
+| 4     | autoplay (final-state policy walk)           |
+| 5     | static                                       |
 
 `&run` triggers Play on autoplay scenes; `&instant` skips the opacity transition (per ANYmal precedent).
 
@@ -101,14 +101,14 @@ In scene 2, only the numerical view is on the side (and it starts all zero, fill
 
 ## 5. Scene list (6 scenes, click-step)
 
-| # | Title | What the student sees and does | Internal step engine? |
-|---|---|---|---|
-| 0 | Putting it together | Title + four small recap cards in a row, one per prior viz: **ANYmal** (red, MDP, anymal sprite + "states, actions, rewards"), **Casino** (blue, ε-greedy, slot/lever icon + "explore vs exploit"), **Spooky House** (purple, Bellman+γ, mini-grid icon + KaTeX `V(s) = R(s) + γ max V(s')`), **Darts** (amber, Robbins-Monro, bullseye icon + KaTeX `\hat{x} \leftarrow \hat{x} + α(s - \hat{x})`). KaTeX teaser below: *"Today they fuse into one update."* | No |
-| 1 | The SARSA update | Centred large KaTeX of `Q(s,a) \leftarrow Q(s,a) + α [r + γ Q(s',a') - Q(s,a)]` with each chunk colour-keyed: `Q(s,a)` ANYmal-red, `α` Darts-amber, `r + γ Q(s',a')` Spooky-purple, the bracket as a whole = "TD error". Below: a small components table mapping each chunk → its viz of origin. Below that: a one-line callout *"where a' is chosen by ε-greedy on Q(s', ·)"* with **ε-greedy** in Casino-blue. | No |
-| 2 | One step | Live 3×7 grid (ANYmal sprite at start, two ghosts patrolling, star at (2,6)). Right panel: the **numerical Q-table** (21 rows × 4 cols, all zeroes initially). Pressing arrow → agent moves → (a) tuple `(s, a, r, s', a')` floats up near agent for ~600 ms → (b) the Q-update arithmetic `Q(s,a) ← 0 + 0.5 × (-1 + 0.95 × 0 - 0) = -0.5` floats below for ~600 ms → (c) the Q-table cell flashes and updates → (d) ghosts move → (e) collision check. Three sliders (ε, α, γ). Tutorial caption above: *"For now, state is just (r, c). Ghosts are part of the environment, not the state."* | Yes — student's own steps; ←/→ rewind/replay via reset+replay (rng captured per step) |
-| 3 | Episodes accumulate | Same grid + Q-table layout, but autoplay-scrubber driven by precomputed training. Scrubber over snapshots `[0, 1, 5, 10, 25, 50, 100, 250, 500]`. Numerical Q-table updates per scrubber position; cells that changed since last snapshot flash briefly. Below grid: learning curve (cumulative reward per episode), with current episode highlighted. View toggle: numerical / heatmap+arrows / per-action 4-up. **Slider for α**: default 0.5 → moving to 0.95 swaps to the precomputed *oscillating* trajectory (visible learning-curve wobble). Slider for ε. **Toggle: ghost-occupancy heatmap underlay** (precomputed stationary distributions; faint red where ghosts spend time). Caption: *"Q starts at zero. After ~100 episodes, the dangerous columns are learned."* | Yes — the scrubber |
-| 4 | The policy emerges | Final episode (scrubber pinned to t=500). Default view: max-Q heatmap on grid + argmax arrows on each cell + ghost-occupancy underlay toggleable. Click any grid cell → highlights that row in the numerical Q-table on the side + shows its 4 Q-values as a mini bar chart. ANYmal walks the policy from start to goal, slowly (animated, ~150 ms per step). Caption: *"The arrows zigzag — under each ghost's bias."* | Yes — the policy walk has play/step/reset |
-| 5 | Recap → next | Five-card layout: **Q(s,a)** (the central object), **TD target** `r + γQ'`, **TD error** `target − Q`, **α** (the update size), **ε-greedy** (the policy). Foreshadow: *"What's next — function approximation, deep RL, beyond this course."* Plus a muted aside under the cards: *"Slide α up to 0.95 in scene 3 — watch SARSA oscillate."* | No |
+| # | Title               | What the student sees and does                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Internal step engine?                                                                 |
+|---|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| 0 | Putting it together | Title + four small recap cards in a row, one per prior viz: **ANYmal** (red, MDP, anymal sprite + "states, actions, rewards"), **Casino** (blue, ε-greedy, slot/lever icon + "explore vs exploit"), **Spooky House** (purple, Bellman+γ, mini-grid icon + KaTeX `V(s) = R(s) + γ max V(s')`), **Darts** (amber, Robbins-Monro, bullseye icon + KaTeX `\hat{x} \leftarrow \hat{x} + α(s - \hat{x})`). KaTeX teaser below: *"Today they fuse into one update."*                                                                                                                                                                                                                                                                                                                    | No                                                                                    |
+| 1 | The SARSA update    | Centred large KaTeX of `Q(s,a) \leftarrow Q(s,a) + α [r + γ Q(s',a') - Q(s,a)]` with each chunk colour-keyed: `Q(s,a)` ANYmal-red, `α` Darts-amber, `r + γ Q(s',a')` Spooky-purple, the bracket as a whole = "TD error". Below: a small components table mapping each chunk → its viz of origin. Below that: a one-line callout *"where a' is chosen by ε-greedy on Q(s', ·)"* with **ε-greedy** in Casino-blue.                                                                                                                                                                                                                                                                                                                                                                 | No                                                                                    |
+| 2 | One step            | Live 3×7 grid (ANYmal sprite at start, two ghosts patrolling, star at (2,6)). Right panel: the **numerical Q-table** (21 rows × 4 cols, all zeroes initially). Pressing arrow → agent moves → (a) tuple `(s, a, r, s', a')` floats up near agent for ~600 ms → (b) the Q-update arithmetic `Q(s,a) ← 0 + 0.5 × (-1 + 0.95 × 0 - 0) = -0.5` floats below for ~600 ms → (c) the Q-table cell flashes and updates → (d) ghosts move → (e) collision check. Three sliders (ε, α, γ). Tutorial caption above: *"For now, state is just (r, c). Ghosts are part of the environment, not the state."*                                                                                                                                                                                   | Yes — student's own steps; ←/→ rewind/replay via reset+replay (rng captured per step) |
+| 3 | Episodes accumulate | Same grid + Q-table layout, but autoplay-scrubber driven by precomputed training. Scrubber over snapshots `[0, 1, 5, 10, 25, 50, 100, 250, 500]`. Numerical Q-table updates per scrubber position; cells that changed since last snapshot flash briefly. Below grid: learning curve (cumulative reward per episode), with current episode highlighted. View toggle: numerical / heatmap+arrows / per-action 4-up. **Slider for α**: default 0.5 → moving to 0.95 swaps to the precomputed *oscillating* trajectory (visible learning-curve wobble). Slider for ε. **Toggle: ghost-occupancy heatmap underlay** (precomputed stationary distributions; faint red where ghosts spend time). Caption: *"Q starts at zero. After ~100 episodes, the dangerous columns are learned."* | Yes — the scrubber                                                                    |
+| 4 | The policy emerges  | Final episode (scrubber pinned to t=500). Default view: max-Q heatmap on grid + argmax arrows on each cell + ghost-occupancy underlay toggleable. Click any grid cell → highlights that row in the numerical Q-table on the side + shows its 4 Q-values as a mini bar chart. ANYmal walks the policy from start to goal, slowly (animated, ~150 ms per step). Caption: *"The arrows zigzag — under each ghost's bias."*                                                                                                                                                                                                                                                                                                                                                          | Yes — the policy walk has play/step/reset                                             |
+| 5 | Recap → next        | Five-card layout: **Q(s,a)** (the central object), **TD target** `r + γQ'`, **TD error** `target − Q`, **α** (the update size), **ε-greedy** (the policy). Foreshadow: *"What's next — function approximation, deep RL, beyond this course."* Plus a muted aside under the cards: *"Slide α up to 0.95 in scene 3 — watch SARSA oscillate."*                                                                                                                                                                                                                                                                                                                                                                                                                                     | No                                                                                    |
 
 **Why 6 scenes and not 7:** Q-learning dropped → no need for a dedicated SARSA-vs-Q comparison scene. Six scenes match every other viz in the curriculum and fit comfortably as a 30-minute lecture segment.
 
