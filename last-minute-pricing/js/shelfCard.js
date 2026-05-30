@@ -66,7 +66,8 @@
     );
   }
 
-  /* One day-pip (a calendar tear-off square). */
+  /* One day-pip (a calendar tear-off square). Retained for back-compat;
+     the day ribbon now uses the X-off calendar below. */
   function pipSVG(on) {
     const fill = on ? 'var(--pip-on)' : 'var(--pip-off)';
     return (
@@ -76,6 +77,43 @@
         '<rect x="9" y="1" width="2" height="3" fill="var(--ticket-edge)"/>' +
       '</svg>'
     );
+  }
+
+  /* A hand-stamped red X, overlaid on an elapsed calendar day. */
+  function xSVG() {
+    return (
+      '<svg class="cal-x-mark" viewBox="0 0 20 20" preserveAspectRatio="none" aria-hidden="true">' +
+        '<path d="M3 3 L17 17 M17 3 L3 17" stroke="var(--cal-x-ink)" stroke-width="4" ' +
+          'stroke-linecap="round" fill="none"/>' +
+      '</svg>'
+    );
+  }
+
+  /* A crescent moon for the MIDNIGHT (deadline) cell. */
+  function moonSVG() {
+    return (
+      '<svg class="cal-moon-mark" viewBox="0 0 16 16" aria-hidden="true">' +
+        '<path d="M11.5 2 a6.2 6.2 0 1 0 0 12 a4.6 4.6 0 0 1 0-12 z" fill="var(--cal-moon)"/>' +
+      '</svg>'
+    );
+  }
+
+  /* Build the X-off calendar row for a state: NUM_DAYS day cells (the
+     earliest `elapsed` are stamped with a red X) plus a MIDNIGHT cell.
+     days-left = the un-X'd day cells = d. */
+  function calendarHTML(ud, terminalDeadline) {
+    const elapsed = Math.max(0, NUM_DAYS - ud.d);   // deadline => ud.d 0 => all elapsed
+    let cells = '';
+    for (let i = 0; i < NUM_DAYS; i++) {
+      const xd = i < elapsed;
+      cells += '<div class="cal-cell ' + (xd ? 'is-x' : 'is-open') + '" data-day="' + (i + 1) + '">' +
+                 '<span class="cal-num">' + (i + 1) + '</span>' +
+                 (xd ? '<span class="cal-x">' + xSVG() + '</span>' : '') +
+               '</div>';
+    }
+    cells += '<div class="cal-cell cal-midnight' + (terminalDeadline ? ' is-active' : '') + '">' +
+               moonSVG() + '</div>';
+    return '<div class="shelf-calendar" role="img" aria-label="' + ud.d + ' days left">' + cells + '</div>';
   }
 
   function captionFor(state) {
@@ -108,17 +146,14 @@
       tickets += '<div class="shelf-slot">' + ticketSVG(live) + '</div>';
     }
 
-    /* Day ribbon: NUM_DAYS pips, leftmost d lit. */
-    let pips = '';
-    for (let i = 0; i < NUM_DAYS; i++) pips += pipSVG(i < ud.d);
+    /* Day ribbon: an X-off vintage calendar (elapsed days carry a red X;
+       the last cell is MIDNIGHT). */
+    const cal = calendarHTML(ud, !!(state.terminal && state.deadline));
 
     return (
       '<div class="shelf-body">' +
         '<div class="shelf-stack" role="img" aria-label="' + ud.u + ' units left">' + tickets + '</div>' +
-        '<div class="shelf-ribbon" role="img" aria-label="' + ud.d + ' days left">' +
-          '<div class="shelf-pips">' + pips + '</div>' +
-          '<div class="shelf-midnight" aria-hidden="true"></div>' +
-        '</div>' +
+        '<div class="shelf-ribbon">' + cal + '</div>' +
       '</div>' +
       (showLabel ? '<div class="shelf-caption">' + captionFor(state) + '</div>' : '')
     );
@@ -159,9 +194,19 @@
     if (host) { host.appendChild(card); }
 
     function setState(next) {
+      const prevUD = resolveUD(state || {});
       state = next || {};
+      const nextUD = resolveUD(state);
       applyFrame(card, state, size, lever);
       card.innerHTML = innerHTML(state, showLabel);
+      /* If a day just elapsed, stamp a fresh red X onto the day that
+         passed (the highest newly-elapsed cell). */
+      const prevElapsed = Math.max(0, NUM_DAYS - prevUD.d);
+      const newElapsed  = Math.max(0, NUM_DAYS - nextUD.d);
+      if (newElapsed > prevElapsed) {
+        const cell = card.querySelector('.cal-cell[data-day="' + newElapsed + '"]');
+        if (cell) cell.classList.add('is-stamping');
+      }
     }
     function set(u, d) { setState({ u: u, d: d }); }
     function setLever(id) { lever = id || null; applyFrame(card, state, size, lever); }
@@ -176,5 +221,5 @@
     return render(s || {}, opts);
   }
 
-  window.ShelfCard = { render, mount, fromIndex, ticketSVG, pipSVG, NUM_UNITS, NUM_DAYS };
+  window.ShelfCard = { render, mount, fromIndex, ticketSVG, pipSVG, xSVG, moonSVG, calendarHTML, NUM_UNITS, NUM_DAYS };
 })();
