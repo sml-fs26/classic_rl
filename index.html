@@ -146,8 +146,8 @@
   <div class="wrap">
     <header>
       <div class="brand">SML &middot; Reinforcement Learning</div>
-      <h1>Classic RL — seven visualizations</h1>
-      <p class="lede">A short curriculum: from the MDP framework, through the explore-exploit dilemma and the Bellman recursion, to a SARSA agent learning a small cliff-walk by itself, and finally a pair of integrative reviews — Snakes &amp; Ladders for the abstract board, a classic Pokemon battle for the cultural one. Each viz is a single click-step page; press <kbd>t</kbd> for dark mode, <kbd>←</kbd>/<kbd>→</kbd> to navigate scenes.</p>
+      <h1>Classic RL visualizations</h1>
+      <p class="lede">A short curriculum: from the MDP framework, through the explore-exploit dilemma and the Bellman recursion, to a SARSA agent learning a small cliff-walk by itself, and finally a pair of integrative reviews — Snakes &amp; Ladders for the abstract board, a classic Pokemon battle for the cultural one. Below the curriculum, a <strong>manager-facing gallery</strong> reframes the same RL bones (MDP, policy, return, Q*, Bellman, DP, SARSA) as everyday business decisions, for an audience with little programming background. Each viz is a single click-step page; press <kbd>t</kbd> for theme, <kbd>←</kbd>/<kbd>→</kbd> to navigate scenes.</p>
     </header>
 
     <ol class="viz-list">
@@ -205,6 +205,22 @@
           <p>A wild CHARMANDER appeared! Same RL lesson, classic Pokemon palette. Pikachu battles Charmander; Bellman, γ, ε-greedy and SARSA each play their role under a Gen-1 Red/Blue battle screen.</p>
         </div>
         <div class="viz-cta"><a href="pokemon-battle/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="last-minute-pricing/">Manager gallery: Last-Minute Pricing</a></h2>
+          <p>Perishable stock, a midnight deadline. Each day you set a price (premium, standard, or fire-sale), the demand draw decides how many sell, and unsold units expire worthless. The best price flips across a board of inventory by days-left: the whole revenue-management surface as an MDP, learned by DP and then by SARSA.</p>
+        </div>
+        <div class="viz-cta"><a href="last-minute-pricing/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="press-your-luck/">Manager gallery: Press Your Luck</a></h2>
+          <p>Roll to grow a pot or bank it before a 1 wipes it out, racing a rival to the finish. The optimal call flips on the scoreboard: push your luck when behind, protect the lead when ahead. The Pig dice game as an MDP, with the same DP-then-SARSA arc.</p>
+        </div>
+        <div class="viz-cta"><a href="press-your-luck/">open →</a></div>
       </li>
     </ol>
 
