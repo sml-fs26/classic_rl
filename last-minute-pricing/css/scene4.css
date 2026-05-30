@@ -1,0 +1,291 @@
+/* scene4 -- "A policy is a playbook" (the Policy scene).
+   A policy board (5x4 grid of mini shelf cards painted with one lever-region
+   colour per cell) on the left; a control panel (playbook tabs + blurb +
+   completeness note + scene-2 callback) on the right. The board reuses the
+   .lever-fill-* region tokens from style.css so the CRT retint is automatic. */
+
+.sc4-root { padding: 10px 8px 18px; }
+
+.sc4-head { margin: 0 2px 8px; }
+.sc4-title { margin: 0 0 6px; }
+.sc4-lede {
+  margin: 0;
+  max-width: 112ch;
+  line-height: 1.8;
+  color: var(--ink);
+}
+.sc4-lede b { color: var(--lever-standard); }
+
+/* ---- Formula strip ---- */
+.sc4-formula-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 4px 2px 12px;
+}
+.sc4-formula.poke-formula { margin: 0; display: inline-block; }
+.sc4-formula .katex { font-size: 18px; }
+.sc4-formula-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 60ch;
+}
+
+/* ---- Two-column body ---- */
+.sc4-body {
+  display: grid;
+  grid-template-columns: minmax(440px, 1.05fr) minmax(360px, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+/* ===== LEFT: the policy board ===== */
+.sc4-board-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.sc4-board-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.sc4-col-heads {
+  display: grid;
+  grid-template-columns: 40px repeat(var(--cols, 4), minmax(0, 1fr));
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+.sc4-corner-head { align-self: end; padding-bottom: 2px; }
+.sc4-col-head { text-align: center; align-self: end; padding-bottom: 2px; }
+
+.sc4-grid {
+  display: grid;
+  grid-template-columns: 40px repeat(var(--cols, 4), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows, 5), auto);
+  gap: 6px;
+}
+.sc4-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink);
+}
+
+/* A policy cell: a coloured region (lever-fill-*) with a mini shelf icon and
+   the lever's short name. It is a button for keyboard focus / hover read-out. */
+.sc4-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 4px 7px;
+  border: 3px solid var(--rule);
+  box-shadow: inset -2px -2px 0 0 rgba(0, 0, 0, 0.16), 2px 2px 0 0 rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--lever-ink);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.sc4-cell:hover,
+.sc4-cell:focus-visible {
+  outline: none;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px var(--rule), inset -2px -2px 0 0 rgba(0,0,0,0.16), 3px 4px 0 0 rgba(0,0,0,0.25);
+  z-index: 2;
+}
+
+/* The mini shelf icon sits on a translucent plate so the ticket/pip pixels
+   stay legible on top of a saturated lever colour. */
+.sc4-cell-shelf {
+  display: flex;
+  justify-content: center;
+  padding: 4px 6px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 2px solid rgba(0, 0, 0, 0.35);
+}
+.sc4-cell-lever {
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--lever-ink);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* Repaint sweep flash when a new playbook is selected. */
+@keyframes sc4-cell-flip {
+  0%   { transform: scale(1); filter: brightness(1); }
+  40%  { transform: scale(1.07); filter: brightness(1.25); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.sc4-cell.sc4-cell-flip { animation: sc4-cell-flip 0.46s ease-out; z-index: 3; }
+@media (prefers-reduced-motion: reduce) { .sc4-cell.sc4-cell-flip { animation: none; } }
+
+/* Read-out under the board: pi(s) = the lever for the hovered cell. */
+.sc4-readout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: 2px 2px 0 var(--rule);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  min-height: 20px;
+}
+.sc4-readout-label { color: var(--ink-secondary); letter-spacing: 0.04em; }
+.sc4-readout-val { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
+.sc4-readout-val .lever-tag { font-size: 8px; padding: 4px 8px; }
+.sc4-readout-state { color: var(--ink-secondary); }
+
+/* ===== RIGHT: the control panel ===== */
+.sc4-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.sc4-tabs-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.sc4-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+.sc4-tab {
+  flex: 1 1 0;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  padding: 9px 11px;
+}
+.sc4-tab-name { font-size: 9px; letter-spacing: 0.03em; }
+.sc4-tab-sub { font-size: 7px; opacity: 0.78; text-transform: none; letter-spacing: 0.02em; }
+.sc4-tab.active {
+  background: var(--lever-standard);
+  color: var(--lever-ink);
+  border-color: var(--lever-standard-rule);
+}
+.sc4-tab.active .sc4-tab-sub { opacity: 0.9; }
+
+/* Blurb describing the active playbook. */
+.sc4-blurb {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sc4-blurb-name {
+  align-self: flex-start;
+  font-size: 9px;
+}
+.sc4-blurb-text {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+
+.sc4-complete-note {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.75;
+  color: var(--ink-secondary);
+  padding-left: 10px;
+  border-left: 3px solid var(--lever-firesale);
+}
+
+/* The scene-2 callback card. */
+.sc4-callback {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: 4px 4px 0 var(--rule);
+  padding: 12px 14px;
+}
+.sc4-callback-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--lever-firesale);
+  margin-bottom: 8px;
+}
+.sc4-callback-body {
+  margin: 0 0 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+.sc4-callback-body b { color: var(--lever-standard); }
+.sc4-callback-tease {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  font-style: italic;
+}
+
+.sc4-hint { margin-top: 12px; }
+
+/* Generic poke-btn fallback (tabs use it), tokenised only. */
+.sc4-root .poke-btn {
+  font-family: 'Press Start 2P', monospace;
+  text-transform: uppercase;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  box-shadow: 3px 3px 0 var(--rule);
+  cursor: pointer;
+}
+.sc4-root .poke-btn:hover:not(.active) { background: var(--card-bg); }
+.sc4-root .poke-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--rule); }
+
+/* CRT: keep the inner shelf plate bright enough that ticket pixels read on
+   the dark phosphor; the lever tokens already retint. */
+:root[data-theme="crt"] .sc4-cell-shelf { background: rgba(240, 224, 192, 0.85); }
+
+/* JP font swap. */
+.lang-jp .sc4-board-title,
+.lang-jp .sc4-col-heads,
+.lang-jp .sc4-row-head,
+.lang-jp .sc4-cell-lever,
+.lang-jp .sc4-readout,
+.lang-jp .sc4-tabs-label,
+.lang-jp .sc4-tab,
+.lang-jp .sc4-blurb-text,
+.lang-jp .sc4-complete-note,
+.lang-jp .sc4-callback-title,
+.lang-jp .sc4-callback-body,
+.lang-jp .sc4-callback-tease,
+.lang-jp .sc4-formula-foot {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+/* Responsive: stack the columns and let the board scroll on narrow viewports. */
+@media (max-width: 920px) {
+  .sc4-body { grid-template-columns: 1fr; }
+  .sc4-board-col { overflow-x: auto; }
+  .sc4-col-heads, .sc4-grid { min-width: 460px; }
+}

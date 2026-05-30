@@ -1,0 +1,279 @@
+/* scene3 -- "What makes this an MDP?" (Formalization).
+   The four MDP parts slide over a shelf card the learner just played: a
+   left "stage" (big shelf card + floating part-tags + lever rail + demand
+   deck) and a right "panel" (formula box + manager/formal copy + nav).
+   All colour comes from CSS tokens so the CRT retint is automatic. */
+
+.sc3-root { padding: 10px 8px 18px; }
+
+.sc3-head { margin: 0 2px 8px; }
+.sc3-title { margin: 0 0 6px; }
+.sc3-lede {
+  margin: 0;
+  max-width: 100ch;
+  line-height: 1.8;
+  color: var(--ink);
+}
+.sc3-lede b { color: var(--lever-standard); }
+
+/* ---- Two-column body ---- */
+.sc3-body {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(420px, 1.15fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+/* ===== LEFT: the stage ===== */
+.sc3-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: 5px 5px 0 var(--rule);
+  padding: 14px 12px 16px;
+}
+.sc3-stage-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+/* The card + its floating part-tags share a positioned wrapper. */
+.sc3-card-wrap {
+  position: relative;
+  padding: 30px 56px;
+}
+.sc3-card-host { display: flex; justify-content: center; }
+
+/* Floating MDP part-tags around the card. */
+.sc3-tag {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 5px 8px;
+  border: 3px solid var(--rule);
+  background: var(--card-bg);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--rule);
+  white-space: nowrap;
+  opacity: 0;
+  transform: scale(0.82);
+  transition: opacity 280ms ease, transform 280ms ease;
+  pointer-events: none;
+  z-index: 4;
+}
+.sc3-tag.show { opacity: 1; transform: scale(1); }
+.sc3-tag-s { left: -8px;  top: 14px;  border-color: var(--lever-premium-rule);  color: var(--lever-premium); }
+.sc3-tag-a { left: -8px;  bottom: 14px; border-color: var(--lever-standard-rule); color: var(--lever-standard); }
+.sc3-tag-p { right: -8px; top: 14px;  border-color: var(--lever-firesale-rule); color: var(--lever-firesale); }
+.sc3-tag-r { right: -8px; bottom: 14px; border-color: var(--rule); color: var(--ink); }
+
+/* +$ money flash that rises off the shelf on the demand draw. */
+@keyframes sc3-money-rise {
+  0%   { opacity: 0; transform: translate(-50%, 6px) scale(0.9); }
+  18%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -42px) scale(1.05); }
+}
+.sc3-money-flash {
+  position: absolute;
+  left: 50%;
+  top: 36%;
+  transform: translate(-50%, 0);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  padding: 5px 9px;
+  border: 3px solid var(--rule);
+  box-shadow: 3px 3px 0 var(--rule);
+  pointer-events: none;
+  z-index: 6;
+  animation: sc3-money-rise 1.25s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sc3-money-flash { animation: none; opacity: 0; }
+}
+
+/* The lever rail (action set). Hidden until step 2. */
+.sc3-levers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 260ms ease, max-height 260ms ease;
+}
+.sc3-levers.show { opacity: 1; max-height: 120px; }
+.sc3-levers .lever-tag { transition: transform 160ms ease, filter 160ms ease; }
+.sc3-levers .lever-tag.is-demo {
+  transform: translateY(-3px) scale(1.06);
+  filter: brightness(1.08);
+  outline: 2px solid var(--rule);
+  outline-offset: 2px;
+}
+
+/* The demand-draw row (deck + label). Hidden until step 3. */
+.sc3-draw {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 260ms ease, max-height 260ms ease;
+}
+.sc3-draw.show { opacity: 1; max-height: 200px; }
+.sc3-draw-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+}
+.sc3-deck-host { display: flex; justify-content: center; }
+
+/* ===== RIGHT: the formula / copy panel ===== */
+.sc3-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Step rail: the four parts as chips. */
+.sc3-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sc3-rail-chip {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  padding: 4px 6px;
+  border: 2px solid var(--ink-secondary);
+  color: var(--ink-secondary);
+  background: transparent;
+  opacity: 0.55;
+  transition: opacity 180ms, color 180ms, background 180ms, border-color 180ms;
+}
+.sc3-rail-chip.active {
+  opacity: 1;
+  color: var(--lever-ink);
+  background: var(--lever-standard);
+  border-color: var(--lever-standard-rule);
+}
+.sc3-rail-chip.done { opacity: 0.95; color: var(--ink); border-color: var(--rule); }
+
+.sc3-ptitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-on-box);
+  margin: 2px 0 2px;
+}
+
+/* The formula box. .poke-formula gives the chunky bordered look; we just
+   center it and keep it from overflowing on narrow widths. */
+.sc3-formula.poke-formula {
+  display: block;
+  margin: 4px 0 6px;
+  text-align: center;
+  overflow-x: auto;
+}
+.sc3-formula .katex { font-size: 15px; }
+
+.sc3-manager {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9.5px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+.sc3-manager b { color: var(--lever-firesale); }
+
+.sc3-formal {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+}
+.sc3-formal b { color: var(--ink-on-box); }
+
+.sc3-foot {
+  margin: 2px 0 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--inner-highlight);
+  padding-top: 8px;
+}
+
+/* Nav controls inside the panel. */
+.sc3-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.sc3-stepof {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-left: auto;
+}
+.sc3-ctrls .poke-btn.is-edge { opacity: 0.45; }
+
+.sc3-hint { margin-top: 12px; }
+
+/* Generic poke-btn (panel nav): mirror the dialog-box button look in case
+   the shared .poke-btn rule is scoped narrowly. Tokenised only. */
+.sc3-root .poke-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 12px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  box-shadow: 3px 3px 0 var(--rule);
+  cursor: pointer;
+}
+.sc3-root .poke-btn:hover { background: var(--lever-standard); color: var(--lever-ink); }
+.sc3-root .poke-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--rule); }
+
+/* CRT retint touch-ups: the tokens already retint; keep the premium tag
+   colour explicit so it stays legible on the dark phosphor ground. */
+:root[data-theme="crt"] .sc3-tag-s { color: var(--lever-premium); }
+:root[data-theme="crt"] .sc3-stage { box-shadow: 5px 5px 0 var(--rule); }
+
+/* JP font swap. */
+.lang-jp .sc3-tag,
+.lang-jp .sc3-rail-chip,
+.lang-jp .sc3-ptitle,
+.lang-jp .sc3-manager,
+.lang-jp .sc3-formal,
+.lang-jp .sc3-foot,
+.lang-jp .sc3-stepof,
+.lang-jp .sc3-stage-label,
+.lang-jp .sc3-draw-label,
+.lang-jp .sc3-root .poke-btn {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+/* Responsive: stack the columns on narrow viewports. */
+@media (max-width: 900px) {
+  .sc3-body { grid-template-columns: 1fr; }
+  .sc3-card-wrap { padding: 28px 44px; }
+}
