@@ -1,1 +1,359 @@
-/* scene11.css - per-scene styles (empty stub) */
+/* scene11.css - SARSA (learn Q* by playing).
+ *
+ *   Three-step pager: left = step text + KaTeX (+ live controls on step 3),
+ *   right = the 6x3 board + a sampled/latest-game tape + the closeness-to-Q*
+ *   convergence bar.  All colours come from CSS tokens in css/style.css
+ *   (--c-roll / --c-hold / --chip-* / --pikachu-* / --cb-* / --hue-*), so the
+ *   scene retints correctly under the CRT theme.  ASCII hyphens only. */
+
+.s11-scene { display: flex; flex-direction: column; gap: 12px; }
+
+/* ---- heading (base, since style.css only defines the CRT glow) ---- */
+.s11-scene .concept-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin: 4px 0 2px;
+}
+
+/* ---- pager controls ---- */
+.s11-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.s11-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-left: auto;
+}
+
+/* Generic button look (style.css ships only the .pyl-btn cursor alias). */
+.s11-scene .pyl-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  padding: 6px 9px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+}
+.s11-scene .pyl-btn:hover { background: var(--pikachu-yellow); color: var(--ink); }
+.s11-scene .pyl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.s11-scene .pyl-btn.s11-play { background: var(--pikachu-yellow); color: var(--ink); }
+
+/* ---- two-column layout ---- */
+.s11-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.18fr);
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+}
+
+.s11-left {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 16px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  min-width: 0;
+  min-height: 420px;
+  animation: s11-fade 280ms ease-out;
+}
+.s11-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  animation: s11-fade 280ms ease-out;
+}
+@keyframes s11-fade {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- left card text ---- */
+.s11-kicker {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--pikachu-cheek);
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.s11-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  color: var(--ink-on-box);
+}
+.s11-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+.s11-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--rule);
+}
+
+/* ---- KaTeX formula boxes ---- */
+.s11-formula {
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  padding: 10px 12px;
+  margin: 10px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+.s11-formula .katex-display { margin: 0; }
+.s11-formula .katex { font-size: 0.92em; }
+.s11-formula-box {
+  border-color: var(--c-hold);
+  box-shadow: 3px 3px 0 0 var(--c-hold-soft);
+}
+
+/* epsilon callout - the explore/exploit dial, the Pig flavour. */
+.s11-eps-note {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+  background: var(--bg);
+  border: 2px solid var(--hue-casino);
+  padding: 8px 10px;
+  margin: 10px 0 0;
+}
+.s11-eps-mark {
+  display: inline-block;
+  color: var(--hue-casino);
+  font-size: 11px;
+  margin-right: 2px;
+}
+
+/* ---- live controls (step 3, inside the left card) ---- */
+.s11-ctrls {
+  display: flex;
+  gap: 8px 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0 0;
+  padding: 10px 10px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+}
+.s11-ctrls .pyl-btn { font-size: 8px; padding: 6px 8px; }
+.s11-slider {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.03em;
+  color: var(--ink-secondary);
+}
+.s11-slabel { color: var(--ink-secondary); }
+.s11-slabel b { color: var(--pikachu-cheek); min-width: 26px; display: inline-block; }
+.s11-sedge { font-size: 6.5px; color: var(--ink-secondary); }
+.s11-slider input[type="range"] {
+  width: 78px;
+  accent-color: var(--pikachu-cheek);
+}
+.s11-eps input[type="range"] { width: 92px; }
+.s11-alpha {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.03em;
+  padding-left: 6px;
+  border-left: 1px solid var(--inner-highlight);
+}
+.s11-runhint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  margin-top: 10px;
+}
+
+/* ---- right column: caption / convergence strip ---- */
+.s11-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--pikachu-cheek);
+  min-height: 1.4em;
+  padding: 2px 2px;
+}
+.s11-cap.s11-cap-conv { color: var(--ink-on-box); }
+
+.s11-conv-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+}
+.s11-conv-label { color: var(--ink-secondary); letter-spacing: 0.03em; }
+.s11-conv-track {
+  flex: 1 1 auto;
+  height: 11px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.s11-conv-fill {
+  display: block;
+  height: 100%;
+  background: var(--cb-bluish-green);
+  transition: width 320ms ease-out;
+}
+.s11-conv-val {
+  min-width: 34px;
+  text-align: right;
+  color: var(--pikachu-cheek);
+  font-variant-numeric: tabular-nums;
+}
+.s11-games {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.03em;
+  margin-top: 4px;
+}
+
+/* ---- the board: compact so all 6 rows + the legend fit one viewport ----
+   The QTable default cell is min-height 92px + a mini table-card on top,
+   which makes 6 rows overflow 900px.  Shrink the cell, the card, the row
+   gaps and the bars so each row sits near ~78px: 6 rows + headers + legend
+   then clear ~640px. */
+.s11-board-host { min-width: 0; }
+.s11-scene .pyl-board-grid { gap: 4px; }
+.s11-scene .pyl-cell {
+  min-height: 0;
+  padding: 3px 4px 4px;
+  gap: 2px;
+}
+.s11-scene .pyl-cell-card {
+  transform: scale(0.8);
+  transform-origin: center top;
+  margin-bottom: -8px;       /* reclaim the space the scale leaves below */
+}
+.s11-scene .pyl-cell-levers { gap: 1px; }
+.s11-scene .pyl-lever-row { font-size: 7px; padding: 0 3px; }
+.s11-scene .pyl-lever-q { font-size: 7px; }
+.s11-scene .pyl-col-head { font-size: 7px; padding: 3px 2px; }
+.s11-scene .pyl-row-head { font-size: 7px; }
+.s11-scene .pyl-board-corner { font-size: 6px; }
+/* The mini table-card's own metrics, tightened for the grid. */
+.s11-scene .table-card-compact { gap: 3px; }
+.s11-scene .table-card-compact .tc-pot-meter { gap: 1px; padding: 2px; }
+.s11-scene .table-card-compact .tc-chip-row { height: 5px; }
+.s11-scene .table-card-compact .tc-standing-badge { padding: 2px; gap: 2px; }
+
+/* Active cell (step 2, the driving tuple's cell). */
+.s11-scene .pyl-cell.s11-active-cell {
+  outline: 4px solid var(--pikachu-cheek);
+  outline-offset: -4px;
+  z-index: 4;
+}
+
+/* DP-oracle ghost (step 1): a dashed seam marking the target regions so the
+   learner sees what the live board converges to, without revealing q. */
+.s11-scene .pyl-cell.s11-oracle-roll {
+  box-shadow: inset 0 0 0 3px var(--c-roll);
+}
+.s11-scene .pyl-cell.s11-oracle-hold {
+  box-shadow: inset 0 0 0 3px var(--c-hold);
+}
+.s11-scene .pyl-cell.s11-oracle-roll::after,
+.s11-scene .pyl-cell.s11-oracle-hold::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 2px dashed currentColor;
+  opacity: 0.45;
+  pointer-events: none;
+}
+.s11-scene .pyl-cell.s11-oracle-roll::after { color: var(--c-roll); }
+.s11-scene .pyl-cell.s11-oracle-hold::after { color: var(--c-hold); }
+
+/* ---- the trajectory tape (reuses .pyl-return-tape from style.css) ---- */
+.s11-tape { margin-top: 2px; min-height: 38px; align-items: center; }
+.s11-tape-none {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+  align-self: center;
+}
+.pyl-tape-step.s11-tape-active {
+  outline: 2px solid var(--pikachu-cheek);
+  outline-offset: 1px;
+  z-index: 2;
+}
+.s11-tape-outcome {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  align-self: center;
+  padding: 4px 7px;
+  border: 2px solid var(--rule);
+  margin-left: 2px;
+}
+.s11-tape-outcome.s11-win  { background: var(--c-hold); color: var(--c-hold-ink); }
+.s11-tape-outcome.s11-lose { background: var(--chip-danger); color: #fff; }
+
+/* ---- legend ---- */
+.s11-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  padding: 2px 2px 0;
+}
+.s11-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.s11-swatch {
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--rule);
+  display: inline-block;
+}
+.s11-sw-q   { background: var(--c-hold); box-shadow: inset 0 0 0 2px var(--c-roll); }
+.s11-sw-tgt { background: var(--bg); border-style: dashed; }
+
+/* ---- reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .s11-left, .s11-right { animation: none; }
+  .s11-conv-fill { transition: none; }
+}
+
+/* ---- mobile: stack columns ---- */
+@media (max-width: 760px) {
+  .s11-row { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .s11-left { min-height: 0; }
+  .s11-controls { flex-wrap: wrap; }
+  .s11-status { margin-left: 0; flex: 0 0 100%; }
+}
