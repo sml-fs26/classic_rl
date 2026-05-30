@@ -236,14 +236,6 @@
 :root[data-theme="crt"] .concept-heading {
   text-shadow: 0 0 6px rgba(255, 180, 80, 0.55);
 }
-/* Sprites washed amber for CRT. */
-:root[data-theme="crt"] .poke-sprite,
-:root[data-theme="crt"] .traj-box-sprite,
-:root[data-theme="crt"] .q-thumb-sprite,
-:root[data-theme="crt"] .sd-f-tape-sprite,
-:root[data-theme="crt"] .sc0-bn-sprite {
-  filter: grayscale(1) sepia(1) saturate(5) hue-rotate(-10deg) contrast(1.05) brightness(0.95);
-}
 
 * { box-sizing: border-box; }
 
@@ -424,326 +416,6 @@ html, body {
   margin: 8px 4px 0;
   max-width: 76ch;
 }
-
-/* ---------- Pokemon sprite ----------
-   Hard rule: image-rendering: pixelated must apply on both the <img> tag and
-   any wrapper that scales. */
-.poke-sprite {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  image-rendering: -moz-crisp-edges;
-  -ms-interpolation-mode: nearest-neighbor;
-  display: block;
-  /* Idle breathing — 1.5 px vertical bob on a 2.4s cycle. The
-     animation property is replaced wholesale by .shake / .faint when
-     those classes are added, so it cleanly pauses during damage and
-     KO animations. */
-  animation: poke-breathe 2.4s ease-in-out infinite;
-}
-
-/* Grass tufts at the platform rim — 5 chunky pixel tufts that sway on
-   staggered cycles.  Lives inside .grass-rim so it sits at the right
-   vertical position automatically.  prefers-reduced-motion disables. */
-.grass-tufts {
-  position: absolute;
-  inset: -14px 0 auto 0;        /* lift above the rim */
-  height: 14px;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 6%;
-  pointer-events: none;
-  z-index: 2;
-}
-.grass-tuft {
-  width: 14px;
-  height: 14px;
-  background: var(--grass-rim);
-  clip-path: polygon(
-    20% 100%,  0%  35%, 18% 55%,
-    35% 0%,   45% 50%, 50% 25%,
-    55% 50%,  65% 0%,  82% 55%,
-    100% 35%, 80% 100%
-  );
-  transform-origin: 50% 100%;
-  animation: grass-sway 4.0s ease-in-out infinite alternate;
-}
-.grass-tuft:nth-child(2) { animation-delay: -0.7s; animation-duration: 4.4s; }
-.grass-tuft:nth-child(3) { animation-delay: -1.5s; animation-duration: 3.6s; }
-.grass-tuft:nth-child(4) { animation-delay: -2.1s; animation-duration: 4.8s; }
-.grass-tuft:nth-child(5) { animation-delay: -0.3s; animation-duration: 4.2s; }
-@keyframes grass-sway {
-  0%   { transform: rotate(-5deg); }
-  100% { transform: rotate(5deg);  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .grass-tuft { animation: none; }
-}
-@keyframes poke-breathe {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-1.5px); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .poke-sprite { animation: none; }
-}
-.poke-sprite.shake {
-  animation: poke-shake 320ms steps(1, end);
-}
-@keyframes poke-shake {
-  0%   { transform: translate(0, 0); }
-  10%  { transform: translate(-6px, 0); }
-  25%  { transform: translate(6px, 0); }
-  40%  { transform: translate(-5px, 0); }
-  55%  { transform: translate(5px, 0); }
-  70%  { transform: translate(-3px, 0); }
-  85%  { transform: translate(3px, 0); }
-  100% { transform: translate(0, 0); }
-}
-.poke-sprite.faint {
-  animation: poke-faint 600ms ease-in forwards;
-}
-@keyframes poke-faint {
-  0%   { transform: translateY(0); opacity: 1; filter: brightness(1); }
-  100% { transform: translateY(48px); opacity: 0; filter: brightness(0); }
-}
-
-/* ---------- Battle stage ---------- */
-.battle-stage {
-  position: relative;
-  width: 100%;
-  max-width: 640px;
-  aspect-ratio: 5 / 3;
-  margin: 0 auto;
-  background:
-    linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 65%, var(--grass) 65%, var(--grass) 100%);
-  border: 4px solid var(--rule);
-  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
-  overflow: hidden;
-  font-family: 'Press Start 2P', monospace;
-}
-.battle-stage .grass-rim {
-  position: absolute;
-  left: 0; right: 0;
-  top: 65%;
-  height: 4px;
-  background: var(--grass-rim);
-}
-.battle-stage .platform {
-  position: absolute;
-  width: 38%;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--grass-rim);
-  opacity: 0.65;
-}
-.battle-stage .platform.player   { left: 6%;  bottom: 14%; }
-.battle-stage .platform.opponent { right: 6%; top: 35%;    }
-
-.battle-stage .sprite-host {
-  position: absolute;
-}
-.battle-stage .sprite-host.player {
-  left: 10%;
-  bottom: 16%;
-  width: 30%;
-}
-.battle-stage .sprite-host.opponent {
-  right: 10%;
-  top: 12%;
-  width: 22%;
-}
-.battle-stage .sprite-host img {
-  width: 100%;
-  height: auto;
-  /* feet rest on platform: the platform is at the host's bottom */
-  transform: translateY(0);
-}
-
-/* Stars for night sky */
-.battle-stage.night::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 35% 0;
-  background-image:
-    radial-gradient(1px 1px at 20% 12%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 60% 22%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 78% 8%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 38% 32%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 90% 30%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 8% 25%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 48% 8%, #fff 1px, transparent 1px),
-    radial-gradient(1px 1px at 72% 38%, #fff 1px, transparent 1px);
-  pointer-events: none;
-}
-
-/* HP box — sits floating over the battle */
-.hp-box {
-  position: absolute;
-  background: var(--bg-strong);
-  border: 3px solid var(--rule);
-  padding: 6px 10px 6px 12px;
-  box-shadow:
-    inset 0 0 0 2px var(--bg-strong),
-    inset 0 0 0 4px var(--inner-highlight);
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  color: var(--ink-on-box);
-  min-width: 160px;
-}
-.hp-box.player   { right: 4%; bottom: 6%;   }
-.hp-box.opponent { left:  4%; top: 6%;      }
-
-.hp-box .row1 {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
-}
-.hp-box .name { color: var(--ink-on-box); }
-.hp-box .lvl { color: var(--ink-on-box); }
-
-.hp-bar-row {
-  display: flex; align-items: center; gap: 6px;
-}
-.hp-bar-row .hp-label {
-  font-size: 8px;
-  color: var(--pikachu-yellow);
-  -webkit-text-stroke: 0.5px var(--ink);
-}
-.hp-bar-track {
-  flex: 1 1 auto;
-  height: 9px;
-  background: #585858;
-  border: 2px solid var(--rule);
-  position: relative;
-  overflow: hidden;
-}
-.hp-bar-fill {
-  position: absolute;
-  top: 0; left: 0; bottom: 0;
-  background: #48C848;     /* default = full */
-  width: 100%;
-  transition: width 1100ms cubic-bezier(.45, .05, .55, .95), background-color 200ms;
-}
-/* Discrete bucket fill — 5 buckets + fainted. Width snaps to 100/80/60/
-   40/20/0%, color phases green → light-green → yellow → orange → red. */
-.hp-bar-fill[data-bucket="0"] { width: 100%; background: var(--hp-b0, #48C848); }
-.hp-bar-fill[data-bucket="1"] { width: 80%;  background: var(--hp-b1, #88D848); }
-.hp-bar-fill[data-bucket="2"] { width: 60%;  background: var(--hp-b2, #E8C828); }
-.hp-bar-fill[data-bucket="3"] { width: 40%;  background: var(--hp-b3, #E89028); }
-.hp-bar-fill[data-bucket="4"] { width: 20%;  background: var(--hp-b4, #E84828); }
-.hp-bar-fill[data-bucket="5"] { width: 0%;   background: var(--hp-b4, #E84828); }
-/* Tick marks at the bucket boundaries — makes the discretisation
-   readable even in a still screenshot. */
-.hp-bar-tick {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 1px;
-  background: rgba(0,0,0,0.45);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.hp-box .row3 {
-  margin-top: 4px;
-  display: flex;
-  justify-content: flex-end;
-  font-size: 9px;
-  color: var(--ink-on-box);
-}
-
-/* Damage flash number */
-.damage-flash {
-  position: absolute;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 22px;
-  color: var(--damage-text);
-  -webkit-text-stroke: 2px var(--damage-stroke);
-  text-stroke: 2px var(--damage-stroke);
-  pointer-events: none;
-  animation: dmg-rise 700ms ease-out forwards;
-}
-@keyframes dmg-rise {
-  0%   { transform: translateY(8px); opacity: 0; }
-  20%  { transform: translateY(0);   opacity: 1; }
-  80%  { transform: translateY(-24px); opacity: 1; }
-  100% { transform: translateY(-32px); opacity: 0; }
-}
-
-/* ---------- Move menu (scene 1) ---------- */
-.move-menu {
-  background: var(--bg-strong);
-  border: 4px solid var(--rule);
-  padding: 10px 12px;
-  box-shadow:
-    inset 0 0 0 2px var(--bg-strong),
-    inset 0 0 0 4px var(--inner-highlight);
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
-  color: var(--ink-on-box);
-}
-.move-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  background: transparent;
-  border: 0;
-  padding: 4px 6px;
-  font: inherit;
-  font-size: 10px;
-  color: var(--ink-on-box);
-  cursor: pointer;
-  text-align: left;
-  position: relative;
-  text-transform: uppercase;
-}
-.move-btn::before {
-  content: '\25B6 ';
-  visibility: hidden;
-  color: var(--ink-on-box);
-}
-.move-btn:hover::before, .move-btn:focus::before, .move-btn.selected::before {
-  visibility: visible;
-}
-.move-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.move-btn:disabled::before { visibility: hidden; }
-.move-btn .move-sub {
-  font-size: 8px;
-  color: #585858;
-  letter-spacing: 0.5px;
-  text-transform: none;
-  display: flex;
-  flex-direction: column;     /* two rows: .move-stats then .move-drop */
-  gap: 3px;
-}
-.move-btn .move-stats {
-  display: flex;
-  flex-wrap: wrap;            /* just the type pill now (PWR/ACC retired) */
-  gap: 2px 8px;
-  align-items: center;
-}
-.move-btn .move-drop {
-  font-size: 8px;
-  color: var(--pikachu-cheek);
-  letter-spacing: 0.5px;
-}
-.move-btn:disabled .move-drop { color: #888; }
-.move-btn .type-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 1px 4px;
-  border: 1px solid var(--rule);
-  font-size: 7px;
-  text-transform: uppercase;
-}
-.type-pill.electric { background: #F8D028; color: #181818; }
-.type-pill.normal   { background: #C8C0B0; color: #181818; }
-.type-pill.steel    { background: #B0B0C0; color: #181818; }
-.type-pill.fire     { background: #F58030; color: #181818; }
 
 /* ---------- Pokemon-styled "menu option" rows (for sliders / params) ---------- */
 .poke-menu-row {
@@ -1329,200 +1001,6 @@ html, body {
 .comp-door    { color: var(--hue-door); }
 .comp-poke    { color: var(--pikachu-yellow); -webkit-text-stroke: 0.5px var(--ink); }
 
-/* MDP-frame overlay (scene 0) */
-.mdp-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: #181818;
-}
-.mdp-overlay .mdp-tag {
-  position: absolute;
-  background: var(--pikachu-yellow);
-  border: 2px solid var(--rule);
-  padding: 3px 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 2px 2px 0 0 var(--ink);
-  pointer-events: auto;
-}
-
-/* ============================================================
-   Japanese "flavor mode" — body.lang-jp swaps the primary font
-   to DotGothic16 (a bitmap-style Japanese font from Google Fonts)
-   so the kana glyphs match the chiptune pixel-art feel of the
-   English Press-Start-2P text. Press Start 2P stays as a fallback
-   for Latin glyphs nested inside Japanese strings (e.g. "10まんボルト",
-   "SML · ポケモン", "Q*"), giving us bitmap consistency on both sides.
-
-   DotGothic16 is also listed as a tail fallback even in EN mode so
-   the language-toggle button's "日本語" label renders cleanly without
-   falling back to a system font. ============================ */
-body.lang-jp,
-body.lang-jp button,
-body.lang-jp input,
-body.lang-jp .scene,
-body.lang-jp .topbar {
-  font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace;
-}
-body.lang-jp .scene {
-  /* DotGothic16 is denser per glyph than Press Start 2P. Add a touch
-     of letter-spacing so kana don't run together at small sizes. */
-  letter-spacing: 0.02em;
-}
-/* Even in EN mode, allow Japanese glyphs (only the lang-toggle label
-   right now) to fall through to DotGothic16 rather than the OS default. */
-.theme-toggle, .pager-btn, .topbar .brand, .scene-title {
-  font-family: 'Press Start 2P', 'DotGothic16', 'Courier New', monospace;
-}
-
-/* ============================================================
-   Scene 1 — wild-encounter intro
-   ----------------------------------------------------------------
-   The cascade hides both sprite hosts on reset, flashes the
-   opponent into view ("A wild CHARMANDER appeared!"), then arcs
-   a Pokeball in from off-screen-left onto the player platform,
-   pops it open, and materializes Pikachu in its place ("Go!
-   PIKACHU!"). All animations are opacity- and filter-based on
-   the sprite hosts so they DO NOT conflict with the
-   .poke-sprite breathing/shake/faint transform animations that
-   live on the inner <img>. The Pokeball is its own absolute
-   element layered above the platform.
-   ============================================================ */
-
-/* Initial hidden state for sprite hosts — opacity only, no
-   transform/display so the inner sprite's breathing keyframes
-   keep running unmolested. */
-.sc1-hidden {
-  opacity: 0;
-}
-
-/* Opponent wild-appears: a fast white-flash that brings the
-   host from invisible+overbright down to fully visible at
-   normal brightness. Filter + opacity only — no transform. */
-.sc1-wild-appear {
-  animation: sc1-wild-appear 500ms steps(8, end) forwards;
-}
-@keyframes sc1-wild-appear {
-  0%   { opacity: 0; filter: brightness(6) contrast(0.4); }
-  20%  { opacity: 1; filter: brightness(4) contrast(0.6); }
-  60%  { opacity: 1; filter: brightness(2) contrast(0.9); }
-  100% { opacity: 1; filter: brightness(1) contrast(1); }
-}
-
-/* Player materialize: similar opacity+filter flash for the
-   Pikachu reveal that follows the Pokeball pop. */
-.sc1-materialize {
-  animation: sc1-materialize 360ms steps(6, end) forwards;
-}
-@keyframes sc1-materialize {
-  0%   { opacity: 0; filter: brightness(4) contrast(0.5); }
-  30%  { opacity: 1; filter: brightness(3) contrast(0.7); }
-  100% { opacity: 1; filter: brightness(1) contrast(1); }
-}
-
-/* Pokeball arcing onto the player platform. The ball is its
-   own element appended to .battle-stage; it lives above the
-   platforms but below the HP boxes (z-index: 6). The arc keyframe
-   uses left/bottom percentages so it scales with the stage,
-   plus rotation for the spinning ball feel. */
-.sc1-pokeball {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  z-index: 6;
-  pointer-events: none;
-  left: -20%;
-  bottom: -20%;
-}
-.sc1-pokeball svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.sc1-pokeball-arc {
-  animation: sc1-pokeball-arc 620ms cubic-bezier(0.3, 0.05, 0.55, 1) forwards;
-}
-@keyframes sc1-pokeball-arc {
-  0%   { left: -20%; bottom: -20%; transform: rotate(0deg);   }
-  40%  { left:   2%; bottom:  45%; transform: rotate(360deg); }
-  65%  { left:  18%; bottom:  60%; transform: rotate(540deg); }
-  100% { left:  22%; bottom:  22%; transform: rotate(720deg); }
-}
-.sc1-pokeball-open {
-  left: 22%;
-  bottom: 22%;
-  animation: sc1-pokeball-open 280ms ease-out forwards;
-}
-@keyframes sc1-pokeball-open {
-  0%   { transform: scale(1)   rotate(720deg); opacity: 1; }
-  100% { transform: scale(2.4) rotate(720deg); opacity: 0; }
-}
-
-/* Reduced motion — collapse the cascade to a simple opacity
-   reveal. Pokeball is invisible (the materialize alone reads
-   as "appears"). */
-@media (prefers-reduced-motion: reduce) {
-  .sc1-hidden {
-    opacity: 0;
-    transition: opacity 200ms linear;
-  }
-  .sc1-wild-appear,
-  .sc1-materialize {
-    animation: none;
-    opacity: 1;
-    filter: none;
-    transition: opacity 200ms linear;
-  }
-  .sc1-pokeball,
-  .sc1-pokeball-arc,
-  .sc1-pokeball-open {
-    animation: none;
-    opacity: 0;
-  }
-}
-
-/* ============================================================
-   Gen-1 rotating-hex scene transition
-   ----------------------------------------------------------------
-   A full-viewport overlay shaped as a 6-point hexagon (extended
-   beyond the viewport so the shape fully covers the screen at
-   scale 1) animates from scale 1 / rotate 0 down to scale 0 /
-   rotate 180, opacity fading at the tail.  The new scene is
-   already mounted underneath; the overlay just gates the reveal.
-   pointer-events: none keeps the underlying scene interactive.
-   Fires only on entry to the three battle-flavored scenes
-   (scene1, sceneSarsaDerive, sceneQstar) — see playSceneTransition
-   in main.js.
-   ============================================================ */
-.scene-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: var(--bg);
-  pointer-events: none;
-  clip-path: polygon(
-    50% -50%,
-    130% 25%,
-    130% 75%,
-    50% 150%,
-    -30% 75%,
-    -30% 25%
-  );
-  transform-origin: 50% 50%;
-  animation: scene-trans-hex 700ms cubic-bezier(.42, 0, .58, 1) forwards;
-}
-@keyframes scene-trans-hex {
-  0%   { transform: scale(1) rotate(0deg);     opacity: 1; }
-  70%  {                                       opacity: 1; }
-  100% { transform: scale(0) rotate(180deg);   opacity: 0; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .scene-transition { display: none; }
-}
-
 /* ============================================================
    Speaker-notes overlay (press `n`)
    ----------------------------------------------------------------
@@ -1594,123 +1072,6 @@ body.lang-jp .scene {
 }
 .speaker-notes-content b { color: var(--pikachu-cheek); }
 .speaker-notes-content em { color: var(--cb-blue); font-style: normal; }
-
-/* ============================================================
-   Trainer badges in the topbar
-   ----------------------------------------------------------------
-   Five concept badges (MDP, RTN, Q*, DP, SAR) sit between the
-   dot-pager and the music toggle.  Grey when unearned, glowing
-   yellow when earned.  Awarded on first visit to each concept
-   scene; persisted via window.Trainer / localStorage.
-   ============================================================ */
-.trainer-badges {
-  display: flex;
-  gap: 4px;
-  margin: 0 6px;
-  align-items: center;
-}
-.trainer-badge {
-  width: 30px;
-  height: 22px;
-  border: 2px solid var(--rule);
-  background: var(--bg);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  letter-spacing: 0.04em;
-  color: var(--ink-secondary);
-  opacity: 0.4;
-  transition: opacity 200ms, background 200ms, color 200ms;
-}
-.trainer-badge.earned {
-  background: var(--pikachu-yellow);
-  color: var(--ink-on-box);
-  opacity: 1;
-  box-shadow: inset 0 0 0 1px var(--inner-highlight);
-}
-.trainer-badge.mdp.earned    { background: #D55E00; color: #fff; }   /* MDP — red-orange */
-.trainer-badge.return.earned { background: #0072B2; color: #fff; }   /* RTN — blue */
-.trainer-badge.qstar.earned  { background: var(--pikachu-yellow); }
-.trainer-badge.dp.earned     { background: #009E73; color: #fff; }   /* DP — green */
-.trainer-badge.sarsa.earned  { background: #CC79A7; color: #fff; }   /* SAR — purple */
-
-@keyframes trainer-badge-flash {
-  0%   { transform: scale(1);    box-shadow: 0 0 0 0 var(--pikachu-yellow); }
-  40%  { transform: scale(1.3);  box-shadow: 0 0 0 8px var(--pikachu-yellow); }
-  100% { transform: scale(1);    box-shadow: 0 0 0 0 transparent; }
-}
-.trainer-badge.flashing {
-  animation: trainer-badge-flash 1.0s ease-out;
-  z-index: 4;
-  position: relative;
-}
-@media (prefers-reduced-motion: reduce) {
-  .trainer-badge.flashing { animation: none; }
-}
-
-/* ============================================================
-   Trainer-name modal — first-visit prompt
-   ============================================================ */
-.trainer-name-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9995;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.trainer-name-card {
-  background: var(--bg-strong);
-  border: 4px solid var(--rule);
-  box-shadow:
-    inset 0 0 0 2px var(--bg-strong),
-    inset 0 0 0 4px var(--inner-highlight),
-    inset 0 0 0 6px var(--bg-strong),
-    4px 4px 0 0 rgba(0, 0, 0, 0.20);
-  padding: 22px 26px;
-  width: 340px;
-  font-family: 'Press Start 2P', monospace;
-  color: var(--ink-on-box);
-  text-align: center;
-}
-.trainer-name-title {
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  color: var(--pikachu-cheek);
-  margin-bottom: 10px;
-}
-.trainer-name-prompt {
-  font-size: 9px;
-  line-height: 1.7;
-  margin-bottom: 12px;
-}
-.trainer-name-card input[type="text"] {
-  width: 100%;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 11px;
-  text-align: center;
-  letter-spacing: 0.08em;
-  padding: 8px;
-  border: 3px solid var(--rule);
-  background: var(--bg);
-  color: var(--ink-on-box);
-  margin-bottom: 12px;
-  text-transform: uppercase;
-}
-.trainer-name-ctrls {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-.trainer-name-hint {
-  font-size: 7px;
-  color: var(--ink-secondary);
-  line-height: 1.6;
-}
 
 /* ============================================================
    Slide mode (`f` hotkey)
@@ -1914,9 +1275,9 @@ body.slide-mode .stage  { padding: 12px 18px; }
    topbar collapses to three wrapping rows:
      row 1 — brand
      row 2 — PREV + dot-pager + NEXT  (primary navigation, big taps)
-     row 3 — trainer-badges            (full-width, centered)
+     row 3 — concept-badges            (full-width, centered)
      row 4 — music + lang + theme     (secondary toggles, compact)
-   The trainer-badges row forces a wrap via `flex: 1 1 100%`, which pushes
+   The concept-badges row forces a wrap via `flex: 1 1 100%`, which pushes
    the three secondary toggles to a fresh row beneath it. The scene-title
    is hidden — every scene already opens with its own H2 — and per-scene
    responsive rules (sd-row, sd-f-row, tut-welcome, Q-table scroll) live
@@ -1954,8 +1315,8 @@ body.slide-mode .stage  { padding: 12px 18px; }
   }
   .dot-pager .dot { width: 12px; height: 12px; }
 
-  /* Row 3 — trainer badges, forced to their own full-width row. */
-  .topbar .right-cluster .trainer-badges {
+  /* Row 3 — concept badges, forced to their own full-width row. */
+  .topbar .right-cluster .concept-badges {
     flex: 1 1 100%;
     margin: 0;
     justify-content: center;
@@ -2045,6 +1406,23 @@ body.slide-mode .stage  { padding: 12px 18px; }
 .shelf-lg .shelf-pip  { width: 18px; height: 20px; }
 .shelf-lg .shelf-caption { font-size: 10px; }
 
+/* MINI form: the Q-table-cell icon. No caption (set off in JS); tiny
+   slots/pips with hairline gaps and no card chrome so it nests cleanly
+   inside a packed board cell, yet stays legible at projector scale. */
+.shelf-mini {
+  padding: 0;
+  gap: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.shelf-mini .shelf-body { gap: 6px; }
+.shelf-mini .shelf-stack { gap: 1px; }
+.shelf-mini .shelf-slot { width: 20px; height: 7px; }
+.shelf-mini .shelf-pips { gap: 1px; }
+.shelf-mini .shelf-pip  { width: 6px; height: 8px; }
+.shelf-mini .shelf-midnight { height: 3px; border-width: 1px; margin-top: 1px; }
+
 /* ---- Price-lever tag (a chunky coloured price button/label) ---- */
 .lever-tag {
   display: inline-flex;
@@ -2130,5 +1508,218 @@ body.slide-mode .stage  { padding: 12px 18px; }
 }
 .lang-jp .stub-title, .lang-jp .stub-note, .lang-jp .shelf-caption,
 .lang-jp .lever-tag, .lang-jp .concept-badge {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+/* ============================================================
+   Last-Minute Pricing -- shared scene primitives: the DEMAND DECK
+   (the signature card-flip draw, window.Deck), the MONEY counter,
+   and the RETURN tape. All themeable via the existing tokens.
+   ============================================================ */
+
+/* ---- The DEMAND DECK: a face-down deck with one flipping card ---- */
+.demand-deck {
+  position: relative;
+  display: inline-block;
+  width: 86px;
+  height: 112px;
+  /* the flipper rotates in 3D */
+  perspective: 520px;
+}
+.deck-stack { position: absolute; inset: 0; }
+.deck-card {
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: 3px 3px 0 var(--rule);
+}
+.deck-under-1 { transform: translate(3px, 3px); }
+.deck-under-2 { transform: translate(6px, 6px); opacity: 0.85; }
+
+.deck-flipper {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(.45, .05, .55, .95);
+  transform: rotateY(0deg);
+}
+.deck-flipper.is-flipped { transform: rotateY(180deg); }
+/* a tiny "snap" pop as the card lands face-up */
+.deck-flipper.is-snap { animation: deck-snap 180ms ease-out; }
+@keyframes deck-snap {
+  0%   { transform: rotateY(180deg) scale(1); }
+  45%  { transform: rotateY(180deg) scale(1.08); }
+  100% { transform: rotateY(180deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deck-flipper { transition: none; }
+  .deck-flipper.is-snap { animation: none; }
+}
+
+.deck-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border: 3px solid var(--rule);
+  box-shadow: 3px 3px 0 var(--rule);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+}
+.deck-back {
+  background: var(--bg-strong);
+  /* a pixel cross-hatch on the card back */
+  background-image:
+    repeating-linear-gradient(45deg, var(--inner-highlight) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(-45deg, var(--inner-highlight) 0 2px, transparent 2px 7px);
+}
+.deck-back-mark {
+  font-size: 30px;
+  color: var(--ink-secondary);
+  text-shadow: 2px 2px 0 var(--rule);
+}
+.deck-front {
+  transform: rotateY(180deg);
+  background: var(--lever-standard);
+  color: var(--lever-ink);
+}
+.deck-front-k {
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+.deck-front-label {
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ---- The MONEY counter (running revenue, mono, top-corner HUD) ---- */
+.money-counter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 7px 12px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: 3px 3px 0 var(--rule);
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.money-counter .money-label {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.money-counter .money-amount {
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  color: var(--ink-on-box);
+}
+.money-counter .money-amount .money-sign { color: var(--lever-standard); }
+/* a brief gold pulse when revenue ticks up */
+.money-counter.money-bump .money-amount { animation: money-bump 360ms ease-out; }
+@keyframes money-bump {
+  0%   { transform: scale(1);   color: var(--lever-standard); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1);   color: var(--ink-on-box); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .money-counter.money-bump .money-amount { animation: none; }
+}
+
+/* a floating "+$N" flash in a lever colour (the sale receipt) */
+.money-flash {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  pointer-events: none;
+  color: var(--lever-standard);
+  text-shadow: 1px 1px 0 var(--bg), -1px -1px 0 var(--bg), 1px -1px 0 var(--bg), -1px 1px 0 var(--bg);
+  animation: money-flash-rise 800ms ease-out forwards;
+  z-index: 6;
+}
+.money-flash.lever-fill-premium  { color: var(--lever-premium); }
+.money-flash.lever-fill-standard { color: var(--lever-standard); }
+.money-flash.lever-fill-firesale { color: var(--lever-firesale); }
+@keyframes money-flash-rise {
+  0%   { transform: translateY(8px);   opacity: 0; }
+  20%  { transform: translateY(0);     opacity: 1; }
+  80%  { transform: translateY(-24px); opacity: 1; }
+  100% { transform: translateY(-32px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .money-flash { animation: none; opacity: 1; }
+}
+
+/* ---- The RETURN tape: a left-to-right rollout of episode steps ---- */
+.return-tape {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  overflow-x: auto;
+}
+.return-tape .tape-step {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 64px;
+  padding: 6px 6px 5px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-on-box);
+}
+.return-tape .tape-step .tape-day {
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.return-tape .tape-step .tape-reward {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.return-tape .tape-step.tape-sale   { box-shadow: inset 0 0 0 2px var(--lever-standard); }
+.return-tape .tape-step.tape-nosale .tape-reward { color: var(--ink-secondary); }
+/* the terminal cap (MIDNIGHT) on the right of the tape */
+.return-tape .tape-step.tape-terminal {
+  background: var(--midnight-bg);
+  color: #FFFFFF;
+  border-color: var(--rule);
+}
+.return-tape .tape-arrow {
+  flex: 0 0 auto;
+  align-self: center;
+  color: var(--ink-secondary);
+  font-size: 12px;
+}
+.return-tape .tape-total {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-left: 4px;
+  padding: 6px 10px;
+  border: 2px solid var(--rule);
+  background: var(--lever-standard);
+  color: var(--lever-ink);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.lang-jp .deck-front-label, .lang-jp .money-label, .lang-jp .money-amount,
+.lang-jp .tape-day, .lang-jp .tape-total {
   font-family: 'DotGothic16', 'Press Start 2P', monospace;
 }

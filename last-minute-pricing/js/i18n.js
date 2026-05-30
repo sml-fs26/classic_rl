@@ -78,6 +78,20 @@
       'lever.standard.short': 'STD',
       'lever.firesale.short': 'FIRE',
 
+      /* shared Q-table / board widget labels (window.QTable) */
+      'qtable.corner':    'UNITS \\ DAYS',
+      'qtable.dayCol':    '{d}D LEFT',
+      'qtable.unitRow':   '{u}U',
+      'qtable.gutterSub': 'leftover = $0',
+      'qtable.usageTitle':'BEST LEVER ACROSS THE {n} SITUATIONS',
+      'qtable.bestLever': 'BEST LEVER HERE',
+      'qtable.priced':    'PRICED!',
+
+      /* shared demand-deck labels (window.Deck) */
+      'deck.flip':        'FLIP',
+      'deck.sold':        '{k} SOLD',
+      'deck.none':        'NONE SOLD',
+
       /* shared overlay chrome */
       'speakerNotes.title': 'SPEAKER NOTES · press <kbd>n</kbd> to close',
       'speakerNotes.empty': '(No notes for this scene yet.)',
@@ -118,6 +132,18 @@
       'lever.premium.short':  'プレミ',
       'lever.standard.short': 'スタ',
       'lever.firesale.short': 'やすうり',
+
+      'qtable.corner':    'ざいこ \\ にっすう',
+      'qtable.dayCol':    'のこり{d}にち',
+      'qtable.unitRow':   '{u}こ',
+      'qtable.gutterSub': 'うれのこり = $0',
+      'qtable.usageTitle':'{n}じょうきょうでの さいてきレバー',
+      'qtable.bestLever': 'ここでの さいてきレバー',
+      'qtable.priced':    'かくてい！',
+
+      'deck.flip':        'めくる',
+      'deck.sold':        '{k}こ うれた',
+      'deck.none':        'うれず',
 
       'speakerNotes.title': 'スピーカー ノート · <kbd>n</kbd> で とじる',
       'speakerNotes.empty': '（このシーンの ノートは まだ ありません。）',

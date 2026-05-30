@@ -1,199 +1,171 @@
-/* Shared base styling for the Q-table widget mounted by qtable.js.
- * Previously lived inside scene4.css; promoted here so the DP scene
- * and the SARSA-derivation F-widget continue to render after scene4
- * was removed. */
+/* qtable.css -- the 5x4 PRICING BOARD widget (window.QTable, js/qtable.js).
+ *
+ *   Reskinned from the Pokemon 5x5 bucket grid. The board is a 5-row (units
+ *   5..1) x 4-col (days 4..1) grid of situation cells plus a dark MIDNIGHT
+ *   gutter on the right. Each cell carries a mini shelf-card icon and three
+ *   lever rows; the argmax row is starred and the whole cell is tinted with
+ *   the winning lever's region colour (.lever-tint-* from style.css), so the
+ *   three coloured regions with their diagonal seam read at projector scale.
+ *
+ *   All colour comes from CSS tokens, so the CRT retint is automatic. */
 
 .qtable-host {
   display: block;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box, #000);
 }
 
+/* Column headers: a corner label + COLS day columns + the MIDNIGHT gutter. */
 .q-col-heads {
   display: grid;
-  grid-template-columns: 70px repeat(var(--nb, 5), minmax(0, 1fr));
+  grid-template-columns: 54px repeat(var(--cols, 4), minmax(0, 1fr)) 92px;
   gap: 6px;
-  margin-bottom: 4px;
-  font-family: 'Press Start 2P', monospace;
+  margin-bottom: 5px;
   font-size: 7px;
   letter-spacing: 0.04em;
-  color: var(--ink-secondary, #6b6b6b);
+  color: var(--ink-secondary);
 }
-.q-corner-head {
-  font-size: 7px;
-  color: var(--ink-secondary, #6b6b6b);
-  align-self: end;
-  padding-bottom: 2px;
-}
+.q-corner-head { align-self: end; padding-bottom: 2px; color: var(--ink-secondary); }
 .q-col-head {
   text-align: center;
   align-self: end;
   padding-bottom: 2px;
 }
+.q-col-head.q-gutter-head { color: var(--ink-secondary); }
 
+/* The board grid: row-label column + COLS cells + MIDNIGHT gutter column. */
 .q-grid {
   display: grid;
-  grid-template-columns: 70px repeat(var(--nb, 5), minmax(0, 1fr));
-  grid-template-rows: repeat(var(--nb, 5), auto);
+  grid-template-columns: 54px repeat(var(--cols, 4), minmax(0, 1fr)) 92px;
+  grid-template-rows: repeat(var(--rows, 5), auto);
   gap: 6px;
-}
-
-.q-cell {
-  position: relative;
-  background: var(--bg-strong, #F8F8F8);
-  border: 3px solid var(--ink, #000);
-  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18);
-  padding: 4px 6px 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--ink-on-box, #000);
-  overflow: hidden;
-  transition: opacity 200ms;
-}
-.q-cell.unvisited { opacity: 0.62; }
-
-/* Pokedex-style header bar at the top of each Q-cell.  Each cell IS a
-   Pokedex entry: a 3-digit Nº, a state-as-species name, and a star
-   marker that fades in once the cell has been visited (Q-values
-   non-zero).  Sits flush with the cell's top edge inside the existing
-   3px border. */
-.q-pokedex-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  margin: -4px -6px 2px;
-  padding: 2px 5px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 6.5px;
-  letter-spacing: 0.04em;
-  color: var(--ink-on-box, #000);
-  background: var(--pikachu-yellow, #F8D028);
-  border-bottom: 2px solid var(--ink, #000);
-  text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.q-pokedex-header .q-dex-num {
-  font-weight: bold;
-  color: var(--pikachu-cheek, #C62828);
-  flex: 0 0 auto;
-}
-.q-pokedex-header .q-dex-state {
-  flex: 1 1 auto;
-  text-align: right;
-  opacity: 0.78;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-/* Visited cells get a tiny star next to their Nº — the Pokedex
-   "OWNED" indicator.  Unvisited cells stay un-starred. */
-.q-cell:not(.unvisited) .q-pokedex-header .q-dex-num::after {
-  content: ' ★';
-  color: var(--pikachu-cheek, #C62828);
-}
-
-/* First-visit "REGISTERED!" flash — a yellow box-shadow ring that
-   pulses around the cell at the moment the agent first lands a
-   non-zero Q.  Pairs with the existing 'REGISTERED!' toast spawned
-   by qtable.js's spawnAwake. */
-@keyframes q-pokedex-register {
-  0%   { box-shadow: 0 0 0 0 var(--pikachu-yellow, #F8D028),
-                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
-                     2px 2px 0 0 rgba(0,0,0,0.18); }
-  50%  { box-shadow: 0 0 0 6px var(--pikachu-yellow, #F8D028),
-                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
-                     2px 2px 0 0 rgba(0,0,0,0.18); }
-  100% { box-shadow: 0 0 0 0 transparent,
-                     inset -2px -2px 0 0 rgba(0,0,0,0.12),
-                     2px 2px 0 0 rgba(0,0,0,0.18); }
-}
-.q-cell.q-just-registered {
-  animation: q-pokedex-register 1.05s ease-out;
-  z-index: 4;
-}
-@media (prefers-reduced-motion: reduce) {
-  .q-cell.q-just-registered { animation: none; }
 }
 
 .q-row-head {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  letter-spacing: 0.04em;
-  color: var(--ink-secondary, #6b6b6b);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
   text-align: center;
 }
 
-.q-thumb {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  align-items: end;
-  padding-bottom: 5px;
-  border-bottom: 2px solid rgba(0,0,0,0.16);
-}
-.q-thumb-side {
+/* MIDNIGHT gutter: one tall dark cell spanning all rows. */
+.q-midnight-gutter {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  justify-content: center;
+  gap: 8px;
+  background: var(--midnight-bg);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.35);
+  color: #F0E0C0;
+  text-align: center;
+  padding: 8px 6px;
 }
-.q-thumb-sprite {
-  width: 34px;
-  height: 34px;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+.q-gutter-label {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  color: #F0E0C0;
 }
-.q-thumb-hp-bg {
-  width: 100%;
-  height: 5px;
-  background: rgba(0,0,0,0.16);
-  border: 1px solid var(--ink, #000);
-  box-sizing: border-box;
+.q-gutter-sub {
+  font-size: 7px;
+  line-height: 1.5;
+  color: #C8B48C;
 }
-.q-thumb-hp-fill {
-  height: 100%;
-  background: #48C848;
-  transition: width 200ms;
-}
-.q-thumb-hp-fill.b1 { background: #88D848; }
-.q-thumb-hp-fill.b2 { background: #E8C828; }
-.q-thumb-hp-fill.b3 { background: #E89028; }
-.q-thumb-hp-fill.b4 { background: #E84828; }
 
+/* A board cell. The lever-region tint (.lever-tint-*) is applied by the JS
+   on update; the base cell is the neutral card. */
+.q-cell {
+  position: relative;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset -2px -2px 0 0 rgba(0, 0, 0, 0.12), 2px 2px 0 0 rgba(0, 0, 0, 0.18);
+  padding: 6px 6px 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  overflow: hidden;
+  transition: background 200ms, opacity 200ms;
+}
+.q-cell.unvisited { opacity: 0.6; }
+.q-cell.clickable { cursor: pointer; }
+.q-cell.clickable:hover { box-shadow: 0 0 0 2px var(--lever-standard), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+
+/* The mini shelf-card icon, centered at the top of the cell. */
+.q-shelf {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 5px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.16);
+}
+
+/* The three lever rows. */
 .q-bars { display: flex; flex-direction: column; gap: 2px; }
 .q-bar-row {
   display: grid;
-  grid-template-columns: 9px 36px 1fr;
+  grid-template-columns: 10px 10px 1fr auto;
   gap: 4px;
   align-items: center;
   font-size: 7px;
   padding: 1px 3px;
-  border-radius: 1px;
 }
-.q-mark { width: 9px; text-align: center; color: var(--pikachu-cheek, #C62828); font-weight: bold; }
+/* Press Start 2P has no star glyph, so the ★ mark + the legend star fall
+   through to DotGothic16 (bitmap, includes ★) before any system font. */
+.q-mark {
+  width: 10px;
+  text-align: center;
+  color: var(--lever-firesale);
+  font-weight: bold;
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+.q-swatch {
+  width: 9px; height: 9px;
+  border: 1px solid var(--rule);
+  box-sizing: border-box;
+}
 .q-label { font-size: 7px; letter-spacing: 0.04em; }
 .q-val { font-size: 8px; text-align: right; font-variant-numeric: tabular-nums; }
 .q-bar-row.argmax {
-  background: rgba(248, 208, 40, 0.32);
-  box-shadow: inset 0 0 0 1px var(--accent, #F8D028);
+  background: rgba(0, 0, 0, 0.10);
+  box-shadow: inset 0 0 0 1px var(--rule);
 }
 .q-bar-row.argmax .q-val,
 .q-bar-row.argmax .q-label { font-weight: bold; }
-.q-bar-row.argmax .q-val { color: var(--ink-on-box, #000); }
 
-/* Argmax-flip flash — fires when a cell's argmax move changes. */
-@keyframes q-argmax-flip {
-  0%   { box-shadow: 0 0 0 3px var(--accent, #F8D028), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+/* On a tinted (visited) cell the chrome reads on a saturated background.
+   The lever-tint-* classes set the background; nudge inner contrast. */
+.q-cell[class*="lever-tint-"] .q-shelf { border-bottom-color: rgba(0, 0, 0, 0.28); }
+.q-cell[class*="lever-tint-"] .q-bar-row.argmax {
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+
+/* Argmax / region flip flash. */
+@keyframes q-lever-flip {
+  0%   { box-shadow: 0 0 0 3px var(--lever-standard), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
   100% { box-shadow: 0 0 0 0 transparent, inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
 }
-.q-cell.argmax-flip { animation: q-argmax-flip 1.0s ease-out; }
+.q-cell.lever-flip { animation: q-lever-flip 1.0s ease-out; z-index: 3; }
+@media (prefers-reduced-motion: reduce) { .q-cell.lever-flip { animation: none; } }
 
-/* Floating delta indicators (per-step change). */
+/* First-priced "PRICED!" ring (cell goes from all-zero to a winning lever). */
+@keyframes q-priced-ring {
+  0%   { box-shadow: 0 0 0 0 var(--lever-standard), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+  50%  { box-shadow: 0 0 0 6px var(--lever-standard), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+  100% { box-shadow: 0 0 0 0 transparent, inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+}
+.q-cell.q-just-priced { animation: q-priced-ring 1.05s ease-out; z-index: 4; }
+@media (prefers-reduced-motion: reduce) { .q-cell.q-just-priced { animation: none; } }
+
+/* Floating per-step delta + "PRICED!" toast. */
 @keyframes q-delta-rise {
   0%   { opacity: 0; transform: translateY(2px); }
   18%  { opacity: 1; }
@@ -207,39 +179,52 @@
   font-size: 7px;
   pointer-events: none;
   animation: q-delta-rise 1.2s ease-out forwards;
-  text-shadow: 1px 1px 0 #FFF, -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF;
+  text-shadow: 1px 1px 0 var(--bg), -1px -1px 0 var(--bg), 1px -1px 0 var(--bg), -1px 1px 0 var(--bg);
   z-index: 5;
   letter-spacing: 0.02em;
 }
-.q-delta.pos { color: var(--cb-blue); }
-.q-delta.neg { color: var(--cb-vermillion); }
-.q-delta.awake { color: #B7791F; }
+.q-delta.pos   { color: var(--lever-premium); }
+.q-delta.neg   { color: var(--lever-firesale); }
+.q-delta.awake { color: var(--lever-standard); }
+@media (prefers-reduced-motion: reduce) { .q-delta { animation: none; opacity: 0; } }
 
-/* Argmax-distribution strip below the grid. */
+/* Optional max-Q heat ramp UNDER the policy tint (opt-in via mount{heat:true}).
+   A neutral brightness ladder so it never competes with the lever hue. */
+.q-cell.heat-zero { background: var(--bg-strong); }
+.q-cell.heat-1 { box-shadow: inset 0 0 0 9999px rgba(0,0,0,0.00), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+.q-cell.heat-2 { box-shadow: inset 0 0 0 9999px rgba(0,0,0,0.05), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+.q-cell.heat-3 { box-shadow: inset 0 0 0 9999px rgba(0,0,0,0.10), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+.q-cell.heat-4 { box-shadow: inset 0 0 0 9999px rgba(0,0,0,0.15), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+
+/* Lever-usage strip below the grid. */
 .q-freq-strip {
   margin-top: 14px;
-  background: var(--bg-strong, #F8F8F8);
-  border: 3px solid var(--ink, #000);
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
   box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18);
   padding: 8px 12px;
-  font-family: 'Press Start 2P', monospace;
   font-size: 8px;
-  color: var(--ink-on-box, #000);
+  color: var(--ink-on-box);
 }
 .q-freq-title { font-size: 8px; letter-spacing: 0.05em; margin-bottom: 8px; text-transform: uppercase; }
 .q-freq-row {
   display: grid;
-  grid-template-columns: 48px 1fr 24px;
+  grid-template-columns: 11px 48px 1fr 24px;
   gap: 8px;
   align-items: center;
   margin-bottom: 4px;
   font-size: 7px;
 }
+.q-freq-swatch {
+  width: 10px; height: 10px;
+  border: 1px solid var(--rule);
+  box-sizing: border-box;
+}
 .q-freq-label { letter-spacing: 0.04em; }
 .q-freq-track {
   height: 10px;
-  background: rgba(0,0,0,0.16);
-  border: 1px solid var(--ink, #000);
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid var(--rule);
   position: relative;
   box-sizing: border-box;
 }
@@ -247,7 +232,6 @@
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: 0%;
-  background: var(--accent, #F8D028);
   transition: width 240ms;
 }
 .q-freq-val { text-align: right; font-variant-numeric: tabular-nums; }
@@ -257,47 +241,30 @@
   flex-wrap: wrap;
   gap: 14px;
   margin-top: 10px;
-  font-family: 'Press Start 2P', monospace;
   font-size: 7px;
   letter-spacing: 0.04em;
-  color: var(--ink-secondary, #6b6b6b);
+  color: var(--ink-secondary);
+  /* DotGothic16 fallback so the ★ in the legend renders (Latin stays PS2P). */
+  font-family: 'Press Start 2P', 'DotGothic16', monospace;
 }
 .q-legend-item { display: inline-flex; align-items: center; gap: 5px; }
-.q-legend-bar {
+.q-legend-swatch {
   display: inline-block;
-  width: 24px;
-  height: 7px;
-  border: 1px solid var(--ink, #000);
-  background: #B0B0B0;
+  width: 18px; height: 9px;
+  border: 1px solid var(--rule);
   box-sizing: border-box;
 }
-.q-legend-bar.argmax { background: var(--accent, #F8D028); }
 
-/* Q-cell heatmap (max-Q over the moves → coloured cell background).
-   Diverging encoding via the colour-blind-safe blue ↔ vermillion ramp. */
-.q-cell.heat-zero        { background: var(--bg-strong); }
-.q-cell.heat-pos-strong  { background: var(--cb-blue); color: #FFFFFF; }
-.q-cell.heat-pos-mid     { background: var(--cb-blue-light); }
-.q-cell.heat-neutral     { background: var(--bg-strong); }
-.q-cell.heat-neg-mid     { background: var(--cb-vermillion-light); }
-.q-cell.heat-neg-strong  { background: var(--cb-vermillion); color: #FFFFFF; }
-.q-cell.heat-pos-strong .q-thumb-hp-bg,
-.q-cell.heat-neg-strong .q-thumb-hp-bg {
-  background: rgba(0,0,0,0.32);
-}
-.q-cell.heat-pos-strong .q-bar-row.argmax,
-.q-cell.heat-neg-strong .q-bar-row.argmax {
-  background: rgba(255,255,255,0.32);
-  box-shadow: inset 0 0 0 1px #FFFFFF;
+.lang-jp .qtable-host,
+.lang-jp .qtable-host button {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
 }
 
 /* ---------------------------------------------------------------------------
-   Mobile (≤ 720px). The Q-table is the main reading surface for SARSA/DP
-   scenes; shrinking 5 columns × 5 rows × ~6 sub-bars each to fit a 390px
-   phone makes labels and bar fills illegible. Instead, keep the desktop
-   sizing and let the user pan horizontally inside .qtable-host. The
-   wider min-width matches scenes that show the full 5×5 grid; .sd-scene
-   uses the already-tighter q-bar layout so a smaller floor is fine.
+   Mobile (<= 720px). The board is the main reading surface for the DP/SARSA
+   scenes; shrinking 4 cols + a gutter + 3 sub-rows each onto a 390px phone
+   makes the lever values illegible. Keep the desktop sizing and let the user
+   pan horizontally inside .qtable-host.
    --------------------------------------------------------------------------- */
 @media (max-width: 720px) {
   .qtable-host {
@@ -306,7 +273,5 @@
     padding-bottom: 4px;
   }
   .qtable-host .q-col-heads,
-  .qtable-host .q-grid { min-width: 540px; }
-  .sd-scene .qtable-host .q-col-heads,
-  .sd-scene .qtable-host .q-grid { min-width: 420px; }
+  .qtable-host .q-grid { min-width: 560px; }
 }
