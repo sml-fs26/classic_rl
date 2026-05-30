@@ -1,0 +1,360 @@
+/* Scene 0 -- Title / hook for Last-Minute Pricing.
+   Retro-pixel title ceremony: a clock sweeping to MIDNIGHT beside a
+   shelf of glowing tickets, then a dissolve into the empty 5x4 board.
+   All colour via theme tokens (light + crt retint automatically). */
+
+.sc0-scene { overflow: hidden; }
+
+.sc0-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 14px 8px 8px;
+  text-align: center;
+}
+
+/* ---- wordmark ---- */
+.sc0-title {
+  font-size: 34px;
+  margin: 0 0 6px;
+  letter-spacing: 4px;
+  display: inline-flex;
+  gap: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.sc0-title-letter { display: inline-block; }
+.sc0-first .sc0-title-letter {
+  animation: sc0-letter-drop 520ms cubic-bezier(.34, 1.56, .64, 1) backwards;
+  animation-delay: calc(var(--i) * 70ms + 120ms);
+}
+@keyframes sc0-letter-drop {
+  0%   { transform: translateY(-70px) rotate(-10deg); opacity: 0; }
+  60%  { transform: translateY(5px)   rotate(2deg);   opacity: 1; }
+  100% { transform: translateY(0)     rotate(0);      opacity: 1; }
+}
+
+.sc0-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+/* ---- stage: clock + shelf side by side ---- */
+.sc0-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 38px;
+  margin: 6px 0 8px;
+  flex-wrap: wrap;
+}
+
+.sc0-clock-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.sc0-clock-svg {
+  width: 168px;
+  height: 168px;
+  filter: drop-shadow(4px 4px 0 var(--rule));
+}
+.sc0-clock-min {
+  transform-origin: 50px 50px;
+  animation: sc0-clock-sweep 6s linear infinite;
+}
+@keyframes sc0-clock-sweep {
+  /* sweep the last hour up to MIDNIGHT and reset -- the deadline looms */
+  0%   { transform: rotate(300deg); }
+  100% { transform: rotate(360deg); }
+}
+.sc0-clock-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+}
+.sc0-midnight-chip {
+  position: absolute;
+  top: -10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--lever-ink);
+  background: var(--lever-firesale);
+  border: 2px solid var(--lever-firesale-rule);
+  padding: 2px 6px;
+  letter-spacing: 1px;
+  animation: sc0-mid-pulse 1.6s ease-in-out infinite;
+}
+@keyframes sc0-mid-pulse {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.06); }
+}
+
+.sc0-shelf-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.sc0-hero-card {
+  filter: drop-shadow(4px 4px 0 var(--rule));
+  animation: sc0-shelf-glow 2.4s ease-in-out infinite;
+}
+@keyframes sc0-shelf-glow {
+  0%, 100% { filter: drop-shadow(4px 4px 0 var(--rule)) drop-shadow(0 0 0 transparent); }
+  50%      { filter: drop-shadow(4px 4px 0 var(--rule)) drop-shadow(0 0 10px var(--ticket-fill)); }
+}
+.sc0-shelf-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+}
+
+/* ---- tagline + hook ---- */
+.sc0-tagline {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink);
+  max-width: 46ch;
+  margin: 6px auto 2px;
+}
+.sc0-hook {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  max-width: 60ch;
+  margin: 10px auto 0;
+}
+
+/* ---- START button (pixel idiom) ---- */
+.sc0-start, .sc0-board-go {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  padding: 12px 22px;
+  margin-top: 8px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  color: var(--ink-on-box);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    4px 4px 0 var(--rule);
+  animation: sc0-blink 1.0s steps(2, end) infinite;
+}
+.sc0-start:hover, .sc0-board-go:hover {
+  background: var(--lever-standard);
+  color: var(--lever-ink);
+  animation: none;
+}
+.sc0-start-chevron {
+  display: inline-block;
+  color: var(--lever-firesale);
+  animation: sc0-chevron 0.7s ease-in-out infinite;
+}
+@keyframes sc0-chevron {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
+}
+@keyframes sc0-blink {
+  0%, 60%   { opacity: 1; }
+  61%, 100% { opacity: 0.45; }
+}
+
+.sc0-credits {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+  margin-top: 18px;
+}
+.sc0-credits.sc0-credits-by {
+  margin-top: 6px;
+  color: var(--lever-firesale);
+}
+
+/* ---- first-visit staged fade-in for everything after the wordmark ---- */
+.sc0-first .sc0-subtitle { animation: sc0-fade 380ms ease-out 700ms backwards; }
+.sc0-first .sc0-stage    { animation: sc0-fade 460ms ease-out 900ms backwards; }
+.sc0-first .sc0-tagline  { animation: sc0-fade 380ms ease-out 1150ms backwards; }
+.sc0-first .sc0-start    { animation: sc0-fade 380ms ease-out 1350ms backwards, sc0-blink 1.0s steps(2, end) 1750ms infinite; }
+.sc0-first .sc0-hook     { animation: sc0-fade 380ms ease-out 1550ms backwards; }
+@keyframes sc0-fade {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- the dissolve (title -> board) ---- */
+.sc0-dissolve {
+  animation: sc0-dissolve-out 600ms ease-in forwards;
+}
+@keyframes sc0-dissolve-out {
+  0%   { opacity: 1; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0; transform: scale(0.94); filter: blur(3px); }
+}
+
+/* =====================================================================
+   PHASE 2 -- the empty 5x4 board reveal
+   ===================================================================== */
+.sc0-board-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 8px;
+  opacity: 0;
+  transition: opacity 480ms ease-out;
+}
+.sc0-board-wrap.sc0-board-in { opacity: 1; }
+
+.sc0-board-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  color: var(--ink);
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.sc0-board {
+  position: relative;
+  display: inline-block;
+  padding: 8px 8px 8px 0;
+}
+
+/* column heads (corner + d4..d1 + midnight gutter head) */
+.sc0-board-heads {
+  display: grid;
+  grid-template-columns: 34px repeat(var(--cols), 56px) 30px;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.sc0-corner { }
+.sc0-col-head {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: center;
+  align-self: end;
+  padding-bottom: 2px;
+}
+.sc0-gutter-head { color: var(--lever-firesale); }
+
+/* grid body */
+.sc0-board-body {
+  display: grid;
+  grid-template-columns: 34px repeat(var(--cols), 56px) 30px;
+  grid-auto-rows: 56px;
+  gap: 4px;
+}
+.sc0-row-head {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+}
+.sc0-cell {
+  background: var(--bg-strong);
+  border: 2px solid var(--inner-highlight);
+  box-shadow: inset 0 0 0 1px var(--bg-strong);
+  animation: sc0-cell-pop 360ms ease-out backwards;
+  animation-delay: calc(var(--i) * 22ms + 200ms);
+}
+@keyframes sc0-cell-pop {
+  0%   { opacity: 0; transform: scale(0.7); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.sc0-gutter-cell {
+  background: var(--midnight-bg);
+  border: 2px solid var(--rule);
+}
+
+/* axis labels */
+.sc0-axis {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+}
+.sc0-axis-days {
+  text-align: center;
+  margin-top: 8px;
+}
+.sc0-axis-units {
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: rotate(-90deg) translateX(50%);
+  transform-origin: left center;
+  white-space: nowrap;
+}
+
+.sc0-board-sub {
+  font-size: 9px;
+  text-align: center;
+  max-width: 50ch;
+}
+
+/* reduced motion: kill all the staging/sweep/pulse animations */
+@media (prefers-reduced-motion: reduce) {
+  .sc0-first .sc0-title-letter,
+  .sc0-first .sc0-subtitle,
+  .sc0-first .sc0-stage,
+  .sc0-first .sc0-tagline,
+  .sc0-first .sc0-start,
+  .sc0-first .sc0-hook,
+  .sc0-clock-min,
+  .sc0-midnight-chip,
+  .sc0-hero-card,
+  .sc0-start,
+  .sc0-board-go,
+  .sc0-start-chevron,
+  .sc0-cell {
+    animation: none;
+  }
+  .sc0-board-wrap { transition: none; }
+  .sc0-dissolve { animation: none; opacity: 0; }
+}
+
+/* JP captions get the rounded gothic face */
+.lang-jp .sc0-tagline,
+.lang-jp .sc0-subtitle,
+.lang-jp .sc0-clock-label,
+.lang-jp .sc0-midnight-chip,
+.lang-jp .sc0-shelf-label,
+.lang-jp .sc0-credits,
+.lang-jp .sc0-board-title,
+.lang-jp .sc0-col-head,
+.lang-jp .sc0-row-head,
+.lang-jp .sc0-axis,
+.lang-jp .sc0-start,
+.lang-jp .sc0-board-go {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+/* ---- mobile ---- */
+@media (max-width: 720px) {
+  .sc0-title { font-size: 24px; letter-spacing: 2px; }
+  .sc0-stage { gap: 20px; }
+  .sc0-clock-svg { width: 132px; height: 132px; }
+  .sc0-board-heads,
+  .sc0-board-body {
+    grid-template-columns: 28px repeat(var(--cols), 44px) 24px;
+  }
+  .sc0-board-body { grid-auto-rows: 44px; }
+}
