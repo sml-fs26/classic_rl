@@ -1,0 +1,380 @@
+/* scene11.css -- "Learn the playbook with SARSA" (the RL capstone).
+ *
+ *   Self-contained: this is the first real scene, so it defines its own retro
+ *   button / heading / formula-card chrome rather than leaning on classes the
+ *   foundation removed. Every colour comes from CSS tokens (style.css), so the
+ *   CRT retint is automatic; no categorical colour is inlined. Layout target:
+ *   1400x900, two columns (explanation | board), fits one viewport. */
+
+/* ---------- scene shell ---------- */
+.scene-pad.s11 { padding: 10px 6px 18px; }
+
+.s11-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 17px;
+  letter-spacing: 1px;
+  color: var(--ink);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+/* ---------- pager bar ---------- */
+.s11-pager {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.s11-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+  margin-left: auto;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- retro buttons (local; .poke-btn was removed by the foundation) ---------- */
+.s11-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  padding: 7px 11px;
+  font-size: 9px;
+  line-height: 1.3;
+  color: var(--ink-on-box);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 rgba(0, 0, 0, 0.18);
+}
+.s11-btn:hover:not(:disabled) { background: var(--pikachu-yellow); }
+.s11-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+.s11-btn.primary {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+}
+.s11-btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
+
+/* ---------- two-column body ---------- */
+.s11-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.18fr);
+  gap: 16px;
+  align-items: start;
+}
+.s11-left {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.s11-right {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---------- left-column text blocks ---------- */
+.s11-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--charmander-orange);
+}
+.s11-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.s11-lead {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.s11-foot {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+  border-top: 1px dashed var(--inner-highlight);
+  padding-top: 7px;
+  margin-top: 2px;
+}
+.s11-foot.done {
+  color: var(--ink);
+  border-top-color: var(--lever-firesale);
+}
+
+/* ---------- formula cards ---------- */
+.s11-fcaption {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  margin-top: 4px;
+}
+.s11-formula {
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 3px var(--inner-highlight);
+  padding: 8px 10px;
+  overflow-x: auto;
+}
+.s11-formula .katex { color: var(--ink-on-box); font-size: 14px; }
+.s11-formula .katex .underbrace .stretchy,
+.s11-formula .katex .boxed { color: var(--ink-on-box); }
+
+.s11-alpha-note {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+}
+.s11-alpha-note b { color: var(--lever-standard-rule); }
+
+/* ---------- step 2: epsilon choice cards ---------- */
+.s11-eps-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 2px 0 2px;
+}
+.s11-eps-card {
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  padding: 8px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.s11-eps-card.exploit { border-color: var(--lever-premium-rule); }
+.s11-eps-card.explore { border-color: var(--lever-firesale-rule); }
+.s11-eps-prob {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+}
+.s11-eps-card.exploit .s11-eps-prob .katex { color: var(--lever-premium); }
+.s11-eps-card.explore .s11-eps-prob .katex { color: var(--lever-firesale); }
+.s11-eps-body {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* ---------- right column caption strip ---------- */
+.s11-rcap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  min-height: 14px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.s11-rcap-sub { color: var(--ink-secondary); }
+.s11-rcap-pair { display: inline-flex; align-items: center; gap: 5px; }
+.s11-rcap-dot {
+  width: 9px; height: 9px;
+  border: 1.5px solid var(--rule);
+  display: inline-block;
+}
+.s11-rcap-dot.learned { background: var(--pikachu-yellow); }
+.s11-rcap-dot.oracle  { background: var(--lever-premium); }
+
+/* ---------- boards (step 1 + 3) ---------- */
+.s11-boards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.s11-boards.s11-boards-split {
+  grid-template-columns: 1fr 1fr;
+}
+.s11-board-host { min-width: 0; }
+/* When two boards share the row, shrink the dense board copy a touch. */
+.s11-boards-split .qtable-host { font-size: 95%; }
+.s11-oracle .q-cell { opacity: 0.96; }
+
+/* ---------- step 2: one sampled step panel ---------- */
+.s11-sample-panel {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.s11-sample-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.s11-sample-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 8px 0;
+}
+.s11-sample-lever {
+  display: flex;
+  justify-content: center;
+  min-height: 22px;
+}
+.s11-sample-note {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--ink-secondary);
+  min-height: 34px;
+}
+.s11-sample-actions { display: flex; justify-content: center; }
+
+/* the (s,a,r,s',a') tuple */
+.s11-tuple {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+  border: 2px solid var(--inner-highlight);
+  padding: 8px 10px;
+}
+.s11-tuple-row { white-space: nowrap; }
+.s11-tuple-row.s  { grid-column: 1 / -1; }
+.s11-tuple-row.r  { color: var(--lever-standard-rule); }
+.s11-tuple-row.muted { color: var(--ink-secondary); opacity: 0.6; }
+.s11-tuple .lever-tag { font-size: 9px; padding: 1px 5px; }
+
+/* ---------- lever tag (local mirror, in case the shared rule is absent) ---------- */
+.s11 .lever-tag {
+  font-family: 'Press Start 2P', monospace;
+  display: inline-block;
+  padding: 2px 6px;
+  border: 2px solid var(--rule);
+  color: var(--lever-ink);
+  letter-spacing: 0.5px;
+  font-size: 10px;
+}
+.s11 .lever-tag[data-lever="premium"]  { background: var(--lever-premium);  border-color: var(--lever-premium-rule); }
+.s11 .lever-tag[data-lever="standard"] { background: var(--lever-standard); border-color: var(--lever-standard-rule); }
+.s11 .lever-tag[data-lever="firesale"] { background: var(--lever-firesale); border-color: var(--lever-firesale-rule); }
+
+/* ---------- step 3: controls ---------- */
+.s11-ctrls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 0 4px;
+  border-bottom: 1px dashed var(--inner-highlight);
+  margin-bottom: 4px;
+}
+.s11-slider {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+}
+.s11-slider-cap { color: var(--ink); }
+.s11-slider-cap b { color: var(--charmander-orange); }
+.s11-slider input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 92px;
+  height: 6px;
+  background: var(--inner-highlight);
+  border: 1px solid var(--rule);
+  cursor: pointer;
+}
+.s11-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px; height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  cursor: pointer;
+}
+.s11-slider input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 16px;
+  background: var(--pikachu-yellow);
+  border: 2px solid var(--rule);
+  cursor: pointer;
+}
+.s11-alpha-fixed {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  border: 1.5px solid var(--inner-highlight);
+  padding: 4px 7px;
+}
+
+/* ---------- step 3: meters (seasons / convergence / revenue) ---------- */
+.s11-meters {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 6px 0;
+}
+.s11-meter {
+  display: grid;
+  grid-template-columns: 132px 1fr auto;
+  align-items: center;
+  gap: 9px;
+}
+.s11-meter.seasons { grid-template-columns: 132px auto; }
+.s11-meter-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  line-height: 1.4;
+}
+.s11-meter-big {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  color: var(--ink);
+}
+.s11-meter-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.s11-bar {
+  position: relative;
+  height: 14px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  overflow: hidden;
+}
+.s11-bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  transition: width 0.25s ease-out;
+}
+/* colour-blind-safe semantic fills (Okabe-Ito), paired with a % label. */
+.s11-bar-fill.conv { background: var(--cb-bluish-green); }
+.s11-bar-fill.rev  { background: var(--cb-blue); }
+
+/* ---------- responsive: stack on narrow viewports ---------- */
+@media (max-width: 900px) {
+  .s11-row { grid-template-columns: 1fr; }
+  .s11-boards.s11-boards-split { grid-template-columns: 1fr; }
+  .s11-eps-choices { grid-template-columns: 1fr; }
+}
