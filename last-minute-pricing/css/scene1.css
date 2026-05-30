@@ -1,0 +1,334 @@
+/* scene1 -- TUTORIAL ("How to read the shelf").
+   Step-walked guided tour in the shelf-card visual language. All colour is
+   from the shared tokens (--lever-*, --ticket-*, --ink, --rule, --bg-strong)
+   so the CRT theme retints for free. No JS-injected styles. */
+
+.tut-scene { display: flex; flex-direction: column; gap: 10px; }
+
+/* ---- top bar: step counter + SKIP ---- */
+.tut-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tut-step-counter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.poke-btn,
+.tut-skip-btn,
+.tut-demo-play {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  padding: 7px 12px;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--rule);
+}
+.poke-btn:hover,
+.tut-skip-btn:hover,
+.tut-demo-play:hover { background: var(--pikachu-yellow); }
+.poke-btn:active,
+.tut-skip-btn:active,
+.tut-demo-play:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--rule); }
+.poke-btn:disabled,
+.tut-demo-play:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0 var(--rule); }
+
+.tut-section-title { font-size: 13px; margin: 2px 0 4px; }
+
+/* ---- demo area (swaps per step) ---- */
+.tut-demo {
+  min-height: 318px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px 8px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+
+.tut-dialog { margin-top: 2px; }
+.tut-nav-hint { text-align: center; margin: 4px auto 0; }
+.tut-nav-hint kbd {
+  font-family: 'Press Start 2P', monospace;
+  border: 2px solid var(--rule);
+  padding: 1px 5px;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* ---- step 1: welcome ---- */
+.tut-welcome {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.tut-welcome-card { flex: 0 0 auto; }
+.tut-welcome-text { max-width: 30ch; }
+.tut-welcome-big {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.tut-welcome-small {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+}
+
+/* ---- steps 2 + 3: a strip of shelf cards with captions ---- */
+.tut-strip {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.tut-strip-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.tut-strip-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+  text-align: center;
+  max-width: 18ch;
+  line-height: 1.6;
+}
+
+/* Focus rings: step 2 spotlights the ticket stack, step 3 the day ribbon.
+   A dashed accent box around the relevant sub-part of each card. */
+.tut-focus-stack .shelf-stack {
+  outline: 3px dashed var(--lever-standard);
+  outline-offset: 4px;
+}
+.tut-focus-ribbon .shelf-ribbon {
+  outline: 3px dashed var(--lever-premium);
+  outline-offset: 4px;
+}
+
+/* ---- step 4: the three price tags + odds ---- */
+.tut-levers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+.tut-lever-row {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+.tut-lever-card {
+  flex: 1 1 200px;
+  max-width: 248px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px 12px 13px;
+  background: var(--bg);
+  border: 3px solid var(--rule);
+  box-shadow: 4px 4px 0 var(--rule);
+}
+.tut-lever-card[data-lever="premium"]  { box-shadow: 4px 4px 0 var(--lever-premium-rule); }
+.tut-lever-card[data-lever="standard"] { box-shadow: 4px 4px 0 var(--lever-standard-rule); }
+.tut-lever-card[data-lever="firesale"] { box-shadow: 4px 4px 0 var(--lever-firesale-rule); }
+.tut-lever-card .lever-tag { align-self: flex-start; }
+.tut-lever-role {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink);
+  min-height: 2.6em;
+}
+.tut-lever-odds-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+}
+.tut-lever-odds { display: flex; flex-direction: column; gap: 4px; }
+.tut-odds-row {
+  display: grid;
+  grid-template-columns: 14px 1fr 30px;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink);
+}
+.tut-odds-k { text-align: center; }
+.tut-odds-bar {
+  height: 9px;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.tut-odds-fill { display: block; height: 100%; }
+.tut-odds-p { text-align: right; font-variant-numeric: tabular-nums; }
+
+.tut-lever-axis {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 560px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+}
+.tut-lever-axis .ax-l { white-space: nowrap; }
+.tut-lever-axis .ax-r { white-space: nowrap; }
+.tut-lever-axis .ax-line {
+  flex: 1 1 auto;
+  height: 0;
+  border-top: 3px solid var(--ink-secondary);
+  position: relative;
+}
+.tut-lever-axis .ax-line::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: -5px;
+  border-left: 8px solid var(--ink-secondary);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+/* ---- step 5: one slow demo day ---- */
+.tut-demo-day {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    "stage panel"
+    "ctrl  script";
+  gap: 18px 28px;
+  align-items: start;
+  justify-content: center;
+}
+.tut-demo-stage {
+  grid-area: stage;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+  padding: 4px;
+}
+.tut-demo-card { position: relative; }
+
+/* the sold ticket slides up-and-off; the whole card "tears" a day */
+.tut-demo-card.tut-sold .shelf-stack .shelf-slot:first-child .shelf-ticket {
+  animation: tut-ticket-slide 360ms ease-in forwards;
+}
+@keyframes tut-ticket-slide {
+  0%   { transform: translate(0, 0);     opacity: 1; }
+  100% { transform: translate(26px, -30px) rotate(8deg); opacity: 0; }
+}
+.tut-demo-card.tut-tear .shelf-ribbon { animation: tut-day-tear 520ms ease-out; }
+@keyframes tut-day-tear {
+  0%   { transform: translateY(0)   rotate(0); }
+  30%  { transform: translateY(-3px) rotate(-2deg); }
+  100% { transform: translateY(0)   rotate(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tut-demo-card.tut-sold .shelf-stack .shelf-slot:first-child .shelf-ticket { animation: none; opacity: 0; }
+  .tut-demo-card.tut-tear .shelf-ribbon { animation: none; }
+}
+.tut-demo-flash { left: 50%; top: 8px; transform: translateX(-50%); }
+
+.tut-demo-panel {
+  grid-area: panel;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.tut-demo-pick { display: flex; flex-direction: column; gap: 6px; }
+.tut-demo-pick-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.tut-demo-deck { min-height: 112px; }
+.tut-demo-money { align-self: flex-start; }
+
+.tut-demo-ctrl { grid-area: ctrl; }
+.tut-demo-ctrl.poke-menu-row::before { content: none; }
+
+.tut-demo-script {
+  grid-area: script;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-width: 34ch;
+}
+.tut-demo-step {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+  padding: 6px 8px;
+  border: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.tut-demo-step.done { color: var(--ink); }
+.tut-demo-step.active {
+  color: var(--ink-on-box);
+  background: var(--bg);
+  border-color: var(--rule);
+  box-shadow: 2px 2px 0 var(--rule);
+}
+
+/* Japanese bitmap font on tutorial text where Press Start 2P lacks glyphs. */
+.lang-jp .tut-step-counter,
+.lang-jp .tut-skip-btn,
+.lang-jp .tut-demo-play,
+.lang-jp .poke-btn,
+.lang-jp .tut-welcome-big,
+.lang-jp .tut-welcome-small,
+.lang-jp .tut-strip-cap,
+.lang-jp .tut-lever-role,
+.lang-jp .tut-lever-odds-title,
+.lang-jp .tut-lever-axis,
+.lang-jp .tut-demo-pick-label,
+.lang-jp .tut-demo-step { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+/* Tighter columns when the viewport is narrow. */
+@media (max-width: 900px) {
+  .tut-demo-day {
+    grid-template-columns: 1fr;
+    grid-template-areas: "stage" "panel" "ctrl" "script";
+    justify-items: center;
+  }
+  .tut-demo-script { max-width: none; }
+}

@@ -1,0 +1,205 @@
+/* scene2 -- PLAYTEST ("You run the shelf").
+   The live interactive board: a large shelf card + the demand deck on the
+   left with a DAY / REVENUE HUD; the dialog, three price-tag buttons, and
+   RESTART on the right; a RETURN tape across the bottom. All colour is from
+   the shared tokens so the CRT theme retints. No JS-injected styles. */
+
+.play-scene { display: flex; flex-direction: column; gap: 12px; }
+
+/* ---- main row ---- */
+.play-row {
+  display: flex;
+  gap: 26px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* ---- left: the board ---- */
+.play-board {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.play-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.play-day {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  letter-spacing: 1px;
+  padding: 6px 10px;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  box-shadow: 2px 2px 0 var(--rule);
+}
+.play-money { margin: 0; }
+
+.play-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 8px 6px;
+}
+.play-card { position: relative; }
+.play-deck { flex: 0 0 auto; }
+
+/* sale pulse: the live tickets brighten + lift briefly, then card.set()
+   swaps to the reduced inventory. (Variable inventory makes per-ticket
+   targeting fragile, so a stack-level "something sold" pulse reads cleanly,
+   paired with the floating +$ receipt and the money bump.) */
+.play-card.play-sold .shelf-stack .shelf-ticket.is-live {
+  animation: play-ticket-sell 480ms ease-out;
+}
+@keyframes play-ticket-sell {
+  0%   { transform: translateY(0)    scale(1);    filter: brightness(1); }
+  35%  { transform: translateY(-5px) scale(1.05); filter: brightness(1.35); }
+  100% { transform: translateY(0)    scale(1);    filter: brightness(1); }
+}
+.play-card.play-tear .shelf-ribbon { animation: play-day-tear 460ms ease-out; }
+@keyframes play-day-tear {
+  0%   { transform: translateY(0)    rotate(0); }
+  30%  { transform: translateY(-3px) rotate(-2deg); }
+  100% { transform: translateY(0)    rotate(0); }
+}
+/* midnight: leftover units crumble grey before the terminal icon lands */
+.play-card.play-midnight .shelf-stack .shelf-ticket.is-live {
+  animation: play-crumble 880ms ease-in forwards;
+}
+@keyframes play-crumble {
+  0%   { filter: grayscale(0)   brightness(1);    transform: translateY(0); }
+  60%  { filter: grayscale(1)   brightness(0.7);  transform: translateY(2px); }
+  100% { filter: grayscale(1)   brightness(0.45); transform: translateY(5px) rotate(3deg); opacity: 0.6; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .play-card.play-sold .shelf-stack .shelf-ticket.is-live,
+  .play-card.play-tear .shelf-ribbon,
+  .play-card.play-midnight .shelf-stack .shelf-ticket.is-live { animation: none; }
+}
+.play-flash { left: 38px; top: 6px; }
+
+/* ---- right: dialog + lever menu + restart ---- */
+.play-right {
+  flex: 1 1 360px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.play-dialog { min-height: 92px; }
+.play-prompt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+.play-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.play-lever-btn {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "name price"
+    "odds odds";
+  gap: 3px 10px;
+  align-items: center;
+  text-align: left;
+  padding: 10px 14px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--lever-ink);
+  background: var(--lever-standard);
+  border: 3px solid var(--lever-standard-rule);
+  box-shadow: 4px 4px 0 var(--lever-standard-rule);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.play-lever-btn[data-lever="premium"]  { background: var(--lever-premium);  border-color: var(--lever-premium-rule);  box-shadow: 4px 4px 0 var(--lever-premium-rule); }
+.play-lever-btn[data-lever="standard"] { background: var(--lever-standard); border-color: var(--lever-standard-rule); box-shadow: 4px 4px 0 var(--lever-standard-rule); }
+.play-lever-btn[data-lever="firesale"] { background: var(--lever-firesale); border-color: var(--lever-firesale-rule); box-shadow: 4px 4px 0 var(--lever-firesale-rule); }
+.play-lever-btn:hover { filter: brightness(1.08); }
+.play-lever-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--rule); }
+.play-lever-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.play-lever-name  { grid-area: name;  font-size: 11px; letter-spacing: 0.5px; }
+.play-lever-price { grid-area: price; font-size: 10px; opacity: 0.95; }
+.play-lever-odds  { grid-area: odds;  font-size: 8px; opacity: 0.85; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
+
+.play-ctrl.poke-menu-row::before { content: none; }
+
+/* ---- end-of-run summary (overlays the right column) ---- */
+.play-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 18px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: 5px 5px 0 var(--rule);
+}
+.play-summary-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--ink);
+}
+.play-summary-money { align-self: flex-start; }
+.play-summary-line {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.play-summary-line.is-good { color: var(--lever-standard); }
+.play-summary-line.is-bad  { color: var(--lever-firesale); }
+.play-summary .play-again { align-self: flex-start; }
+.play-summary-hint { margin: 0; max-width: 40ch; }
+
+/* ---- the RETURN tape ---- */
+.play-tape-wrap { display: flex; flex-direction: column; gap: 6px; }
+.play-tape-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.play-tape { min-height: 58px; }
+/* colour each played step by the lever pulled */
+.play-tape .tape-step[data-lever="premium"]  { box-shadow: inset 0 0 0 2px var(--lever-premium); }
+.play-tape .tape-step[data-lever="standard"] { box-shadow: inset 0 0 0 2px var(--lever-standard); }
+.play-tape .tape-step[data-lever="firesale"] { box-shadow: inset 0 0 0 2px var(--lever-firesale); }
+.play-tape .tape-step.tape-nosale { box-shadow: none; }
+.play-tape .tape-step.play-tape-ph {
+  box-shadow: none;
+  color: var(--ink-secondary);
+  font-size: 8px;
+  justify-content: center;
+  min-width: 160px;
+}
+
+.play-caption { margin-top: 0; }
+
+/* Japanese bitmap font where Press Start 2P lacks glyphs. */
+.lang-jp .play-day,
+.lang-jp .play-prompt,
+.lang-jp .play-lever-name,
+.lang-jp .play-lever-price,
+.lang-jp .play-lever-odds,
+.lang-jp .play-summary-title,
+.lang-jp .play-summary-line,
+.lang-jp .play-tape-label,
+.lang-jp .play-tape .tape-step.play-tape-ph { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
