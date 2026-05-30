@@ -182,8 +182,22 @@
 
     const prev = document.getElementById('prev-btn');
     const next = document.getElementById('next-btn');
-    if (prev) prev.addEventListener('click', () => { cursorBlip(); goTo(current - 1); });
-    if (next) next.addEventListener('click', () => { cursorBlip(); goTo(current + 1); });
+    /* Tappable PREV/NEXT delegate to the scene's internal step engine
+       first (same as the arrow keys), then advance the scene. Without
+       this, mobile users (no arrow keys) could not step through the
+       tutorial, the SARSA pager, or the DP stepper. */
+    if (prev) prev.addEventListener('click', () => {
+      cursorBlip();
+      const st = sceneState[current];
+      const handled = st && typeof st.onPrevKey === 'function' && st.onPrevKey();
+      if (!handled) goTo(current - 1);
+    });
+    if (next) next.addEventListener('click', () => {
+      cursorBlip();
+      const st = sceneState[current];
+      const handled = st && typeof st.onNextKey === 'function' && st.onNextKey();
+      if (!handled) goTo(current + 1);
+    });
 
     /* ---- Concept badges (in-memory, lit on reaching the relevant scene) ----
        Order: MDP POLICY RETURN Q* DP SARSA. No persistence (a fresh session
