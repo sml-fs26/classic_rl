@@ -1,0 +1,505 @@
+/* Scene 11 (SARSA capstone) styles. All colour comes from theme tokens
+   (lever-*, cb-*, bg/rule/ink); no inline categorical colours. The layout
+   is a 2-column row: left = derivation card / live step-detail panel,
+   right = caption + trajectory tape + the retention map + a number line.
+   Tuned to fit 1400x900 in one viewport without scroll. */
+
+.s11-scene {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ---- heading + controls ---- */
+.s11-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ink-on-box);
+  margin: 0 0 10px;
+}
+.s11-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.s11-controls .poke-btn { font-size: 10px; padding: 8px 12px; }
+.s11-controls .poke-btn:disabled { opacity: 0.4; cursor: default; box-shadow: none; transform: none; }
+.s11-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+}
+.s11-step-dots { display: inline-flex; gap: 5px; }
+.s11-dot {
+  width: 9px; height: 9px;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  box-sizing: border-box;
+}
+.s11-dot.done { background: var(--ink-secondary); }
+.s11-dot.on   { background: var(--lever-checkin); border-color: var(--lever-checkin); }
+.s11-step-id {
+  min-width: 16px;
+  text-align: center;
+  color: var(--ink-on-box);
+}
+
+/* ---- 2-column layout ---- */
+.s11-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.18fr);
+  gap: 18px;
+  align-items: start;
+  width: 100%;
+  min-height: 0;
+}
+
+/* ---- left column: derivation card / live detail ---- */
+.s11-left {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 14px 16px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  min-width: 0;
+}
+.s11-card-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  margin-bottom: 8px;
+}
+.s11-card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-on-box);
+  margin-bottom: 10px;
+}
+.s11-card-body {
+  font-size: 13.5px;
+  line-height: 1.62;
+  color: var(--ink-on-box);
+}
+.s11-card-body, .s11-card-foot, .s11-live-detail, .s11-ld-hint {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+}
+.s11-card-foot {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 2px dotted var(--inner-highlight);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-secondary);
+}
+.s11-card-foot b { color: var(--ink-on-box); }
+.s11-card-formula {
+  display: block;
+  width: 100%;
+  margin: 12px 0 0;
+  text-align: center;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+.s11-card-formula .katex { color: var(--ink-on-box); font-size: 15px; }
+
+/* ---- right column ---- */
+.s11-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* caption / convergence strip sits at the top of the right column */
+.s11-cap {
+  min-height: 18px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+}
+.s11-cap-line {
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  border-left: 5px solid var(--lever-checkin);
+  padding: 7px 9px;
+}
+
+/* convergence bar (step E) */
+.s11-conv-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.s11-conv-label {
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink-on-box);
+  white-space: nowrap;
+}
+.s11-conv-track {
+  flex: 1 1 auto;
+  height: 12px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+}
+.s11-conv-fill {
+  display: block;
+  height: 100%;
+  background: var(--lever-checkin);
+  transition: width 260ms ease-out;
+}
+.s11-conv-val {
+  font-size: 9px;
+  color: var(--ink-on-box);
+  min-width: 34px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.s11-conv-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 8px;
+  color: var(--ink-secondary);
+}
+
+/* ---- trajectory tape ---- */
+.s11-tape-wrap {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 7px 9px;
+}
+.s11-tape-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  margin-bottom: 6px;
+}
+.s11-tape-count { color: var(--ink-on-box); font-size: 8px; }
+.s11-tape {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 3px;
+  min-height: 56px;
+}
+.s11-tuple {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 62px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 4px 5px;
+  font-family: 'Press Start 2P', monospace;
+}
+.s11-tuple-t { font-size: 7px; color: var(--ink-secondary); }
+.s11-tuple-s { font-size: 7px; color: var(--ink-on-box); line-height: 1.4; }
+.s11-tuple-a {
+  font-size: 7.5px;
+  padding: 2px 3px;
+  text-align: center;
+  border: 1px solid var(--rule);
+}
+.s11-tuple-a.lever-nothing { background: var(--lever-nothing-bg); color: var(--ink-on-box); }
+.s11-tuple-a.lever-checkin { background: var(--lever-checkin-bg); color: var(--ink-on-box); }
+.s11-tuple-a.lever-offer   { background: var(--lever-offer-bg);   color: var(--ink-on-box); }
+.s11-tuple-r {
+  font-size: 8px;
+  text-align: right;
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.s11-tuple.active { outline: 3px solid var(--lever-checkin); outline-offset: 1px; }
+.s11-tuple.terminal { opacity: 0.65; }
+.s11-tuple.explore {
+  border-style: dashed;
+  border-color: var(--lever-offer);
+}
+.s11-tuple.explore .s11-tuple-t::after {
+  content: ' ✦';
+  color: var(--lever-offer);
+}
+.s11-tuple-arrow {
+  flex: 0 0 auto;
+  align-self: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+}
+.s11-tuple-end {
+  flex: 0 0 auto;
+  align-self: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 5px 7px;
+  border: 2px solid var(--rule);
+  text-align: center;
+}
+.s11-tuple-end.renew { background: var(--lever-offer-bg); color: var(--ink-on-box); }
+.s11-tuple-end.churn { background: var(--bg); color: var(--cb-vermillion); }
+
+/* ---- retention map host: shrink the embedded grid so map + tape + the
+   number line all fit one 1400x900 viewport. We compress each cell (drop
+   the avatar glyph, keep the engagement bar + tier + 3 lever rows) and hide
+   the widget's freq-strip + legend; the convergence bar above carries the
+   "how good is the playbook" read-out instead. ---- */
+.s11-q-host { min-width: 0; }
+.s11-q-host.retention-map { font-size: 7.5px; }
+.s11-q-host .rm-grid { grid-template-columns: 60px repeat(var(--nm, 5), minmax(0, 1fr)); gap: 4px; }
+.s11-q-host .rm-cell { padding: 3px 4px 4px; gap: 3px; }
+/* Drop the company-logo glyph in the embedded mini-cards to save vertical
+   space; the segmented engagement bar + tier label still carry the state. */
+.s11-q-host .rm-cell .account-avatar { display: none; }
+.s11-q-host .rm-cell .account-body { gap: 0; }
+.s11-q-host .rm-cell .account-tier { font-size: 7px; }
+.s11-q-host .rm-bar-row { font-size: 6.5px; padding: 0 3px; }
+.s11-q-host .rm-bar-row .rm-label,
+.s11-q-host .rm-bar-row .rm-val { font-size: 6.5px; }
+/* The frequency census + legend are redundant here (the convergence bar is
+   the live metric); hide them to reclaim ~90px of height. */
+.s11-q-host .rm-freq-strip,
+.s11-q-host .rm-legend { display: none; }
+
+/* ---- trajectory overlays on retention-map cells ---- */
+.s11-cell-badge {
+  position: absolute;
+  top: 1px; right: 2px;
+  z-index: 4;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  line-height: 1;
+  padding: 2px 3px;
+  background: var(--ink-secondary);
+  color: var(--bg-strong);
+  border: 1px solid var(--rule);
+}
+.s11-cell-badge.active { background: var(--lever-checkin); color: var(--lever-on); }
+.rm-cell.s11-mark { outline: 2px solid var(--ink-secondary); outline-offset: -1px; }
+.rm-cell.s11-active { outline: 3px solid var(--lever-checkin); outline-offset: -1px; z-index: 3; }
+.rm-cell.s11-ghost { opacity: 0.55; }
+.rm-bar-row.s11-bar {
+  box-shadow: inset 0 0 0 2px var(--lever-checkin);
+}
+
+/* the target callout floating on the active cell */
+.s11-cell-callout {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 6px);
+  background: var(--bg-strong);
+  border: 3px solid var(--lever-checkin);
+  box-shadow: 3px 3px 0 var(--rule);
+  padding: 6px 8px;
+  width: max-content;
+  max-width: 150px;
+  font-family: 'Press Start 2P', monospace;
+  pointer-events: none;
+}
+.s11-callout-title { font-size: 7px; color: var(--ink-secondary); margin-bottom: 3px; }
+.s11-callout-eq { font-size: 8px; color: var(--ink-on-box); line-height: 1.6; }
+.s11-callout-val { font-size: 9px; color: var(--lever-checkin); margin-top: 2px; }
+.s11-callout-val b { color: var(--lever-checkin); }
+
+/* ---- number line (the nudge) ---- */
+.s11-numline {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 9px 14px 22px;
+}
+.s11-numline-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.s11-numline-track {
+  position: relative;
+  height: 18px;
+  margin: 0 44px;
+}
+.s11-numline-axis {
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 3px;
+  background: var(--rule);
+}
+.s11-numline-arrow {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  background: var(--lever-checkin);
+  opacity: 0.6;
+}
+.s11-numline-dot {
+  position: absolute;
+  top: 50%;
+  width: 13px; height: 13px;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--rule);
+  box-sizing: border-box;
+  z-index: 2;
+}
+.s11-numline-dot.q   { background: var(--ink-secondary); }
+.s11-numline-dot.new { background: var(--lever-checkin); border-radius: 50%; }
+.s11-numline-dot.tgt { background: var(--lever-offer); }
+.s11-numline-lab {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-on-box);
+}
+.s11-numline-lab.above { bottom: 150%; }
+.s11-numline-lab.below {
+  top: 150%;
+  color: var(--lever-checkin);
+}
+
+/* ---- live trainer controls (left column, step E) ---- */
+.s11-live-ctrls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 10px;
+  padding: 10px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.s11-live-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.s11-live-row .poke-btn { font-size: 9px; padding: 7px 10px; }
+.s11-play.is-playing { background: var(--lever-checkin); color: var(--lever-on); }
+.s11-slider { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink-on-box); }
+.s11-slider-lab { min-width: 84px; }
+.s11-slider-lab b { color: var(--lever-offer); }
+.s11-slider-end { font-size: 7px; color: var(--ink-secondary); }
+.s11-slider input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1 1 auto;
+  min-width: 90px;
+  height: 8px;
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  margin: 0;
+}
+.s11-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px; height: 16px;
+  background: var(--lever-checkin);
+  border: 2px solid var(--rule);
+  cursor: pointer;
+}
+.s11-slider input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 16px;
+  background: var(--lever-checkin);
+  border: 2px solid var(--rule);
+  cursor: pointer;
+}
+.s11-live-fixed {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  padding-top: 2px;
+}
+
+/* ---- live step-detail (the latest SARSA update) ---- */
+.s11-live-detail {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-on-box);
+}
+.s11-live-detail-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  margin-bottom: 7px;
+}
+.s11-ld-row {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 8px;
+  align-items: baseline;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.5;
+  padding: 1px 0;
+}
+.s11-ld-k { color: var(--ink-secondary); }
+.s11-ld-v { color: var(--ink-on-box); }
+.s11-explore-tag {
+  font-style: normal;
+  color: var(--lever-offer);
+  font-size: 7.5px;
+}
+.s11-ld-div {
+  height: 0;
+  border-top: 2px dotted var(--inner-highlight);
+  margin: 7px 0;
+}
+.s11-ld-calc {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.6;
+  color: var(--ink-on-box);
+}
+.s11-ld-calc b { color: var(--lever-checkin); }
+.s11-ld-hint {
+  font-size: 12px;
+  color: var(--ink-secondary);
+  line-height: 1.55;
+}
+
+/* ---- CRT theme: the convergence fill + accents read as the neon set ---- */
+:root[data-theme="crt"] .s11-conv-fill,
+:root[data-theme="crt"] .s11-numline-dot.new {
+  background: var(--lever-checkin);
+}
+:root[data-theme="crt"] .s11-tuple-end.churn { color: var(--cb-vermillion); }
+
+/* ---- responsive: stack at narrow widths so nothing clips ---- */
+@media (max-width: 1100px) {
+  .s11-row { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .s11-card-formula .katex { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s11-conv-fill { transition: none; }
+}

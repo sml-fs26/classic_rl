@@ -1,0 +1,279 @@
+/* Scene 8: the Bellman optimality equation, animated on one cell.
+   Reuses the foundation tokens (--ink, --rule, --bg-strong, lever tokens)
+   and widgets (account card, coin, die, margin ledger). */
+
+.s8-scene { max-width: 1180px; margin: 0 auto; }
+
+.s8-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0 0 6px;
+  letter-spacing: 1px;
+}
+:root[data-theme="crt"] .s8-heading { text-shadow: 0 0 6px rgba(255, 180, 80, 0.55); }
+
+.s8-hook {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+  max-width: 86em;
+  margin: 0 0 10px;
+}
+
+/* ---- Formula card + business gloss ---- */
+.s8-formula { display: block; margin: 0 auto 6px; text-align: center; width: fit-content; }
+.s8-formula .katex { font-size: 16px; color: var(--ink-on-box); }
+
+.s8-gloss {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  margin: 0 auto 10px;
+  max-width: 860px;
+}
+.s8-gloss-term {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.6;
+  padding: 8px 10px;
+  border: 2px solid var(--rule);
+  border-radius: 4px;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  flex: 1 1 0;
+  min-width: 230px;
+  opacity: 0.55;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+}
+.s8-gloss-plus {
+  align-self: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: var(--ink-secondary);
+}
+.s8-term-cost   { border-color: var(--lever-offer); }
+.s8-term-future { border-color: var(--lever-checkin); }
+.s8-gloss-lit .s8-gloss-term { opacity: 1; box-shadow: 2px 2px 0 var(--rule); }
+
+/* ---- Controls ---- */
+.s8-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 10px;
+  flex-wrap: wrap;
+}
+.s8-stepcount {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-secondary);
+}
+.s8-stepcount b { color: var(--ink); }
+
+/* ---- Stage: today | arrow | branches ---- */
+.s8-stage {
+  display: grid;
+  grid-template-columns: minmax(200px, 260px) 28px minmax(360px, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+.s8-col-head {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+/* TODAY column. */
+.s8-today {
+  border: 3px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg-strong);
+  padding: 12px;
+  box-shadow: 3px 3px 0 var(--rule);
+}
+.s8-today-card { margin-bottom: 10px; }
+
+.s8-lever-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 7px 9px;
+  border: 2px solid var(--rule);
+  border-radius: 4px;
+  color: var(--ink-on-box);
+  background: var(--lever-offer-bg);
+  margin-bottom: 10px;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.s8-lever-chip.lever-nothing { background: var(--lever-nothing-bg); }
+.s8-lever-chip.lever-checkin { background: var(--lever-checkin-bg); }
+.s8-lever-chip.lever-offer   { background: var(--lever-offer-bg); }
+.s8-lever-glyph { display: inline-flex; }
+.s8-lever-chip.lever-nothing .s8-lever-glyph { color: var(--lever-nothing); }
+.s8-lever-chip.lever-checkin .s8-lever-glyph { color: var(--lever-checkin); }
+.s8-lever-chip.lever-offer   .s8-lever-glyph { color: var(--lever-offer); }
+.s8-lever-name { flex: 1; }
+.s8-lever-cost { font-weight: bold; color: var(--lever-offer); }
+.s8-lever-chip.lever-checkin .s8-lever-cost { color: var(--lever-checkin); }
+.s8-lever-chip.s8-chip-active {
+  box-shadow: 3px 3px 0 var(--rule);
+  transform: translate(-1px, -1px);
+}
+
+.s8-ledger { margin: 0; }
+
+/* ARROW. */
+.s8-flow-arrow {
+  align-self: center;
+  font-size: 22px;
+  color: var(--ink-secondary);
+  text-align: center;
+  padding-top: 60px;
+}
+
+/* BRANCHES column. */
+.s8-branches { min-width: 0; }
+
+.s8-coin-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.s8-coin { flex: 0 0 auto; }
+.s8-coin-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+}
+
+.s8-branch-hidden { display: none !important; }
+
+/* CHURN leaf. */
+.s8-churn-leaf {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 2px dashed var(--cb-vermillion);
+  border-radius: 4px;
+  background: var(--bg-strong);
+  margin-bottom: 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+.s8-branch-prob {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+.s8-churn-pill {
+  color: var(--cb-vermillion);
+  font-size: 9px;
+}
+.s8-branch-term { font-size: 10px; }
+.s8-term-neg { color: var(--cb-vermillion); }
+.s8-branch-contrib {
+  margin-left: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* STAY subtree. */
+.s8-stay-wrap {
+  border: 2px solid var(--lever-checkin);
+  border-radius: 6px;
+  padding: 10px;
+  background: var(--bg-strong);
+  margin-bottom: 12px;
+}
+.s8-stay-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.s8-die-host { flex: 0 0 auto; }
+.s8-stay-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+}
+.s8-stay-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.s8-stay-leaf {
+  border: 2px solid var(--rule);
+  border-radius: 4px;
+  padding: 8px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.s8-stay-leaf.s8-leaf-pending { opacity: 0.28; transform: translateY(4px); }
+.s8-stay-card { display: flex; justify-content: center; }
+.s8-stay-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  font-family: 'Press Start 2P', monospace;
+}
+.s8-leaf-prob { font-size: 7px; color: var(--ink-secondary); }
+.s8-vstar { font-size: 8px; color: var(--ink-secondary); text-align: center; }
+.s8-vstar b { color: var(--lever-checkin); font-size: 10px; }
+
+/* Q* total bar. */
+.s8-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 3px solid var(--rule);
+  border-radius: 6px;
+  box-shadow: 3px 3px 0 var(--rule);
+  background: var(--lever-offer-bg);
+}
+.s8-total.lever-checkin { background: var(--lever-checkin-bg); }
+.s8-total.lever-nothing { background: var(--lever-nothing-bg); }
+.s8-total-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--ink-on-box);
+}
+.s8-total-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Narration. */
+.s8-note { margin-top: 10px; min-height: 2.6em; }
+
+/* ---- Responsive: stack the stage on narrow viewports ---- */
+@media (max-width: 760px) {
+  .s8-stage { grid-template-columns: 1fr; }
+  .s8-flow-arrow { padding-top: 0; transform: rotate(90deg); }
+  .s8-stay-cards { grid-template-columns: 1fr; }
+}

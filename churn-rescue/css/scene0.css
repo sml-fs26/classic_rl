@@ -1,0 +1,133 @@
+/* Scene 0: CHURN RESCUE title / hook.
+
+   The foundation shell (css/style.css) already defines .sc0-scene,
+   .sc0-title-wrap, .sc0-title, .sc0-subtitle, .sc0-start,
+   .sc0-start-chevron and .sc0-credits. This file layers the hero
+   account-card stage, the PRESS START blink + chevron bounce, and the
+   card -> empty-retention-map dissolve on top. */
+
+/* The title column: hero stage on top, wordmark + hook + START below.
+   Override the foundation's bare .sc0-title-wrap (text-align only) into a
+   centred flex column so the cooling card leads the eye down to START. */
+.sc0-scene .sc0-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+/* ---- Hero stage: the cooling account card ---- */
+.sc0-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 168px;
+  margin: 0 0 14px;
+}
+.sc0-card-host {
+  /* Scale the full account card up so it reads as the hero of the
+     screen, and give it a gentle "cooling" breath. */
+  transform: scale(1.35);
+  transform-origin: center;
+  animation: sc0-card-breathe 3.2s ease-in-out infinite;
+}
+@keyframes sc0-card-breathe {
+  0%, 100% { transform: scale(1.35) translateY(0); }
+  50%      { transform: scale(1.35) translateY(-4px); }
+}
+
+/* ---- Title wordmark: tighten the foundation default a touch for the
+   longer two-word mark, and add a subtle drop-in on first paint. ---- */
+.sc0-scene .sc0-title {
+  font-size: clamp(26px, 5.4vw, 50px);
+  letter-spacing: 4px;
+  margin: 0 0 14px;
+}
+.sc0-scene .sc0-subtitle {
+  max-width: 34em;
+  margin: 0 auto 22px;
+}
+
+/* ---- PRESS START: blinking primary button with a bouncing chevron.
+   .sc0-start inherits the .poke-btn look from the shell; we add the
+   arcade blink + chevron motion here. ---- */
+.sc0-scene .sc0-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  animation: sc0-start-blink 1.05s steps(2, end) infinite;
+}
+.sc0-scene .sc0-start:hover { animation: none; }
+@keyframes sc0-start-blink {
+  0%, 62%   { opacity: 1; }
+  63%, 100% { opacity: 0.45; }
+}
+.sc0-scene .sc0-start-chevron {
+  display: inline-block;
+  color: var(--pikachu-cheek);
+  animation: sc0-chevron-bounce 0.7s ease-in-out infinite;
+}
+@keyframes sc0-chevron-bounce {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
+}
+
+/* ---- The empty retention-map board the card dissolves into. Hidden
+   (zero height) until START mounts it; then it fades + lifts in while the
+   hero card dissolves and the title furniture fades. ---- */
+.sc0-board-host {
+  width: 100%;
+  max-width: 760px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin: 0 auto;
+  pointer-events: none;
+}
+.sc0-dissolving .sc0-board-host {
+  max-height: 520px;
+  opacity: 1;
+  margin: 6px auto 16px;
+  animation: sc0-board-in 0.7s ease-out both;
+}
+@keyframes sc0-board-in {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* On START, dissolve the hero card and fade the title furniture so the
+   board takes the stage. The card's own animationend (or a JS timeout)
+   advances to scene 1. */
+.sc0-dissolving .sc0-card-host {
+  animation: sc0-card-dissolve 0.75s ease-in forwards;
+}
+@keyframes sc0-card-dissolve {
+  0%   { opacity: 1; transform: scale(1.35); filter: none; }
+  100% { opacity: 0; transform: scale(0.7);  filter: grayscale(1) blur(2px); }
+}
+.sc0-dissolving .sc0-title,
+.sc0-dissolving .sc0-subtitle,
+.sc0-dissolving .sc0-start,
+.sc0-dissolving .sc0-credits {
+  animation: sc0-furniture-fade 0.5s ease-out forwards;
+}
+@keyframes sc0-furniture-fade {
+  0%   { opacity: 1; }
+  100% { opacity: 0.18; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc0-card-host,
+  .sc0-scene .sc0-start,
+  .sc0-scene .sc0-start-chevron,
+  .sc0-dissolving .sc0-board-host,
+  .sc0-dissolving .sc0-card-host,
+  .sc0-dissolving .sc0-title,
+  .sc0-dissolving .sc0-subtitle,
+  .sc0-dissolving .sc0-start,
+  .sc0-dissolving .sc0-credits {
+    animation: none;
+  }
+  .sc0-card-host { transform: scale(1.3); }
+}

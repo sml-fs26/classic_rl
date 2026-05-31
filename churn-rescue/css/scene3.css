@@ -1,0 +1,271 @@
+/* Scene 3: "What makes this an MDP?" (Formalization)
+   Freeze the board, ring the four parts (S / A / P / R) one at a time.
+   All categorical colour comes from the shared tokens (lever-*, cb-*,
+   hp-*, ink-*, rule); this file only does layout + the reveal states. */
+
+.scene3-scene { color: var(--ink); }
+
+.s3-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.s3-heading { text-align: center; }
+
+/* Two columns: the frozen board on the left, the menu + part-cards on
+   the right. */
+.s3-row {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+/* ---------- LEFT: the frozen board ---------- */
+.s3-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 12px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s3-board-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+}
+
+/* The reveal RING: a wrapper that draws a highlight box once .lit. The
+   default (state / action / reward) ring is a solid ink box; the
+   transition ring is a dashed "you don't control this" box in the
+   colour-blind-safe vermillion. */
+.s3-ring {
+  position: relative;
+  padding: 10px 12px;
+  border: 3px solid transparent;
+  border-radius: 6px;
+  transition: border-color 220ms ease-out, box-shadow 220ms ease-out, background-color 220ms ease-out;
+}
+.s3-ring.lit {
+  border-color: var(--rule);
+  background: var(--card-bg);
+  box-shadow: 0 0 0 3px var(--pikachu-yellow);
+}
+.s3-ring-trans.lit {
+  border-style: dashed;
+  border-color: var(--cb-vermillion);
+  box-shadow: 0 0 0 3px var(--cb-vermillion-light);
+}
+
+/* The floating part TAG sits at the corner of a ring. */
+.s3-tag {
+  position: absolute;
+  top: -11px;
+  left: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 2px 6px;
+  background: var(--rule);
+  color: var(--bg-strong);
+  border-radius: 3px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.s3-tag.show { opacity: 1; transform: none; }
+.s3-tag-p {
+  background: var(--cb-vermillion);
+  color: var(--bg-strong);
+}
+
+/* the two-dice ring: hidden until step 3 */
+.s3-dice {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 240ms ease-out, transform 240ms ease-out, border-color 220ms ease-out, box-shadow 220ms ease-out;
+}
+.s3-dice.show { opacity: 1; transform: none; }
+.s3-dice-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.s3-dice-arrow {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: var(--ink-secondary);
+}
+.s3-dice-cap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+}
+.s3-dice-name { color: var(--ink-on-box); }
+.s3-dice-then { color: var(--ink-secondary); }
+
+/* ---------- RIGHT: the menu + part-cards ---------- */
+.s3-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The action ring wraps the lever menu. */
+.s3-ring-action { align-self: start; }
+.s3-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+}
+.s3-lever {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+  background: var(--card-bg);
+  border: 2px solid var(--rule);
+  border-radius: 4px;
+  text-align: left;
+  transition: opacity 200ms ease-out, box-shadow 200ms ease-out, transform 120ms ease-out;
+}
+.s3-lever .s3-lever-name { white-space: nowrap; }
+.s3-lever-chosen {
+  box-shadow: 0 0 0 3px currentColor;
+  transform: translateX(2px);
+}
+.s3-lever-dim { opacity: 0.42; }
+
+/* The four part-cards. Dim until .lit, then full ink + a left rule in the
+   part's own accent. */
+.s3-parts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.s3-part {
+  border: 2px solid var(--rule);
+  border-left-width: 6px;
+  border-radius: 4px;
+  background: var(--bg-strong);
+  padding: 9px 11px;
+  opacity: 0.4;
+  transition: opacity 240ms ease-out, box-shadow 240ms ease-out;
+}
+.s3-part.lit { opacity: 1; box-shadow: 3px 3px 0 var(--rule); }
+.s3-part.part-s { border-left-color: var(--ink-secondary); }
+.s3-part.part-a { border-left-color: var(--lever-checkin); }
+.s3-part.part-p { border-left-color: var(--cb-vermillion); }
+.s3-part.part-r { border-left-color: var(--cb-bluish-green); }
+
+.s3-part-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.s3-part-letter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  color: var(--ink);
+}
+.s3-part-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.05em;
+}
+.s3-part-sym {
+  margin-bottom: 6px;
+  color: var(--ink-on-box);
+  min-height: 18px;
+}
+.s3-part-sym .katex { font-size: 13px; color: var(--ink-on-box); }
+.s3-part-gloss {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.85;
+  color: var(--ink-secondary);
+}
+
+/* ---------- BELOW: ledger + Markov line + tuple ---------- */
+.s3-below {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  gap: 18px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+/* The one-month reward ledger: hidden until step 4. */
+.s3-ledger {
+  opacity: 0.3;
+  transition: opacity 260ms ease-out, box-shadow 260ms ease-out;
+}
+.s3-ledger.show { opacity: 1; }
+.s3-ledger.lit { box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 0 0 0 3px var(--cb-bluish-green); }
+/* the two deferred terminal lumps read fainter than the cost-now row */
+.s3-ledger .s3-ledger-pending { opacity: 0.62; }
+.s3-ledger .s3-ledger-pending .ledger-amt { filter: saturate(0.7); }
+
+/* Markov line + tuple: hidden until step 5. */
+.s3-markov {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 280ms ease-out, transform 280ms ease-out;
+}
+.s3-markov.show { opacity: 1; transform: none; }
+.s3-markov-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink);
+}
+.s3-markov-key { color: var(--cb-vermillion); }
+.s3-tuple { margin: 0; }
+.s3-tuple .katex { font-size: 18px; }
+
+/* ---------- caption + controls ---------- */
+.s3-caption { text-align: center; margin-left: auto; margin-right: auto; min-height: 34px; }
+.s3-ctrls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+.s3-step-of {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-secondary);
+  min-width: 54px;
+  text-align: center;
+}
+.s3-hint { text-align: center; }
+
+/* ---------- narrow viewport: stack the columns ---------- */
+@media (max-width: 880px) {
+  .s3-row, .s3-below { grid-template-columns: 1fr; }
+  .s3-parts { grid-template-columns: 1fr; }
+}

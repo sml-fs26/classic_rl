@@ -1,0 +1,278 @@
+/* Scene 4: "Policy: your playbook"
+   A read/write 5x5 policy board (one lever per cell) + a live outcome panel.
+   All categorical colour comes from the shared lever / hp / cb / ink tokens;
+   this file only does layout + the region tints (matching the retention-map
+   idiom in qtable.css so the board reads as the same kind of object). */
+
+.scene4-scene { color: var(--ink); }
+
+.s4-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.s4-heading { text-align: center; margin-bottom: 6px; }
+
+/* the pi : S -> A definition line */
+.s4-defline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 auto 14px;
+  text-align: center;
+}
+.s4-def-formula { color: var(--ink-on-box); }
+.s4-def-formula .katex { font-size: 17px; color: var(--ink); }
+.s4-def-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+}
+
+/* two columns: the board on the left, the outcome panel on the right */
+.s4-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* ---------- LEFT: the playbook board ---------- */
+.s4-left { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+.s4-presets {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.s4-preset { font-size: 9px; padding: 7px 10px; }
+.s4-preset.active {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--rule), inset 0 0 0 2px var(--rule);
+}
+
+.s4-board {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* column header (months) aligned to the grid's data columns */
+.s4-colheads {
+  display: grid;
+  grid-template-columns: 84px repeat(var(--nm, 5), minmax(0, 1fr));
+  gap: 6px;
+}
+.s4-corner {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.s4-colhead {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink);
+  text-align: center;
+  padding: 4px 0;
+  position: relative;
+}
+.s4-colhead.s4-col-imminent { color: var(--cb-vermillion); }
+.s4-colhead.s4-col-runway { color: var(--cb-bluish-green); }
+
+.s4-grid {
+  display: grid;
+  grid-template-columns: 84px repeat(var(--nm, 5), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--nt, 5), auto);
+  gap: 6px;
+}
+.s4-rowhead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  padding: 0 2px;
+}
+.s4-rowhead.tier0 { color: var(--hp-b4); }
+.s4-rowhead.tier1 { color: var(--hp-b3); }
+.s4-rowhead.tier2 { color: var(--ink); }
+.s4-rowhead.tier3 { color: var(--hp-b1); }
+.s4-rowhead.tier4 { color: var(--hp-b0); }
+
+/* ---- a single policy cell: mini account card + a lever chip ---- */
+.s4-cell {
+  position: relative;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset -2px -2px 0 0 rgba(0, 0, 0, 0.12), 2px 2px 0 0 rgba(0, 0, 0, 0.18);
+  padding: 6px 5px 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  transition: transform 80ms ease-out, background-color 200ms ease-out;
+}
+.s4-cell.clickable { cursor: pointer; }
+.s4-cell.clickable:hover { transform: scale(1.03); z-index: 1; }
+
+/* region tint by the cell's chosen lever (matches qtable region-* idiom) */
+.s4-cell.region-nothing { background: var(--lever-nothing-bg); }
+.s4-cell.region-checkin { background: var(--lever-checkin-bg); }
+.s4-cell.region-offer   { background: var(--lever-offer-bg); }
+
+/* the mini account card sits flush; strip its own border/shadow */
+.s4-cell-card { width: 100%; display: flex; justify-content: center; }
+.s4-cell .account-card.account-card-mini {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 2px 0 0;
+}
+
+/* the lever chip: the policy's pick for this cell */
+.s4-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+  padding: 3px 4px;
+  border: 2px solid var(--rule);
+  border-radius: 3px;
+  background: var(--card-bg);
+}
+.s4-cell.region-nothing .s4-chip { background: var(--lever-nothing); }
+.s4-cell.region-checkin .s4-chip { background: var(--lever-checkin); }
+.s4-cell.region-offer   .s4-chip { background: var(--lever-offer); }
+.s4-chip-glyph { line-height: 0; color: var(--lever-on); display: inline-flex; }
+.s4-chip-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--lever-on);
+}
+
+@keyframes s4-cell-flip {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); filter: brightness(1.3); }
+  100% { transform: scale(1); }
+}
+.s4-cell.s4-cell-flip { animation: s4-cell-flip 0.42s ease-out; z-index: 2; }
+
+/* ---------- RIGHT: the outcome panel ---------- */
+.s4-right { display: flex; flex-direction: column; gap: 14px; }
+.s4-out-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+.s4-startcard { color: var(--lever-checkin); }
+
+/* gauge (renewal rate) */
+.s4-gauge, .s4-return {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  padding: 10px 12px;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s4-gauge-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 7px;
+}
+.s4-gauge-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+}
+.s4-gauge-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.s4-gauge-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  margin-top: 6px;
+}
+.s4-gauge-track {
+  height: 14px;
+  border: 2px solid var(--rule);
+  background: var(--card-bg);
+  position: relative;
+  overflow: hidden;
+}
+.s4-gauge-fill {
+  display: block;
+  height: 100%;
+  background: var(--cb-bluish-green);
+  transition: width 320ms ease-out;
+}
+
+/* return meter: zero at centre, fills left (neg, vermillion) / right (pos, green) */
+.s4-ret-track {
+  height: 16px;
+  border: 2px solid var(--rule);
+  background: var(--card-bg);
+  position: relative;
+  overflow: hidden;
+}
+.s4-ret-zero {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--ink-secondary);
+  transform: translateX(-1px);
+  z-index: 2;
+}
+.s4-ret-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--cb-bluish-green);
+  transition: left 320ms ease-out, width 320ms ease-out;
+}
+.s4-ret-track.is-neg .s4-ret-fill { background: var(--cb-vermillion); }
+.s4-ret-val.pos { color: var(--cb-bluish-green); }
+.s4-ret-val.neg { color: var(--cb-vermillion); }
+
+/* verdict line */
+.s4-verdict {
+  font-size: 9px;
+  line-height: 1.8;
+}
+.s4-verdict-win  { box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 0 0 0 3px var(--cb-bluish-green); }
+.s4-verdict-lose { box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 0 0 0 3px var(--cb-vermillion); }
+
+/* ---------- BELOW: the scene-2 callback ---------- */
+.s4-callback {
+  margin-top: 16px;
+  font-size: 10px;
+  line-height: 1.85;
+}
+.s4-callback-key { color: var(--pikachu-yellow); -webkit-text-stroke: 0.4px var(--rule); }
+.s4-hint { text-align: center; margin-top: 4px; }
+
+/* ---------- narrow viewport ---------- */
+@media (max-width: 900px) {
+  .s4-row { grid-template-columns: 1fr; }
+}

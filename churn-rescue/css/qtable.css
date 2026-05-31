@@ -1,0 +1,318 @@
+/* The RETENTION MAP (the 5x5 Q-grid widget mounted by js/qtable.js).
+ *
+ *   rows    = engagement tier, THRIVING at the top .. CLIFF at the bottom
+ *   columns = months-left, m=1 LEFT (renewal imminent) .. m=5 RIGHT (runway)
+ *   Each cell = a mini account card + three lever-value rows; the argmax
+ *   lever is starred and the whole cell is tinted by the winning lever
+ *   colour token (grey / blue / gold) so the optimal policy reads as a map
+ *   of coloured regions, with the blue notch at at-risk x long runway.
+ *
+ *   All colour comes from the shared lever tokens (--lever-nothing /
+ *   -checkin / -offer + their -bg variants) and the engagement-bar tokens,
+ *   so light + CRT retint with no per-widget overrides.
+ */
+
+.qtable-host.retention-map {
+  display: block;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+
+/* Column header row: corner label + one cell per month. */
+.rm-col-heads {
+  display: grid;
+  grid-template-columns: 84px repeat(var(--nm, 5), minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+.rm-corner-head {
+  align-self: end;
+  padding-bottom: 2px;
+  font-size: 6.5px;
+  color: var(--ink-secondary);
+}
+.rm-col-head {
+  text-align: center;
+  align-self: end;
+  padding-bottom: 2px;
+  color: var(--ink);
+}
+/* The two edge columns carry meaning (imminent vs runway): tag them. */
+.rm-col-head.rm-col-imminent::after {
+  content: '◀';
+  display: block;
+  font-size: 6px;
+  color: var(--lever-offer);
+  margin-top: 1px;
+}
+.rm-col-head.rm-col-runway::after {
+  content: '▶';
+  display: block;
+  font-size: 6px;
+  color: var(--lever-checkin);
+  margin-top: 1px;
+}
+
+/* The grid itself. */
+.rm-grid {
+  display: grid;
+  grid-template-columns: 84px repeat(var(--nm, 5), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--nt, 5), auto);
+  gap: 6px;
+}
+
+/* Row labels (tier names), tinted by the tier token like the card. */
+.rm-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  padding: 0 2px;
+}
+.rm-row-head.tier0 { color: var(--hp-b4); }
+.rm-row-head.tier1 { color: var(--hp-b3); }
+.rm-row-head.tier2 { color: var(--ink); }
+.rm-row-head.tier3 { color: var(--hp-b1); }
+.rm-row-head.tier4 { color: var(--hp-b0); }
+
+/* ---- A single retention-map cell ---- */
+.rm-cell {
+  position: relative;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset -2px -2px 0 0 rgba(0, 0, 0, 0.12), 2px 2px 0 0 rgba(0, 0, 0, 0.18);
+  padding: 6px 6px 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  transition: opacity 200ms, background-color 200ms;
+}
+.rm-cell.unvisited { opacity: 0.6; }
+
+/* The mini account card sits flush at the top of the cell. The card brings
+   its own border/shadow via .account-card; inside a map cell we strip those
+   so it reads as part of the cell, not a nested box. */
+.rm-card { width: 100%; display: flex; justify-content: center; }
+.rm-cell .account-card.account-card-mini {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 2px 0 0;
+  gap: 3px;
+}
+
+/* Three lever-value rows. */
+.rm-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+.rm-bar-row {
+  display: grid;
+  grid-template-columns: 10px 9px 1fr auto;
+  gap: 4px;
+  align-items: center;
+  font-size: 7px;
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+.rm-mark {
+  width: 10px;
+  text-align: center;
+  color: var(--ink-on-box);
+  font-weight: bold;
+}
+.rm-swatch {
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--rule);
+  box-sizing: border-box;
+}
+.rm-swatch.lever-nothing { background: var(--lever-nothing); }
+.rm-swatch.lever-checkin { background: var(--lever-checkin); }
+.rm-swatch.lever-offer   { background: var(--lever-offer); }
+.rm-label {
+  font-size: 7px;
+  letter-spacing: 0.02em;
+  color: var(--ink-on-box);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rm-val {
+  font-size: 7.5px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.rm-bar-row.argmax {
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+.rm-bar-row.argmax .rm-label,
+.rm-bar-row.argmax .rm-val { font-weight: bold; }
+
+/* ---- Policy-region tint: the whole cell takes the winning lever colour
+   (its soft -bg token) so the board reads as coloured regions. The argmax
+   row inside gets the solid lever colour as an accent strip. ---- */
+.rm-cell.region-nothing { background: var(--lever-nothing-bg); }
+.rm-cell.region-checkin { background: var(--lever-checkin-bg); }
+.rm-cell.region-offer   { background: var(--lever-offer-bg); }
+
+.rm-cell.region-nothing .rm-bar-row.argmax { background: var(--lever-nothing); color: var(--lever-on); }
+.rm-cell.region-checkin .rm-bar-row.argmax { background: var(--lever-checkin); color: var(--lever-on); }
+.rm-cell.region-offer   .rm-bar-row.argmax { background: var(--lever-offer);   color: var(--lever-on); }
+.rm-cell.region-nothing .rm-bar-row.argmax .rm-label,
+.rm-cell.region-nothing .rm-bar-row.argmax .rm-val,
+.rm-cell.region-nothing .rm-bar-row.argmax .rm-mark,
+.rm-cell.region-checkin .rm-bar-row.argmax .rm-label,
+.rm-cell.region-checkin .rm-bar-row.argmax .rm-val,
+.rm-cell.region-checkin .rm-bar-row.argmax .rm-mark,
+.rm-cell.region-offer   .rm-bar-row.argmax .rm-label,
+.rm-cell.region-offer   .rm-bar-row.argmax .rm-val,
+.rm-cell.region-offer   .rm-bar-row.argmax .rm-mark { color: var(--lever-on); }
+/* The argmax swatch on the accent strip needs a light border to stay
+   visible against the solid lever colour. */
+.rm-cell .rm-bar-row.argmax .rm-swatch { border-color: var(--lever-on); }
+
+/* Clickable affordance (painted only while a cb is registered). */
+.rm-cell.clickable { cursor: pointer; transition: transform 80ms ease-out, background-color 200ms; }
+.rm-cell.clickable:hover { transform: scale(1.03); z-index: 1; }
+.rm-cell.selected { outline: 3px solid var(--ink); outline-offset: -3px; z-index: 2; }
+
+/* First-fill flash + per-step delta + argmax-flip flash. */
+@keyframes rm-register {
+  0%   { box-shadow: 0 0 0 0 var(--lever-offer), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+  50%  { box-shadow: 0 0 0 6px var(--lever-offer), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+  100% { box-shadow: 0 0 0 0 transparent, inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+}
+.rm-cell.rm-just-registered { animation: rm-register 1.05s ease-out; z-index: 4; }
+
+@keyframes rm-argmax-flip {
+  0%   { box-shadow: 0 0 0 3px var(--ink), inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+  100% { box-shadow: 0 0 0 0 transparent, inset -2px -2px 0 0 rgba(0,0,0,0.12), 2px 2px 0 0 rgba(0,0,0,0.18); }
+}
+.rm-cell.rm-argmax-flip { animation: rm-argmax-flip 1.0s ease-out; }
+
+@keyframes rm-delta-rise {
+  0%   { opacity: 0; transform: translateY(2px); }
+  18%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+.rm-delta {
+  position: absolute;
+  right: 5px;
+  top: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  pointer-events: none;
+  animation: rm-delta-rise 1.2s ease-out forwards;
+  text-shadow: 1px 1px 0 var(--bg-strong), -1px -1px 0 var(--bg-strong), 1px -1px 0 var(--bg-strong), -1px 1px 0 var(--bg-strong);
+  z-index: 5;
+}
+.rm-delta.pos   { color: var(--lever-checkin); }
+.rm-delta.neg   { color: var(--cb-vermillion); }
+.rm-delta.awake { color: var(--lever-offer); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rm-cell.rm-just-registered,
+  .rm-cell.rm-argmax-flip { animation: none; }
+}
+
+/* ---- Lever-frequency strip (the policy-region census) ---- */
+.rm-freq-strip {
+  margin-top: 14px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset -2px -2px 0 0 rgba(0, 0, 0, 0.12), 2px 2px 0 0 rgba(0, 0, 0, 0.18);
+  padding: 8px 12px;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+.rm-freq-title {
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.rm-freq-row {
+  display: grid;
+  grid-template-columns: 12px 56px 1fr 24px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 7px;
+}
+.rm-freq-swatch {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--rule);
+  box-sizing: border-box;
+}
+.rm-freq-swatch.lever-nothing { background: var(--lever-nothing); }
+.rm-freq-swatch.lever-checkin { background: var(--lever-checkin); }
+.rm-freq-swatch.lever-offer   { background: var(--lever-offer); }
+.rm-freq-label { letter-spacing: 0.04em; }
+.rm-freq-track {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.16);
+  border: 1px solid var(--rule);
+  position: relative;
+  box-sizing: border-box;
+}
+.rm-freq-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  transition: width 240ms;
+}
+.rm-freq-fill.lever-nothing { background: var(--lever-nothing); }
+.rm-freq-fill.lever-checkin { background: var(--lever-checkin); }
+.rm-freq-fill.lever-offer   { background: var(--lever-offer); }
+.rm-freq-val { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---- Legend ---- */
+.rm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+.rm-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.rm-legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 9px;
+  border: 1px solid var(--rule);
+  box-sizing: border-box;
+}
+.rm-legend-swatch.lever-nothing { background: var(--lever-nothing); }
+.rm-legend-swatch.lever-checkin { background: var(--lever-checkin); }
+.rm-legend-swatch.lever-offer   { background: var(--lever-offer); }
+
+/* ---------------------------------------------------------------------------
+   Mobile (<= 720px). Five columns x five rows of mini-cards do not shrink
+   to a phone; keep desktop sizing and let the user pan horizontally inside
+   the host, matching the rest of the chrome.
+   --------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .qtable-host.retention-map {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .qtable-host.retention-map .rm-col-heads,
+  .qtable-host.retention-map .rm-grid { min-width: 600px; }
+}

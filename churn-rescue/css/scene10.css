@@ -1,0 +1,180 @@
+/* Scene 10: why DP does not scale. Two side-by-side caveat panels plus a
+   computed state-space blow-up, using the foundation tokens. */
+
+.s10-scene { max-width: 1120px; margin: 0 auto; }
+
+.s10-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0 0 8px;
+  letter-spacing: 1px;
+}
+:root[data-theme="crt"] .s10-heading { text-shadow: 0 0 6px rgba(255, 180, 80, 0.55); }
+
+.s10-hook {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 66em;
+  margin: 0 0 16px;
+}
+
+/* ---- Two-panel layout ---- */
+.s10-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+.s10-panel {
+  border: 3px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg-strong);
+  padding: 14px 16px;
+  box-shadow: 4px 4px 0 var(--rule);
+  display: flex;
+  flex-direction: column;
+}
+.s10-panel-a { border-color: var(--cb-vermillion); }
+.s10-panel-b { border-color: var(--lever-offer); }
+
+.s10-panel-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--lever-on);
+  background: var(--cb-vermillion);
+  display: inline-block;
+  align-self: flex-start;
+  padding: 4px 7px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+.s10-panel-b .s10-panel-tag { background: var(--lever-offer); }
+
+.s10-panel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-on-box);
+  margin-bottom: 12px;
+}
+
+.s10-panel-body { margin-top: auto; }
+.s10-line {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+  margin-bottom: 8px;
+}
+
+/* ---- Panel (a): the hidden model ---- */
+.s10-formula { display: block; margin: 0 auto 12px; text-align: center; width: fit-content; }
+.s10-formula .katex { font-size: 16px; color: var(--ink-on-box); }
+
+.s10-dice-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.s10-myst { text-align: center; }
+.s10-myst-face {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 4px;
+  border: 3px dashed var(--cb-vermillion);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 24px;
+  color: var(--cb-vermillion);
+}
+.s10-myst-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+}
+
+/* ---- Panel (b): the blow-up tally ---- */
+.s10-tally {
+  border: 2px solid var(--inner-highlight);
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 12px;
+  background: var(--bg);
+}
+.s10-tally-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 4px 2px;
+  color: var(--ink);
+}
+.s10-tally-row + .s10-tally-row { border-top: 1px solid var(--inner-highlight); }
+.s10-tally-base { color: var(--ink); }
+.s10-tally-base .s10-tally-total { color: var(--lever-checkin); }
+.s10-tally-label { color: var(--ink); }
+.s10-tally-mult { color: var(--ink-secondary); font-size: 7px; }
+.s10-tally-total {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--lever-offer);
+  min-width: 84px;
+}
+
+/* ---- Scale bar (log) ---- */
+.s10-scale {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.s10-scale-row {
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+.s10-scale-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+}
+.s10-scale-track {
+  height: 12px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.s10-scale-fill { display: block; height: 100%; }
+.s10-fill-small { background: var(--lever-checkin); }
+.s10-fill-big   { background: var(--lever-offer); }
+.s10-scale-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+  text-align: right;
+}
+
+/* ---- Bridge ---- */
+.s10-bridge {
+  margin-top: 18px;
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+@media (max-width: 820px) {
+  .s10-panels { grid-template-columns: 1fr; }
+}

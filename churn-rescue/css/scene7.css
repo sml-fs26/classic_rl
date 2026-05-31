@@ -1,0 +1,154 @@
+/* Scene 7: Q*, value of a lever. Account-card + two-column Q* table, plus
+   the shared concept-* primitives (identical across the concept scenes so
+   each scene CSS is self-contained). */
+
+/* ---------- shared concept primitives ---------- */
+.concept-scene { max-width: 1080px; margin: 0 auto; }
+.concept-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px; color: var(--ink); margin: 4px 0 10px; line-height: 1.5;
+}
+.concept-hook {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; line-height: 1.9; color: var(--ink-secondary);
+  max-width: 60em; margin: 0 0 16px;
+}
+.concept-hook b { color: var(--ink); }
+.concept-formula-card {
+  background: var(--bg-strong); border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 12px 16px; margin: 0 0 16px; text-align: center;
+}
+.concept-formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-secondary); margin-bottom: 8px;
+}
+.concept-formula-card .katex { color: var(--ink-on-box); font-size: 18px; }
+.concept-formula-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.85; color: var(--ink-secondary);
+  margin-top: 10px; max-width: 62em; margin-left: auto; margin-right: auto;
+}
+.concept-formula-foot b { color: var(--ink-on-box); }
+.concept-key-question {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; line-height: 1.9; color: var(--ink);
+  border-left: 4px solid var(--lever-offer);
+  background: var(--bg-strong); padding: 12px 14px; margin: 16px 0 0;
+}
+.concept-key-question b { color: var(--lever-offer); }
+
+/* ---------- the per-state panel ---------- */
+.qstar-panel {
+  display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 16px 18px;
+}
+.qstar-left {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
+  gap: 10px; min-width: 200px;
+}
+.qstar-state-label {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  letter-spacing: 0.06em; color: var(--ink-secondary);
+}
+.qstar-card-host { transform: scale(1.2); transform-origin: top center; margin: 4px 0 28px; }
+.qstar-blurb {
+  font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.85;
+  color: var(--ink-secondary); text-align: center; max-width: 22em;
+}
+.qstar-blurb b { color: var(--ink-on-box); font-size: 9px; }
+
+.qstar-right { flex: 1 1 320px; min-width: 300px; }
+
+/* ---------- guess prompt (before reveal) ---------- */
+.qstar-guess-prompt {
+  font-family: 'Press Start 2P', monospace; font-size: 10px; line-height: 1.7;
+  color: var(--ink-on-box); margin-bottom: 12px;
+}
+.qstar-guess-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.qstar-guess-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  color: var(--ink-on-box); background: var(--card-bg);
+  border: 2px solid currentColor; border-radius: 3px;
+  padding: 8px 10px; cursor: pointer;
+}
+.qstar-guess-btn.lever-nothing { color: var(--lever-nothing); }
+.qstar-guess-btn.lever-checkin { color: var(--lever-checkin); }
+.qstar-guess-btn.lever-offer   { color: var(--lever-offer); }
+.qstar-guess-btn.picked { color: var(--lever-on); }
+.qstar-guess-btn.picked.lever-nothing { background: var(--lever-nothing); border-color: var(--lever-nothing); }
+.qstar-guess-btn.picked.lever-checkin { background: var(--lever-checkin); border-color: var(--lever-checkin); }
+.qstar-guess-btn.picked.lever-offer   { background: var(--lever-offer);   border-color: var(--lever-offer); }
+.qstar-reveal { margin-bottom: 8px; }
+.qstar-guess-hint {
+  font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink-secondary);
+  line-height: 1.7;
+}
+
+/* ---------- the two-column Q* table (after reveal) ---------- */
+.qstar-table {
+  width: 100%; border-collapse: collapse;
+  font-family: 'Press Start 2P', monospace;
+  border: 3px solid var(--rule);
+}
+.qstar-table th {
+  font-size: 8px; letter-spacing: 0.04em; color: var(--ink-secondary);
+  text-align: left; padding: 8px 10px;
+  border-bottom: 2px solid var(--rule); background: var(--bg-strong);
+}
+.qstar-table th.qstar-tq, .qstar-table td.qstar-tq { text-align: right; }
+.qstar-trow td {
+  font-size: 11px; color: var(--ink-on-box);
+  padding: 11px 10px; border-bottom: 1px solid var(--inner-highlight);
+  background: var(--card-bg);
+}
+.qstar-trow:last-child td { border-bottom: none; }
+.qstar-tlever { display: flex; align-items: center; gap: 7px; }
+.qstar-swatch {
+  display: inline-block; width: 11px; height: 11px; border: 1px solid var(--rule);
+}
+.qstar-swatch.lever-nothing { background: var(--lever-nothing); }
+.qstar-swatch.lever-checkin { background: var(--lever-checkin); }
+.qstar-swatch.lever-offer   { background: var(--lever-offer); }
+.qstar-tq { font-variant-numeric: tabular-nums; }
+
+/* argmax row: tinted by its lever colour + a star. */
+.qstar-trow.argmax td { font-weight: bold; }
+.qstar-trow.argmax.lever-nothing td { background: var(--lever-nothing-bg); }
+.qstar-trow.argmax.lever-checkin td { background: var(--lever-checkin-bg); }
+.qstar-trow.argmax.lever-offer   td { background: var(--lever-offer-bg); }
+.qstar-trow.argmax.lever-nothing td:last-child { color: var(--lever-nothing); }
+.qstar-trow.argmax.lever-checkin td:last-child { color: var(--lever-checkin); }
+.qstar-trow.argmax.lever-offer   td:last-child { color: var(--lever-offer); }
+.qstar-star { margin-left: 6px; color: var(--lever-offer); }
+.qstar-trow.argmax.lever-checkin .qstar-star { color: var(--lever-checkin); }
+.qstar-trow.argmax.lever-nothing .qstar-star { color: var(--lever-nothing); }
+
+.qstar-verdict {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.7;
+  margin-top: 12px; padding: 8px 10px; border: 2px solid currentColor; border-radius: 3px;
+}
+.qstar-verdict.right { color: var(--cb-bluish-green); }
+.qstar-verdict.wrong { color: var(--cb-vermillion); }
+
+.qstar-best-line {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.7;
+  color: var(--ink-secondary); margin-top: 10px;
+}
+.qstar-best-line b.lever-nothing { color: var(--lever-nothing); }
+.qstar-best-line b.lever-checkin { color: var(--lever-checkin); }
+.qstar-best-line b.lever-offer   { color: var(--lever-offer); }
+
+/* ---------- tour stepper ---------- */
+.qstar-stepper {
+  display: flex; align-items: center; gap: 14px; margin: 16px 0 0;
+}
+.qstar-dots { display: flex; gap: 8px; }
+.qstar-dot {
+  width: 12px; height: 12px; border: 2px solid var(--rule);
+  background: transparent; border-radius: 50%;
+}
+.qstar-dot.active { background: var(--ink); }

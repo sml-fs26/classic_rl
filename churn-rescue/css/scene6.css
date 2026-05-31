@@ -1,0 +1,178 @@
+/* Scene 6: return G_t. Worked-expansion + payoff-histogram styling, plus
+   the shared concept-* primitives (kept identical across the concept
+   scenes so each scene CSS is self-contained). */
+
+/* ---------- shared concept primitives ---------- */
+.concept-scene { max-width: 1080px; margin: 0 auto; }
+.concept-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px; color: var(--ink); margin: 4px 0 10px; line-height: 1.5;
+}
+.concept-hook {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; line-height: 1.9; color: var(--ink-secondary);
+  max-width: 60em; margin: 0 0 16px;
+}
+.concept-hook b { color: var(--ink); }
+.concept-formula-card {
+  background: var(--bg-strong); border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 16px; margin: 0 0 12px; text-align: center;
+}
+.concept-formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-secondary); margin-bottom: 8px;
+}
+.concept-formula-card .katex { color: var(--ink-on-box); font-size: 18px; }
+.concept-formula-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.85; color: var(--ink-secondary);
+  margin-top: 10px; max-width: 62em; margin-left: auto; margin-right: auto;
+}
+.concept-formula-foot b { color: var(--ink-on-box); }
+.concept-key-question {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; line-height: 1.9; color: var(--ink);
+  border-left: 4px solid var(--lever-offer);
+  background: var(--bg-strong); padding: 12px 14px; margin: 16px 0 0;
+}
+.concept-key-question b { color: var(--lever-offer); }
+
+.ret-panel-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--ink-secondary); margin: 0 0 8px;
+}
+
+/* ---------- worked expansion ---------- */
+.ret-expansion-wrap {
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 14px; margin: 0 0 12px;
+}
+.ret-expansion {
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 10px;
+}
+.ret-exp-line {
+  font-size: 11px; line-height: 1.6;
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px;
+}
+.ret-exp-line sub { font-size: 8px; }
+.ret-lhs { color: var(--ink-on-box); }
+.ret-eq { color: var(--ink-secondary); margin-right: 2px; }
+.ret-nums { font-size: 10px; }
+.ret-r { font-variant-numeric: tabular-nums; }
+.ret-plus { color: var(--ink-secondary); }
+.ret-final { font-size: 12px; align-items: center; }
+.ret-result { font-size: 16px; font-variant-numeric: tabular-nums; }
+.ret-result.pos { color: var(--cb-bluish-green); }
+.ret-result.neg { color: var(--cb-vermillion); }
+.ret-term {
+  font-size: 8px; padding: 3px 6px; border: 2px solid currentColor; border-radius: 3px;
+}
+.ret-term.renewed { color: var(--cb-bluish-green); }
+.ret-term.churned { color: var(--cb-vermillion); }
+.ret-exp-note { font-size: 7px; color: var(--ink-secondary); margin-left: 4px; }
+.ret-resample { margin-top: 2px; }
+
+/* ---------- distribution panel ---------- */
+.ret-dist-wrap {
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 14px; margin: 0 0 12px;
+}
+.ret-playbook-row {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
+}
+.ret-playbook-lab {
+  font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink-secondary);
+}
+.ret-playbook-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  color: var(--ink-on-box); background: var(--card-bg);
+  border: 2px solid currentColor; border-radius: 3px;
+  padding: 6px 9px; cursor: pointer;
+}
+.ret-playbook-btn.lever-nothing { color: var(--lever-nothing); }
+.ret-playbook-btn.lever-checkin { color: var(--lever-checkin); }
+.ret-playbook-btn.lever-offer   { color: var(--lever-offer); }
+.ret-playbook-btn.active {
+  color: var(--lever-on);
+}
+.ret-playbook-btn.active.lever-nothing { background: var(--lever-nothing); border-color: var(--lever-nothing); }
+.ret-playbook-btn.active.lever-checkin { background: var(--lever-checkin); border-color: var(--lever-checkin); }
+.ret-playbook-btn.active.lever-offer   { background: var(--lever-offer);   border-color: var(--lever-offer); }
+
+.ret-stats {
+  display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 10px;
+  font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ink-secondary);
+}
+.ret-stat b { color: var(--ink-on-box); font-variant-numeric: tabular-nums; }
+.ret-stat b.pos { color: var(--cb-bluish-green); }
+.ret-stat b.neg { color: var(--cb-vermillion); }
+.ret-stats-empty { color: var(--ink-secondary); }
+
+/* The histogram: a row of bars in a fixed-height plot. A mu line + zero
+   line are drawn via ::after / ::before positioned by CSS vars. */
+.ret-hist {
+  position: relative;
+  display: flex; align-items: flex-end; gap: 1px;
+  height: 118px; padding: 4px 0 0;
+  border-bottom: 2px solid var(--rule);
+}
+.ret-hist-empty {
+  margin: auto; font-family: 'Press Start 2P', monospace;
+  font-size: 9px; color: var(--ink-secondary);
+}
+.ret-hist::before {   /* zero divider */
+  content: ''; position: absolute; top: 0; bottom: 0;
+  left: var(--zero-x, 50%); width: 2px;
+  background: var(--ink-secondary); opacity: 0.5;
+}
+.ret-hist::after {    /* mu glyph above the mean line */
+  content: 'μ'; position: absolute; top: -4px;
+  left: var(--mean-x, 50%); transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace; font-size: 10px;
+  color: var(--ink); z-index: 4;
+  border-bottom: none;
+}
+.ret-mean-line {   /* vertical mean line spanning the plot */
+  position: absolute; top: 0; bottom: 0;
+  left: var(--mean-x, 50%); width: 2px; transform: translateX(-1px);
+  background: var(--ink); z-index: 2;
+}
+.ret-bar-slot { flex: 1 1 0; display: flex; align-items: flex-end; height: 100%; }
+.ret-bar {
+  width: 100%; min-height: 0;
+  position: relative;
+  border: 1px solid var(--rule); border-bottom: none;
+  transition: height 0.2s ease-out;
+}
+.ret-bar.pos { background: var(--cb-bluish-green); }
+.ret-bar.neg { background: var(--cb-vermillion); }
+.ret-bar.empty { border-color: transparent; }
+.ret-bar-count {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--ink-secondary);
+}
+
+/* mu line as a thin overlay (drawn separately from the ::after glyph). */
+.ret-hist .ret-bar-slot:first-child { margin-left: 0; }
+.ret-hist-axis {
+  position: relative; height: 16px; margin-top: 2px;
+}
+.ret-hist-axis span {
+  position: absolute; transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--ink-secondary);
+  white-space: nowrap;
+}
+
+.ret-dist-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ret-bar { transition: none; }
+}

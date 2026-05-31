@@ -1,0 +1,222 @@
+/* Scene 1: Tutorial: how to play.
+ *
+ *   Three panels walked with arrows. Layout reuses the foundation tokens
+ *   (--rule, --card-bg, --ink-on-box, --bg-strong, lever tokens) so light +
+ *   CRT retint automatically. The account card / coin / die / ledger visuals
+ *   come from the foundation shell in css/style.css; this file styles only
+ *   the tutorial chrome and the per-panel scaffolding around those widgets.
+ */
+
+/* ---------- Step-engine chrome (shared across panels) ---------- */
+.tut-scene { display: flex; flex-direction: column; }
+
+.tut-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 4px;
+}
+.tut-step-counter {
+  font-family: 'Press Start 2P', monospace; font-size: 10px;
+  color: var(--ink-secondary); letter-spacing: 0.04em;
+}
+.tut-skip-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  color: var(--ink-on-box); background: var(--card-bg);
+  border: 2px solid var(--rule); border-radius: 4px;
+  padding: 7px 10px; cursor: pointer;
+  box-shadow: 2px 2px 0 var(--rule);
+}
+.tut-skip-btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--rule); }
+.tut-skip-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--rule); }
+
+.tut-section-title { margin: 2px 0 12px; }
+
+.tut-demo {
+  flex: 1 1 auto;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 360px;
+  padding: 6px 0 12px;
+}
+
+.tut-dialog { margin-top: 4px; }
+.tut-nav-hint {
+  margin-top: 8px; text-align: center;
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--ink-secondary);
+}
+.tut-nav-hint kbd {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  border: 1px solid var(--ink-secondary); border-radius: 3px;
+  padding: 1px 4px; margin: 0 1px;
+}
+
+/* =========================================================================
+   Panel 1: THE ACCOUNT CARD
+   ========================================================================= */
+.tut-card-panel {
+  display: flex; align-items: center; justify-content: center;
+  gap: 48px; flex-wrap: wrap;
+}
+.tut-card-hero {
+  display: flex; align-items: center; gap: 18px;
+  position: relative;
+}
+/* Bump the hero card up a touch so it reads as the centrepiece. */
+.tut-card-hero .account-card { transform: scale(1.25); transform-origin: center; }
+
+.tut-card-callouts {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.tut-callout {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 2px dashed var(--rule); border-radius: 4px;
+  padding: 6px 8px; line-height: 1.5;
+}
+.tut-callout.c-bar { color: var(--cb-bluish-green); }
+.tut-callout.c-countdown { color: var(--cb-blue); }
+
+.tut-tier-strip {
+  display: flex; flex-direction: column; gap: 8px; align-items: center;
+}
+.tut-strip-title {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--ink-secondary); letter-spacing: 0.06em;
+}
+.tut-tier-ladder {
+  display: flex; flex-direction: column; gap: 6px;
+  border: 3px solid var(--rule); border-radius: 6px;
+  background: var(--bg-strong); padding: 10px 12px;
+  box-shadow: 3px 3px 0 var(--rule);
+}
+.tut-tier-row { display: flex; align-items: center; }
+/* Mini cards in the ladder sit flat (no extra shadow stacking). */
+.tut-tier-ladder .account-card-mini { box-shadow: 2px 2px 0 var(--rule); }
+
+/* =========================================================================
+   Panel 2: THE THREE LEVERS
+   ========================================================================= */
+.tut-lever-panel {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  width: 100%; max-width: 760px;
+}
+.tut-lever-menu {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 16px; width: 100%;
+}
+.tut-lever-cell {
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+}
+.tut-lever-btn {
+  width: 100%; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 16px 12px;
+  border: 3px solid currentColor; border-radius: 6px;
+  background: var(--card-bg);
+  box-shadow: 3px 3px 0 var(--rule);
+}
+.tut-lever-name {
+  font-family: 'Press Start 2P', monospace; font-size: 11px;
+  color: currentColor;
+}
+.tut-lever-sub { display: flex; }
+.tut-lever-sub .cost-pill { font-size: 10px; }
+.tut-lever-desc {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  line-height: 1.6; color: var(--ink-on-box); text-align: center;
+  min-height: 3.4em;
+}
+
+.tut-lever-axis {
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 10px; width: 100%;
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--ink-secondary);
+}
+.tut-lever-axis .ax-l { text-align: left; }
+.tut-lever-axis .ax-r { text-align: right; }
+.tut-lever-axis .ax-mid {
+  height: 0; border-top: 2px solid var(--ink-secondary);
+  position: relative;
+}
+.tut-lever-axis .ax-mid::after {
+  content: '▸'; position: absolute; right: -2px; top: -9px;
+  color: var(--ink-secondary);
+}
+
+/* =========================================================================
+   Panel 3: THE TWO DICE
+   ========================================================================= */
+.tut-dice-panel {
+  display: flex; align-items: center; justify-content: center;
+  gap: 56px; flex-wrap: wrap;
+}
+.tut-dice-stage { display: flex; align-items: center; }
+.tut-dice-stage .account-card { transform: scale(1.2); transform-origin: center; }
+
+.tut-dice-col {
+  display: flex; flex-direction: column; gap: 16px; align-items: stretch;
+  min-width: 220px;
+}
+.tut-dice-widget {
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 12px;
+  border: 3px solid var(--rule); border-radius: 6px;
+  background: var(--bg-strong);
+  box-shadow: 3px 3px 0 var(--rule);
+}
+.tut-dice-wlabel {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  color: var(--ink-on-box); flex: 1 1 auto;
+}
+.tut-dice-step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; flex: 0 0 auto;
+  font-size: 9px; color: var(--lever-on);
+  background: var(--rule); border-radius: 50%;
+}
+
+.tut-dice-play {
+  margin-top: 4px; align-self: center;
+}
+
+/* The coin/die widgets keep their own foundation styling; just make sure
+   they sit comfortably inside the tutorial widget boxes. */
+.tut-dice-widget .retention-coin,
+.tut-dice-widget .engagement-die { flex: 0 0 auto; }
+
+/* ---- Flow strip beneath the dice demo ---- */
+.tut-dice-flow {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-top: 18px; flex-wrap: wrap;
+}
+.tut-flow-step {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 6px 10px; min-width: 78px;
+  border: 2px solid var(--rule); border-radius: 5px;
+  background: var(--card-bg);
+  opacity: 0.45; transition: opacity 180ms ease-out, box-shadow 180ms ease-out;
+}
+.tut-flow-step.active {
+  opacity: 1; box-shadow: 0 0 0 3px var(--lever-checkin);
+}
+.tut-flow-icon {
+  font-size: 14px; color: var(--ink-on-box); line-height: 1;
+}
+.tut-flow-step.active .tut-flow-icon { color: var(--lever-checkin); }
+.tut-flow-label {
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--ink-on-box); text-align: center;
+}
+.tut-flow-arrow {
+  font-size: 12px; color: var(--ink-secondary);
+}
+
+/* ---------- Responsive: stack the two-column panels on narrow screens ---------- */
+@media (max-width: 720px) {
+  .tut-card-panel, .tut-dice-panel { gap: 24px; }
+  .tut-card-hero .account-card,
+  .tut-dice-stage .account-card { transform: none; }
+  .tut-lever-menu { grid-template-columns: 1fr; }
+}

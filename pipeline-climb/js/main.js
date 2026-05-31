@@ -152,6 +152,11 @@
       }
     }
 
+    /* Guard: re-assert the engine's 'scene' class in case a builder
+       overwrote root.className, which would drop the node out of the
+       absolute/opacity overlay and stack scenes. */
+    if (sceneNodes[idx]) sceneNodes[idx].classList.add('scene');
+
     current = idx;
     if (window.Music && SCENES[idx].music) {
       try { window.Music.setTrack(SCENES[idx].music); } catch (e) {}
@@ -198,8 +203,21 @@
 
     const prev = document.getElementById('prev-btn');
     const next = document.getElementById('next-btn');
-    if (prev) prev.addEventListener('click', () => { cursorBlip(); goTo(current - 1); });
-    if (next) next.addEventListener('click', () => { cursorBlip(); goTo(current + 1); });
+    /* Tappable PREV/NEXT delegate to the scene's step engine first (like
+       the arrow keys), so mobile users with no arrow keys can step the
+       tutorial / SARSA pager / DP stepper. */
+    if (prev) prev.addEventListener('click', () => {
+      cursorBlip();
+      const st = sceneState[current];
+      const handled = st && typeof st.onPrevKey === 'function' && st.onPrevKey();
+      if (!handled) goTo(current - 1);
+    });
+    if (next) next.addEventListener('click', () => {
+      cursorBlip();
+      const st = sceneState[current];
+      const handled = st && typeof st.onNextKey === 'function' && st.onNextKey();
+      if (!handled) goTo(current + 1);
+    });
 
     /* ---- Concept badges: MDP / POLICY / RETURN / Q* / DP / SARSA ----
        Session-scoped (no persistence dependency). Light up on first

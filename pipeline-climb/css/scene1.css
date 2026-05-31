@@ -1,0 +1,321 @@
+/* Scene 1 - Tutorial: "How it works".
+   Three annotated panels (ladder / levers / die + endings) walked with the
+   page buttons or arrow keys. Reuses the foundation tokens (--ink,
+   --bg-strong, --rule, --lever-*, --warm-*, --signed-green, --lost-grey)
+   and the Press Start 2P chrome; no inline categorical colours. */
+
+.tut-scene { max-width: 980px; margin: 0 auto; }
+
+/* ---- Top bar: step counter + SKIP ---- */
+.tut-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.tut-step-counter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+}
+.tut-skip-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  padding: 6px 10px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+}
+.tut-skip-btn:hover { background: var(--lever-demo-soft); }
+
+.tut-section-title { font-size: 14px; margin: 0 0 12px; }
+
+/* ---- Demo area ---- */
+.tut-demo {
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.tut-panel {
+  width: 100%;
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Dialog ---- */
+.tut-dialog { margin-bottom: 12px; }
+
+/* ---- Page nav ---- */
+.tut-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tut-page-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  padding: 7px 12px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+}
+.tut-page-btn:hover { background: var(--lever-demo); color: #fff; }
+.tut-nav-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: center;
+  flex: 1 1 auto;
+}
+
+/* =========================================================================
+   Panel 1 - the ladder + warmth bar
+   ========================================================================= */
+.tut-ladder-panel { align-items: stretch; }
+.tut-ladder-card { display: flex; align-items: center; }
+/* Big ladder for the tutorial - widen the rung labels so they read. */
+.tut-ladder-card .lc-ladder { min-width: 260px; }
+.tut-ladder-card .lc-rung { height: 40px; }
+.tut-ladder-card .lc-rung-label { font-size: 9px; min-width: 11ch; }
+.tut-ladder-card .lc-rung-bar { width: 8px; }
+.tut-ladder-card .lc-rung-seat { width: 24px; height: 24px; }
+.tut-ladder-card .lc-avatar svg { width: 20px; height: 20px; }
+
+.tut-ladder-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  max-width: 280px;
+  padding: 8px 0;
+}
+.tut-callout {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 4px solid var(--rule);
+  padding: 6px 0 6px 12px;
+}
+.tut-callout-top { border-left-color: var(--warm-4); }
+.tut-callout-bot { border-left-color: var(--warm-0); }
+.tut-callout-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--ink-on-box);
+  letter-spacing: 0.04em;
+}
+.tut-callout-txt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  line-height: 1.7;
+}
+.tut-warm-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.tut-warm-swatch {
+  width: 22px; height: 12px;
+  border: 2px solid var(--rule);
+}
+.tut-warm-legend .lc-warm-0 { background: var(--warm-0); }
+.tut-warm-legend .lc-warm-1 { background: var(--warm-1); }
+.tut-warm-legend .lc-warm-2 { background: var(--warm-2); }
+.tut-warm-legend .lc-warm-3 { background: var(--warm-3); }
+.tut-warm-legend .lc-warm-4 { background: var(--warm-4); }
+.tut-warm-legend-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  margin-left: 4px;
+}
+
+/* =========================================================================
+   Panel 2 - the three levers
+   ========================================================================= */
+.tut-levers-panel { flex-direction: column; gap: 18px; }
+.tut-lever-menu {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 220px));
+  gap: 16px;
+  width: 100%;
+  justify-content: center;
+}
+.tut-lever-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 14px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  position: relative;
+}
+/* Lever colour identity: a left bar + the icon/name tinted by token. */
+.tut-lever-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+}
+.tut-lever-btn.lever-nurture::before   { background: var(--lever-nurture); }
+.tut-lever-btn.lever-demo::before      { background: var(--lever-demo); }
+.tut-lever-btn.lever-hardclose::before { background: var(--lever-hardclose); }
+.tut-lever-icon { display: inline-flex; }
+.tut-lever-btn.lever-nurture   .tut-lever-icon,
+.tut-lever-btn.lever-nurture   .tut-lever-name { color: var(--lever-nurture); }
+.tut-lever-btn.lever-demo      .tut-lever-icon,
+.tut-lever-btn.lever-demo      .tut-lever-name { color: var(--lever-demo); }
+.tut-lever-btn.lever-hardclose .tut-lever-icon,
+.tut-lever-btn.lever-hardclose .tut-lever-name { color: var(--lever-hardclose); }
+.tut-lever-icon svg { width: 18px; height: 18px; }
+.tut-lever-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.tut-lever-gloss {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  line-height: 1.7;
+  min-height: 2.7em;
+}
+.tut-lever-cost {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  align-self: flex-start;
+  border: 2px solid var(--rule);
+  padding: 3px 7px;
+  background: var(--bg);
+}
+.tut-lever-axis {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 700px;
+}
+.tut-lever-axis .tut-axis-line {
+  flex: 1 1 auto;
+  height: 4px;
+  background: linear-gradient(to right, var(--lever-nurture), var(--lever-demo), var(--lever-hardclose));
+}
+.tut-axis-l, .tut-axis-r {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   Panel 3 - the STAGE DIE + the two endings
+   ========================================================================= */
+.tut-die-panel { gap: 36px; align-items: center; flex-wrap: wrap; }
+.tut-die-left {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  gap: 14px 18px;
+  align-items: center;
+  justify-items: center;
+}
+.tut-die-ladder { grid-row: 1 / 3; }
+.tut-die-ladder .lc-ladder { min-width: 70px; }
+.tut-die-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.tut-die-host { margin: 0 auto; }
+.tut-die-host .sd-token { width: 72px; height: 72px; }
+.tut-roll-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--lever-demo);
+  color: #fff;
+  border: 3px solid var(--rule);
+  padding: 8px 18px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.25);
+}
+.tut-roll-btn:hover:not(:disabled) { filter: brightness(1.1); }
+.tut-roll-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.tut-die-faces {
+  grid-column: 1 / 3;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.tut-face {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 3px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+}
+.tut-face-up   { color: var(--signed-green); }
+.tut-face-stay { color: var(--ink-secondary); }
+.tut-face-down { color: var(--lever-hardclose); }
+
+.tut-endings { display: flex; gap: 18px; }
+.tut-ending {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 168px;
+  padding: 14px 12px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.tut-ending-signed { border-color: var(--signed-green); }
+.tut-ending-lost   { border-color: var(--lost-grey); }
+.tut-mini-ladder { margin-bottom: 2px; }
+.tut-mini-ladder .lc-ladder { min-width: 56px; padding: 4px; }
+.tut-ending-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.tut-ending-signed .tut-ending-title { color: var(--signed-green); }
+.tut-ending-lost   .tut-ending-title { color: var(--lost-grey); }
+.tut-ending-reward {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+}
+.tut-ending-signed .tut-ending-reward { color: var(--signed-green); }
+.tut-ending-lost   .tut-ending-reward { color: var(--lost-grey); }
+.tut-ending-txt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: center;
+  line-height: 1.7;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 720px) {
+  .tut-panel { flex-direction: column; gap: 18px; }
+  .tut-lever-menu { grid-template-columns: 1fr; }
+  .tut-die-panel { flex-direction: column; }
+  .tut-endings { flex-direction: row; }
+}
