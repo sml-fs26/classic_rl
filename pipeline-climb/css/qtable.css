@@ -1,0 +1,94 @@
+/* Q-table widget styling: a 5-row (rungs, READY at top) x 3-column
+ * (levers) grid mounted by js/qtable.js. Cells are tinted by the lever's
+ * colour token; the per-row argmax cell is starred and highlighted so the
+ * optimal staircase reads as a diagonal of stars climbing the board.
+ * Colours come from CSS tokens (defined in style.css), never inline. */
+
+.qtable-host {
+  display: inline-block;
+  font-family: 'Press Start 2P', monospace;
+  --na: 3;
+}
+
+/* Column header row: a corner label + one head per lever. */
+.q-col-heads {
+  display: grid;
+  grid-template-columns: 12ch repeat(var(--na), 11ch);
+  gap: 3px;
+  margin-bottom: 3px;
+}
+.q-corner-head {
+  font-size: 7px; color: var(--ink-secondary);
+  display: flex; align-items: center; padding: 0 4px;
+}
+.q-col-head {
+  font-size: 8px; text-align: center;
+  padding: 6px 2px; border: 2px solid var(--ink);
+  background: var(--bg-strong); color: var(--ink-on-box);
+  border-bottom-width: 4px;
+}
+.q-col-head.lever-nurture   { border-bottom-color: var(--lever-nurture); }
+.q-col-head.lever-demo      { border-bottom-color: var(--lever-demo); }
+.q-col-head.lever-hardclose { border-bottom-color: var(--lever-hardclose); }
+
+/* The grid proper: row-label column + 3 lever cells per row. */
+.q-grid {
+  display: grid;
+  grid-template-columns: 12ch repeat(var(--na), 11ch);
+  gap: 3px;
+}
+
+.q-row-head {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 6px; min-height: 38px;
+  border: 2px solid var(--ink);
+  background: var(--bg-strong); color: var(--ink-on-box);
+  border-left-width: 6px;
+}
+.q-row-head.lc-warm-0 { border-left-color: var(--warm-0); }
+.q-row-head.lc-warm-1 { border-left-color: var(--warm-1); }
+.q-row-head.lc-warm-2 { border-left-color: var(--warm-2); }
+.q-row-head.lc-warm-3 { border-left-color: var(--warm-3); }
+.q-row-head.lc-warm-4 { border-left-color: var(--warm-4); }
+.q-row-rung { font-size: 8px; }
+.q-row-head.clickable { cursor: pointer; }
+.q-row-head.clickable:hover { filter: brightness(1.15); }
+
+.q-cell {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 38px;
+  border: 2px solid var(--ink);
+  background: var(--bg-strong); color: var(--ink-on-box);
+  font-size: 10px;
+}
+/* Lever-tinted cell edges so each column reads as its lever. */
+.q-cell.lever-nurture   { box-shadow: inset 4px 0 0 var(--lever-nurture-soft); }
+.q-cell.lever-demo      { box-shadow: inset 4px 0 0 var(--lever-demo-soft); }
+.q-cell.lever-hardclose { box-shadow: inset 4px 0 0 var(--lever-hardclose-soft); }
+
+.q-val { font-variant-numeric: tabular-nums; }
+.q-mark { position: absolute; top: 2px; right: 3px; font-size: 9px; color: var(--ink); }
+
+/* The starred argmax cell: tinted by its lever, raised. */
+.q-cell.q-argmax { color: var(--ink); font-weight: bold; }
+.q-cell.lever-nurture.q-argmax   { background: var(--lever-nurture-soft);   box-shadow: inset 0 0 0 3px var(--lever-nurture); }
+.q-cell.lever-demo.q-argmax      { background: var(--lever-demo-soft);      box-shadow: inset 0 0 0 3px var(--lever-demo); }
+.q-cell.lever-hardclose.q-argmax { background: var(--lever-hardclose-soft); box-shadow: inset 0 0 0 3px var(--lever-hardclose); }
+.q-cell.q-argmax .q-mark { color: var(--lever-demo); }
+
+/* The lone negative cell (COLD + HARD CLOSE) reads as a warning. */
+.q-cell.q-negative .q-val { color: var(--lever-hardclose); }
+
+/* Argmax-flip pulse during a DP / SARSA sweep. */
+.q-cell.q-flip { animation: q-flip-pulse 1s ease-out 1; }
+@keyframes q-flip-pulse {
+  0%   { filter: brightness(2); }
+  100% { filter: brightness(1); }
+}
+
+@media (max-width: 720px) {
+  .q-col-heads, .q-grid { grid-template-columns: 9ch repeat(var(--na), 8.5ch); }
+  .q-col-head, .q-row-rung { font-size: 7px; }
+  .q-cell { font-size: 9px; }
+}

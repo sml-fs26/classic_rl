@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pipeline Climb &middot; SML reinforcement learning</title>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <!-- DotGothic16: Japanese bitmap-style font used when body.lang-jp is set.
+       Falls back to the OS Japanese font if Google Fonts can't load. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/qtable.css">
+  <link rel="stylesheet" href="css/scene0.css">
+  <link rel="stylesheet" href="css/scene1.css">
+  <link rel="stylesheet" href="css/scene2.css">
+  <link rel="stylesheet" href="css/scene3.css">
+  <link rel="stylesheet" href="css/scene4.css">
+  <link rel="stylesheet" href="css/scene5.css">
+  <link rel="stylesheet" href="css/scene6.css">
+  <link rel="stylesheet" href="css/scene7.css">
+  <link rel="stylesheet" href="css/scene8.css">
+  <link rel="stylesheet" href="css/scene9.css">
+  <link rel="stylesheet" href="css/scene10.css">
+  <link rel="stylesheet" href="css/scene11.css">
+  <link rel="stylesheet" href="css/scene12.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">SML &middot; PIPELINE</div>
+    <div id="scene-title" class="scene-title">loading&hellip;</div>
+    <div class="right-cluster">
+      <button id="prev-btn" class="pager-btn" type="button" data-i18n="topbar.prev">PREV</button>
+      <div id="dot-pager" class="dot-pager"></div>
+      <button id="next-btn" class="pager-btn" type="button" data-i18n="topbar.next">NEXT</button>
+      <div id="trainer-badges" class="trainer-badges" aria-label="concept badges earned"></div>
+      <button id="music-toggle" class="theme-toggle music-toggle" type="button" aria-label="Toggle music">&#9834; MUSIC OFF</button>
+      <button id="lang-toggle" class="theme-toggle lang-toggle" type="button" aria-label="Toggle language">日本語</button>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme" data-i18n="topbar.theme">theme</button>
+    </div>
+  </header>
+
+  <main id="stage" class="stage"></main>
+
+  <!-- vendor -->
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="js/katex-helpers.js"></script>
+
+  <!-- precomputed dataset -->
+  <script src="data/datasets.js"></script>
+
+  <!-- MDP engine (Levers + Pipeline, aliased to Moves + Battle) + solvers -->
+  <script src="js/levers.js"></script>
+  <script src="js/ladder.js"></script>
+  <script src="js/bellman.js"></script>
+  <script src="js/sarsa.js"></script>
+
+  <!-- theme + i18n core, then per-scene i18n fragments (register into core) -->
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/i18n/scene0.i18n.js"></script>
+  <script src="js/i18n/scene1.i18n.js"></script>
+  <script src="js/i18n/scene2.i18n.js"></script>
+  <script src="js/i18n/scene3.i18n.js"></script>
+  <script src="js/i18n/scene4.i18n.js"></script>
+  <script src="js/i18n/scene5.i18n.js"></script>
+  <script src="js/i18n/scene6.i18n.js"></script>
+  <script src="js/i18n/scene7.i18n.js"></script>
+  <script src="js/i18n/scene8.i18n.js"></script>
+  <script src="js/i18n/scene9.i18n.js"></script>
+  <script src="js/i18n/scene10.i18n.js"></script>
+  <script src="js/i18n/scene11.i18n.js"></script>
+  <script src="js/i18n/scene12.i18n.js"></script>
+
+  <!-- audio + dialog -->
+  <script src="js/dialog.js"></script>
+  <script src="js/sfx.js"></script>
+  <script src="js/music.js"></script>
+
+  <!-- shared widgets -->
+  <script src="js/ladderCard.js"></script>
+  <script src="js/qtable.js"></script>
+  <script src="js/stageDie.js"></script>
+  <script src="js/chart.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/speakerNotes.js"></script>
+
+  <!-- chrome UI -->
+  <script src="js/i18n-ui.js"></script>
+  <script src="js/music-ui.js"></script>
+
+  <!-- scenes -->
+  <script src="js/scenes/scene0.js"></script>
+  <script src="js/scenes/scene1.js"></script>
+  <script src="js/scenes/scene2.js"></script>
+  <script src="js/scenes/scene3.js"></script>
+  <script src="js/scenes/scene4.js"></script>
+  <script src="js/scenes/scene5.js"></script>
+  <script src="js/scenes/scene6.js"></script>
+  <script src="js/scenes/scene7.js"></script>
+  <script src="js/scenes/scene8.js"></script>
+  <script src="js/scenes/scene9.js"></script>
+  <script src="js/scenes/scene10.js"></script>
+  <script src="js/scenes/scene11.js"></script>
+  <script src="js/scenes/scene12.js"></script>
+
+  <!-- pager -->
+  <script src="js/main.js"></script>
+</body>
+</html>
