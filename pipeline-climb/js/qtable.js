@@ -12,9 +12,13 @@
  *   what bellman.qFromV / sarsa produce.
  *
  *   API mirrors the reused Pokemon qtable so DP / SARSA scenes can drive it:
- *     QTable.mount(host) -> { update, reset, host, setOnCellClick, getCellNode }
+ *     QTable.mount(host) -> { update, reset, host, cells,
+ *                             setOnCellClick, getCellNode }
  *       ctrl.update(Q, opts)   Q = array length 15; opts.suppressFlash
  *       ctrl.reset()           blank every cell (rung never visited)
+ *       ctrl.cells             flat array, cells[rung*3 + leverIdx] = the
+ *                              {state,lever} cell DOM node (same indexing
+ *                              as Q) so scenes can highlight one (s,a) cell
  *       ctrl.setOnCellClick(cb(rung, rowLabelNode)) | null
  *       ctrl.getCellNode(rung) -> the rung's row-label node
  */
@@ -166,8 +170,15 @@
     }
     function getCellNode(rung) { return rowNodes[rung] ? rowNodes[rung].lab : null; }
 
+    /* Flat array of cell DOM nodes, indexed exactly like Q (rung*A + a),
+       so a scene can address one (state, lever) cell for highlighting. */
+    const cells = [];
+    for (let rung = 0; rung < NUM_RUNGS; rung++) {
+      for (let a = 0; a < A; a++) cells[rung * A + a] = rowNodes[rung].cells[a].cell;
+    }
+
     reset();
-    return { update, reset, host, setOnCellClick, getCellNode };
+    return { update, reset, host, cells, setOnCellClick, getCellNode };
   }
 
   /* argmax lever per rung from a Q array (for any consumer). */

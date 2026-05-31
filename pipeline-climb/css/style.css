@@ -189,15 +189,6 @@
 :root[data-theme="crt"] .concept-heading {
   text-shadow: 0 0 6px rgba(255, 180, 80, 0.55);
 }
-/* Sprites washed amber for CRT. */
-:root[data-theme="crt"] .poke-sprite,
-:root[data-theme="crt"] .traj-box-sprite,
-:root[data-theme="crt"] .q-thumb-sprite,
-:root[data-theme="crt"] .sd-f-tape-sprite,
-:root[data-theme="crt"] .sc0-bn-sprite {
-  filter: grayscale(1) sepia(1) saturate(5) hue-rotate(-10deg) contrast(1.05) brightness(0.95);
-}
-
 * { box-sizing: border-box; }
 
 html, body {
@@ -2104,4 +2095,34 @@ body.slide-mode .stage  { padding: 12px 18px; }
   0%   { opacity: 0; transform: translate(-50%, 0); }
   20%  { opacity: 1; }
   100% { opacity: 0; transform: translate(-50%, -44px); }
+}
+
+/* Confetti burst on the READY hard-close stamp. Bits are spawned over the
+   token, travel via per-bit --dx/--dy/--rot custom props, and tint from the
+   signed-green + lever tokens so both themes restyle them. */
+.sd-confetti {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; overflow: visible;
+}
+.sd-confetti-bit {
+  position: absolute; left: 50%; top: 50%;
+  width: 6px; height: 6px;
+  background: var(--signed-green);
+  animation: sd-confetti-fly 1.1s ease-out forwards;
+}
+.sd-confetti-bit.sd-confetti-c1 { background: var(--lever-demo); }
+.sd-confetti-bit.sd-confetti-c2 { background: var(--lever-nurture); }
+@keyframes sd-confetti-fly {
+  0%   { opacity: 0; transform: translate(-50%, -50%) rotate(0deg); }
+  15%  { opacity: 1; }
+  100% { opacity: 0;
+         transform: translate(calc(-50% + var(--dx, 0px)),
+                              calc(-50% + var(--dy, -30px))) rotate(var(--rot, 180deg)); }
+}
+
+/* Reduced-motion: hold the die still and drop the confetti. The JS path
+   already short-circuits the spin + burst; this is the CSS belt-and-braces. */
+@media (prefers-reduced-motion: reduce) {
+  .sd-token.sd-rolling { animation: none; }
+  .sd-confetti-bit { animation: none; display: none; }
 }

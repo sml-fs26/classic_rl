@@ -14,13 +14,17 @@
  *   so both themes (light paper / crt neon) restyle it.
  *
  *   API:
- *     LadderCard.mount(host, opts) -> { setState, host }
+ *     LadderCard.mount(host, opts) -> { set, setState, el, host, rungNodes }
+ *       opts.rung    0..4   initial rung the lead sits on (default 0, COLD)
  *       opts.size    'sm' | 'md' | 'lg'   (default 'md')
- *       opts.compact boolean             (drop rung labels)
- *     ctrl.setState(state)
+ *       opts.compact boolean   drop rung labels (the mini form used as a
+ *                              Q-table row label)
+ *     ctrl.set(rung)          shorthand: place the lead on rung 0..4
+ *     ctrl.setState(state)    full state, including the two terminals:
  *       state = { rung: 0..4, terminal:false }  living lead
  *             | { terminal:true, signed:true }  SIGNED
  *             | { terminal:true, lost:true }     LOST
+ *     ctrl.el()               returns the host element (the mounted root)
  */
 (function () {
   const NUM_RUNGS = (window.Pipeline && window.Pipeline.NUM_RUNGS) || 5;
@@ -128,7 +132,15 @@
       ladder.dataset.current = String(r);
     }
 
-    return { setState, host, rungNodes };
+    /* Shorthand contract: set(rung) places a living lead on a rung. */
+    function set(rung) { setState({ rung: rung | 0, terminal: false }); }
+    function el() { return host; }
+
+    /* Honour an initial rung (default COLD) so a freshly mounted card is
+       never blank. Callers can pass a full terminal via setState later. */
+    setState({ rung: (o.rung | 0) || 0, terminal: false });
+
+    return { set, setState, el, host, rungNodes };
   }
 
   window.LadderCard = { mount };

@@ -17,10 +17,16 @@
  *   restyle it. The faces are spans the CSS rotates; this module just
  *   sets the data-face and fires the chips.
  *
+ *   Respects prefers-reduced-motion: the flip and confetti are skipped and
+ *   the token settles immediately (the Promise still resolves), so the
+ *   reduced-motion path matches the &instant headless path.
+ *
  *   API:
  *     StageDie.mount(host) -> { roll, host }
- *     ctrl.roll(log, opts) -> Promise   // resolves when the land settles
- *       log  = the { face, fromRung, signed, lost, lever } from sample()
+ *     ctrl.roll(arg, opts) -> Promise   // resolves when the land settles
+ *       arg  = either the rich { face, fromRung, signed, lost, lever } log
+ *              from Pipeline.sample(), OR a bare face string
+ *              'up' | 'stay' | 'down' (the minimal roll(face) contract).
  *       opts.reward   number to float as a chip (default by terminal/touch)
  *       opts.instant  skip the flip animation (headless capture)
  */
@@ -60,10 +66,34 @@
         '<span class="sd-face sd-face-stay">' + faceArrowSvg('stay') + '<span class="sd-face-label">' + faceLabel('stay') + '</span></span>' +
         '<span class="sd-face sd-face-down">' + faceArrowSvg('down') + '<span class="sd-face-label">' + faceLabel('down') + '</span></span>' +
       '</div>' +
+      '<div class="sd-confetti" aria-hidden="true"></div>' +
       '<div class="sd-chips" aria-hidden="true"></div>';
 
     const token = host.querySelector('.sd-token');
     const chips = host.querySelector('.sd-chips');
+    const confettiLayer = host.querySelector('.sd-confetti');
+
+    const reduceMotion = !!(window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    /* A short confetti burst over the token when the READY hard-close
+       stamps the contract. Pure DOM nodes the CSS animates; tinted by
+       lever / signed tokens, never inline colours. Skipped when the user
+       prefers reduced motion. */
+    function burstConfetti() {
+      if (reduceMotion) return;
+      const N = 12;
+      for (let i = 0; i < N; i++) {
+        const bit = document.createElement('span');
+        bit.className = 'sd-confetti-bit sd-confetti-c' + (i % 3);
+        /* Spread + travel are CSS custom props so colours stay tokenised. */
+        bit.style.setProperty('--dx', (Math.round((i / (N - 1) - 0.5) * 64)) + 'px');
+        bit.style.setProperty('--dy', (-26 - (i * 37 % 22)) + 'px');
+        bit.style.setProperty('--rot', ((i * 53 % 360)) + 'deg');
+        confettiLayer.appendChild(bit);
+        setTimeout(() => { try { confettiLayer.removeChild(bit); } catch (_e) {} }, 1200);
+      }
+    }
 
     function floatChip(reward) {
       if (reward == null) return;
@@ -79,11 +109,13 @@
       setTimeout(() => { try { chips.removeChild(chip); } catch (_e) {} }, 1400);
     }
 
-    function roll(log, opts) {
+    function roll(arg, opts) {
       const o = opts || {};
-      const face = (log && log.face) || 'stay';
-      const crack = !!(log && log.lost && log.fromRung === COLD);
-      const stamp = !!(log && log.signed);
+      /* Accept either the rich sample() log or a bare face string. */
+      const log = (typeof arg === 'string') ? { face: arg } : (arg || {});
+      const face = log.face || 'stay';
+      const crack = !!(log.lost && log.fromRung === COLD);
+      const stamp = !!log.signed;
 
       /* Reset any prior land state. */
       token.classList.remove('sd-cracked', 'sd-stamped', 'sd-rolling');
@@ -92,7 +124,7 @@
       const settle = () => {
         token.dataset.face = face;
         if (crack)  token.classList.add('sd-cracked');
-        if (stamp)  token.classList.add('sd-stamped');
+        if (stamp)  { token.classList.add('sd-stamped'); burstConfetti(); }
         const reward = (o.reward != null)
           ? o.reward
           : (stamp ? (window.Pipeline ? window.Pipeline.SIGNED_REWARD : 30)
@@ -100,11 +132,13 @@
              : (window.Pipeline ? window.Pipeline.TOUCH_REWARD : -1));
         floatChip(reward);
         if (window.SFX) {
-          try { window.SFX.play(stamp ? 'thunder' : (crack ? 'quick' : 'cursor')); } catch (_e) {}
+          /* SIGNED -> the win arpeggio; LOST -> the loss cadence; else a pip. */
+          try { window.SFX.play(stamp ? 'win' : (crack ? 'loss' : 'cursor')); } catch (_e) {}
         }
       };
 
-      if (o.instant) { settle(); return Promise.resolve(); }
+      /* Headless capture or reduced motion: land at once, no spin. */
+      if (o.instant || reduceMotion) { settle(); return Promise.resolve(); }
 
       token.classList.add('sd-rolling');
       return new Promise((resolve) => {
