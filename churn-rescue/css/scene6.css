@@ -18,6 +18,8 @@
   background: var(--bg-strong); border: 4px solid var(--rule);
   box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
   padding: 10px 16px; margin: 0 0 12px; text-align: center;
+  /* Keep any long KaTeX line inside the card on a 390px viewport. */
+  max-width: 100%; overflow-x: auto;
 }
 .concept-formula-label {
   font-family: 'Press Start 2P', monospace;
@@ -38,6 +40,32 @@
   background: var(--bg-strong); padding: 12px 14px; margin: 16px 0 0;
 }
 .concept-key-question b { color: var(--lever-offer); }
+
+/* ---------- the trajectory tree + E[G_t] ledger (the centerpiece) ---------- */
+.obj-eg-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.85;
+  color: var(--ink-secondary);
+  margin: 0 0 12px; max-width: 62em;
+}
+.obj-eg-label b { color: var(--ink-on-box); }
+.obj-eg-label b.lever-offer   { color: var(--lever-offer); }
+.obj-eg-label b.lever-checkin { color: var(--lever-checkin); }
+.obj-eg-label b.lever-nothing { color: var(--lever-nothing); }
+.obj-eg-label sub { font-size: 7px; }
+
+.obj-tree-host { margin: 0 0 12px; }
+
+.obj-eg-tie {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.9;
+  color: var(--ink);
+  border-left: 4px solid var(--lever-offer);
+  background: var(--bg-strong);
+  padding: 12px 14px; margin: 0 0 16px;
+}
+.obj-eg-tie b { color: var(--lever-offer); font-variant-numeric: tabular-nums; }
+.obj-eg-tie sub { font-size: 7px; }
 
 .ret-panel-title {
   font-family: 'Press Start 2P', monospace;
@@ -145,6 +173,24 @@
   left: var(--mean-x, 50%); width: 2px; transform: translateX(-1px);
   background: var(--ink); z-index: 2;
 }
+/* Target line: the tree's EXACT fixed-action E[G], the value the empirical
+   mean μ converges to. Dashed, in the value (offer) hue, with an "E[G]" tag
+   above it; only shown when .has-target is set. */
+.ret-target-line { display: none; }
+.ret-hist.has-target .ret-target-line {
+  display: block;
+  position: absolute; top: 0; bottom: 0;
+  left: var(--target-x, 50%); width: 0; transform: translateX(-1px);
+  border-left: 2px dashed var(--lever-offer);
+  z-index: 3;
+}
+.ret-hist.has-target .ret-target-line::after {
+  content: 'E[G]';
+  position: absolute; top: -4px; left: 0; transform: translateX(-50%);
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  color: var(--lever-offer);
+}
+.ret-stat-target b { color: var(--lever-offer); font-variant-numeric: tabular-nums; }
 .ret-bar-slot { flex: 1 1 0; display: flex; align-items: flex-end; height: 100%; }
 .ret-bar {
   width: 100%; min-height: 0;

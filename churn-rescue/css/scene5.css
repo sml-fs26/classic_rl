@@ -30,6 +30,10 @@
   padding: 12px 16px;
   margin: 0 0 16px;
   text-align: center;
+  /* The long τ = (S₁,A₁,R₁, …) KaTeX line can be wider than a 390px viewport;
+     keep it inside the card (scroll internally) instead of widening the page. */
+  max-width: 100%;
+  overflow-x: auto;
 }
 .concept-formula-label {
   font-family: 'Press Start 2P', monospace;
@@ -177,6 +181,46 @@
 .traj-tally-pill.churned { color: var(--cb-vermillion); }
 
 .traj-punch { transition: visibility 0s; }
+
+/* ---------- the trajectory TREE (window.TrajTree) ---------- */
+.traj-tree-foot { color: var(--lever-offer); }
+
+.traj-tree-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.85;
+  color: var(--ink-secondary);
+  margin: 0 0 12px;
+  max-width: 62em;
+}
+.traj-tree-caption b { color: var(--ink-on-box); }
+.traj-tree-caption b.lever-offer   { color: var(--lever-offer); }
+.traj-tree-caption b.lever-checkin { color: var(--lever-checkin); }
+.traj-tree-caption b.lever-nothing { color: var(--lever-nothing); }
+.traj-tree-caption sub { font-size: 7px; }
+
+.traj-tree-host { margin: 0 0 16px; }
+
+/* ---------- the derived (S, A, R) tape under the tree ---------- */
+.traj-derived { margin: 0 0 4px; }
+.traj-derived-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ink-secondary); margin: 0 0 6px;
+}
+.traj-derived-tape { min-height: 120px; }
+.traj-derived-g {
+  flex: 0 0 auto; align-self: center;
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule); border-radius: 3px;
+  padding: 6px 8px; margin-left: 4px; white-space: nowrap;
+}
+.traj-derived-g b { color: var(--lever-offer); font-variant-numeric: tabular-nums; }
+.traj-derived-g sub { font-size: 7px; }
+.traj-box-terminal-tag {
+  font-family: 'Press Start 2P', monospace; font-size: 6px;
+  color: var(--ink-secondary);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .traj-box { animation: none; }

@@ -1453,6 +1453,66 @@ body.slide-mode .stage  { padding: 12px 18px; }
 .shelf-mini .cal-num { display: none; }
 .shelf-mini .cal-midnight .cal-moon-mark { width: 82%; height: 82%; }
 
+/* ---- Trajectory-tree node icons (window.TrajTree host adapter) ----
+   The state-icon for a tree node is a shelf card; these styles only size /
+   tag it inside a .tt-node wrapper and render the compact terminal badge.
+   ZERO new icon art (the shelf card is reused verbatim). Used by scenes
+   5 (trajectory), 6 (return / E[G]), and 8 (Bellman backup). */
+.tt-pr-node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.tt-pr-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+}
+.tt-pr-tag sub { font-size: 0.7em; vertical-align: baseline; }
+/* Root reads as the focal node: a touch more breathing room. */
+.tt-pr-node-root { gap: 4px; }
+
+/* Compact terminal-leaf badge: SOLD OUT (a sale, blue) / MIDNIGHT (deadline,
+   vermillion), with a glyph so the outcome reads from the non-colour channel.
+   Mirrors the win/loss colour-blind identity used across the deck. */
+.tt-pr-final {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 8px;
+  min-width: 58px;
+}
+.tt-pr-glyph { font-size: 16px; line-height: 1; }
+.tt-pr-word {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  white-space: nowrap;
+}
+.lang-jp .tt-pr-word { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.tt-pr-final.soldout  { color: var(--cb-blue); }
+.tt-pr-final.deadline { color: var(--cb-vermillion); }
+
+/* The lever chip riding the root edges (reuses .lever-tag; keep it compact). */
+.tt-pr-lever {
+  font-size: 7px;
+  padding: 3px 6px;
+  gap: 3px;
+  box-shadow: 1px 1px 0 var(--rule);
+}
+
+@media (max-width: 720px) {
+  /* Shrink the descendant shelf cards so a depth-2 by 5-leaf tree fits 390px. */
+  .tt-node-icon .shelf-mini .shelf-slot { width: 16px; height: 6px; }
+  .tt-node-icon .shelf-mini .cal-cell { width: 8px; height: 10px; }
+  .tt-pr-final { min-width: 50px; padding: 3px 5px; }
+  .tt-pr-glyph { font-size: 14px; }
+}
+
 /* ---- Price-lever tag (a chunky coloured price button/label) ---- */
 .lever-tag {
   display: inline-flex;

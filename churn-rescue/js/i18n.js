@@ -92,6 +92,8 @@
       /* ---- terminals ---- */
       'terminal.renewed': '✓ RENEWED',
       'terminal.churned': '✗ CHURNED',
+      'terminal.renewed_short': 'RENEW',
+      'terminal.churned_short': 'CHURN',
       'terminal.renew_lump': '+20',
       'terminal.churn_lump': '−20',
       'terminal.mini':    '(terminal)',
@@ -188,6 +190,8 @@
 
       'terminal.renewed': '✓ こうしん',
       'terminal.churned': '✗ りだつ',
+      'terminal.renewed_short': 'こうしん',
+      'terminal.churned_short': 'りだつ',
       'terminal.renew_lump': '+20',
       'terminal.churn_lump': '−20',
       'terminal.mini':    '（しゅうりょう）',

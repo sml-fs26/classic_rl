@@ -47,6 +47,12 @@
   padding: 14px 18px 12px;
   margin: 0 0 16px;
   text-align: center;
+  /* The long tau = (S1, A1, R1, ...) KaTeX line can be wider than a 390px
+     viewport; bound the card to its container and let the formula scroll
+     INSIDE rather than widen the page. Desktop has ample room, so no
+     scrollbar appears. */
+  max-width: 100%;
+  overflow-x: auto;
 }
 .concept-formula-label {
   font-family: 'Press Start 2P', monospace;
@@ -214,7 +220,70 @@
   margin: 16px 0 0;
 }
 
+/* ---- The trajectory TREE ---- */
+.scene5 .s5-tree-foot { color: var(--lever-standard); }
+.lang-jp .scene5 .s5-tree-foot { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+.scene5 .s5-tree-caption {
+  font-size: 9.5px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  max-width: 820px;
+  margin: 0 0 12px;
+}
+.scene5 .s5-tree-caption b { color: var(--ink); }
+.lang-jp .scene5 .s5-tree-caption { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+.scene5 .s5-tree-host { margin: 0 0 14px; max-width: 100%; }
+
+/* ---- Derived tape strip (the lit path as the old S, A, R tape) ---- */
+.scene5 .s5-derived { margin: 4px 0 0; }
+.scene5 .s5-derived-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  margin: 0 0 6px;
+}
+.lang-jp .scene5 .s5-derived-label { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.scene5 .s5-derived-tape {
+  align-items: stretch;
+  gap: 4px;
+  padding: 10px 12px;
+  min-height: 132px;
+}
+.scene5 .s5-derived-empty {
+  align-self: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  opacity: 0.8;
+}
+.lang-jp .scene5 .s5-derived-empty { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.scene5 .s5-derived-g {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-left: 6px;
+  padding: 6px 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--lever-standard);
+  border: 2px solid var(--lever-standard-rule);
+  background: var(--bg);
+  white-space: nowrap;
+}
+.lang-jp .scene5 .s5-derived-g { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+/* The single-line status reads as a hint under the controls. */
+.scene5 .s5-controls .s5-status {
+  font-size: 8px;
+  align-self: center;
+}
+
 @media (max-width: 720px) {
   .concept-heading { font-size: 14px; }
   .scene5 .s5-cell { min-width: 64px; }
+  .scene5 .s5-controls .s5-status { flex-basis: 100%; }
 }

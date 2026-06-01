@@ -96,6 +96,11 @@
       'speakerNotes.title': 'SPEAKER NOTES · press <kbd>n</kbd> to close',
       'speakerNotes.empty': '(No notes for this scene yet.)',
       'boot.tag':           'A REINFORCEMENT-LEARNING ADVENTURE',
+
+      /* shared trajectory-tree widget labels (window.TrajTree) */
+      'tt.eg':    'E[G]',
+      'tt.merge': 'merges ↑',
+      'tt.rare':  'rare',
     },
     jp: {
       'brand':        'SML · プライシング',
@@ -148,6 +153,11 @@
       'speakerNotes.title': 'スピーカー ノート · <kbd>n</kbd> で とじる',
       'speakerNotes.empty': '（このシーンの ノートは まだ ありません。）',
       'boot.tag':           '〜 きょうかがくしゅう ぼうけん 〜',
+
+      /* shared trajectory-tree widget labels (window.TrajTree) */
+      'tt.eg':    'E[G]',
+      'tt.merge': 'まとめ ↑',
+      'tt.rare':  'まれ',
     },
   });
 

@@ -1,23 +1,28 @@
-/* Scene 6 -- Return to the deadline (the return G and its spread).
+/* Scene 6 -- Return G, the objective E[G], and the value of a lever.
  *
- *   G_i(tau) = sum_{j >= i} r_j  -- the total cash a run brings in from a
- *   chosen point to the deadline. The manager point: a lever is not one
- *   good night; its payoff is a DISTRIBUTION, and the spread is the risk
- *   you carry into the deadline.
+ *   G_i(tau) = sum_{j >= i} r_j -- the total cash a run brings in from a
+ *   chosen point to the deadline. A lever is not one good night; its payoff is
+ *   a DISTRIBUTION over runs, and E[G] averages that distribution into ONE
+ *   honest number.
  *
- *   We fix ONE situation (5 units, 1 day) and ONE lever, then sample the
- *   run MANY times with window.Pricing.sample, stacking each return into a
- *   histogram. With one day left the run terminates at midnight, so the
- *   return is the single reward price * min(k, u): PREMIUM lands on 0 or 5
- *   (mostly 0); STANDARD clusters in the middle; FIRE-SALE clusters higher
- *   and tighter. Same situation, same lever, yet G lands all over a range.
+ *   The heart of the scene is the TRAJECTORY TREE + its weighted-leaf ledger
+ *   (window.TrajTree). E[G] is DEFINED, visibly, as the weighted sum over the
+ *   leaves of the same hero tree scene 5 introduced (2 units, 2 days, fixed
+ *   STANDARD):
  *
- *   (We draw a purpose-built discrete histogram here rather than the
- *   line-chart in js/chart.js -- a return distribution wants bars, not a
- *   trend line.)
+ *       E[G] = sum over leaves of P(path) * G(path).
  *
- *   Cold entry: rebuilds from window.Pricing / window.Levers.
- *   &run: auto-stacks a batch of returns for the default lever (headless). */
+ *   Hovering / tapping a ledger row lights that leaf's root-to-leaf path:
+ *   "one trajectory = one path." For this hero root the sum is $5.22, which a
+ *   callout states IS Q*(2u/2d, STANDARD): G -> E[G] -> Q* in one frame.
+ *
+ *   Below, the EMPIRICAL companion: sample whole runs from the same opening
+ *   under the same playbook and stack their returns into a histogram. The
+ *   running mean has a TARGET LINE -- the ledger's computed E[G] = $5.22 --
+ *   so the learner watches the empirical mean walk toward the computed value.
+ *
+ *   Cold entry: rebuilds from window.Pricing / window.Levers / window.DATA.
+ *   &run: mounts the tree+ledger and stacks a batch of returns (headless). */
 (function () {
   if (!window.scenes) window.scenes = {};
 
@@ -25,21 +30,51 @@
   const L = window.Levers;
   const T = (k, v) => window.I18N.t(k, v);
 
-  /* The fixed experiment situation. */
-  const FIX = { u: 5, d: 1 };
-  const LEVERS = L.LEVER_IDS;   // premium, standard, firesale
-  const BATCH = 50;
+  /* The hero tree: the same near-terminal root scene 5 introduced, so the
+     ledger reads against a tree the student already knows. */
+  const HERO_ROOT = { u: 2, d: 2, terminal: false };
+  const HERO_LEVER = 'standard';
 
   function leverName(id) { return T('lever.' + id); }
 
-  /* All possible returns for (FIX, lever): one day left => G = reward of a
-     single draw = price * min(k, u). Used to lay out the histogram bins so
-     the x-axis is stable as samples accumulate. */
-  function possibleReturns(leverId) {
-    const lever = L.LEVER_BY_ID[leverId];
-    const set = new Set();
-    for (const kp of lever.demand) set.add(lever.price * Math.min(kp[0], FIX.u));
-    return Array.from(set).sort((a, b) => a - b);
+  function policyLever(s) {
+    const pol = (window.DATA && window.DATA.policy) || null;
+    if (pol) { const id = pol[P.stateIndex(s)]; if (id && L.LEVER_BY_ID[id]) return id; }
+    return 'standard';
+  }
+
+  /* Compact state-icon renderer for the tree nodes (shared shape with scene 5).
+     ZERO new icon art: reuses window.ShelfCard; terminals draw a tight badge. */
+  function makeRenderNode() {
+    return function renderNode(state, ctx) {
+      const host = ctx.el;
+      const role = ctx.role;
+      if (state && state.terminal) {
+        const soldout = !!state.soldout;
+        host.parentNode && host.parentNode.classList.add(soldout ? 'win' : 'loss');
+        host.innerHTML =
+          '<div class="tt-pr-final ' + (soldout ? 'soldout' : 'deadline') + '">' +
+            '<span class="tt-pr-glyph">' + (soldout ? '✓' : '☾') + '</span>' +
+            '<span class="tt-pr-word">' +
+              (soldout ? T('vocab.soldout') : T('vocab.midnight')) +
+            '</span>' +
+          '</div>';
+        return;
+      }
+      const big = (role === 'root');
+      const wrap = document.createElement('div');
+      wrap.className = 'tt-pr-node' + (big ? ' tt-pr-node-root' : '');
+      if (big) {
+        const tag = document.createElement('div');
+        tag.className = 'tt-pr-tag';
+        tag.innerHTML = 'S<sub>1</sub>';
+        wrap.appendChild(tag);
+      }
+      wrap.appendChild(window.ShelfCard.render(
+        { u: state.u, d: state.d }, { size: big ? 'sm' : 'mini', label: false }
+      ));
+      host.appendChild(wrap);
+    };
   }
 
   window.scenes.scene6 = function (root) {
@@ -57,7 +92,7 @@
     lede.innerHTML = T('scene6.lede');
     root.appendChild(lede);
 
-    /* ---- Formula card: G_i(tau) = sum r_j ---- */
+    /* ---- G formula card: G_i(tau) = sum r_j ---- */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene6.formula.label') + '</div>';
@@ -74,95 +109,109 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- The fixed-experiment setup row: FROM <shelf> PULL <lever picker> ---- */
-    const setup = document.createElement('div');
-    setup.className = 's6-setup';
-    setup.innerHTML = '<div class="s6-setup-label">' + T('scene6.setup.label') + '</div>';
+    /* ---- The trajectory tree + weighted-leaf ledger ---- */
+    const egLabel = document.createElement('div');
+    egLabel.className = 's6-eg-label';
+    egLabel.innerHTML = T('scene6.eg.label', {
+      u: HERO_ROOT.u, d: HERO_ROOT.d, lever: leverName(HERO_LEVER),
+    });
+    root.appendChild(egLabel);
 
-    const setupRow = document.createElement('div');
-    setupRow.className = 's6-setup-row';
+    const treeHost = document.createElement('div');
+    treeHost.className = 's6-tree-host';
+    root.appendChild(treeHost);
 
-    /* FROM <shelf card> */
-    const fromBox = document.createElement('div');
-    fromBox.className = 's6-from';
-    fromBox.innerHTML = '<div class="s6-mini-label">' + T('scene6.setup.from') + '</div>';
-    fromBox.appendChild(window.ShelfCard.render(FIX, { size: 'sm', label: true }));
-    setupRow.appendChild(fromBox);
+    /* Ground-truth Q*(HERO_ROOT, HERO_LEVER) for the in-code honesty assertion
+       AND the on-screen "= Q*" callout. */
+    let policy = null, groundTruth = null;
+    try {
+      const vi = window.Bellman.valueIteration(1, {});
+      policy = vi.policy;
+      const Q = window.Bellman.qFromV(vi.V, 1);
+      const A = (window.DATA && window.DATA.dims && window.DATA.dims.A) || L.LEVER_IDS.length;
+      const ai = L.LEVER_IDS.indexOf(HERO_LEVER);
+      groundTruth = Q[P.stateIndex(HERO_ROOT) * A + ai];
+    } catch (e) { policy = null; }
 
-    /* PULL <lever picker> */
-    const pullBox = document.createElement('div');
-    pullBox.className = 's6-pull';
-    pullBox.innerHTML = '<div class="s6-mini-label">' + T('scene6.setup.pull') + '</div>';
-    const picker = document.createElement('div');
-    picker.className = 's6-picker';
-    for (const id of LEVERS) {
-      const b = document.createElement('button');
-      b.className = 'lever-tag s6-lever-btn';
-      b.setAttribute('data-lever', id);
-      b.dataset.lever = id;
-      b.textContent = leverName(id);
-      picker.appendChild(b);
-    }
-    pullBox.appendChild(picker);
-    setupRow.appendChild(pullBox);
+    const tt = window.TrajTree.mount(treeHost, {
+      engine: {
+        successors: P.successors,
+        isTerminal: (s) => !!(s && s.terminal),
+        stateKey: P.stateKey,
+      },
+      rootState: HERO_ROOT,
+      rootAction: HERO_LEVER,
+      expandPolicy: policy ? (s) => policy[P.stateIndex(s)] : (() => HERO_LEVER),
+      maxDepth: 2, maxLeaves: 12, merge: false, gamma: 1,
+      renderNode: makeRenderNode(),
+      actionLabel: (leverId) =>
+        '<span class="lever-tag tt-pr-lever" data-lever="' + leverId + '">' + leverName(leverId) + '</span>',
+      layout: 'v',
+      sfx: window.SFX || null,
+      assertValue: groundTruth != null ? groundTruth : undefined,
+      assertTol: 1e-6,
+    });
 
-    setup.appendChild(setupRow);
-    root.appendChild(setup);
+    /* "= Q*" callout: the weighted leaf sum the ledger just computed IS the
+       optimal action-value here. Closes G -> E[G] -> Q*. */
+    const egTie = document.createElement('div');
+    egTie.className = 's6-eg-tie';
+    egTie.innerHTML = T('scene6.eg.tie', {
+      eg: '$' + tt.getEG().toFixed(2),
+      u: HERO_ROOT.u, d: HERO_ROOT.d, lever: leverName(HERO_LEVER),
+    });
+    root.appendChild(egTie);
 
-    /* ---- Histogram panel ---- */
-    const histWrap = document.createElement('div');
-    histWrap.className = 's6-hist-wrap';
-    histWrap.innerHTML =
-      '<div class="s6-hist-head">' +
-        '<span class="s6-hist-title">' + T('scene6.hist.title') + '</span>' +
-        '<span class="s6-stats" id="s6-stats">' + T('scene6.stats.empty') + '</span>' +
+    /* ---- Empirical companion: histogram of full-run returns ---- */
+    const variance = document.createElement('div');
+    variance.className = 's6-empirical collapsed';
+    variance.innerHTML =
+      '<div class="s6-empirical-title">' +
+        '<span class="s6-empirical-caret">▶</span> ' + T('scene6.emp.title') +
+        '<span class="s6-empirical-hint">' + T('scene6.emp.hint') + '</span>' +
       '</div>' +
-      '<div class="s6-hist" id="s6-hist"></div>' +
-      '<div class="s6-hist-x">' + T('scene6.hist.x') + '</div>';
-    root.appendChild(histWrap);
-
-    /* ---- Controls ---- */
-    const ctrls = document.createElement('div');
-    ctrls.className = 's6-controls';
-    ctrls.innerHTML =
-      '<button class="poke-btn" id="s6-run">' + T('scene6.btn.run') + '</button>' +
-      '<button class="poke-btn" id="s6-reset">' + T('scene6.btn.reset') + '</button>';
-    root.appendChild(ctrls);
-
-    /* ---- Per-lever takeaway ---- */
-    const take = document.createElement('p');
-    take.className = 'concept-note s6-take';
-    take.id = 's6-take';
-    root.appendChild(take);
+      '<div class="s6-empirical-body">' +
+        '<div class="s6-empirical-explainer">' + T('scene6.emp.explainer') + '</div>' +
+        '<div class="s6-hist-head">' +
+          '<span class="s6-hist-title">' + T('scene6.hist.title') + '</span>' +
+          '<span class="s6-stats" id="s6-stats">' + T('scene6.stats.empty') + '</span>' +
+        '</div>' +
+        '<div class="s6-hist" id="s6-hist"></div>' +
+        '<div class="s6-hist-x">' + T('scene6.hist.x') + '</div>' +
+        '<button class="poke-btn" id="s6-run">' + T('scene6.btn.run') + '</button>' +
+      '</div>';
+    root.appendChild(variance);
 
     const note = document.createElement('p');
     note.className = 'concept-note';
     note.innerHTML = T('scene6.spread.note');
     root.appendChild(note);
 
-    /* ===== State ===== */
-    let leverId = 'premium';
+    /* ===== Empirical state ===== */
+    const targetEG = tt.getEG();        // the line the running mean converges to
     let samples = [];
-    let rng = P.makeRng(0x6E11);
+    let rngSeed = 0x6E11;
 
-    const histEl  = histWrap.querySelector('#s6-hist');
-    const statsEl = histWrap.querySelector('#s6-stats');
-    const takeEl  = take;
-    const runBtn  = ctrls.querySelector('#s6-run');
-    const resetBtn= ctrls.querySelector('#s6-reset');
+    const histEl  = variance.querySelector('#s6-hist');
+    const statsEl = variance.querySelector('#s6-stats');
+    const runBtn  = variance.querySelector('#s6-run');
 
-    function setActiveLever(id) {
-      leverId = id;
-      picker.querySelectorAll('.s6-lever-btn').forEach((b) =>
-        b.classList.toggle('is-active', b.dataset.lever === id));
-      takeEl.innerHTML = T('scene6.take.' + id);
-    }
-
-    /* One return from (FIX, lever): single draw, capped at inventory. With
-       one day left this is the whole episode, so G = that reward. */
+    /* One return: a whole run from the hero opening under the optimal playbook
+       (forced HERO_LEVER on day 1, then the policy). Sum of daily cash. */
     function sampleOneReturn() {
-      const out = P.sample({ u: FIX.u, d: FIX.d, terminal: false }, leverId, rng);
-      return out.reward;   // terminal after one day -> return is this reward
+      rngSeed = (rngSeed + 1013904223) | 0;
+      const rng = P.makeRng(rngSeed >>> 0);
+      let s = { u: HERO_ROOT.u, d: HERO_ROOT.d, terminal: false };
+      let G = 0, first = true;
+      for (let t = 0; t < 8; t++) {
+        const lever = first ? HERO_LEVER : policyLever(s);
+        first = false;
+        const out = P.sample(s, lever, rng);
+        G += out.reward;
+        if (out.terminal) break;
+        s = out.sNext;
+      }
+      return G;
     }
 
     function drawBatch(n) {
@@ -170,91 +219,87 @@
       renderHist();
     }
 
+    /* Discrete histogram over the integer return values that actually occur. */
     function renderHist() {
-      const bins = possibleReturns(leverId);
       const counts = {};
-      bins.forEach((b) => { counts[b] = 0; });
       for (const g of samples) counts[g] = (counts[g] || 0) + 1;
-      const maxCount = Math.max(1, ...bins.map((b) => counts[b]));
+      const bins = Object.keys(counts).map(Number).sort((a, b) => a - b);
+      const tgtStr = '$' + targetEG.toFixed(2);
+
+      if (samples.length === 0) {
+        statsEl.innerHTML = T('scene6.stats.empty') + ' · ' + T('scene6.target', { target: tgtStr });
+        histEl.innerHTML = '<div class="s6-hist-empty">' + T('scene6.hist.empty') + '</div>';
+        return;
+      }
+
+      const lo = Math.min.apply(null, samples), hi = Math.max.apply(null, samples);
+      /* Pad the axis so both extremes and the target line sit comfortably. */
+      const axLo = Math.min(lo, Math.floor(targetEG));
+      const axHi = Math.max(hi, Math.ceil(targetEG));
+      const allBins = [];
+      for (let v = axLo; v <= axHi; v++) allBins.push(v);
+      const maxCount = Math.max(1, ...allBins.map((b) => counts[b] || 0));
 
       let html = '';
-      for (const b of bins) {
+      for (const b of allBins) {
         const c = counts[b] || 0;
         const pct = (c / maxCount) * 100;
-        const frac = samples.length ? Math.round((c / samples.length) * 100) : 0;
+        const frac = Math.round((c / samples.length) * 100);
         html +=
           '<div class="s6-bin">' +
             '<div class="s6-bar-track">' +
-              '<div class="s6-bar lever-fill-' + leverId + '" style="height:' + pct.toFixed(1) + '%">' +
+              '<div class="s6-bar' + (c > 0 ? '' : ' is-zero') + '" style="height:' + pct.toFixed(1) + '%">' +
                 (c > 0 ? '<span class="s6-bar-count">' + c + '</span>' : '') +
               '</div>' +
             '</div>' +
             '<div class="s6-bin-x">$' + b + '</div>' +
-            '<div class="s6-bin-frac">' + (samples.length ? frac + '%' : '') + '</div>' +
+            '<div class="s6-bin-frac">' + (c > 0 ? frac + '%' : '') + '</div>' +
           '</div>';
       }
       histEl.innerHTML = html;
 
-      if (samples.length === 0) {
-        statsEl.textContent = T('scene6.stats.empty');
-        return;
+      const mean = samples.reduce((a, b) => a + b, 0) / samples.length;
+      statsEl.innerHTML = T('scene6.stats', {
+        n: samples.length, mean: '$' + mean.toFixed(2), lo: '$' + lo, hi: '$' + hi,
+      }) + ' · ' + T('scene6.target', { target: tgtStr });
+
+      /* Mean + target ticks across the bins (evenly spaced by value). */
+      const span = (axHi - axLo) || 1;
+      function tick(v, cls, label) {
+        const left = ((v - axLo) / span) * 100;
+        const el = document.createElement('div');
+        el.className = cls;
+        el.style.left = left.toFixed(1) + '%';
+        el.innerHTML = '<span>' + label + '</span>';
+        histEl.appendChild(el);
       }
-      const sum = samples.reduce((a, b) => a + b, 0);
-      const mean = sum / samples.length;
-      const lo = Math.min.apply(null, samples);
-      const hi = Math.max.apply(null, samples);
-      statsEl.textContent = T('scene6.stats', {
-        n: samples.length,
-        mean: '$' + mean.toFixed(2),
-        lo: '$' + lo, hi: '$' + hi,
-      });
-
-      /* Mean marker: place a vertical tick across the bins at the mean's
-         x-position (bins are evenly spaced). */
-      const idxLo = bins[0], idxHi = bins[bins.length - 1];
-      const span = (idxHi - idxLo) || 1;
-      const leftPct = ((mean - idxLo) / span) * 100;
-      const meanEl = document.createElement('div');
-      meanEl.className = 's6-mean';
-      meanEl.style.left = 'calc(' + leftPct.toFixed(1) + '% )';
-      meanEl.innerHTML = '<span class="s6-mean-tag">' + T('scene6.mean.tag') + ' $' + mean.toFixed(2) + '</span>';
-      histEl.appendChild(meanEl);
+      tick(targetEG, 's6-target', T('scene6.target_tag', { target: tgtStr }));
+      tick(mean, 's6-mean', T('scene6.mean.tag') + ' $' + mean.toFixed(2));
     }
 
-    function reset() {
-      samples = [];
-      rng = P.makeRng((0x6E11 + ((Math.random() * 0xffff) | 0)) >>> 0);
-      renderHist();
+    function toggleEmp(open) {
+      variance.classList.toggle('collapsed', !open);
+      const caret = variance.querySelector('.s6-empirical-caret');
+      if (caret) caret.textContent = open ? '▼' : '▶';
     }
 
-    /* Lever picker: switching the lever resets the samples (they are
-       conditioned on the chosen lever). */
-    picker.querySelectorAll('.s6-lever-btn').forEach((b) => {
-      b.addEventListener('click', () => {
-        const id = b.dataset.lever;
-        if (id === leverId) return;
-        setActiveLever(id);
-        samples = [];
-        renderHist();
-        if (window.SFX) window.SFX.play('cursor');
-      });
+    runBtn.addEventListener('click', () => drawBatch(50));
+    variance.querySelector('.s6-empirical-title').addEventListener('click', () => {
+      toggleEmp(variance.classList.contains('collapsed'));
     });
 
-    runBtn.addEventListener('click', () => drawBatch(BATCH));
-    resetBtn.addEventListener('click', reset);
-
-    /* Initial paint. */
-    setActiveLever('premium');
     renderHist();
 
-    /* &run: stack a batch for headless capture. */
-    if (window.PRICING_AUTORUN) setTimeout(() => drawBatch(BATCH * 2), 150);
+    /* &run: open the empirical panel + stack a batch so the target line and
+       the converging mean are visible (also for headless capture). */
+    if (window.PRICING_AUTORUN) {
+      toggleEmp(true);
+      setTimeout(() => drawBatch(150), 180);
+    }
 
     return {
       onEnter() { renderHist(); },
       onLeave() {},
-      /* Right arrow = stack one more batch; never consumes once empty so the
-         pager can advance. */
       onNextKey() { return false; },
       onPrevKey() { return false; },
     };

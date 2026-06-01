@@ -14,6 +14,16 @@
       's8.gloss.cost':   "the cost / payoff you take right now",
       's8.gloss.future': "+ the value of playing optimally from next month's situation",
 
+      's8.backup.title': "The backup IS the depth-1 trajectory tree",
+      's8.backup.hint':  "(tap to expand)",
+      's8.backup.lead':
+        "The Bellman backup is just the one-ply trajectory tree under this lever. " +
+        "Each leaf carries G_t = r + V*(s'): the reward this month plus the best-lever value " +
+        "of next month's card. Weigh the leaves by probability and the ledger lands on Q*.",
+      's8.backup.tie':
+        "Weighted leaf sum E[G_t] = {eg} = Q*({state}, {lever}). " +
+        "The same P(path)·G_t ledger from the return scene, now one ply deep with V* bootstrapped in.",
+
       's8.btn.step':  "STEP",
       's8.btn.reset': "RESET",
       's8.beat':      "STEP",
@@ -42,6 +52,16 @@
 
       's8.gloss.cost':   "いま うけとる コスト / みかえり",
       's8.gloss.future': "+ つぎつき の じょうたい から さいてき に プレイ した かち",
+
+      's8.backup.title': "バックアップ は しんさ1 の きせきのき",
+      's8.backup.hint':  "(タップ で ひらく)",
+      's8.backup.lead':
+        "ベルマン バックアップ は、 この レバー の もとでの 1プライ の きせきのき。 " +
+        "かくはっぱ は G_t = r + V*(s'): こんげつ の ほうしゅう と つぎつき の カード の " +
+        "さいこうレバー の かち。 はっぱ を かくりつ で おもみづけ すれば だいちょう は Q* に つく。",
+      's8.backup.tie':
+        "かじゅう はっぱ ごうけい E[G_t] = {eg} = Q*({state}, {lever})。 " +
+        "リターン の シーン と おなじ P(けいろ)·G_t だいちょう、 いまは V* を くみこんだ 1プライ。",
 
       's8.btn.step':  "ステップ",
       's8.btn.reset': "リセット",

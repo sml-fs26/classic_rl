@@ -16,6 +16,19 @@
       /* formula card */
       'scene8.formula.label': 'BELLMAN OPTIMALITY EQUATION',
 
+      /* the depth-1 backup tree (collapsible): backup = one-ply trajectory tree */
+      'scene8.backup.title': 'THE BACKUP IS A DEPTH-1 TREE',
+      'scene8.backup.hint':  '(tap to expand)',
+      'scene8.backup.lead':
+        'One day before the deadline at <b>2 units, 2 days</b>, the backup under ' +
+        '<b>STANDARD</b> is just the demand fan. Each child carries today&rsquo;s ' +
+        'cash <b>r</b> plus the value of where it lands, <b>r + V(s&prime;)</b> ' +
+        '(dashed leaves bootstrap tomorrow&rsquo;s value):',
+      'scene8.backup.tie':
+        'The weighted leaf sum is <b>{eg}</b> = Q*({u}u / {d}d, {lever}) &mdash; ' +
+        'the same value the trajectory tree gave two scenes ago. The Bellman ' +
+        'backup IS the depth-1 trajectory tree.',
+
       /* the plain-English read of each piece of the equation */
       'scene8.read.title': 'READ IT LIKE A MANAGER',
       'scene8.read.lhs':   '<b>Q*(s, a)</b> &mdash; the honest long-run value of pulling lever <i>a</i> in situation <i>s</i>.',
@@ -59,6 +72,18 @@
         'げんきん ＋ あした おかれる じょうきょうの かち（そこでも さいてきな レバーを ひく）です。',
 
       'scene8.formula.label': 'ベルマン さいてき ほうていしき',
+
+      'scene8.backup.title': 'バックアップ ＝ ふかさ1の き',
+      'scene8.backup.hint':  '（タップで ひらく）',
+      'scene8.backup.lead':
+        'しめきり 1にちまえ、 <b>2こ・2にち</b> で <b>スタンダード</b> の ' +
+        'バックアップは じゅようの ひろがり だけ。 かくこは きょうの げんきん <b>r</b> ＋ ' +
+        'いきつく さきの かち、 つまり <b>r + V(s&prime;)</b>（てんせんの はっぱは ' +
+        'あしたの かちを ブートストラップ）：',
+      'scene8.backup.tie':
+        'はっぱの おもみづけ ごうけいは <b>{eg}</b> ＝ Q*({u}こ / {d}にち, {lever})。 ' +
+        '2シーンまえの トラジェクトリの きと おなじ あたい。 ベルマン バックアップは ' +
+        'ふかさ1の トラジェクトリの き そのもの。',
 
       'scene8.read.title': 'マネージャー ふうに よむ',
       'scene8.read.lhs':   '<b>Q*(s, a)</b>：じょうきょう <i>s</i> で レバー <i>a</i> を ひく ちょうきの かち。',

@@ -28,6 +28,8 @@
   background: var(--bg-strong); border: 4px solid var(--rule);
   box-shadow: 6px 6px 0 var(--rule); padding: 14px 18px 12px;
   margin: 0 0 16px; text-align: center;
+  /* Long KaTeX lines scroll inside the card instead of widening a 390px page. */
+  max-width: 100%; overflow-x: auto;
 }
 .concept-formula-label {
   font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 1px;
@@ -148,12 +150,16 @@
   min-height: 3px;
   border: 2px solid var(--rule);
   border-bottom: none;
+  /* The hero tree fixes STANDARD, so the histogram is single-coloured: use the
+     STANDARD lever fill so the bars read as that lever's run-return spread. */
+  background: var(--lever-standard);
   position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   transition: height 0.25s ease-out;
 }
+.scene6 .s6-bar.is-zero { background: transparent; border-color: transparent; }
 .scene6 .s6-bar-count {
   font-family: 'Press Start 2P', monospace;
   font-size: 9px;
@@ -175,32 +181,44 @@
   margin-top: 2px;
 }
 
-/* the mean marker (a vertical tick + tag floating over the bars) */
-.scene6 .s6-mean {
+/* the mean + target markers (vertical ticks + tags floating over the bars) */
+.scene6 .s6-mean, .scene6 .s6-target {
   position: absolute;
   top: -2px;
   bottom: 0;
   width: 0;
-  border-left: 2px dashed var(--ink);
   pointer-events: none;
-  z-index: 4;
 }
-.scene6 .s6-mean-tag {
+.scene6 .s6-mean { border-left: 2px dashed var(--ink); z-index: 4; }
+/* target = the tree's computed E[G], the convergence goal (STANDARD hue). */
+.scene6 .s6-target { border-left: 3px dashed var(--lever-standard-rule); z-index: 3; }
+.scene6 .s6-mean span, .scene6 .s6-target span {
   position: absolute;
-  top: -2px;
-  left: 4px;
   white-space: nowrap;
   font-family: 'Press Start 2P', monospace;
   font-size: 7px;
-  color: var(--ink);
-  background: var(--bg-strong);
-  border: 1px solid var(--ink);
   padding: 2px 4px;
 }
-.lang-jp .scene6 .s6-bin-x, .lang-jp .scene6 .s6-mean-tag,
-.lang-jp .scene6 .s6-bin-frac {
+.scene6 .s6-mean span {
+  top: -2px; left: 4px;
+  color: var(--ink); background: var(--bg-strong); border: 1px solid var(--ink);
+}
+.scene6 .s6-target span {
+  bottom: 2px; right: 4px;
+  color: var(--lever-ink); background: var(--lever-standard);
+  border: 1px solid var(--lever-standard-rule);
+}
+.lang-jp .scene6 .s6-bin-x, .lang-jp .scene6 .s6-mean span,
+.lang-jp .scene6 .s6-target span, .lang-jp .scene6 .s6-bin-frac {
   font-family: 'DotGothic16', 'Press Start 2P', monospace;
 }
+
+.scene6 .s6-hist-empty {
+  align-self: center; margin: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; color: var(--ink-secondary); opacity: 0.8;
+}
+.lang-jp .scene6 .s6-hist-empty { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
 
 .scene6 .s6-hist-x {
   text-align: center;
@@ -213,10 +231,62 @@
 }
 .lang-jp .scene6 .s6-hist-x { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
 
-.scene6 .s6-controls { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 0; }
-.scene6 .s6-take { border-left-color: var(--lever-premium); }
+/* ---- The trajectory tree + weighted-leaf ledger (the heart) ---- */
+.scene6 .s6-eg-label {
+  font-size: 9.5px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  max-width: 820px;
+  margin: 2px 0 12px;
+}
+.scene6 .s6-eg-label b { color: var(--ink); }
+.lang-jp .scene6 .s6-eg-label { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+.scene6 .s6-tree-host { margin: 0 0 12px; max-width: 100%; }
+
+/* "= Q*" callout: the payoff line tying E[G] to the optimal action-value. */
+.scene6 .s6-eg-tie {
+  font-size: 10px;
+  line-height: 1.85;
+  color: var(--ink);
+  max-width: 820px;
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-left: 4px solid var(--lever-standard);
+  background: var(--bg-strong);
+}
+.scene6 .s6-eg-tie b { color: var(--lever-standard); }
+.lang-jp .scene6 .s6-eg-tie { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+/* ---- Empirical companion (collapsible) ---- */
+.scene6 .s6-empirical {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: 3px 3px 0 var(--rule);
+  margin: 0 0 4px;
+}
+.scene6 .s6-empirical-title {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  cursor: pointer;
+  padding: 10px 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink);
+}
+.lang-jp .scene6 .s6-empirical-title { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.scene6 .s6-empirical-caret { color: var(--lever-standard); }
+.scene6 .s6-empirical-hint {
+  font-size: 7px; color: var(--ink-secondary); text-transform: none; letter-spacing: 0;
+}
+.scene6 .s6-empirical-body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.scene6 .s6-empirical.collapsed .s6-empirical-body { display: none; }
+.scene6 .s6-empirical-explainer {
+  font-size: 9.5px; line-height: 1.75; color: var(--ink-secondary); max-width: 760px;
+}
+.lang-jp .scene6 .s6-empirical-explainer { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+.scene6 .s6-empirical .s6-hist-head { margin-bottom: 4px; }
+.scene6 .s6-empirical .poke-btn { align-self: flex-start; }
 
 @media (max-width: 720px) {
   .concept-heading { font-size: 14px; }
-  .scene6 .s6-hist { height: 170px; gap: 8px; }
+  .scene6 .s6-hist { height: 170px; gap: 4px; }
 }

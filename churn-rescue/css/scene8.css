@@ -59,6 +59,47 @@
 .s8-term-future { border-color: var(--lever-checkin); }
 .s8-gloss-lit .s8-gloss-term { opacity: 1; box-shadow: 2px 2px 0 var(--rule); }
 
+/* ---- The backup IS the depth-1 trajectory tree (collapsible) ---- */
+.s8-backup {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  margin: 0 0 12px;
+}
+.s8-backup-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+  padding: 12px 14px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.s8-backup-caret { color: var(--lever-offer); font-size: 9px; }
+.s8-backup-hint {
+  font-size: 7px; color: var(--ink-secondary); letter-spacing: 0.02em;
+  margin-left: auto;
+}
+.s8-backup-body {
+  padding: 0 14px 14px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.s8-backup.collapsed .s8-backup-body { display: none; }
+.s8-backup-lead {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.85;
+  color: var(--ink-secondary); max-width: 64em;
+}
+.s8-backup-lead b { color: var(--ink-on-box); }
+.s8-backup-host { margin: 0; }
+.s8-backup-tie {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.9;
+  color: var(--ink);
+  border-left: 4px solid var(--lever-offer);
+  background: var(--bg);
+  padding: 10px 12px;
+}
+.s8-backup-tie b { color: var(--lever-offer); font-variant-numeric: tabular-nums; }
+
 /* ---- Controls ---- */
 .s8-controls {
   display: flex;

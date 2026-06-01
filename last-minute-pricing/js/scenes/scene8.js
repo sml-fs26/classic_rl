@@ -26,9 +26,51 @@
   /* The worked cell: 3 units, last day. All futures = deadline ($0). */
   const WORKED = { u: 3, d: 1 };
 
+  /* The depth-1 backup tree's root: the SAME hero situation scenes 5 and 6
+     used (2 units, 2 days, fixed STANDARD). One day left after the backup, so
+     the frontier children are bootstrapped by V: leaf = r + V(s'). The
+     weighted leaf sum is Q*(2u/2d, STANDARD) = $5.22, the very value the
+     trajectory/return scenes computed -- the backup IS the one-ply tree. */
+  const BACKUP_ROOT = { u: 2, d: 2, terminal: false };
+  const BACKUP_LEVER = 'standard';
+
   function leverName(id) { return T('lever.' + id); }
   function money(v) { return '$' + (Math.round(v * 100) / 100).toFixed(2); }
   function fmtP(p) { return p.toFixed(2); }
+
+  /* Compact state-icon renderer for the backup tree (shared shape with scenes
+     5 / 6). ZERO new icon art: reuses window.ShelfCard; terminals draw a tight
+     badge. */
+  function makeRenderNode() {
+    return function renderNode(state, ctx) {
+      const host = ctx.el;
+      const big = (ctx.role === 'root');
+      if (state && state.terminal) {
+        const soldout = !!state.soldout;
+        host.parentNode && host.parentNode.classList.add(soldout ? 'win' : 'loss');
+        host.innerHTML =
+          '<div class="tt-pr-final ' + (soldout ? 'soldout' : 'deadline') + '">' +
+            '<span class="tt-pr-glyph">' + (soldout ? '✓' : '☾') + '</span>' +
+            '<span class="tt-pr-word">' +
+              (soldout ? T('vocab.soldout') : T('vocab.midnight')) +
+            '</span>' +
+          '</div>';
+        return;
+      }
+      const wrap = document.createElement('div');
+      wrap.className = 'tt-pr-node' + (big ? ' tt-pr-node-root' : '');
+      if (big) {
+        const tag = document.createElement('div');
+        tag.className = 'tt-pr-tag';
+        tag.innerHTML = 's';
+        wrap.appendChild(tag);
+      }
+      wrap.appendChild(window.ShelfCard.render(
+        { u: state.u, d: state.d }, { size: big ? 'sm' : 'mini', label: false }
+      ));
+      host.appendChild(wrap);
+    };
+  }
 
   /* Compute the term-by-term backup of Q*(WORKED, leverId) straight from the
      engine's successor enumeration. Returns the rows + the total so the panel
@@ -79,6 +121,82 @@
       String.raw`Q^{*}(s,a) \;=\; \mathbb{E}\,[\, R + \max_{a'} Q^{*}(S',a') \,]`;
     window.Katex.render(bellmanTex, fhost, true);
     root.appendChild(fcard);
+
+    /* ---- The backup IS the depth-1 trajectory tree ----
+       A collapsible card holding a depth-1 TrajTree under (2u/2d, STANDARD)
+       with each frontier child bootstrapped by V: leaf = r + V(s'). Its
+       weighted leaf sum equals Q*(2u/2d, STANDARD) = $5.22, the same value the
+       trajectory + return scenes computed. It makes "Bellman backup = the
+       one-ply trajectory tree" visible and reuses the same node / edge /
+       ledger components as the earlier scenes. */
+    const backup = document.createElement('div');
+    backup.className = 's8-backup collapsed';
+    backup.innerHTML =
+      '<div class="s8-backup-title">' +
+        '<span class="s8-backup-caret">&#9654;</span> ' + T('scene8.backup.title') +
+        '<span class="s8-backup-hint">' + T('scene8.backup.hint') + '</span>' +
+      '</div>' +
+      '<div class="s8-backup-body">' +
+        '<div class="s8-backup-lead">' + T('scene8.backup.lead') + '</div>' +
+        '<div class="s8-backup-host" id="s8-backup-host"></div>' +
+        '<div class="s8-backup-tie" id="s8-backup-tie"></div>' +
+      '</div>';
+    root.appendChild(backup);
+    backup.querySelector('.s8-backup-title').addEventListener('click', () => {
+      backup.classList.toggle('collapsed');
+      const c = backup.querySelector('.s8-backup-caret');
+      if (c) c.innerHTML = backup.classList.contains('collapsed') ? '&#9654;' : '&#9660;';
+    });
+    /* &backup or &run: open the card so the depth-1 tree is visible (headless). */
+    if (/[#&?](backup|run)\b/.test(window.location.hash)) {
+      backup.classList.remove('collapsed');
+      const c = backup.querySelector('.s8-backup-caret');
+      if (c) c.innerHTML = '&#9660;';
+    }
+
+    /* Mount the depth-1 backup tree. Bootstrapped frontier leaves carry
+       G = r + V(s'); the weighted leaf sum is asserted in code to equal
+       Q*(s, a) from value iteration, so the picture is honest, never typed. */
+    (function mountBackupTree() {
+      const host = document.getElementById('s8-backup-host');
+      if (!host || !window.TrajTree) return;
+      let V = null, groundTruth = null;
+      try {
+        const vi = window.Bellman.valueIteration(1, {});
+        V = vi.V;
+        const Q = window.Bellman.qFromV(V, 1);
+        const A = (window.DATA && window.DATA.dims && window.DATA.dims.A) || LEVER_IDS.length;
+        const ai = LEVER_IDS.indexOf(BACKUP_LEVER);
+        groundTruth = Q[P.stateIndex(BACKUP_ROOT) * A + ai];
+      } catch (e) { /* cold-entry fallback: no value fn / assertion */ }
+      const valueFn = (s) => (s && !s.terminal && V) ? V[P.stateIndex(s)] : 0;
+      const tt = window.TrajTree.mount(host, {
+        engine: {
+          successors: P.successors,
+          isTerminal: (s) => !!(s && s.terminal),
+          stateKey: P.stateKey,
+        },
+        rootState: BACKUP_ROOT,
+        rootAction: BACKUP_LEVER,
+        maxDepth: 1, merge: false, gamma: 1,
+        valueFn: V ? valueFn : null,
+        bootstrapFrontier: !!V,
+        renderNode: makeRenderNode(),
+        actionLabel: (leverId) =>
+          '<span class="lever-tag tt-pr-lever" data-lever="' + leverId + '">' + leverName(leverId) + '</span>',
+        layout: 'v',
+        sfx: window.SFX || null,
+        assertValue: groundTruth != null ? groundTruth : undefined,
+        assertTol: 1e-5,
+      });
+      const tie = document.getElementById('s8-backup-tie');
+      if (tie) {
+        tie.innerHTML = T('scene8.backup.tie', {
+          eg: '$' + tt.getEG().toFixed(2),
+          u: BACKUP_ROOT.u, d: BACKUP_ROOT.d, lever: leverName(BACKUP_LEVER),
+        });
+      }
+    })();
 
     /* ---- Two-column body: the "read it" panel + the worked backup ---- */
     const body = document.createElement('div');

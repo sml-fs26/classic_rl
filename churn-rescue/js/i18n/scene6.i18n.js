@@ -17,6 +17,14 @@
         'No discount, so it is just addition: the lever costs you paid, plus <b>+20</b> if ' +
         'the account renewed or <b>−20</b> if it churned.',
 
+      'scene6.eg.label':
+        'Weigh every leaf by its probability: the trajectory tree for <b>{state}</b>, lever ' +
+        '{lever}. The average return E[G<sub>t</sub>] is the sum of P(path)·G<sub>t</sub> down the ledger.',
+      'scene6.eg.tie':
+        'That weighted sum is <b>E[G<sub>t</sub>] = {eg}</b>, and it is exactly ' +
+        '<b>Q*({state}, {lever})</b>: the average over all paths IS the value of the lever. ' +
+        'G<sub>t</sub> → E[G<sub>t</sub>] → Q*, in one ledger.',
+
       'scene6.expansion.title': 'SUM ONE RUN INTO A SINGLE SCORE',
       'scene6.expansion.note':  'each rⱼ is a month\'s cost; the last folds in the terminal lump',
       'scene6.btn.resample':    '↻ ANOTHER RUN',
@@ -27,6 +35,7 @@
       'scene6.stats.empty':     'No runs yet. Press RUN to fill the histogram.',
       'scene6.stats.runs':      'runs',
       'scene6.stats.mean':      'mean return μ',
+      'scene6.stats.target':    'target E[G] <b>{target}</b>',
       'scene6.stats.range':     'range',
       'scene6.stats.renewrate': 'renewal rate',
 
@@ -57,6 +66,14 @@
         'わりびきなし、 つまり たしざんだけ: はらった レバーコストに、 こうしんなら ' +
         '<b>+20</b>、 りだつなら <b>−20</b>。',
 
+      'scene6.eg.label':
+        'かくはっぱを かくりつで おもみづけ: <b>{state}</b>・レバー {lever} の きせきのき。 ' +
+        'へいきん リターン E[G<sub>t</sub>] は だいちょうの P(けいろ)·G<sub>t</sub> の ごうけい。',
+      'scene6.eg.tie':
+        'その かじゅう ごうけいが <b>E[G<sub>t</sub>] = {eg}</b>、 そして これは まさに ' +
+        '<b>Q*({state}, {lever})</b>: すべての けいろの へいきん こそ レバーの かち。 ' +
+        'G<sub>t</sub> → E[G<sub>t</sub>] → Q*、 ひとつの だいちょうで。',
+
       'scene6.expansion.title': '１かいの ランを ひとつの スコアに',
       'scene6.expansion.note':  'かくrⱼは つきの コスト; さいごに しゅうりょうがくを くわえる',
       'scene6.btn.resample':    '↻ べつの ラン',
@@ -67,6 +84,7 @@
       'scene6.stats.empty':     'まだ ランなし。 RUN で ヒストグラムを うめよう。',
       'scene6.stats.runs':      'かい',
       'scene6.stats.mean':      'へいきん リターン μ',
+      'scene6.stats.target':    'もくひょう E[G] <b>{target}</b>',
       'scene6.stats.range':     'はんい',
       'scene6.stats.renewrate': 'こうしんりつ',
 

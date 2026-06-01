@@ -15,34 +15,41 @@
       'scene5.formula.foot':
         'Capital letters: every entry was a roll of the dice <i>before</i> it ' +
         'happened. Same playbook, same opening, yet a different run each time.',
+      'scene5.tree.foot': 'One trajectory = one path through the tree.',
 
-      /* tape column labels */
+      /* tree caption + tape column labels */
+      'scene5.tree.caption':
+        'The tree of all runs from a fixed opening &mdash; <b>{u} units, {d} days</b>, ' +
+        'pulling <b>{lever}</b>. It branches only on the <b>demand draw</b>; each ' +
+        'leaf is a real ending (SOLD OUT or MIDNIGHT) carrying its run total G.',
       'scene5.col.situation': 'SITUATION',
       'scene5.col.lever':     'LEVER',
       'scene5.col.cash':      'CASH',
 
       'scene5.start':    'OPENING: {u} units, {d} days',
       'scene5.midnight': 'MIDNIGHT',
+      'scene5.atmidnight':'reached the deadline',
       'scene5.soldout':  'SOLD OUT',
       'scene5.leftover': '{n} left, worth $0',
       'scene5.cleared':  'shelf cleared',
 
-      /* the running revenue HUD */
-      'scene5.revenue.label': 'REVENUE THIS RUN',
+      /* derived tape strip (the lit path as the old S,A,R tape) */
+      'scene5.derived.label': 'THE LIT PATH, AS A TAPE',
+      'scene5.derived.empty': 'press PLAY A RUN to sample one path through the tree',
+      'scene5.derived.g':     'run total G = {g}',
 
       /* controls */
-      'scene5.btn.step':  'NEXT DAY ▶',
-      'scene5.btn.run':   'PLAY NEW RUN ⟳',
-      'scene5.btn.reset': 'CLEAR',
+      'scene5.btn.sample': 'PLAY A RUN ⟳',
+      'scene5.btn.step':   'NEXT DAY ▶',
+      'scene5.btn.reset':  'CLEAR',
 
-      'scene5.status.day':   'DAY',
-      'scene5.status.now':   'NOW: {u} units, {d} days',
-      'scene5.status.done':  'run complete',
-      'scene5.status.ready': 'press NEXT DAY to roll the demand',
+      'scene5.status.hint': 'PLAY A RUN samples one path; NEXT DAY walks it day by day.',
+      'scene5.status.run':  'one sampled run, lit as a single root-to-leaf path.',
+      'scene5.status.walk': 'walking the path one day at a time…',
 
       'scene5.same.note':
-        'Same playbook π, same opening (5 units, 4 days). Play it again: ' +
-        'the demand cards fall differently, so the trajectory τ differs.',
+        'Same playbook π, same opening, yet a <b>different path</b> each time. ' +
+        'The flat tape is just one route through this tree.',
     },
     jp: {
       'scene5.title': 'トラジェクトリ',
@@ -61,33 +68,38 @@
         '<i>まえ</i> は サイコロの けっか でした。 ' +
         'おなじ ほうさく、 おなじ スタート でも、 ' +
         'まいかい ちがう ラン に なります。',
+      'scene5.tree.foot': '1つの トラジェクトリ ＝ きの 1つの みち。',
 
+      'scene5.tree.caption':
+        'きまった スタート（<b>{u}こ・{d}にち</b>、 <b>{lever}</b> を ひく）からの ' +
+        'すべての ランの き。 わかれるのは <b>じゅようの ひき</b> だけ。 ' +
+        'はっぱは ほんものの おわり（うりきれ か まよなか）で、 その ランの ごうけい G を もつ。',
       'scene5.col.situation': 'じょうきょう',
       'scene5.col.lever':     'レバー',
       'scene5.col.cash':      'うりあげ',
 
       'scene5.start':    'スタート： {u}こ, {d}にち',
       'scene5.midnight': 'まよなか',
+      'scene5.atmidnight':'しめきりに とうたつ',
       'scene5.soldout':  'うりきれ',
       'scene5.leftover': 'のこり {n}こ, $0',
       'scene5.cleared':  'うりきり',
 
-      'scene5.revenue.label': 'この ランの うりあげ',
+      'scene5.derived.label': 'ひかった みち を テープ で',
+      'scene5.derived.empty': '「ランを みる」 で きの みちを 1つ サンプリング',
+      'scene5.derived.g':     'ランの ごうけい G = {g}',
 
-      'scene5.btn.step':  'つぎの ひ ▶',
-      'scene5.btn.run':   'べつの ランを みる ⟳',
-      'scene5.btn.reset': 'クリア',
+      'scene5.btn.sample': 'ランを みる ⟳',
+      'scene5.btn.step':   'つぎの ひ ▶',
+      'scene5.btn.reset':  'クリア',
 
-      'scene5.status.day':   'ひ',
-      'scene5.status.now':   'いま： {u}こ, {d}にち',
-      'scene5.status.done':  'ラン しゅうりょう',
-      'scene5.status.ready': 'つぎの ひ で じゅようを ひく',
+      'scene5.status.hint': '「ランを みる」で みちを 1つ サンプリング、「つぎの ひ」で 1にち ずつ あるく。',
+      'scene5.status.run':  'サンプリングした 1つの ラン。 ねもとから はっぱへの 1つの みち。',
+      'scene5.status.walk': 'みちを 1にち ずつ あるいて います…',
 
       'scene5.same.note':
-        'おなじ ほうさく π、 おなじ スタート' +
-        '（5こ・4にち）。 もういちど やると ' +
-        'じゅようの カードの でかたが ちがい、 ' +
-        'トラジェクトリ τ も かわります。',
+        'おなじ ほうさく π、 おなじ スタート でも、 まいかい <b>ちがう みち</b>。 ' +
+        'たいらな テープは この きを とおる 1つの ルート に すぎません。',
     },
   });
 })();

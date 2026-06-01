@@ -48,6 +48,33 @@
   function leverClass(id) { return window.Levers ? window.Levers.tokenClass(id) : ('lever-' + id); }
   function fmt(v) { return (v >= 0 ? '+' : '') + v.toFixed(2); }
 
+  /* Account-card node renderer for the depth-1 backup tree (shared shape
+     with scenes 5 / 6). ZERO new icon art: reuses window.AccountCard.
+     Terminals get the renewed/churned glyph. */
+  function makeRenderNode() {
+    return function renderNode(state, ctx) {
+      const host = ctx.el;
+      if (state && state.terminal) {
+        const renewed = !!state.renewed;
+        host.parentNode && host.parentNode.classList.add(renewed ? 'renewed' : 'churned');
+        host.innerHTML =
+          '<div class="tt-leaf-final ' + (renewed ? 'renewed' : 'churned') + '">' +
+            '<span class="tt-leaf-glyph">' + (renewed ? '✓' : '✗') + '</span>' +
+            '<span class="tt-leaf-word">' +
+              T(renewed ? 'terminal.renewed_short' : 'terminal.churned_short') +
+            '</span>' +
+          '</div>';
+        return;
+      }
+      const cardHost = document.createElement('div');
+      cardHost.className = 'tt-account';
+      host.appendChild(cardHost);
+      window.AccountCard.mount(cardHost, {
+        tier: state.tier, m: state.m, size: ctx.role === 'root' ? 'full' : 'mini',
+      });
+    };
+  }
+
   /* Build the branch list for (tier, m, lever): one CHURN branch plus the
      three STAY/die branches, each carrying the next card's V* and its
      probability-weighted contribution to Q*. */
@@ -122,6 +149,76 @@
       '<span class="s8-gloss-plus">+</span>' +
       '<span class="s8-gloss-term s8-term-future">' + T('s8.gloss.future') + '</span>';
     root.appendChild(gloss);
+
+    /* ---- The backup IS the depth-1 trajectory tree ----
+       A collapsible card holding a depth-1 TrajTree under the SAME teaching
+       cell (AT-RISK, m=2, BIG OFFER) with each non-terminal child
+       bootstrapped by V*: G_t = r + V*(s'). Its weighted leaf sum equals
+       Q*(AT-RISK/m2, OFFER) = +7.76, exactly the per-branch arithmetic the
+       beats below walk. It makes "Bellman backup = the one-ply trajectory
+       tree" visible and reuses the same node / edge / ledger components as
+       scenes 5 and 6. The bootstrapped leaves render dashed, with the
+       +V(s') term shown explicitly. */
+    const backup = document.createElement('div');
+    backup.className = 's8-backup collapsed';
+    backup.innerHTML =
+      '<div class="s8-backup-title">' +
+        '<span class="s8-backup-caret">&#9654;</span> ' + T('s8.backup.title') +
+        '<span class="s8-backup-hint">' + T('s8.backup.hint') + '</span>' +
+      '</div>' +
+      '<div class="s8-backup-body">' +
+        '<div class="s8-backup-lead">' + T('s8.backup.lead') + '</div>' +
+        '<div class="s8-backup-host" id="s8-backup-host"></div>' +
+        '<div class="s8-backup-tie" id="s8-backup-tie"></div>' +
+      '</div>';
+    root.appendChild(backup);
+    backup.querySelector('.s8-backup-title').addEventListener('click', () => {
+      backup.classList.toggle('collapsed');
+      const c = backup.querySelector('.s8-backup-caret');
+      if (c) c.innerHTML = backup.classList.contains('collapsed') ? '&#9654;' : '&#9660;';
+    });
+    if (/[#&?](backup|run)\b/.test(window.location.hash)) {
+      backup.classList.remove('collapsed');
+      const c = backup.querySelector('.s8-backup-caret');
+      if (c) c.innerHTML = '&#9660;';
+    }
+
+    /* Mount the depth-1 backup tree. V*(s) = DATA.V[si]; the weighted leaf
+       sum is asserted in code to equal the precomputed Q* oracle, so the
+       picture is honest, never hard-coded. */
+    (function mountBackupTree() {
+      const host = document.getElementById('s8-backup-host');
+      if (!host || !window.TrajTree) return;
+      const rootState = { tier: CELL.tier, m: CELL.m, terminal: false };
+      const valueFn = (s) => (s && !s.terminal) ? DATA.V[si(s.tier, s.m)] : 0;
+      const groundTruth = DATA.Qstar[si(CELL.tier, CELL.m) * A + ACTIONS.indexOf(CELL.lever)];
+      const ttb = window.TrajTree.mount(host, {
+        engine: {
+          successors: C.successors,
+          isTerminal: (s) => !!(s && s.terminal),
+          stateKey: C.stateKey,
+        },
+        rootState: rootState,
+        rootAction: CELL.lever,
+        maxDepth: 1, gamma: GAMMA,
+        valueFn: valueFn,
+        bootstrapFrontier: true,
+        renderNode: makeRenderNode(),
+        actionLabel: (leverId) => leverName(leverId),
+        layout: 'v',
+        sfx: window.SFX || null,
+        assertValue: groundTruth,
+        assertTol: 1e-5,
+      });
+      const tie = document.getElementById('s8-backup-tie');
+      if (tie) {
+        tie.innerHTML = T('s8.backup.tie', {
+          eg: window.TrajTree._fmt.fmtSigned2(ttb.getEG()),
+          state: tierShort(CELL.tier) + ' · ' + T('months.short', { n: CELL.m }),
+          lever: leverName(CELL.lever),
+        });
+      }
+    })();
 
     /* ---- Controls ---- */
     const ctrls = document.createElement('div');
