@@ -194,3 +194,49 @@
   }
   .dp-q { max-width: none; }
 }
+
+/* =====================================================================
+   "The backup IS the depth-1 trajectory tree" card (window.TrajTree).
+   A collapsible card holding a one-ply bootstrapped tree whose weighted
+   leaf sum equals Q*(FULL/MID, THUNDER). Tree + ledger styled in
+   css/trajTree.css; these rules are the card chrome only. Theme tokens.
+   ===================================================================== */
+.dp-backup {
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  margin: 2px 0 8px;
+}
+.dp-backup-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+  padding: 10px 14px;
+}
+.dp-backup-caret { color: var(--hue-ghost); font-size: 8px; }
+.dp-backup-hint { font-size: 7px; color: var(--ink-secondary); margin-left: auto; }
+.dp-backup-body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.dp-backup.collapsed .dp-backup-body { display: none; }
+.dp-backup-lead {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.75;
+  color: var(--ink-on-box);
+}
+.dp-backup-lead b { color: var(--hue-ghost); }
+.dp-backup-host { width: 100%; }
+.dp-backup-tie {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+  border: 2px solid var(--hue-ghost);
+  background: var(--bg);
+  padding: 9px 12px;
+}
+.dp-backup-tie b { color: var(--hue-ghost); }

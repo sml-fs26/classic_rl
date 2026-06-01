@@ -785,3 +785,150 @@
   .g-variance-right { max-width: none; }
   .g-variance-policy-row { flex-wrap: wrap; }
 }
+
+/* =====================================================================
+   Trajectory-as-TREE additions (window.TrajTree host wrappers).
+   The tree + ledger themselves are styled in css/trajTree.css; these
+   rules style the scene-level scaffolding around them and the compact
+   node icon the scenes render via renderNode. Retro-pixel, theme tokens
+   only, no inline categorical colors.
+   ===================================================================== */
+
+/* Foot line on the tau formula card: the tree reframe. */
+.traj-tree-foot { color: var(--pikachu-cheek); display: inline-block; margin-top: 4px; }
+
+/* Caption naming the fixed root + action. */
+.traj-tree-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  border-left: 6px solid var(--hue-anymal);
+  padding: 8px 12px;
+  margin: 2px 0 4px;
+}
+.traj-tree-caption b { color: var(--pikachu-cheek); }
+
+/* The TrajTree mount host (tree panel + ledger stack inside). */
+.traj-tree-host, .obj-tree-host { width: 100%; }
+
+/* ---- compact node icon rendered into .tt-node-icon by renderNode ---- */
+/* Descendant sprites at desktop: a touch smaller than the 28px root so the
+   tree reads as shrinking with depth. The mobile rule in trajTree.css
+   shrinks .tt-mini-sprite further to 22px. */
+.tt-node-icon .tt-mini-sprite { width: 24px; height: 24px; }
+.tt-node-icon .tt-root-sprite { width: 28px; height: 28px; }
+.tt-state-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  align-items: end;
+}
+.tt-state-body .traj-box-bucket { font-size: 6px; text-align: center; }
+.tt-node-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  margin-bottom: 3px;
+}
+.tt-node-tag sub { font-size: 5px; vertical-align: baseline; }
+
+/* Terminal-leaf body: a glyph + WIN/LOSS word (color-blind safe). */
+.tt-leaf-final {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  font-family: 'Press Start 2P', monospace;
+}
+.tt-leaf-glyph { font-size: 16px; line-height: 1; }
+.tt-leaf-word { font-size: 8px; letter-spacing: 0.04em; }
+.tt-leaf-final.win .tt-leaf-glyph, .tt-leaf-final.win .tt-leaf-word { color: var(--cb-blue); }
+.tt-leaf-final.loss .tt-leaf-glyph, .tt-leaf-final.loss .tt-leaf-word { color: var(--cb-vermillion); }
+
+/* ---- derived tape strip (the lit path as the old S/A/R tape) ---- */
+.traj-derived {
+  margin-top: 4px;
+  background: var(--bg-strong);
+  border: 2px dashed var(--rule);
+  padding: 8px 10px 10px;
+}
+.traj-derived-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.traj-derived-tape { min-height: 64px; align-items: center; }
+.traj-derived-empty {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  opacity: 0.8;
+  padding: 14px 4px;
+}
+.traj-derived-g {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-left: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  border-left: 5px solid var(--hue-ghost);
+  background: var(--bg);
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+.traj-derived-g b { color: var(--hue-ghost); }
+
+/* ---- objective scene: E[G_t] ledger label + the "= Q*" callout ---- */
+.obj-eg-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  border-left: 6px solid var(--hue-ghost);
+  padding: 8px 12px;
+  margin: 4px 0;
+}
+.obj-eg-label b { color: var(--hue-ghost); }
+.obj-eg-tie {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--cb-blue);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 14px;
+  margin: 6px 0 2px;
+}
+.obj-eg-tie b { color: var(--cb-blue); }
+
+/* ---- variance widget: the target line (tree-computed E[G]) ---- */
+/* Distinct from the dashed cheek-colored mean line: a dotted ghost-purple
+   line, so the two are never confused. The mean walks toward it. */
+.g-variance-target {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 0;
+  border-left: 2px dotted var(--hue-ghost);
+  z-index: 2;
+}
+.g-variance-target span {
+  position: absolute;
+  bottom: -2px;
+  left: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: var(--hue-ghost);
+  background: var(--bg);
+  padding: 1px 4px;
+  white-space: nowrap;
+}

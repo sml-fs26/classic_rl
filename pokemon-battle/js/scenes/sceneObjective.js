@@ -1,35 +1,37 @@
-/* Scene — Return and the optimal action-value Q*.
+/* Scene: Return G_t, the objective E[G_t], and the optimal action-value Q*.
  *
- *   Three pieces, stacked:
+ *   Four pieces, stacked:
  *
- *     1. G formula card — undiscounted sum of rewards from time i to
- *        the end of the trajectory.
- *     2. A concrete 4-turn winning trajectory with the same (s, a, r)
- *        boxes as the trajectory scene, but with STATE and ACTION boxes
- *        muted (greyed) so the eye only catches the REWARD boxes — the
- *        ones that actually feed G. Below the rollout, the G_t
- *        expansion shows each r_j colour-coded back to its origin.
- *     3. Q formula card (defines Q in terms of G).
+ *     1. G formula card: the return G_i(tau) = sum_{j>=i} r_j (undiscounted).
+ *     2. The TRAJECTORY TREE + its weighted-leaf ledger (window.TrajTree).
+ *        This is the heart of the scene: E[G_t] is DEFINED, visibly, as the
+ *        weighted sum over the leaves,
+ *            E[G_t] = sum_leaves P(path) * G_t(path),
+ *        and the ledger lands the number. Hovering/clicking a ledger row
+ *        lights that leaf's root-to-leaf path: "one trajectory = one path."
+ *        For the hero root LOW/MID under THUNDER this sum is -3.4875 = Q*,
+ *        which a callout states explicitly: G_t -> E[G_t] -> Q* in one frame.
+ *     3. Q* formula card (defines Q* as the max expected return).
+ *     4. The variance/histogram widget: the EMPIRICAL companion. It samples
+ *        trajectories from FULL/FULL under a chosen action; the running mean
+ *        mu now has a TARGET LINE to converge to: the exact fixed-action
+ *        E[G] computed from the tree (deep, full enumeration), so the
+ *        student watches the empirical mean walk toward the computed value.
  *
- *   Click any reward box in the rollout to recompute the expansion for
- *   that t. Default t = 1.
+ *   The old muted 4-turn rollout (its job was "what is a return") is replaced
+ *   by the tree+ledger; the G card above still gives the symbolic definition.
  */
 (function () {
   window.scenes = window.scenes || {};
 
-  /* ---- Fixed illustrative trajectory ----
-     Pikachu uses Thunderbolt every turn and wins on the 4th turn.
-     With undiscounted return: G_1 = +7, G_2 = +8, G_3 = +9, G_4 = +10. */
-  const TRAJ = [
-    { your: 0, opp: 0, action: 'thunderbolt', reward: -1, terminal: false },
-    { your: 0, opp: 1, action: 'thunderbolt', reward: -1, terminal: false },
-    { your: 1, opp: 2, action: 'thunderbolt', reward: -1, terminal: false },
-    { your: 1, opp: 3, action: 'thunderbolt', reward: 10, terminal: true, won: true },
-  ];
-
   const NB = window.Battle.NUM_BUCKETS;
   const BUCKETS = window.Battle.BUCKETS;
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+
+  /* Hero root: the same near-terminal tree the trajectory scene introduced,
+     so the ledger reads against a tree the student already knows. */
+  const HERO_ROOT = { your: 3, opp: 2, terminal: false };
+  const HERO_ACTION = 'thunder';
 
   function bucketName(b) { return b >= NB ? T('hp.bucket.faint_short') : T('hp.bucket.' + BUCKETS[b]); }
   function bucketClass(b) {
@@ -41,88 +43,60 @@
   }
   function bucketPct(b) { return Math.max(0, (NB - b) * 100 / NB); }
   function moveName(id) { return T('move.' + id); }
-  function fmtSigned(v, dp) {
-    const d = dp === undefined ? 2 : dp;
-    return (v >= 0 ? '+' : '') + v.toFixed(d);
+
+  /* Compact state-icon renderer for the tree nodes (shared shape with the
+     trajectory scene). ZERO new icon art: reuses .traj-box-state-body. */
+  function makeRenderNode() {
+    return function renderNode(state, ctx) {
+      const role = ctx.role;
+      const host = ctx.el;
+      if (state && state.terminal) {
+        const won = !!state.win;
+        host.parentNode && host.parentNode.classList.add(won ? 'win' : 'loss');
+        host.innerHTML =
+          '<div class="tt-leaf-final ' + (won ? 'win' : 'loss') + '">' +
+            '<span class="tt-leaf-glyph">' + (won ? '✓' : '✗') + '</span>' +
+            '<span class="tt-leaf-word">' + (won ? T('terminal.win') : T('terminal.loss')) + '</span>' +
+          '</div>';
+        return;
+      }
+      const your = state.your === undefined ? 0 : state.your;
+      const opp  = state.opp  === undefined ? 0 : state.opp;
+      const big = (role === 'root');
+      const spriteCls = 'traj-box-sprite tt-mini-sprite' + (big ? ' tt-root-sprite' : '');
+      host.innerHTML =
+        (big ? '<div class="tt-node-tag">S<sub>1</sub></div>' : '') +
+        '<div class="traj-box-state-body tt-state-body' + (big ? ' tt-state-body-root' : '') + '">' +
+          '<div class="traj-box-side">' +
+            '<img class="' + spriteCls + '" src="assets/pikachu-back.png" alt="">' +
+            '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + bucketClass(your) + '" style="width:' + bucketPct(your) + '%"></div></div>' +
+            '<div class="traj-box-bucket">' + bucketName(your) + '</div>' +
+          '</div>' +
+          '<div class="traj-box-side">' +
+            '<img class="' + spriteCls + '" src="' + window.Battle.spriteForOpp(opp) + '" alt="' + window.Battle.displayNameForOpp(opp) + '">' +
+            '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + bucketClass(opp) + '" style="width:' + bucketPct(opp) + '%"></div></div>' +
+            '<div class="traj-box-bucket">' + bucketName(opp) + '</div>' +
+          '</div>' +
+        '</div>';
+    };
   }
 
-  /* Render one turn's three boxes into the rollout.  States and actions
-     are .muted (greyed out) since G_t only sums over rewards. Reward
-     boxes are clickable; clicking sets the t for the G_t expansion. */
-  function renderTurn(host, step, turn, isTerminal, isSelected, onSelect) {
-    const group = document.createElement('div');
-    group.className = 'traj-group';
-
-    const sBox = document.createElement('div');
-    sBox.className = 'traj-box traj-box-state muted';
-    sBox.innerHTML =
-      '<div class="traj-box-label">s<sub>' + step + '</sub></div>' +
-      '<div class="traj-box-state-body">' +
-        '<div class="traj-box-side">' +
-          '<img class="traj-box-sprite" src="assets/pikachu-back.png" alt="">' +
-          '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + bucketClass(turn.your) + '" style="width:' + bucketPct(turn.your) + '%"></div></div>' +
-          '<div class="traj-box-bucket">' + bucketName(turn.your) + '</div>' +
-        '</div>' +
-        '<div class="traj-box-side">' +
-          '<img class="traj-box-sprite" src="' + window.Battle.spriteForOpp(turn.opp) + '" alt="' + window.Battle.displayNameForOpp(turn.opp) + '">' +
-          '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + bucketClass(turn.opp) + '" style="width:' + bucketPct(turn.opp) + '%"></div></div>' +
-          '<div class="traj-box-bucket">' + bucketName(turn.opp) + '</div>' +
-        '</div>' +
-      '</div>';
-    group.appendChild(sBox);
-
-    const aBox = document.createElement('div');
-    aBox.className = 'traj-box traj-box-action muted';
-    aBox.innerHTML =
-      '<div class="traj-box-label">a<sub>' + step + '</sub></div>' +
-      '<div class="traj-box-action-body">' + moveName(turn.action) + '</div>';
-    group.appendChild(aBox);
-
-    const rBox = document.createElement('div');
-    rBox.className = 'traj-box traj-box-reward clickable';
-    if (isTerminal) rBox.classList.add(turn.won ? 'win' : 'loss');
-    if (isSelected) rBox.classList.add('selected');
-    const sign = turn.reward >= 0 ? '+' : '';
-    let inner =
-      '<div class="traj-box-label">r<sub>' + step + '</sub></div>' +
-      '<div class="traj-box-reward-body">' + sign + turn.reward + '</div>';
-    if (isTerminal) {
-      inner += '<div class="traj-box-terminal-tag">' + (turn.won ? T('terminal.win') : T('terminal.loss')) + '</div>';
-    }
-    rBox.innerHTML = inner;
-    rBox.addEventListener('click', () => onSelect(step - 1));
-    group.appendChild(rBox);
-
-    host.appendChild(group);
-  }
-
-  /* Build the G_t expansion HTML for the given starting index (0-based).
-     Undiscounted: G_t = sum of r_j from j=t to the end. */
-  function renderExpansion(host, startIdx) {
-    const t = startIdx + 1;
-    const horizon = TRAJ.length;     // 4
-    const symLine = []; const numLine = [];
-    let sum = 0;
-    for (let j = startIdx; j < horizon; j++) {
-      const r = TRAJ[j].reward;
-      sum += r;
-      const rSpan = '<span class="g-r">r<sub>' + (j + 1) + '</sub></span>';
-      symLine.push(rSpan);
-      const rStr = (r >= 0 ? '+' : '−') + Math.abs(r);
-      numLine.push('<span class="g-r">(' + rStr + ')</span>');
-    }
-    const resultClass = sum >= 0 ? 'pos' : 'neg';
-    host.innerHTML =
-      '<div class="g-line">' +
-        '<span class="g-lhs">G<sub>' + t + '</sub>(τ)</span>' +
-        ' = ' + symLine.join(' + ') +
-      '</div>' +
-      '<div class="g-line g-numbers">' +
-        '<span class="g-eq">=</span> ' + numLine.join(' + ') +
-      '</div>' +
-      '<div class="g-line g-final">' +
-        '<span class="g-eq">=</span> <span class="g-result ' + resultClass + '">' + fmtSigned(sum, 0) + '</span>' +
-      '</div>';
+  /* Exact fixed-action E[G] from FULL/FULL, computed by enumerating the full
+     chance tree under a constant action to a depth deep enough that the
+     residual probability is negligible. This is the TARGET the empirical
+     histogram mean converges to (it is NOT V, since V uses the optimal
+     policy; here the action is held fixed every step). */
+  function fixedActionValue(action) {
+    try {
+      const tree = window.TrajTree.build({ your: 0, opp: 0, terminal: false }, {
+        successors: window.Battle.successors,
+        isTerminal: (s) => !!(s && s.terminal),
+        stateKey: window.Battle.stateKey,
+        expandPolicy: () => action,
+        maxDepth: 80, gamma: 1, maxLeaves: 1e9, pPrune: 0, merge: true,
+      });
+      return tree.EG;
+    } catch (e) { return null; }
   }
 
   window.scenes.sceneObjective = function (root) {
@@ -140,41 +114,67 @@
     c1.innerHTML = '<div class="concept-formula-label">' + T('obj.g.label') + '</div>';
     const f1 = document.createElement('div');
     c1.appendChild(f1);
-    window.Katex.render(
-      String.raw`G_i(\tau) \;=\; \sum_{j \ge i}\, r_j`,
-      f1, true
-    );
+    window.Katex.render(String.raw`G_i(\tau) \;=\; \sum_{j \ge i}\, r_j`, f1, true);
     const foot1 = document.createElement('div');
     foot1.className = 'concept-formula-foot';
     foot1.textContent = T('obj.g.foot');
     c1.appendChild(foot1);
     root.appendChild(c1);
 
-    /* ---- Concrete G illustration ---- */
-    const illus = document.createElement('div');
-    illus.className = 'g-illus';
-    illus.innerHTML = '<div class="g-illus-label">' + T('obj.illus.label') + '</div>';
-    const rollout = document.createElement('div');
-    rollout.className = 'traj-rollout g-illus-rollout';
-    illus.appendChild(rollout);
-    const expansion = document.createElement('div');
-    expansion.className = 'g-expansion';
-    illus.appendChild(expansion);
-    root.appendChild(illus);
+    /* ---- The trajectory tree + weighted-leaf ledger ---- */
+    const egLabel = document.createElement('div');
+    egLabel.className = 'obj-eg-label';
+    egLabel.innerHTML = T('obj.eg.label', {
+      state: bucketName(HERO_ROOT.your) + ' / ' + bucketName(HERO_ROOT.opp),
+      move: moveName(HERO_ACTION),
+    });
+    root.appendChild(egLabel);
 
-    let selectedIdx = 0;
+    const treeHost = document.createElement('div');
+    treeHost.className = 'obj-tree-host';
+    root.appendChild(treeHost);
 
-    function rerender() {
-      rollout.innerHTML = '';
-      for (let i = 0; i < TRAJ.length; i++) {
-        renderTurn(rollout, i + 1, TRAJ[i], TRAJ[i].terminal, i === selectedIdx, (newIdx) => {
-          selectedIdx = newIdx;
-          rerender();
-        });
-      }
-      renderExpansion(expansion, selectedIdx);
-    }
-    rerender();
+    /* Ground-truth Q*(HERO_ROOT, HERO_ACTION) for the in-code honesty
+       assertion AND the on-screen "= Q*" callout. */
+    let V = null, groundTruth = null, policy = null;
+    try {
+      const vi = window.Bellman.valueIteration(1, {});
+      V = vi.V; policy = vi.policy;
+      const Q = window.Bellman.qFromV(V, 1);
+      const A = window.Moves.MOVE_IDS.length;
+      const ai = window.Moves.MOVE_IDS.indexOf(HERO_ACTION);
+      groundTruth = Q[window.Battle.stateIndex(HERO_ROOT) * A + ai];
+    } catch (e) { /* cold-entry fallback: no assertion / callout number */ }
+
+    const tt = window.TrajTree.mount(treeHost, {
+      engine: {
+        successors: window.Battle.successors,
+        isTerminal: (s) => !!(s && s.terminal),
+        stateKey: window.Battle.stateKey,
+      },
+      rootState: HERO_ROOT,
+      rootAction: HERO_ACTION,
+      expandPolicy: policy ? (s) => policy[window.Battle.stateIndex(s)] : (() => HERO_ACTION),
+      maxDepth: 2, maxLeaves: 12, gamma: 1,
+      renderNode: makeRenderNode(),
+      actionLabel: (moveId) => window.Moves.moveSubHtml(moveId),
+      layout: 'v',
+      sfx: window.SFX || null,
+      assertValue: groundTruth != null ? groundTruth : undefined,
+      assertTol: 1e-6,
+    });
+
+    /* "= Q*" callout: the weighted leaf sum the ledger just computed IS the
+       optimal action-value here. Closes G_t -> E[G_t] -> Q*. */
+    const egTie = document.createElement('div');
+    egTie.className = 'obj-eg-tie';
+    const egVal = tt.getEG();
+    egTie.innerHTML = T('obj.eg.tie', {
+      eg: window.TrajTree._fmt.fmtSigned2(egVal),
+      state: bucketName(HERO_ROOT.your) + ' / ' + bucketName(HERO_ROOT.opp),
+      move: moveName(HERO_ACTION),
+    });
+    root.appendChild(egTie);
 
     /* ---- Q* formula card ---- */
     const c2 = document.createElement('div');
@@ -182,19 +182,16 @@
     c2.innerHTML = '<div class="concept-formula-label">' + T('obj.qstar.label') + '</div>';
     const f2 = document.createElement('div');
     c2.appendChild(f2);
-    window.Katex.render(
-      String.raw`Q^{\star}(s, a) \;=\; \max\; \mathbb{E}\!\left[\, G_i(\tau) \,\right]`,
-      f2, true
-    );
+    window.Katex.render(String.raw`Q^{\star}(s, a) \;=\; \max\; \mathbb{E}\!\left[\, G_i(\tau) \,\right]`, f2, true);
     const foot2 = document.createElement('div');
     foot2.className = 'concept-formula-foot';
     foot2.textContent = T('obj.qstar.foot');
     c2.appendChild(foot2);
     root.appendChild(c2);
 
-    /* ---- Variance illustration ---- */
+    /* ---- Variance illustration (empirical companion) ---- */
     const variance = document.createElement('div');
-    variance.className = 'g-variance collapsed';   /* collapsed by default — click the title to expand */
+    variance.className = 'g-variance collapsed';
     variance.innerHTML =
       '<div class="g-variance-title">' +
         '<span class="g-variance-caret">▶</span> ' +
@@ -218,19 +215,17 @@
     root.appendChild(variance);
 
     let variancePolicy = 'thunderbolt';
-    const ACTIONS_LOCAL = window.Moves.MOVE_IDS;
+    /* The exact fixed-action E[G] from the tree: the line mu converges to. */
+    let targetEG = fixedActionValue(variancePolicy);
 
-    /* Sample one trajectory from FULL/FULL using the selected action
-       at every step (no policy machinery yet). */
     let varianceRngSeed = 20260516;
     function sampleOneG() {
       varianceRngSeed = (varianceRngSeed + 1013904223) | 0;
       const rng = window.Battle.makeRng(varianceRngSeed >>> 0);
       let state = window.Battle.initialState();
       let G = 0;
-      for (let t = 0; t < 30; t++) {
-        const action = variancePolicy;
-        const out = window.Battle.sample(state, action, rng);
+      for (let t = 0; t < 60; t++) {
+        const out = window.Battle.sample(state, variancePolicy, rng);
         G += out.reward;
         state = out.sNext;
         if (state.terminal) break;
@@ -243,12 +238,14 @@
       for (let i = 0; i < n; i++) G_samples.push(sampleOneG());
       renderVarianceChart();
     }
+
     function renderVarianceChart() {
       const stats = document.getElementById('g-variance-stats');
       const chart = document.getElementById('g-variance-chart');
       if (!chart || !stats) return;
+      const tgtStr = (targetEG != null) ? window.TrajTree._fmt.fmtSigned2(targetEG) : '?';
       if (G_samples.length === 0) {
-        stats.innerHTML = T('obj.var.stats_empty');
+        stats.innerHTML = T('obj.var.stats_empty') + ' · ' + T('obj.var.target', { target: tgtStr });
         chart.innerHTML = '<div class="g-variance-empty">' + T('obj.var.empty_chart') + '</div>';
         return;
       }
@@ -260,18 +257,25 @@
         mean: (mean >= 0 ? '+' : '') + mean.toFixed(2),
         lo: (lo >= 0 ? '+' : '') + lo,
         hi: (hi >= 0 ? '+' : '') + hi,
-      });
-      /* Render each sample as a horizontal bar, ordered by G (descending),
-         left-anchored, width proportional to |G|.  Positive = blue, negative = vermillion. */
+      }) + ' · ' + T('obj.var.target', { target: tgtStr });
+
       const sorted = G_samples.slice().sort((a, b) => b - a);
-      const maxAbs = Math.max(Math.abs(lo), Math.abs(hi), 1);
+      /* Include the target in the axis extent so its line is always on-chart. */
+      const tgt = (targetEG != null) ? targetEG : mean;
+      const maxAbs = Math.max(Math.abs(lo), Math.abs(hi), Math.abs(tgt), 1);
       const meanPct = ((mean + maxAbs) / (2 * maxAbs)) * 100;
+      const tgtPct = ((tgt + maxAbs) / (2 * maxAbs)) * 100;
       let html = '<div class="g-variance-zero"></div>';
-      html += '<div class="g-variance-mean" style="left:' + meanPct.toFixed(1) + '%"><span>μ = ' + (mean >= 0 ? '+' : '') + mean.toFixed(2) + '</span></div>';
+      /* Target line (the tree's computed E[G]): the convergence goal. */
+      if (targetEG != null) {
+        html += '<div class="g-variance-target" style="left:' + tgtPct.toFixed(1) + '%">' +
+                  '<span>' + T('obj.var.target_tag', { target: tgtStr }) + '</span></div>';
+      }
+      html += '<div class="g-variance-mean" style="left:' + meanPct.toFixed(1) + '%"><span>&mu; = ' + (mean >= 0 ? '+' : '') + mean.toFixed(2) + '</span></div>';
       for (const g of sorted) {
         const sign = g >= 0 ? 'pos' : 'neg';
-        const width = (Math.abs(g) / maxAbs) * 50;            /* up to 50 % of width either side of centre */
-        const offset = g >= 0 ? 50 : (50 - width);            /* anchor at zero line */
+        const width = (Math.abs(g) / maxAbs) * 50;
+        const offset = g >= 0 ? 50 : (50 - width);
         html +=
           '<div class="g-variance-bar ' + sign + '" style="left:' + offset.toFixed(2) + '%; width:' + width.toFixed(2) + '%">' +
             '<span class="g-variance-bar-label">' + (g >= 0 ? '+' : '') + g + '</span>' +
@@ -281,29 +285,33 @@
     }
     document.getElementById('g-variance-sample').addEventListener('click', () => drawSamples(20));
 
-    /* Action-selector buttons: clicking one switches the action used
-       at every step and resets the samples (since they're conditioned
-       on the chosen action).  The data-policy attr is a legacy name. */
     variance.querySelectorAll('.g-variance-policy').forEach((btn) => {
       btn.addEventListener('click', () => {
         const p = btn.getAttribute('data-policy');
         if (!p || p === variancePolicy) return;
         variancePolicy = p;
-        variance.querySelectorAll('.g-variance-policy').forEach((b) => {
-          b.classList.toggle('active', b === btn);
-        });
+        targetEG = fixedActionValue(variancePolicy);
+        variance.querySelectorAll('.g-variance-policy').forEach((b) => b.classList.toggle('active', b === btn));
         G_samples = [];
         renderVarianceChart();
       });
     });
 
-    /* Expand/collapse on title click. */
     variance.querySelector('.g-variance-title').addEventListener('click', () => {
       variance.classList.toggle('collapsed');
       const caret = variance.querySelector('.g-variance-caret');
       if (caret) caret.textContent = variance.classList.contains('collapsed') ? '▶' : '▼';
     });
     renderVarianceChart();
+
+    /* &var or &run: expand the variance widget and draw a batch so the
+       target line + converging mean are visible (also for headless capture). */
+    if (/[#&?](var|run)\b/.test(window.location.hash)) {
+      variance.classList.remove('collapsed');
+      const caret = variance.querySelector('.g-variance-caret');
+      if (caret) caret.textContent = '▼';
+      setTimeout(() => drawSamples(120), 180);
+    }
 
     return {};
   };

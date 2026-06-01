@@ -257,6 +257,10 @@
        to NEXT, we ask their name.  Triggered exactly once. */
     function maybeShowTrainerModal() {
       if (!window.Trainer || window.Trainer.hasBeenAsked()) return;
+      /* Suppressed under the same test flags that skip the boot animation
+         (&run / &skipboot): the name prompt is a presentation nicety and must
+         never sit over a scene in headless capture or an auto-run demo. */
+      if (/[#&?](skipboot|run)\b/.test(window.location.hash)) return;
       const modal = document.createElement('div');
       modal.className = 'trainer-name-modal';
       const fallback = T('trainer.modal.placeholder');

@@ -49,6 +49,51 @@
     return T('move.' + id);
   }
 
+  /* Compact state-icon helpers for the depth-1 backup tree (window.TrajTree).
+     Same node vocabulary as the trajectory / objective scenes; ZERO new icon
+     art (reuses .traj-box-state-body). */
+  function bucketClass(b) {
+    if (b === 0) return '';
+    if (b === 1) return 'b1';
+    if (b === 2) return 'b2';
+    if (b === 3) return 'b3';
+    return 'b4';
+  }
+  function bucketPct(b) { return Math.max(0, (NB - b) * 100 / NB); }
+  function makeRenderNode() {
+    return function renderNode(state, ctx) {
+      const big = (ctx.role === 'root');
+      const host = ctx.el;
+      if (state && state.terminal) {
+        const won = !!state.win;
+        host.parentNode && host.parentNode.classList.add(won ? 'win' : 'loss');
+        host.innerHTML =
+          '<div class="tt-leaf-final ' + (won ? 'win' : 'loss') + '">' +
+            '<span class="tt-leaf-glyph">' + (won ? '✓' : '✗') + '</span>' +
+            '<span class="tt-leaf-word">' + (won ? T('terminal.win') : T('terminal.loss')) + '</span>' +
+          '</div>';
+        return;
+      }
+      const your = state.your === undefined ? 0 : state.your;
+      const opp  = state.opp  === undefined ? 0 : state.opp;
+      const spriteCls = 'traj-box-sprite tt-mini-sprite' + (big ? ' tt-root-sprite' : '');
+      host.innerHTML =
+        (big ? '<div class="tt-node-tag">s</div>' : '') +
+        '<div class="traj-box-state-body tt-state-body' + (big ? ' tt-state-body-root' : '') + '">' +
+          '<div class="traj-box-side">' +
+            '<img class="' + spriteCls + '" src="assets/pikachu-back.png" alt="">' +
+            '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + bucketClass(your) + '" style="width:' + bucketPct(your) + '%"></div></div>' +
+            '<div class="traj-box-bucket">' + bucketName(your) + '</div>' +
+          '</div>' +
+          '<div class="traj-box-side">' +
+            '<img class="' + spriteCls + '" src="' + window.Battle.spriteForOpp(opp) + '" alt="' + window.Battle.displayNameForOpp(opp) + '">' +
+            '<div class="traj-box-hp"><div class="traj-box-hp-fill ' + bucketClass(opp) + '" style="width:' + bucketPct(opp) + '%"></div></div>' +
+            '<div class="traj-box-bucket">' + bucketName(opp) + '</div>' +
+          '</div>' +
+        '</div>';
+    };
+  }
+
   /* Convert (your, opp) → flat state index. */
   function idx(y, o) { return y * NB + o; }
 
@@ -322,6 +367,39 @@
     );
     root.appendChild(fcard);
 
+    /* ---- The backup IS the depth-1 trajectory tree ----
+       A collapsible card holding a depth-1 TrajTree under (FULL/MID, THUNDER)
+       with each frontier child bootstrapped by V: G_t = r + V(s'). Its
+       weighted leaf sum equals Q*(FULL/MID, THUNDER) = 5.77, exactly the
+       per-cell breakdown this scene already walks for the detail cell. It
+       makes "Bellman backup = the one-ply trajectory tree" visible and
+       reuses the same node / edge / ledger components as the earlier scenes. */
+    const backup = document.createElement('div');
+    backup.className = 'dp-backup collapsed';
+    backup.innerHTML =
+      '<div class="dp-backup-title">' +
+        '<span class="dp-backup-caret">&#9654;</span> ' + T('dp.backup.title') +
+        '<span class="dp-backup-hint">' + T('dp.backup.hint') + '</span>' +
+      '</div>' +
+      '<div class="dp-backup-body">' +
+        '<div class="dp-backup-lead">' + T('dp.backup.lead') + '</div>' +
+        '<div class="dp-backup-host" id="dp-backup-host"></div>' +
+        '<div class="dp-backup-tie" id="dp-backup-tie"></div>' +
+      '</div>';
+    root.appendChild(backup);
+    backup.querySelector('.dp-backup-title').addEventListener('click', () => {
+      backup.classList.toggle('collapsed');
+      const c = backup.querySelector('.dp-backup-caret');
+      if (c) c.innerHTML = backup.classList.contains('collapsed') ? '&#9654;' : '&#9660;';
+    });
+    /* &backup or &run: open the card so the depth-1 tree is visible (also for
+       headless capture). */
+    if (/[#&?](backup|run)\b/.test(window.location.hash)) {
+      backup.classList.remove('collapsed');
+      const c = backup.querySelector('.dp-backup-caret');
+      if (c) c.innerHTML = '&#9660;';
+    }
+
     /* Controls + status */
     const ctrls = document.createElement('div');
     ctrls.className = 'dp-controls-row';
@@ -353,6 +431,47 @@
     const { Q: qStar, V } = computeQstar();
     const detailBreakdown = buildBreakdown(DETAIL_CELL.yourB, DETAIL_CELL.oppB, DETAIL_CELL.moveId, V);
     const detailCellIdx = DETAIL_CELL.yourB * NB + DETAIL_CELL.oppB;
+
+    /* ---- Mount the depth-1 backup tree (root = the detail cell) ----
+       Bootstrapped frontier leaves: G_t = r + V(s'). The weighted leaf sum
+       is asserted in code to equal Q*(s, a) from this very value iteration,
+       so the picture is honest, never hard-coded. */
+    (function mountBackupTree() {
+      const host = document.getElementById('dp-backup-host');
+      if (!host || !window.TrajTree) return;
+      const rootState = { your: DETAIL_CELL.yourB, opp: DETAIL_CELL.oppB, terminal: false };
+      const action = DETAIL_CELL.moveId;
+      /* V is a Float32Array indexed your*NB+opp here. */
+      const valueFn = (s) => (s && !s.terminal) ? V[s.your * NB + s.opp] : 0;
+      const ai = ACTIONS.indexOf(action);
+      const groundTruth = qStar[ (DETAIL_CELL.yourB * NB + DETAIL_CELL.oppB) * A + ai ];
+      const tt = window.TrajTree.mount(host, {
+        engine: {
+          successors: window.Battle.successors,
+          isTerminal: (s) => !!(s && s.terminal),
+          stateKey: window.Battle.stateKey,
+        },
+        rootState: rootState,
+        rootAction: action,
+        maxDepth: 1, gamma: GAMMA,
+        valueFn: valueFn,
+        bootstrapFrontier: true,
+        renderNode: makeRenderNode(),
+        actionLabel: (moveId) => window.Moves.moveSubHtml(moveId),
+        layout: 'v',
+        sfx: window.SFX || null,
+        assertValue: groundTruth,
+        assertTol: 1e-5,
+      });
+      const tie = document.getElementById('dp-backup-tie');
+      if (tie) {
+        tie.innerHTML = T('dp.backup.tie', {
+          eg: window.TrajTree._fmt.fmtSigned2(tt.getEG()),
+          state: bucketName(DETAIL_CELL.yourB) + ' / ' + bucketName(DETAIL_CELL.oppB),
+          move: moveName(action),
+        });
+      }
+    })();
 
     /* ---- Phase definitions ----
        Fill order matches the new dynamics: the right two columns (Charizard
