@@ -5,3 +5,12 @@ __pycache__/
 *.pyc
 .idea/
 .vscode/
+
+# viz build / headless-QA scratch (never deliverables)
+.qa/
+.qa_c/
+.shots_tmp/
+tests/shots/
+probe*.html
+seed.html
+*.output
