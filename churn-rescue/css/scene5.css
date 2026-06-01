@@ -207,13 +207,13 @@
   font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase;
   color: var(--ink-secondary); margin: 0 0 6px;
 }
-.traj-derived-tape { min-height: 120px; }
+.traj-derived-tape { min-height: 120px; overflow-x: auto; max-width: 100%; }
 .traj-derived-g {
   flex: 0 0 auto; align-self: center;
   font-family: 'Press Start 2P', monospace; font-size: 9px;
   color: var(--ink-on-box);
   border: 2px solid var(--rule); border-radius: 3px;
-  padding: 6px 8px; margin-left: 4px; white-space: nowrap;
+  padding: 6px 8px; margin-left: 4px; white-space: normal; max-width: 100%;
 }
 .traj-derived-g b { color: var(--lever-offer); font-variant-numeric: tabular-nums; }
 .traj-derived-g sub { font-size: 7px; }

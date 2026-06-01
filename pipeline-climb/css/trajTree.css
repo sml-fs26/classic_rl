@@ -439,3 +439,7 @@
   .pc-tree-caption, .pc-eg-label { font-size: 8px; }
   .pc-eg-tie { font-size: 9px; }
 }
+
+/* Mobile: shrink display math so the long tau / E[G_t] formulas fit the
+   phone width instead of scrolling inside their card. */
+@media (max-width: 480px) { .katex-display { font-size: 0.74em; } }

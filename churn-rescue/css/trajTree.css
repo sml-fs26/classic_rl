@@ -389,3 +389,7 @@
   .tt-node-icon .account-card-mini .account-tier { font-size: 6px; }
   .tt-leaf-glyph { font-size: 14px; }
 }
+
+/* Mobile: shrink display math so the long tau / E[G_t] formulas fit the
+   phone width instead of scrolling inside their card. */
+@media (max-width: 480px) { .katex-display { font-size: 0.74em; } }
