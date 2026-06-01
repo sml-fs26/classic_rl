@@ -769,6 +769,66 @@ html, body {
 .scene-pad {
   padding: 12px 4px 24px;
 }
+
+/* ---------- Shared concept-scene chrome ----------
+   Used by the theory scenes (trajectory tree, return / E[G_t], Bellman).
+   Retro-pixel; all colour from tokens; no inline categorical colours. */
+.concept-scene { max-width: 980px; margin: 0 auto; }
+.concept-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin: 2px 0 14px;
+}
+.concept-formula-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), inset 0 0 0 6px var(--bg-strong);
+  padding: 12px 16px 14px;
+  margin: 0 0 14px;
+  text-align: center;
+  /* A long KaTeX line scrolls INSIDE the card instead of widening the page. */
+  max-width: 100%;
+  overflow-x: auto;
+}
+.concept-formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-bottom: 8px;
+}
+.concept-formula-card .katex-display { margin: 6px 0; }
+.concept-formula-card .katex { color: var(--ink-on-box); font-size: 16px; }
+.concept-formula-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  margin-top: 8px;
+}
+
+/* The recurring scene control button (SAMPLE / STEP / RESET). */
+.poke-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  padding: 8px 12px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+}
+.poke-btn:hover:not(:disabled) { background: var(--lever-demo); color: #fff; }
+.poke-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 720px) {
+  .concept-heading { font-size: 13px; }
+  .concept-formula-card .katex { font-size: 13px; }
+}
 .scene-row {
   display: flex;
   flex-wrap: wrap;

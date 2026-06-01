@@ -1,0 +1,131 @@
+/* Scene 5 - the trajectory tree.
+   The tree + ledger + caption + lever chip live in trajTree.css (shared with
+   scenes 6 / 8). This file styles only the scene-unique bits: the derived
+   (s, a, r) tape strip and the SAMPLE / STEP / RESET controls. Retro-pixel;
+   all colour from tokens. */
+
+/* ---- Controls ---- */
+.pc-traj-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.pc-traj-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+/* ---- Derived tape: the lit path read back as the old (s, a, r) boxes ---- */
+.pc-traj-derived {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), inset 0 0 0 6px var(--bg-strong);
+  padding: 10px 12px 12px;
+  margin: 0 0 14px;
+  max-width: 100%;
+}
+.pc-derived-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  margin-bottom: 8px;
+}
+.pc-derived-tape {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.pc-derived-empty {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  line-height: 1.7;
+  padding: 6px 0;
+}
+.pc-derived-g {
+  flex: 0 0 auto;
+  align-self: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--signed-green);
+  border: 2px solid var(--signed-green);
+  background: var(--bg);
+  padding: 6px 9px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* One (s, a, r) group + its boxes. */
+.pc-tape-group {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.pc-tape-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 5px 7px;
+  min-width: 56px;
+}
+.pc-tape-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+}
+.pc-tape-label sub { font-size: 5px; vertical-align: baseline; }
+.pc-tape-icon .lc-rung { height: 9px; padding: 0 3px; gap: 3px; }
+.pc-tape-icon .lc-rung-bar { width: 5px; }
+.pc-tape-icon .lc-rung-seat { width: 9px; height: 9px; }
+.pc-tape-icon .lc-avatar svg { width: 7px; height: 7px; }
+.pc-tape-icon .lc-ladder { border-width: 2px; padding: 3px; gap: 2px; }
+
+/* Action box: the lever taken (amber identity for emphasis). */
+.pc-tape-action { justify-content: center; }
+.pc-tape-action-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.02em;
+  color: var(--lever-demo);
+  text-align: center;
+}
+
+/* Reward box: signed number; terminal boxes tint SIGNED / LOST. */
+.pc-tape-reward { justify-content: center; }
+.pc-tape-reward-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.pc-tape-reward.win  { border-color: var(--signed-green); }
+.pc-tape-reward.win  .pc-tape-reward-body { color: var(--signed-green); }
+.pc-tape-reward.loss { border-color: var(--lost-grey); }
+.pc-tape-reward.loss .pc-tape-reward-body { color: var(--lost-grey); }
+.pc-tape-terminal-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+.pc-tape-final.win  { border-color: var(--signed-green); }
+.pc-tape-final.loss { border-color: var(--lost-grey); }
+
+@media (max-width: 720px) {
+  .pc-tape-box { min-width: 48px; padding: 4px 5px; }
+  .pc-tape-reward-body { font-size: 11px; }
+  .pc-derived-g { font-size: 10px; }
+}
