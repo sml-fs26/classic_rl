@@ -315,3 +315,49 @@
   .s8-heading { font-size: 13px; }
   .s8-formula .katex { font-size: 16px; }
 }
+
+/* =====================================================================
+   THE BACKUP IS A DEPTH-1 TREE: a collapsible card holding a depth-1
+   window.TrajTree of ROLL from (20,20,pot20) + its weighted-leaf ledger.
+   Tree/ledger structure lives in css/trajTree.css; the table-card NODE
+   styles are shared from css/scene5.css.
+   ===================================================================== */
+.s8-ttbackup {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  margin: 6px 0 10px;
+}
+.s8-ttbackup-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.s8-ttbackup-caret { font-size: 8px; color: var(--hue-ghost); }
+.s8-ttbackup-hint { font-size: 7px; color: var(--ink-secondary); letter-spacing: 0.02em; }
+.s8-ttbackup-body { display: flex; flex-direction: column; gap: 10px; padding: 0 14px 14px; }
+.s8-ttbackup.collapsed .s8-ttbackup-body { display: none; }
+.s8-ttbackup-lead {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+}
+.s8-ttbackup-host { width: 100%; }
+.s8-ttbackup-tie {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+  border: 3px solid var(--cb-blue);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 14px;
+}
+.s8-ttbackup-tie b { color: var(--cb-blue); }

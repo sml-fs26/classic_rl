@@ -23,12 +23,76 @@
   window.scenes = window.scenes || {};
 
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
+  const Pig = window.Pig;
+  const PT  = window.PigTraj;
+  const NB = (Pig && Pig.POT_BUCKETS) || 6;
+  const DANGER_BUCKET = NB - 1;
+  const POT_LABELS = (Pig && Pig.POT_BUCKET_LABELS) || [];
+  const STAND_CLASS = ['behind', 'even', 'ahead'];
 
   /* The EVEN representative scores + the break-even pot we back up from. */
   const EVEN = (window.Pig && window.Pig.STANDING_REP)
     ? window.Pig.STANDING_REP[1] : { my: 20, riv: 20 };
   const BACKUP_POT = 20;                       // the knife-edge pot
   const GROW_FACES = (window.Pig && window.Pig.ROLL_GAIN) || [2, 3, 4, 5, 6];
+
+  function standName(st) { return T('vocab.' + STAND_CLASS[st]); }
+
+  /* Compact inline table-card for a depth-1 backup node (shared shape with
+     scenes 5 / 6; ZERO new state-icon art). */
+  function miniCardHtml(my, riv, pot, tag) {
+    const pb = Pig.bucketOfPot(pot);
+    const st = Pig.standingOf(my, riv);
+    const tg = Pig.TARGET;
+    let rows = '';
+    for (let b = NB - 1; b >= 1; b--) {
+      const on = b <= pb ? ' tc-chip-on' : '';
+      const danger = b >= DANGER_BUCKET ? ' tc-chip-danger' : '';
+      rows += '<div class="tc-chip-row' + danger + on + '"></div>';
+    }
+    const potDanger = pb >= DANGER_BUCKET ? ' tc-pot-danger' : '';
+    const meter =
+      '<div class="tc-pot-meter' + potDanger + '">' + rows +
+        '<div class="tc-pot-label">' + POT_LABELS[pb] + '</div>' +
+      '</div>';
+    const pct = (v) => Math.max(0, Math.min(100, (v / tg) * 100));
+    const badge =
+      '<div class="tc-standing-badge tc-stand-' + STAND_CLASS[st] + '">' +
+        '<div class="tc-bar-row tc-bar-you">' +
+          '<span class="tc-bar-tag">' + T('vocab.you') + '</span>' +
+          '<span class="tc-bar-track"><span class="tc-bar-fill tc-fill-you" style="width:' + pct(my) + '%"></span></span>' +
+          '<span class="tc-bar-num tc-num-you">' + my + '</span>' +
+        '</div>' +
+        '<div class="tc-bar-row tc-bar-riv">' +
+          '<span class="tc-bar-tag">' + T('vocab.rival') + '</span>' +
+          '<span class="tc-bar-track"><span class="tc-bar-fill tc-fill-riv" style="width:' + pct(riv) + '%"></span></span>' +
+          '<span class="tc-bar-num tc-num-riv">' + riv + '</span>' +
+        '</div>' +
+        '<div class="tc-standing-tag">' + standName(st) + '</div>' +
+      '</div>';
+    return (tag ? '<div class="tt-node-tag">' + tag + '</div>' : '') +
+      '<div class="table-card table-card-compact traj-mini-card">' + meter + badge + '</div>';
+  }
+
+  function renderNode(state, ctx) {
+    const host = ctx.el;
+    if (state && state.terminal) {
+      const won = !!state.win;
+      if (host.parentNode) host.parentNode.classList.add(won ? 'win' : 'loss');
+      host.innerHTML =
+        '<div class="tt-leaf-final ' + (won ? 'win' : 'loss') + '">' +
+          '<span class="tt-leaf-glyph">' + (won ? '✓' : '✗') + '</span>' +
+          '<span class="tt-leaf-word">' + (won ? T('vocab.win') : T('vocab.lose')) + '</span>' +
+        '</div>';
+      return;
+    }
+    const big = (ctx.role === 'root');
+    const rival = (state && state.turn === 'rival');
+    if (rival && host.parentNode) host.parentNode.classList.add('tt-node-rival');
+    host.innerHTML =
+      (rival ? '<div class="tt-node-rival-tag">' + T('scene5.rival.tag') + '</div>' : '') +
+      miniCardHtml(state.my, state.riv, state.pot || 0, big ? 's' : null);
+  }
 
   function pct(v) { return (v * 100).toFixed(1) + '%'; }
   function p2(v) { return Number(v).toFixed(2); }
@@ -91,6 +155,62 @@
     read.textContent = T('s8.formula.read');
     fcard.appendChild(read);
     root.appendChild(fcard);
+
+    /* ---- The backup IS the depth-1 trajectory tree ----
+       A collapsible card holding a depth-1 TrajTree of ROLL from (20,20,pot20)
+       with each frontier child bootstrapped by its win prob V: G_t = r + V(s').
+       Its weighted leaf sum equals Q*(s, ROLL) - exactly the branch arithmetic
+       the rest of this scene walks by hand. It makes "Bellman backup = the
+       one-ply trajectory tree" visible and reuses the node/edge/ledger
+       components from the trajectory + return scenes. Asserted in code. */
+    (function mountBackupTree() {
+      if (!window.TrajTree || !PT) return;
+      const card = document.createElement('div');
+      card.className = 's8-ttbackup collapsed';
+      card.innerHTML =
+        '<div class="s8-ttbackup-title">' +
+          '<span class="s8-ttbackup-caret">&#9654;</span> ' + T('s8.tt.title') +
+          '<span class="s8-ttbackup-hint">' + T('s8.tt.hint') + '</span>' +
+        '</div>' +
+        '<div class="s8-ttbackup-body">' +
+          '<div class="s8-ttbackup-lead">' + T('s8.tt.lead') + '</div>' +
+          '<div class="s8-ttbackup-host" id="s8-ttbackup-host"></div>' +
+          '<div class="s8-ttbackup-tie" id="s8-ttbackup-tie"></div>' +
+        '</div>';
+      root.appendChild(card);
+      card.querySelector('.s8-ttbackup-title').addEventListener('click', () => {
+        card.classList.toggle('collapsed');
+        const c = card.querySelector('.s8-ttbackup-caret');
+        if (c) c.innerHTML = card.classList.contains('collapsed') ? '&#9654;' : '&#9660;';
+      });
+      if (/[#&?](backup|run)\b/.test(window.location.hash)) {
+        card.classList.remove('collapsed');
+        const c = card.querySelector('.s8-ttbackup-caret');
+        if (c) c.innerHTML = '&#9660;';
+      }
+
+      const host = card.querySelector('#s8-ttbackup-host');
+      const rootState = { my: EVEN.my, riv: EVEN.riv, pot: BACKUP_POT, terminal: false, turn: 'me' };
+      let groundTruth;
+      try { groundTruth = PT.qStar(rootState, 'roll'); } catch (e) { groundTruth = undefined; }
+      const tt = window.TrajTree.mount(host, {
+        engine: { successors: PT.successors, isTerminal: PT.isTerminal, stateKey: PT.stateKey },
+        rootState: rootState,
+        rootAction: 'roll',
+        expandPolicy: PT.optimalLever,
+        maxDepth: 1, maxLeaves: 12, gamma: 1,
+        valueFn: PT.valueFn,
+        bootstrapFrontier: true,
+        renderNode: renderNode,
+        actionLabel: (id) => T('vocab.' + id),
+        layout: 'v',
+        sfx: window.SFX || null,
+        assertValue: groundTruth != null ? groundTruth : undefined,
+        assertTol: 1e-6,
+      });
+      const tie = card.querySelector('#s8-ttbackup-tie');
+      if (tie) tie.innerHTML = T('s8.tt.tie', { eg: window.TrajTree._fmt.fmtSigned2(tt.getEG()) });
+    })();
 
     /* ---- The worked one-step backup ---- */
     const backup = document.createElement('div');

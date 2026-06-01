@@ -1,56 +1,64 @@
-/* Scene 5 - THE TRAJECTORY.
+/* Scene 5 - THE TRAJECTORY, drawn as a TREE.
  *
- *   One full game, written down move by move, as a tape of RANDOM
- *   VARIABLES:
+ *   tau = (S_1, A_1, R_1, S_2, A_2, R_2, ...) is usually written as a flat
+ *   tape of random-variable boxes. But that tape is ONE realization - one
+ *   root-to-leaf PATH through a branching process. This scene draws the *set*
+ *   of possible paths as a tree (window.TrajTree):
  *
- *     tau = (S_1, A_1, R_1,  S_2, A_2, R_2,  ...,  S_T)
+ *     - NODES are situations (the recurring table-card: pot meter + standing
+ *       badge), in a compact form; the root keeps an S_1 tag.
+ *     - EDGES are annotated with the LEVER (shown once, on the root edges),
+ *       the transition probability p of that die outcome, and the reward r
+ *       (0 every turn here - reward only lands at the terminal +1 / 0).
+ *     - LEAVES carry G_t = the return from the root along that path. Because
+ *       reward is 0 until the end, G_t IS a win probability here.
  *
- *   Capital letters because every entry was a roll of the die before it
- *   happened. The recurring table-card (pot meter + standing badge)
- *   marches LEFT along a rollout tape: situation S_i, lever A_i, reward
- *   R_i, next situation - through busts and banks until someone crosses
- *   the target. Rewards are 0 every turn until the terminal +1 (I win) or
- *   0 (the rival wins). MANAGER MEANING first: a run is a sequence, and
- *   the SAME playbook from the SAME start reads completely differently
- *   every time the die falls differently.
+ *   THE HERO ROOT (engine-verified): (my 29, riv 41, pot 12), BEHIND, under
+ *   ROLL. ROLL is the optimal lever there (catch up). The depth-1 chance tree
+ *   has 6 leaves: roll a 2-6 and you are one bank from 50 (win prob 0.73-0.84),
+ *   roll a 1 and you BUST - the dice pass to a 41-point rival (win prob 0.18).
+ *   E[G_t] = Q*(s, ROLL) = 0.687 exactly (asserted in code).
  *
- *   Each MY-turn emits three boxes wrapped in a .traj-group so the eye
- *   maps each subscripted symbol in the formula to its own box:
- *     S_i - a mini table-card (pot meter + standing badge)  [orange seam]
- *     A_i - the lever I pulled (ROLL / HOLD)                [lever colour]
- *     R_i - the reward (0 until the terminal +1)            [reward box]
- *   The rival's whole fixed-rule turn collapses into one compact
- *   interlude box (the turn passes; the part you do not control).
+ *   THE RIVAL-TURN COUPLING (stated on-screen): a bust hands the dice to the
+ *   fixed rival. That child is "rival to move" - not your decision and not
+ *   terminal - so it is a BOOTSTRAPPED leaf annotated with that state's win
+ *   probability (the part you do not control). The grown-pot children are
+ *   bootstrapped the same way. The caption says so.
  *
- *   We REPLAY THE REAL GAME via window.Pig: I follow the optimal playbook
- *   (Q*) and the fixed rival ("holds at 20") answers each time my turn
- *   ends. STEP plays one of my turns (auto-resolving the rival after a
- *   HOLD / bust); PLAY auto-advances; NEW GAME reseeds so the die falls
- *   differently. &run auto-plays for headless capture.
+ *   One sampled trajectory = one highlighted root-to-leaf path. SAMPLE draws a
+ *   path with die-faithful probabilities and lights it; STEP / -> walks it one
+ *   ply at a time, the faint tree behind it showing the roads not taken. A
+ *   strip under the tree shows the lit path AS THE OLD TAPE (S_i, A_i, R_i)
+ *   so the tape becomes a *derived* view, not the primary one. &run
+ *   auto-samples for the headless screenshot.
  */
 (function () {
   window.scenes = window.scenes || {};
 
   const Pig = window.Pig;
+  const PT  = window.PigTraj;
   const NB = Pig.POT_BUCKETS;                 // 6
   const DANGER_BUCKET = NB - 1;               // bucket 5 = "21+" = past 20
   const POT_LABELS = Pig.POT_BUCKET_LABELS;
   const STAND_CLASS = ['behind', 'even', 'ahead'];
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
+  /* Hero root + the fixed lever whose chance-tree we draw. */
+  const HERO_ROOT = { my: 29, riv: 41, pot: 12, terminal: false, turn: 'me' };
+  const HERO_LEVER = 'roll';
+
   function leverName(id) { return T('vocab.' + id); }        // ROLL / HOLD
   function standName(st) { return T('vocab.' + STAND_CLASS[st]); }
 
-  /* A lightweight inline "mini table-card" for a state box: the pot-meter
-     chip stack (height = pot bucket, red danger band past 20) on the left,
-     the two-bar standing badge (you vs rival, tinted) on the right. Shares
-     the table-card CSS tokens without mounting the full widget per box. */
-  function miniCardHtml(my, riv, pot, target) {
+  /* A compact inline "mini table-card" for a node: the pot-meter chip stack
+     (height = pot bucket, red danger band past 20) on the left, the two-bar
+     standing badge (you vs rival, tinted) on the right. Reuses the .tc-* /
+     .traj-mini-card CSS - ZERO new state-icon art. */
+  function miniCardHtml(my, riv, pot, tag) {
     const pb = Pig.bucketOfPot(pot);
     const st = Pig.standingOf(my, riv);
-    const tg = target || Pig.TARGET;
+    const tg = Pig.TARGET;
 
-    /* Pot meter: rows stacked top(danger) -> bottom, lit up to pb. */
     let rows = '';
     for (let b = NB - 1; b >= 1; b--) {
       const on = b <= pb ? ' tc-chip-on' : '';
@@ -79,7 +87,31 @@
         '<div class="tc-standing-tag">' + standName(st) + '</div>' +
       '</div>';
 
-    return '<div class="table-card table-card-compact traj-mini-card">' + meter + badge + '</div>';
+    return (tag ? '<div class="tt-node-tag">' + tag + '</div>' : '') +
+      '<div class="table-card table-card-compact traj-mini-card">' + meter + badge + '</div>';
+  }
+
+  /* The TrajTree node renderer. Reuses the table-card; terminals reuse the
+     win/loss colour-blind treatment + a check / cross glyph; rival-turn
+     frontier leaves get a "turn passes" tag so the coupling is legible. */
+  function renderNode(state, ctx) {
+    const host = ctx.el;
+    if (state && state.terminal) {
+      const won = !!state.win;
+      if (host.parentNode) host.parentNode.classList.add(won ? 'win' : 'loss');
+      host.innerHTML =
+        '<div class="tt-leaf-final ' + (won ? 'win' : 'loss') + '">' +
+          '<span class="tt-leaf-glyph">' + (won ? '✓' : '✗') + '</span>' +
+          '<span class="tt-leaf-word">' + (won ? T('vocab.win') : T('vocab.lose')) + '</span>' +
+        '</div>';
+      return;
+    }
+    const big = (ctx.role === 'root');
+    const rival = (state && state.turn === 'rival');
+    if (rival && host.parentNode) host.parentNode.classList.add('tt-node-rival');
+    host.innerHTML =
+      (rival ? '<div class="tt-node-rival-tag">' + T('scene5.rival.tag') + '</div>' : '') +
+      miniCardHtml(state.my, state.riv, state.pot || 0, big ? 'S<sub>1</sub>' : null);
   }
 
   window.scenes.scene5 = function (root) {
@@ -96,7 +128,8 @@
     lede.innerHTML = T('scene5.lede');
     root.appendChild(lede);
 
-    /* ---- Formula card: the trajectory as a sequence of random vars ---- */
+    /* ---- Formula card: tau as a sequence of random vars; foot adds the tree
+       reframe "one trajectory = one path." ---- */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene5.formula.label') + '</div>';
@@ -108,232 +141,264 @@
     );
     const ffoot = document.createElement('div');
     ffoot.className = 'concept-formula-foot';
-    ffoot.textContent = T('scene5.formula.foot');
+    ffoot.innerHTML = T('scene5.formula.foot') +
+      '<br><b class="traj-tree-foot">' + T('scene5.tree.foot') + '</b>';
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Rollout tape ---- */
-    const rollout = document.createElement('div');
-    rollout.className = 'traj-rollout pyl-traj-rollout';
-    root.appendChild(rollout);
+    /* ---- Tree caption: names the fixed root + lever (chance-only tree). ---- */
+    const caption = document.createElement('div');
+    caption.className = 'traj-tree-caption';
+    caption.innerHTML = T('scene5.tree.caption', {
+      stand: standName(Pig.standingOf(HERO_ROOT.my, HERO_ROOT.riv)),
+      pot: POT_LABELS[Pig.bucketOfPot(HERO_ROOT.pot)],
+      lever: leverName(HERO_LEVER),
+    });
+    root.appendChild(caption);
+
+    /* ---- Tree host: TrajTree mounts the indented tree + the E[G_t] ledger. ---- */
+    const treeHost = document.createElement('div');
+    treeHost.className = 'traj-tree-host';
+    root.appendChild(treeHost);
+
+    /* Ground-truth Q*(HERO_ROOT, ROLL) for the in-code honesty assertion. */
+    let groundTruth;
+    try { groundTruth = PT.qStar(HERO_ROOT, HERO_LEVER); } catch (e) { groundTruth = undefined; }
+
+    const tt = window.TrajTree.mount(treeHost, {
+      engine: {
+        successors: PT.successors,
+        isTerminal: PT.isTerminal,
+        stateKey: PT.stateKey,
+      },
+      rootState: HERO_ROOT,
+      rootAction: HERO_LEVER,
+      expandPolicy: PT.optimalLever,
+      maxDepth: 1,                 // depth-1: the rival-turn + grown-pot children
+      maxLeaves: 12,               // are bootstrapped leaves (see PigTraj header)
+      gamma: 1,
+      valueFn: PT.valueFn,
+      bootstrapFrontier: true,
+      renderNode: renderNode,
+      actionLabel: (id) => leverName(id),
+      layout: 'v',
+      sfx: window.SFX || null,
+      assertValue: groundTruth != null ? groundTruth : undefined,
+      assertTol: 1e-6,
+    });
+
+    /* Caption note: the rival-turn / grown-pot leaves are bootstrapped values
+       (a win probability), since the turn passes or the game plays on. */
+    const bootNote = document.createElement('div');
+    bootNote.className = 'traj-tree-bootnote';
+    bootNote.innerHTML = T('scene5.tree.bootnote');
+    root.appendChild(bootNote);
+
+    /* ---- Derived tape strip: the lit path AS THE OLD (S, A, R) tape ----
+       Empty until a path is sampled/walked. */
+    const tapeWrap = document.createElement('div');
+    tapeWrap.className = 'traj-derived';
+    tapeWrap.innerHTML =
+      '<div class="traj-derived-label">' + T('scene5.derived.label') + '</div>' +
+      '<div class="traj-derived-tape pyl-traj-rollout" id="traj-derived-tape"></div>';
+    root.appendChild(tapeWrap);
+    const tapeEl = tapeWrap.querySelector('#traj-derived-tape');
 
     /* ---- Controls + status ---- */
     const ctrls = document.createElement('div');
     ctrls.className = 'traj-controls';
     ctrls.innerHTML =
+      '<button class="poke-btn" id="traj-sample">' + T('scene5.btn.sample') + '</button>' +
       '<button class="poke-btn" id="traj-step">' + T('scene5.btn.step') + '</button>' +
-      '<button class="poke-btn" id="traj-play">' + T('scene5.btn.play') + '</button>' +
-      '<button class="poke-btn" id="traj-new">' + T('scene5.btn.new') + '</button>' +
-      '<div class="traj-status">' +
-        T('scene5.status.turns') + ' <b id="traj-turns">0</b>' +
-        ' &middot; <span id="traj-state">' + T('scene5.status.fresh') + '</span>' +
-      '</div>';
+      '<button class="poke-btn" id="traj-reset">' + T('scene5.btn.reset') + '</button>' +
+      '<div class="traj-status" id="traj-status">' + T('scene5.status.hint') + '</div>';
     root.appendChild(ctrls);
 
-    const caption = document.createElement('div');
-    caption.className = 'poke-caption pyl-traj-caption';
-    caption.textContent = T('scene5.caption');
-    root.appendChild(caption);
+    const caption2 = document.createElement('div');
+    caption2.className = 'poke-caption pyl-traj-caption';
+    caption2.textContent = T('scene5.caption');
+    root.appendChild(caption2);
 
-    /* ---- Replay state ---- */
-    let seed = 0xBEEF;
-    let rng = Pig.makeRng(seed);
-    let s = Pig.initialState();           // {my, riv, pot, turn:'me', terminal}
-    let stepIdx = 1;                      // the i-subscript on the next emitted turn
-    let myTurns = 0;                      // count of MY turns played (for status)
-    let done = false;
-    let playTimer = null;
+    /* ---- Walk state ----
+       A "current path" is a fixed list of edges from root to a leaf, chosen by
+       sampling (die-faithful). STEP reveals it one ply at a time and lights the
+       prefix; SAMPLE draws a fresh path and lights it whole. */
+    let rng = Pig.makeRng((0x51A7 + Math.floor(Math.random() * 65535)) >>> 0);
+    let curPath = null;     // { edges, nodes:[root..leaf], leafId }
+    let walkPly = 0;
 
-    function reset(newSeed) {
-      stopPlay();
-      seed = newSeed != null ? newSeed : ((seed * 1103515245 + 12345) >>> 0);
-      rng = Pig.makeRng(seed);
-      s = Pig.initialState();
-      stepIdx = 1;
-      myTurns = 0;
-      done = false;
-      rollout.innerHTML = '';
-      updateStatus();
+    function pathToLeaf(tree, leafId) {
+      let found = null;
+      function rec(node, chainNodes, edges) {
+        if (node.id === leafId) { found = { nodes: chainNodes.concat([node]), edges }; return true; }
+        for (const e of (node.children || [])) {
+          if (rec(e.node, chainNodes.concat([node]),
+                  edges.concat([{ move: node.move, p: e.p, reward: e.reward }]))) return true;
+        }
+        return false;
+      }
+      rec(tree.root, [], []);
+      return found;
     }
-    function stopPlay() { if (playTimer) { clearInterval(playTimer); playTimer = null; } }
 
-    /* Append one MY turn: S_i, A_i, R_i (+ a closing S_{T} on terminal). */
-    function emitMyTurn(sBefore, leverId, out) {
+    function setStatus(html) {
+      const el = document.getElementById('traj-status');
+      if (el) el.innerHTML = html;
+    }
+
+    function renderTape() {
+      tapeEl.innerHTML = '';
+      if (!curPath) {
+        tapeEl.innerHTML = '<div class="traj-derived-empty">' + T('scene5.derived.empty') + '</div>';
+        return;
+      }
+      const reveal = Math.min(walkPly, curPath.edges.length);
+      for (let i = 0; i < reveal; i++) {
+        const sBefore = curPath.nodes[i].state;
+        const e = curPath.edges[i];
+        const childNode = curPath.nodes[i + 1];
+        appendTapeTriple(tapeEl, i + 1, sBefore, e.move, e.reward, childNode);
+      }
+      if (reveal === curPath.edges.length && curPath.edges.length > 0) {
+        const leaf = curPath.nodes[curPath.nodes.length - 1];
+        const gtag = document.createElement('div');
+        gtag.className = 'traj-derived-g';
+        gtag.innerHTML = T('scene5.derived.g', { g: window.TrajTree._fmt.fmtG(leaf.G != null ? leaf.G : 0) });
+        tapeEl.appendChild(gtag);
+      }
+      setTimeout(() => { tapeEl.scrollLeft = tapeEl.scrollWidth; }, 60);
+    }
+
+    /* One (S, A, R) triple in the derived tape - same box vocabulary as the
+       old flat rollout (roll/hold-tinted action, reward box), then the child
+       situation (or a terminal / "turn passes" closer). */
+    function appendTapeTriple(host, step, sBefore, leverId, r, childNode) {
+      const child = childNode.state;
+      const terminal = !!(child && child.terminal);
+      const won = !!(child && child.win);
+      const rival = !!(child && child.turn === 'rival');
+
       const group = document.createElement('div');
       group.className = 'traj-group';
 
-      /* S_i - state box (mini table-card). */
       const sBox = document.createElement('div');
       sBox.className = 'traj-box traj-box-state';
-      sBox.style.animationDelay = '0ms';
       sBox.innerHTML =
-        '<div class="traj-box-label">S<sub>' + stepIdx + '</sub></div>' +
-        miniCardHtml(sBefore.my, sBefore.riv, sBefore.pot, Pig.TARGET);
+        '<div class="traj-box-label">S<sub>' + step + '</sub></div>' +
+        miniCardHtml(sBefore.my, sBefore.riv, sBefore.pot || 0, null);
       group.appendChild(sBox);
 
-      /* A_i - lever box (ROLL / HOLD), lever-coloured. */
       const aBox = document.createElement('div');
       aBox.className = 'traj-box traj-box-action traj-act-' + leverId;
-      aBox.style.animationDelay = '110ms';
       aBox.innerHTML =
-        '<div class="traj-box-label">A<sub>' + stepIdx + '</sub></div>' +
-        '<div class="traj-box-action-body">' + leverName(leverId) +
-          (out.log && out.log.busted ? '<span class="traj-bust-flag">' + T('vocab.bust') + '!</span>' : '') +
-        '</div>';
+        '<div class="traj-box-label">A<sub>' + step + '</sub></div>' +
+        '<div class="traj-box-action-body">' + leverName(leverId) + '</div>';
       group.appendChild(aBox);
 
-      /* R_i - reward box (0 until the terminal +1). */
       const rBox = document.createElement('div');
       rBox.className = 'traj-box traj-box-reward';
-      if (out.terminal) rBox.classList.add(out.win ? 'win' : 'loss');
-      rBox.style.animationDelay = '220ms';
+      if (terminal) rBox.classList.add(won ? 'win' : 'loss');
+      const sign = r > 0 ? '+' : '';
       let inner =
-        '<div class="traj-box-label">R<sub>' + stepIdx + '</sub></div>' +
-        '<div class="traj-box-reward-body">' + (out.reward > 0 ? '+1' : '0') + '</div>';
-      if (out.terminal) {
-        inner += '<div class="traj-box-terminal-tag">' + (out.win ? T('vocab.win') : T('vocab.lose')) + '</div>';
-      }
+        '<div class="traj-box-label">R<sub>' + step + '</sub></div>' +
+        '<div class="traj-box-reward-body">' + sign + r + '</div>';
+      if (terminal) inner += '<div class="traj-box-terminal-tag">' + (won ? T('vocab.win') : T('vocab.lose')) + '</div>';
       rBox.innerHTML = inner;
       group.appendChild(rBox);
+      host.appendChild(group);
 
-      rollout.appendChild(group);
-      stepIdx++;
-
-      /* On terminal: append the closing S_T (the final, absorbing
-         situation) so the tape visibly closes. */
-      if (out.terminal) {
-        const fin = document.createElement('div');
-        fin.className = 'traj-group';
-        const fBox = document.createElement('div');
-        fBox.className = 'traj-box traj-box-state traj-box-state-final ' + (out.win ? 'win' : 'loss');
-        fBox.style.animationDelay = '330ms';
-        const fs = out.sNext;
+      /* Close with the child situation: a terminal state box, or - for a
+         bootstrapped rival/grown-pot leaf - the next situation tagged with its
+         value-to-go (a win probability). */
+      const finalGroup = document.createElement('div');
+      finalGroup.className = 'traj-group';
+      const fBox = document.createElement('div');
+      if (terminal) {
+        fBox.className = 'traj-box traj-box-state traj-box-state-final ' + (won ? 'win' : 'loss');
         fBox.innerHTML =
-          '<div class="traj-box-label">S<sub>' + stepIdx + '</sub> ' +
+          '<div class="traj-box-label">S<sub>' + (step + 1) + '</sub> ' +
             '<span class="traj-box-terminal-mini">' + T('scene5.terminal.mini') + '</span></div>' +
-          miniCardHtml(fs.my, fs.riv, 0, Pig.TARGET);
-        fin.appendChild(fBox);
-        rollout.appendChild(fin);
-      }
-      scrollEnd();
-    }
-
-    /* Append the rival's whole fixed-rule turn as one compact interlude. */
-    function emitRivalTurn(before, after) {
-      const box = document.createElement('div');
-      box.className = 'traj-box traj-box-rival';
-      box.style.animationDelay = '0ms';
-      const gained = after.riv - before.riv;
-      box.innerHTML =
-        '<div class="traj-box-label">' + T('scene5.rival.label') + '</div>' +
-        '<div class="traj-rival-body">' +
-          '<div class="traj-rival-icon">' + diceGlyph() + '</div>' +
-          '<div class="traj-rival-note">' +
-            (gained > 0
-              ? T('scene5.rival.banked', { n: gained })
-              : T('scene5.rival.busted')) +
-          '</div>' +
-        '</div>';
-      rollout.appendChild(box);
-      scrollEnd();
-    }
-
-    function diceGlyph() {
-      /* A tiny inline die face (the part you do not control). */
-      return '<span class="traj-die-mini">' +
-        '<span class="dp on"></span><span class="dp"></span><span class="dp on"></span>' +
-        '<span class="dp"></span><span class="dp on"></span><span class="dp"></span>' +
-        '<span class="dp on"></span><span class="dp"></span><span class="dp on"></span>' +
-        '</span>';
-    }
-
-    function scrollEnd() { setTimeout(() => { rollout.scrollLeft = rollout.scrollWidth; }, 60); }
-
-    /* Play exactly ONE of my turns: choose the optimal lever, sample it,
-       render the triple. If my turn ends (HOLD or bust) and the game is
-       not over, immediately resolve the rival's whole turn so the tape
-       reads as a full back-and-forth game. */
-    function nextTurn() {
-      if (done) { reset(); return; }
-
-      const sBefore = { my: s.my, riv: s.riv, pot: s.pot };
-      const q = Pig.Q(s.my, s.riv, s.pot);
-      const leverId = q.roll >= q.hold ? 'roll' : 'hold';
-      const out = Pig.sample(s, leverId, rng);
-      myTurns++;
-      emitMyTurn(sBefore, leverId, out);
-
-      if (out.terminal) { done = true; updateStatus(); return; }
-
-      if (out.sNext.turn === 'rival') {
-        /* My turn ended (HOLD or bust). Run the rival's whole turn. */
-        const beforeRiv = { my: out.sNext.my, riv: out.sNext.riv };
-        const rt = Pig.rivalTurn(out.sNext.my, out.sNext.riv, rng);
-        emitRivalTurn(beforeRiv, rt);
-        if (rt.rivalWon) {
-          /* Close the tape with a terminal LOSS state box. */
-          const fin = document.createElement('div');
-          fin.className = 'traj-group';
-          const fBox = document.createElement('div');
-          fBox.className = 'traj-box traj-box-state traj-box-state-final loss';
-          fBox.innerHTML =
-            '<div class="traj-box-label">S<sub>' + stepIdx + '</sub> ' +
-              '<span class="traj-box-terminal-mini">' + T('scene5.terminal.mini') + '</span></div>' +
-            miniCardHtml(rt.my, rt.riv, 0, Pig.TARGET);
-          fin.appendChild(fBox);
-          rollout.appendChild(fin);
-          scrollEnd();
-          done = true;
-          updateStatus();
-          return;
-        }
-        s = { my: rt.my, riv: rt.riv, pot: 0, turn: 'me', terminal: false };
+          miniCardHtml(child.my, child.riv, 0, null);
       } else {
-        /* A non-bust roll: my turn continues at the grown pot. */
-        s = out.sNext;
+        const vto = childNode.G != null ? childNode.G : 0;   // bootstrap value = win prob
+        fBox.className = 'traj-box traj-box-state' + (rival ? ' traj-box-bootleaf-rival' : ' traj-box-bootleaf');
+        fBox.innerHTML =
+          '<div class="traj-box-label">S<sub>' + (step + 1) + '</sub> ' +
+            '<span class="traj-box-terminal-mini">' + (rival ? T('scene5.derived.rival') : T('scene5.derived.playon')) + '</span></div>' +
+          miniCardHtml(child.my, child.riv, child.pot || 0, null) +
+          '<div class="traj-box-boot">' + T('scene5.derived.vto', { v: vto.toFixed(2) }) + '</div>';
       }
-      updateStatus();
+      finalGroup.appendChild(fBox);
+      host.appendChild(finalGroup);
     }
 
-    function updateStatus() {
-      const tEl = document.getElementById('traj-turns');
-      const sEl = document.getElementById('traj-state');
-      if (tEl) tEl.textContent = String(myTurns);
-      if (!sEl) return;
-      if (done) {
-        sEl.textContent = T('scene5.status.over');
+    function describeLeaf(leaf) {
+      if (!leaf || !leaf.state) return '';
+      const s = leaf.state;
+      if (s.terminal) return s.win ? T('scene5.status.win') : T('scene5.status.lose');
+      if (s.turn === 'rival') return T('scene5.status.rival', { v: (leaf.G != null ? leaf.G : 0).toFixed(2) });
+      return T('scene5.status.playon', { v: (leaf.G != null ? leaf.G : 0).toFixed(2) });
+    }
+
+    /* SAMPLE: draw one die-faithful path, light it whole, lay it out as the
+       derived tape. */
+    function sample() {
+      const res = tt.samplePath(rng);      // lights the leaf path in the tree
+      const tree = tt.getTree();
+      const chain = pathToLeaf(tree, res.leafId);
+      curPath = chain ? { edges: chain.edges, nodes: chain.nodes, leafId: res.leafId } : null;
+      walkPly = curPath ? curPath.edges.length : 0;
+      renderTape();
+      const leaf = curPath ? curPath.nodes[curPath.nodes.length - 1] : null;
+      setStatus(T('scene5.status.sampled', { outcome: describeLeaf(leaf) }));
+    }
+
+    /* STEP / ->: if no path yet, sample one but reveal only its first ply;
+       otherwise reveal one more ply; once complete, the next STEP re-samples. */
+    function step() {
+      if (!curPath) {
+        const res = tt.samplePath(rng);
+        const tree = tt.getTree();
+        const chain = pathToLeaf(tree, res.leafId);
+        curPath = chain ? { edges: chain.edges, nodes: chain.nodes, leafId: res.leafId } : null;
+        walkPly = 1;
+        if (curPath) tt.highlightLeaf(curPath.leafId);
+        renderTape();
+        setStatus(T('scene5.status.walking'));
+        return;
+      }
+      if (walkPly < curPath.edges.length) {
+        walkPly++;
+        renderTape();
       } else {
-        sEl.textContent = T('scene5.status.now', {
-          pot: POT_LABELS[Pig.bucketOfPot(s.pot)],
-          stand: standName(Pig.standingOf(s.my, s.riv)),
-        });
+        curPath = null; walkPly = 0;
+        sample();
       }
     }
 
-    function play() {
-      stopPlay();
-      playTimer = setInterval(() => {
-        nextTurn();
-        if (done) stopPlay();
-      }, 600);
+    function reset() {
+      curPath = null; walkPly = 0;
+      tt.highlightLeaf(null);
+      rng = Pig.makeRng((0x51A7 + Math.floor(Math.random() * 65535)) >>> 0);
+      renderTape();
+      setStatus(T('scene5.status.hint'));
     }
 
-    document.getElementById('traj-step').addEventListener('click', nextTurn);
-    document.getElementById('traj-play').addEventListener('click', play);
-    document.getElementById('traj-new').addEventListener('click', () => reset());
+    document.getElementById('traj-sample').addEventListener('click', sample);
+    document.getElementById('traj-step').addEventListener('click', step);
+    document.getElementById('traj-reset').addEventListener('click', reset);
 
-    updateStatus();
+    renderTape();
 
-    /* &run: auto-play a full game for headless capture. */
+    /* &run: auto-sample a path so the screenshot shows a lit path + tape. */
     const autoRun = /[#&?]run\b/.test(window.location.hash);
-    if (autoRun) setTimeout(play, 200);
+    if (autoRun) setTimeout(sample, 220);
 
     return {
-      onEnter() { updateStatus(); },
-      onLeave() { stopPlay(); },
-      /* Right arrow = "do one more turn" (matches STEP). The loop is
-         open-ended; advance scenes with the topbar NEXT. */
-      onNextKey() { stopPlay(); nextTurn(); return true; },
+      onEnter() {},
+      onLeave() {},
+      /* Right arrow = walk the current path one more ply (matches STEP). */
+      onNextKey() { step(); return true; },
       onPrevKey() { return false; },
     };
   };

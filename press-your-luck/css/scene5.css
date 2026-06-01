@@ -205,7 +205,7 @@
 }
 .traj-mini-card .tc-bar-row {
   display: grid;
-  grid-template-columns: 30px 1fr 18px;
+  grid-template-columns: 28px 1fr 22px;
   gap: 4px;
   align-items: center;
 }
@@ -262,3 +262,141 @@
 }
 .traj-status b { color: var(--pikachu-cheek); }
 .pyl-traj-caption { max-width: 92ch; }
+
+/* =====================================================================
+   THE TRAJECTORY TREE (window.TrajTree). The structural tree + ledger
+   styles live in css/trajTree.css; here we style THIS scene's chrome and
+   the table-card nodes the renderNode draws. Retro-pixel, theme tokens
+   only, no inline categorical colours.
+   ===================================================================== */
+
+/* Foot line on the tau formula card: the tree reframe. */
+.traj-tree-foot { color: var(--pikachu-cheek); display: inline-block; margin-top: 4px; }
+
+/* Caption naming the fixed root + lever (the chance-only tree). */
+.traj-tree-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  border-left: 6px solid var(--hue-anymal);   /* MDP-red identity */
+  padding: 8px 12px;
+  margin: 2px 0 4px;
+}
+.traj-tree-caption b { color: var(--pikachu-cheek); }
+
+/* The TrajTree mount host (tree panel + ledger stacked inside). */
+.traj-tree-host { width: 100%; }
+
+/* Note under the tree: the bootstrapped (value-to-go) leaves. */
+.traj-tree-bootnote {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  border-left: 4px dashed var(--hue-ghost);
+  padding: 4px 0 4px 10px;
+  margin: 2px 0 4px;
+}
+
+/* ---- table-card nodes rendered into .tt-node-icon by renderNode ---- */
+/* The compact card must fit the node box; descendants read a touch smaller
+   than the root. The mobile rule in trajTree.css shrinks .tt-mini-sprite,
+   but our nodes are CSS pixel-blocks, so we cap the card width per breakpoint. */
+.tt-node-icon .traj-mini-card { width: 172px; max-width: 172px; }
+.tt-node-root .tt-node-icon .traj-mini-card { width: 188px; max-width: 188px; }
+/* Two-digit scores (up to 49) need a wider numeric column than the tape's
+   default 18px, and a slightly tighter tag column, so nothing clips in a node. */
+.tt-node-icon .traj-mini-card .tc-bar-row { grid-template-columns: 28px 1fr 24px; }
+.tt-node-icon .traj-mini-card .tc-bar-num { font-size: 7px; }
+.tt-node-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  margin-bottom: 3px;
+}
+.tt-node-tag sub { font-size: 5px; vertical-align: baseline; }
+
+/* Rival-turn frontier node: dashed ghost identity + a "turn passes" tag. */
+.tt-node.tt-node-rival { border-left-color: var(--ink-secondary); border-style: dashed; }
+.tt-node-rival-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-bottom: 3px;
+}
+
+/* Terminal-leaf body: a glyph + WIN/LOSS word (colour-blind safe). */
+.tt-leaf-final {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  font-family: 'Press Start 2P', monospace;
+}
+.tt-leaf-glyph { font-size: 16px; line-height: 1; }
+.tt-leaf-word { font-size: 8px; letter-spacing: 0.04em; }
+.tt-leaf-final.win  .tt-leaf-glyph, .tt-leaf-final.win  .tt-leaf-word { color: var(--cb-blue); }
+.tt-leaf-final.loss .tt-leaf-glyph, .tt-leaf-final.loss .tt-leaf-word { color: var(--cb-vermillion); }
+
+/* ---- derived tape strip (the lit path as the old S/A/R tape) ---- */
+.traj-derived {
+  margin-top: 4px;
+  background: var(--bg-strong);
+  border: 2px dashed var(--rule);
+  padding: 8px 10px 10px;
+}
+.traj-derived-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.traj-derived-tape { min-height: 92px; align-items: center; }
+.traj-derived-empty {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  opacity: 0.8;
+  padding: 18px 4px;
+}
+.traj-derived-g {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-left: 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  border-left: 5px solid var(--hue-ghost);
+  background: var(--bg);
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+
+/* A bootstrapped (non-terminal) closing situation in the derived tape: the
+   next situation plus its value-to-go (a win probability). */
+.pyl-traj-rollout .traj-box-bootleaf,
+.pyl-traj-rollout .traj-box-bootleaf-rival {
+  border-left-color: var(--hue-ghost);
+  border-style: dashed;
+  min-width: 142px;
+}
+.pyl-traj-rollout .traj-box-bootleaf-rival { border-left-color: var(--ink-secondary); }
+.traj-box-boot {
+  margin-top: 5px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--hue-ghost);
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .tt-node-icon .traj-mini-card,
+  .tt-node-root .tt-node-icon .traj-mini-card { width: 132px; max-width: 132px; }
+}

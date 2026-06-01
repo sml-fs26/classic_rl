@@ -170,3 +170,74 @@
 @media (max-width: 720px) {
   .ret-panel { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* =====================================================================
+   THE E[G_t] REVEAL: the same hero trajectory tree + its weighted-leaf
+   ledger (window.TrajTree), then the "= Q*" callout, then a collapsible
+   empirical experiment. Tree/ledger structure lives in css/trajTree.css;
+   the table-card NODE styles are shared from css/scene5.css.
+   ===================================================================== */
+.obj-tree-host { width: 100%; }
+
+.obj-eg-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 2px solid var(--rule);
+  border-left: 6px solid var(--hue-ghost);   /* Bellman/return purple identity */
+  padding: 8px 12px;
+  margin: 4px 0;
+}
+.obj-eg-label b { color: var(--hue-ghost); }
+
+.obj-eg-tie {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--cb-blue);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 14px;
+  margin: 6px 0 2px;
+}
+.obj-eg-tie b { color: var(--cb-blue); }
+
+/* ---- collapsible empirical experiment ---- */
+.ret-exp {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  margin: 4px 0;
+}
+.ret-exp-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ret-exp-caret { font-size: 8px; color: var(--pikachu-cheek); }
+.ret-exp-hint { font-size: 7px; color: var(--ink-secondary); letter-spacing: 0.02em; }
+.ret-exp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+.ret-exp.collapsed .ret-exp-body { display: none; }
+.ret-exp-explainer {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+}
+.ret-exp .ret-run-row { align-items: center; }
+.ret-exp .ret-lever-prompt { margin-right: 4px; }

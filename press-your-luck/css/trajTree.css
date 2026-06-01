@@ -1,0 +1,325 @@
+/* window.TrajTree styles -- the reusable trajectory-as-tree widget.
+ *
+ *   Retro-pixel only (Press Start 2P). All color comes from the existing
+ *   theme tokens (--hue-*, --cb-*, --ink*, --rule, --bg*); no inline
+ *   categorical colors, no <style> injection from JS. Motion is gated behind
+ *   prefers-reduced-motion; path-highlight is an instant class swap.
+ *
+ *   Layout: an indented vertical tree (mobile-first, no SVG). Each .tt-row is
+ *   a flex line [spine][edge chips][compact state-icon][leaf G_t]; depth-based
+ *   indentation comes from --tt-depth + a left-border spine.
+ */
+
+.tt-host {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  /* The whole widget (tree + ledger) is bounded by its host so neither panel
+     can widen the page on a 390px viewport. */
+  max-width: 100%;
+}
+
+/* ----- tree panel ----- */
+.tt-tree {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* Deeply-indented rows can exceed a narrow viewport; the panel scrolls
+     internally instead of widening the page. max-width caps it to the host. */
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* One tree node = one row. Indentation is driven by --tt-depth; a left
+   spine + a short horizontal elbow stand in for SVG connectors. */
+.tt-row {
+  --tt-depth: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: calc(var(--tt-depth) * 26px);
+  padding: 3px 0;
+  position: relative;
+}
+
+/* Spine: a vertical guide on the left of every non-root row, plus a short
+   horizontal elbow that points at the node. Root has no spine. */
+.tt-spine {
+  flex: 0 0 auto;
+  width: 14px;
+  align-self: stretch;
+  position: relative;
+}
+.tt-row:not(.tt-row-root) .tt-spine::before {
+  /* vertical guide */
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -6px;
+  bottom: -6px;
+  width: 2px;
+  background: var(--rule);
+  opacity: 0.55;
+}
+.tt-row:not(.tt-row-root) .tt-spine::after {
+  /* horizontal elbow into the node */
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 14px;
+  height: 2px;
+  background: var(--rule);
+  opacity: 0.55;
+}
+.tt-row-root .tt-spine { width: 0; }
+
+/* ----- node icon wrapper ----- */
+.tt-node {
+  flex: 0 0 auto;
+  border: 2px solid var(--ink);
+  background: var(--bg);
+  padding: 4px 6px;
+}
+.tt-node-root {
+  border-width: 3px;
+  border-left-width: 6px;
+  border-left-color: var(--hue-anymal);   /* MDP-red identity on the root */
+  padding: 6px 8px;
+}
+.tt-node-inner { border-left-width: 4px; border-left-color: var(--hue-anymal); }
+
+/* Terminal / frontier leaf nodes reuse the win/loss color-blind tokens. */
+.tt-node-terminal.tt-win,
+.tt-row-terminal .tt-node.win {
+  border-color: var(--cb-blue);
+  border-left-color: var(--cb-blue);
+}
+.tt-node-frontier {
+  border-style: dashed;
+  border-left-color: var(--hue-ghost);
+}
+
+/* The host renders its state-icon in here; we only size descendants down. */
+.tt-node-icon { display: block; }
+
+/* ----- edge chips: action / p / r ----- */
+.tt-edge {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  max-width: 220px;
+}
+.tt-chip {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.02em;
+  padding: 2px 5px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  color: var(--ink-on-box);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* action chip -- casino-blue identity (matches a/action hue across the deck) */
+.tt-chip-action {
+  background: var(--hue-casino);
+  color: #fff;
+  border-color: var(--rule);
+  text-transform: uppercase;
+}
+:root[data-theme="crt"] .tt-chip-action { color: var(--bg); }
+/* reward chip -- ghost-purple identity (matches r/reward hue) */
+.tt-chip-r {
+  color: var(--hue-ghost);
+  border-left-color: var(--hue-ghost);
+  border-left-width: 3px;
+}
+.tt-chip-p { color: var(--ink-secondary); }
+
+/* the type-pill (when the host passes Moves.moveSubHtml through actionLabel)
+   already styles itself via .type-pill in style.css; keep it compact here. */
+.tt-chip-action .type-pill { border: 0; padding: 0; background: transparent; color: inherit; }
+
+/* ----- leaf G_t chip ----- */
+.tt-leaf-g {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-left: 2px;
+  padding: 3px 7px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  font-variant-numeric: tabular-nums;
+}
+.tt-leaf-g-label { font-size: 7px; color: var(--ink-secondary); }
+.tt-leaf-g-label sub { font-size: 5px; vertical-align: baseline; }
+.tt-leaf-g-val { font-size: 12px; letter-spacing: 0.02em; }
+.tt-leaf-g.pos { border-left: 5px solid var(--cb-blue); }
+.tt-leaf-g.pos .tt-leaf-g-val { color: var(--cb-blue); }
+.tt-leaf-g.neg { border-left: 5px solid var(--cb-vermillion); }
+.tt-leaf-g.neg .tt-leaf-g-val { color: var(--cb-vermillion); }
+/* bootstrapped leaf (sceneDp): dashed + a value-to-go split shown faintly. */
+.tt-leaf-g.tt-leaf-boot { border-style: dashed; }
+.tt-leaf-g-boot {
+  font-size: 6px;
+  color: var(--hue-ghost);
+  letter-spacing: 0;
+}
+
+/* ----- merge-reference row (DAG) ----- */
+.tt-row-mergeref .tt-mergeref-tag {
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border: 2px dashed var(--rule);
+  background: var(--bg);
+}
+
+/* ----- aggregate "rare" leaf ----- */
+.tt-node-aggregate {
+  border-style: dotted;
+  opacity: 0.8;
+}
+.tt-aggregate-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+.tt-aggregate-dots { font-size: 14px; color: var(--ink-secondary); }
+.tt-agg-meta {
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+}
+
+/* ----- path highlight (instant class swap) ----- */
+.tt-row.tt-dim { opacity: 0.32; filter: grayscale(0.5); }
+.tt-row.tt-lit .tt-node { box-shadow: 0 0 0 2px var(--pikachu-yellow); }
+.tt-row.tt-lit .tt-leaf-g { box-shadow: 0 0 0 2px var(--pikachu-yellow); }
+
+/* ----- weighted-sum ledger ----- */
+.tt-eg-ledger {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  padding: 12px 16px 14px;
+  color: var(--ink-on-box);
+  /* Never let the ledger widen the page on mobile: cap it to its container and
+     scroll the rows internally if the P·G result column would otherwise be
+     pushed off-screen. Desktop has ample width, so no scrollbar appears. */
+  max-width: 100%;
+  overflow-x: auto;
+}
+.tt-eg-head { text-align: center; margin-bottom: 8px; }
+.tt-eg-head .katex-display { margin: 0; }
+.tt-eg-head .katex { font-size: 14px; }
+
+.tt-eg-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+.tt-eg-row {
+  display: grid;
+  /* The last column (the P.G result) uses minmax so it can never be squeezed
+     to zero or clipped: it keeps a floor width and still right-aligns to the
+     panel edge. Desktop is unchanged (1fr already had ample room). */
+  grid-template-columns: 56px 12px 52px 12px minmax(56px, 1fr);
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.tt-eg-row-head {
+  cursor: default;
+  color: var(--ink-secondary);
+  font-size: 7px;
+  border-bottom: 2px solid var(--rule);
+  border-top: none; border-left: none; border-right: none;
+  padding-bottom: 6px;
+}
+.tt-eg-row-head sub { font-size: 5px; vertical-align: baseline; }
+.tt-eg-c-p { color: var(--ink-secondary); text-align: right; }
+.tt-eg-c-x, .tt-eg-c-eq { color: var(--ink-secondary); text-align: center; }
+.tt-eg-c-g { text-align: right; }
+.tt-eg-c-g sub { font-size: 6px; vertical-align: baseline; }
+.tt-eg-c-g.pos, .tt-eg-c-term.pos { color: var(--cb-blue); }
+.tt-eg-c-g.neg, .tt-eg-c-term.neg { color: var(--cb-vermillion); }
+.tt-eg-c-term { text-align: right; font-size: 11px; }
+
+.tt-eg-row:hover { border-color: var(--rule); background: var(--bg); }
+.tt-eg-row.tt-eg-lit {
+  border-color: var(--pikachu-yellow);
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--pikachu-yellow);
+}
+.tt-eg-row-agg { color: var(--ink-secondary); }
+.tt-eg-row-agg .tt-eg-c-term { font-size: 10px; }
+
+.tt-eg-row-sum {
+  grid-template-columns: 1fr auto;
+  cursor: default;
+  margin-top: 6px;
+  padding-top: 8px;
+  border: none;
+  border-top: 3px solid var(--rule);
+}
+.tt-eg-sum-label { font-size: 10px; letter-spacing: 0.04em; text-align: right; }
+.tt-eg-sum-val {
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.tt-eg-sum-val.pos { color: var(--cb-blue); }
+.tt-eg-sum-val.neg { color: var(--cb-vermillion); }
+
+/* =====================================================================
+   Mobile (<= 720px): shrink descendant sprites + node padding so a
+   depth-2 by 4-leaf tree fits 390px with no horizontal scroll. Edge
+   chips wrap under the node when space is tight.
+   ===================================================================== */
+@media (max-width: 720px) {
+  .tt-row {
+    margin-left: calc(var(--tt-depth) * 18px);
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .tt-edge { max-width: none; order: 3; flex-basis: 100%; margin-left: 22px; }
+  .tt-leaf-g { order: 2; }
+  .tt-node-icon .tt-mini-sprite,
+  .tt-node-icon img { width: 22px !important; height: 22px !important; }
+  /* Tighter columns at <=720px; the P.G result keeps a 52px floor (minmax) so
+     it is always fully visible, and the ledger's own overflow-x:auto absorbs
+     any residual width rather than widening the page. */
+  .tt-eg-row { grid-template-columns: 46px 10px 44px 10px minmax(52px, 1fr); font-size: 8px; gap: 4px; }
+  .tt-eg-c-term { font-size: 10px; }
+  .tt-eg-row-sum { grid-template-columns: auto 1fr; column-gap: 10px; align-items: baseline; }
+  .tt-eg-sum-label { font-size: 9px; }
+  .tt-eg-sum-val { font-size: 16px; }
+  .tt-tree { padding: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-row, .tt-eg-row, .tt-leaf-g { transition: none; }
+}

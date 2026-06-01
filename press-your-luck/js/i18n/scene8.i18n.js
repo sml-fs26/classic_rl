@@ -7,6 +7,13 @@
       "scene8.title": "Bellman",
       "s8.heading": "WHAT IS ONE MORE ROLL WORTH?",
 
+      "s8.tt.title": "THE BACKUP IS A DEPTH-1 TREE",
+      "s8.tt.hint": "(the same trajectory tree, one ply deep)",
+      "s8.tt.lead":
+        "The Bellman backup of ROLL is just the depth-1 trajectory tree from before. Each leaf is r + V(s') - here r = 0, so the leaf is the win probability of where the die lands. Its weighted sum is Q*(s, ROLL).",
+      "s8.tt.tie":
+        "Weighted leaf sum = <b>{eg}</b> = Q*(s, ROLL): the one-ply tree IS the Bellman backup.",
+
       "s8.manager":
         "Knowing when to stop is recursive. The value of pulling a lever now is " +
         "whatever it pays right away, plus the value of the situation it leaves " +
@@ -74,6 +81,13 @@
     jp: {
       "scene8.title": "ベルマン",
       "s8.heading": "もう ひとふり の かち は？",
+
+      "s8.tt.title": "バックアップ = ふかさ1の き",
+      "s8.tt.hint": "(おなじ きせきの き、 1プライ ぶん)",
+      "s8.tt.lead":
+        "ROLL の ベルマン バックアップは、 まえの ふかさ1の きせきの き そのもの。 かく はは r + V(s') - ここでは r = 0 なので、 はは さいが おちる さきの しょうりつ。 その おもみづけ わが Q*(s, ROLL)。",
+      "s8.tt.tie":
+        "おもみづけ した は の わ = <b>{eg}</b> = Q*(s, ROLL)： 1プライの き が ベルマン バックアップ そのもの。",
 
       "s8.manager":
         "いつ やめるか は さいきてき。 いま レバー を ひく かち は、 すぐ の " +
