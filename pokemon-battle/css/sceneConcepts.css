@@ -25,6 +25,13 @@
     inset 0 0 0 6px var(--bg-strong);
   color: var(--ink-on-box);
   text-align: center;
+  /* A long KaTeX line (e.g. τ = (S₁,A₁,R₁, …) on the Trajectory scene) can be
+     wider than a 390px viewport. Cap the card to its container and let the
+     formula scroll INSIDE the card rather than widening the whole page, which
+     would shift and clip every sibling. Desktop is unaffected: the formulas
+     fit, so no scrollbar appears and the box-shadow inset frame is unchanged. */
+  max-width: 100%;
+  overflow-x: auto;
 }
 .concept-formula-card .katex-display {
   margin: 0;
