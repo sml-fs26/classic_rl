@@ -12,7 +12,9 @@
       'scene1.skip':      'SKIP',
       'scene1.skip_title':'Jump straight to running the shelf',
       'scene1.go_play':   'RUN THE SHELF',
-      'scene1.nav.hint':  'Use <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to step. SKIP jumps to the playtest.',
+      'scene1.nav.back':  'BACK',
+      'scene1.nav.next':  'NEXT',
+      'scene1.nav.hint':  'Tap <b>BACK</b> / <b>NEXT</b> (or use <kbd>&larr;</kbd> <kbd>&rarr;</kbd>) to step. SKIP jumps to the playtest.',
 
       /* step 1 -- welcome / the shelf card */
       'scene1.welcome.title':  'The shelf card',
@@ -69,7 +71,9 @@
       'scene1.skip':      'スキップ',
       'scene1.skip_title':'たな うんえいへ すすむ',
       'scene1.go_play':   'たなを うごかす',
-      'scene1.nav.hint':  '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> で すすむ。 スキップで プレイテストへ。',
+      'scene1.nav.back':  'もどる',
+      'scene1.nav.next':  'つぎへ',
+      'scene1.nav.hint':  '<b>もどる</b> / <b>つぎへ</b> を タップ（または <kbd>&larr;</kbd> <kbd>&rarr;</kbd>）で すすむ。 スキップで プレイテストへ。',
 
       'scene1.welcome.title':  'たなカード',
       'scene1.welcome.big':    '1まいの え、 2つの すうじ',

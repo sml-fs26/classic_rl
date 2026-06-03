@@ -86,6 +86,28 @@
     navHint.innerHTML = T('scene1.nav.hint');
     root.appendChild(navHint);
 
+    /* ---------- In-scene step nav (BACK / NEXT) ----------
+       Big, tappable step controls sitting under the content. The arrow keys
+       (onPrevKey/onNextKey) and the topbar PREV/NEXT already walk the steps,
+       but on a phone there are no arrow keys and the topbar pager is detached
+       from the tutorial; without these buttons mobile users had no obvious way
+       to move through the five steps. */
+    const stepNav = document.createElement('div');
+    stepNav.className = 'tut-stepnav';
+    const backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.className = 'tut-step-back poke-btn';
+    backBtn.textContent = T('scene1.nav.back');
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'tut-step-next poke-btn';
+    nextBtn.textContent = T('scene1.nav.next');
+    stepNav.appendChild(backBtn);
+    stepNav.appendChild(nextBtn);
+    root.appendChild(stepNav);
+    backBtn.addEventListener('click', () => { if (cursor > 0) renderStep(cursor - 1); });
+    nextBtn.addEventListener('click', () => { if (cursor < STEPS.length - 1) renderStep(cursor + 1); });
+
     /* ---------- Step engine ---------- */
     let cursor = 0;
 
@@ -100,6 +122,9 @@
       dialog.say(T('scene1.' + step.id + '.dialog'));
       /* On the last step, the SKIP button becomes "RUN THE SHELF". */
       skipBtn.textContent = (c === STEPS.length - 1) ? T('scene1.go_play') : T('scene1.skip');
+      /* Step buttons disable at the two ends of the walk. */
+      backBtn.disabled = (c === 0);
+      nextBtn.disabled = (c === STEPS.length - 1);
     }
 
     /* `#…&tut=N` deep-links an internal step (headless capture / linking). */

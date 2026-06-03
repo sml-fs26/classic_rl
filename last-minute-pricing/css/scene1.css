@@ -59,6 +59,19 @@
 }
 
 .tut-dialog { margin-top: 2px; }
+
+/* ---- in-scene step nav (BACK / NEXT) ----
+   The primary, always-visible way to walk the five steps. Lives under the
+   content so it is thumb-reachable on a phone (where arrow keys and the
+   detached topbar pager are not). */
+.tut-stepnav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 6px auto 0;
+}
+.tut-stepnav .poke-btn { min-width: 116px; }
+
 .tut-nav-hint { text-align: center; margin: 4px auto 0; }
 .tut-nav-hint kbd {
   font-family: 'Press Start 2P', monospace;
@@ -331,4 +344,16 @@
     justify-items: center;
   }
   .tut-demo-script { max-width: none; }
+}
+
+/* On a phone the step buttons become the main control: full-width-ish,
+   iOS-tappable, with the demand-deck-sized gap between them. */
+@media (max-width: 720px) {
+  .tut-stepnav { gap: 16px; }
+  .tut-stepnav .poke-btn {
+    flex: 1 1 0;
+    max-width: 220px;
+    min-height: 44px;
+    font-size: 11px;
+  }
 }
