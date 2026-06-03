@@ -303,9 +303,12 @@
       renderTape();
     }
 
-    /* NEXT DAY / right arrow: if no path yet, sample one and reveal its first
-       day; otherwise reveal one more day. */
-    function step() {
+    /* Reveal one more day of the sampled path. If there is no path yet, sample
+       one and reveal its first day. Returns true while there is still a day
+       left to walk, false once the whole path is revealed -- the same contract
+       every stepped scene here uses, so the right arrow / topbar NEXT can fall
+       through and advance the scene once the walk is done. */
+    function walk() {
       if (!curPath) {
         const res = tt.samplePath(rng);
         const chain = pathToLeaf(tt.getTree(), res.leafId);
@@ -314,10 +317,16 @@
         if (curPath) tt.highlightLeaf(curPath.leafId);
         setStatus(T('scene5.status.walk'));
         renderTape();
-        return;
+        return true;
       }
-      if (walkDay < curPath.edges.length) { walkDay++; renderTape(); }
-      else { curPath = null; walkDay = 0; sample(); }   // path complete -> fresh run
+      if (walkDay < curPath.edges.length) { walkDay++; renderTape(); return true; }
+      return false;   // path fully revealed
+    }
+
+    /* NEXT DAY button: walk one day; once the path is complete, loop straight
+       into a fresh sampled run so the in-scene button always does something. */
+    function step() {
+      if (!walk()) { curPath = null; walkDay = 0; sample(); }   // path complete -> fresh run
     }
 
     function reset() {
@@ -340,9 +349,11 @@
     return {
       onEnter() {},
       onLeave() {},
-      /* Right arrow = walk the current path one more day (matches NEXT DAY).
-         The tree IS the scene; the topbar NEXT advances scenes. */
-      onNextKey() { step(); return true; },
+      /* Right arrow / topbar NEXT walk the current path one more day (matches
+         NEXT DAY); once the whole path is revealed they fall through (return
+         false) so the pager advances to the next scene. The in-scene NEXT DAY
+         button keeps looping into fresh runs via step(). */
+      onNextKey() { return walk(); },
       onPrevKey() { return false; },
     };
   };
