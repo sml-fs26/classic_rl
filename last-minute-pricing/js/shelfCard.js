@@ -1,16 +1,23 @@
 /* shelfCard.js -- the recurring STATE-ICON for Last-Minute Pricing.
  *
- *   A "shelf card" renders one MDP state s = (units left u, days-to-deadline d)
- *   so the learner builds one mental picture across every scene: HOW MUCH
- *   STOCK, HOW MUCH TIME. It is the pricing analogue of the Pokemon HP-bar
+ *   A "shelf card" renders one MDP state s = (seats left u, days-to-departure d)
+ *   so the learner builds one mental picture across every scene: HOW MANY
+ *   SEATS, HOW MUCH TIME. It is the pricing analogue of the Pokemon HP-bar
  *   sprite pair, and it replaces js/hpbar.js + js/sprite.js.
  *
+ *   THEME -- a last-minute airline fare desk: an empty seat is worth real
+ *   money today and exactly $0 the moment the gate closes. (The structural
+ *   class names below -- .shelf-*, .cal-* -- are kept for back-compat with the
+ *   scene animations that target them; only what they RENDER is a seat / a
+ *   departure board.)
+ *
  *   Composition:
- *     - a vertical STACK of NUM_UNITS ticket slots; the bottom u are live
- *       (bright gold), the rest are sold/empty (greyed). Tickets are the
- *       perishable thing, drawn as inline-SVG pixel tickets (no PNG).
- *     - a COUNTDOWN RIBBON of NUM_DAYS day-pips; the leftmost d are still on
- *       the clock (lit), the rest are spent (dim). The deadline is MIDNIGHT.
+ *     - a vertical STACK of NUM_UNITS seat slots; the bottom u are still
+ *       FOR SALE (bright gold), the rest are sold (greyed). The empty seat is
+ *       the perishable thing, drawn as an inline-SVG pixel seat (no PNG).
+ *     - a DEPARTURE BOARD of NUM_DAYS day tiles; the leftmost d are still
+ *       biddable (lit amber digits), elapsed days are flipped dim. The last
+ *       tile is the departing plane: the deadline is GATE CLOSED.
  *
  *   All colour comes from CSS tokens (--ticket-*, --pip-*, --lever-*), so the
  *   CRT theme retints automatically and no categorical colour is inlined.
@@ -48,23 +55,28 @@
     return 'md';
   }
 
-  /* A single pixel ticket as inline SVG. `filled` picks the live vs sold
-     token set. Geometry: a stub-edged admission ticket with two notches. */
-  function ticketSVG(filled) {
+  /* A single pixel airplane seat as inline SVG (side profile). `filled` picks
+     the for-sale (bright) vs sold (greyed) token set. Geometry: a headrest +
+     reclined seat back + cushion -- a chunky chair silhouette that still reads
+     at the tiny Q-table size. Class name kept as `shelf-ticket` so the scene
+     sell / crumble animations keep targeting it. */
+  function seatSVG(filled) {
     const fill = filled ? 'var(--ticket-fill)' : 'var(--ticket-gone)';
     const edge = filled ? 'var(--ticket-edge)' : 'var(--ticket-gone-edge)';
     const cls = 'shelf-ticket' + (filled ? ' is-live' : ' is-gone');
     return (
-      '<svg class="' + cls + '" viewBox="0 0 48 20" preserveAspectRatio="none" aria-hidden="true">' +
-        '<rect x="1" y="1" width="46" height="18" fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
-        /* perforation line */
-        '<line x1="34" y1="2" x2="34" y2="18" stroke="' + edge + '" stroke-width="1.5" stroke-dasharray="2 2"/>' +
-        /* two notches */
-        '<circle cx="34" cy="1" r="2.4" fill="var(--bg)"/>' +
-        '<circle cx="34" cy="19" r="2.4" fill="var(--bg)"/>' +
+      '<svg class="' + cls + '" viewBox="0 0 48 18" preserveAspectRatio="none" aria-hidden="true">' +
+        /* headrest cap */
+        '<rect x="9" y="1"  width="13" height="4"  fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
+        /* seat back */
+        '<rect x="11" y="3" width="10" height="12" fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
+        /* seat cushion */
+        '<rect x="11" y="11" width="26" height="5" fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
       '</svg>'
     );
   }
+  /* Back-compat alias: callers/exports still reference ticketSVG. */
+  const ticketSVG = seatSVG;
 
   /* One day-pip (a calendar tear-off square). Retained for back-compat;
      the day ribbon now uses the X-off calendar below. */
@@ -89,32 +101,37 @@
     );
   }
 
-  /* A crescent moon for the MIDNIGHT (deadline) cell. */
-  function moonSVG() {
+  /* A departing plane for the GATE CLOSED (deadline) tile. Top-view jet
+     pointing up-and-away. Class name kept as `cal-moon-mark` for CSS sizing. */
+  function planeSVG() {
     return (
       '<svg class="cal-moon-mark" viewBox="0 0 16 16" aria-hidden="true">' +
-        '<path d="M11.5 2 a6.2 6.2 0 1 0 0 12 a4.6 4.6 0 0 1 0-12 z" fill="var(--cal-moon)"/>' +
+        '<path d="M8 1 L9 6 L15 9.5 L9 10 L9 13 L11 15 L8 14 L5 15 L7 13 L7 10 ' +
+          'L1 9.5 L7 6 Z" fill="var(--cal-moon)"/>' +
       '</svg>'
     );
   }
+  /* Back-compat alias: exports still reference moonSVG. */
+  const moonSVG = planeSVG;
 
-  /* Build the X-off calendar row for a state: NUM_DAYS day cells (the
-     earliest `elapsed` are stamped with a red X) plus a MIDNIGHT cell.
-     days-left = the un-X'd day cells = d. */
-  function calendarHTML(ud, terminalDeadline) {
-    const elapsed = Math.max(0, NUM_DAYS - ud.d);   // deadline => ud.d 0 => all elapsed
+  /* Build the DEPARTURE BOARD row for a state: NUM_DAYS day tiles (the
+     earliest `elapsed` are flipped dim; the rest are lit) plus the GATE
+     tile (the departing plane). days-to-departure = the lit tiles = d. */
+  function boardHTML(ud, terminalDeadline) {
+    const elapsed = Math.max(0, NUM_DAYS - ud.d);   // departed => ud.d 0 => all elapsed
     let cells = '';
     for (let i = 0; i < NUM_DAYS; i++) {
-      const xd = i < elapsed;
-      cells += '<div class="cal-cell ' + (xd ? 'is-x' : 'is-open') + '" data-day="' + (i + 1) + '">' +
+      const flown = i < elapsed;
+      cells += '<div class="cal-cell ' + (flown ? 'is-x' : 'is-open') + '" data-day="' + (i + 1) + '">' +
                  '<span class="cal-num">' + (i + 1) + '</span>' +
-                 (xd ? '<span class="cal-x">' + xSVG() + '</span>' : '') +
                '</div>';
     }
     cells += '<div class="cal-cell cal-midnight' + (terminalDeadline ? ' is-active' : '') + '">' +
-               moonSVG() + '</div>';
-    return '<div class="shelf-calendar" role="img" aria-label="' + ud.d + ' days left">' + cells + '</div>';
+               planeSVG() + '</div>';
+    return '<div class="shelf-calendar" role="img" aria-label="' + ud.d + ' days to departure">' + cells + '</div>';
   }
+  /* Back-compat alias: exports still reference calendarHTML. */
+  const calendarHTML = boardHTML;
 
   function captionFor(state) {
     if (state.terminal) {
@@ -137,23 +154,23 @@
   function innerHTML(state, showLabel) {
     const ud = resolveUD(state);
 
-    /* Ticket stack: top slots empty, bottom u slots live (a shelf fills up
-       from the bottom). */
-    let tickets = '';
+    /* Seat stack: top slots empty, bottom u slots still for sale (the cabin
+       fills up from the bottom). */
+    let seats = '';
     for (let row = 0; row < NUM_UNITS; row++) {
       const slotFromBottom = NUM_UNITS - row;        // NUM_UNITS..1
       const live = slotFromBottom <= ud.u;
-      tickets += '<div class="shelf-slot">' + ticketSVG(live) + '</div>';
+      seats += '<div class="shelf-slot">' + seatSVG(live) + '</div>';
     }
 
-    /* Day ribbon: an X-off vintage calendar (elapsed days carry a red X;
-       the last cell is MIDNIGHT). */
-    const cal = calendarHTML(ud, !!(state.terminal && state.deadline));
+    /* Departure board: lit day tiles for days still to go; elapsed days are
+       flipped dim; the last tile is the departing plane (GATE CLOSED). */
+    const board = boardHTML(ud, !!(state.terminal && state.deadline));
 
     return (
       '<div class="shelf-body">' +
-        '<div class="shelf-stack" role="img" aria-label="' + ud.u + ' units left">' + tickets + '</div>' +
-        '<div class="shelf-ribbon">' + cal + '</div>' +
+        '<div class="shelf-stack" role="img" aria-label="' + ud.u + ' seats left">' + seats + '</div>' +
+        '<div class="shelf-ribbon">' + board + '</div>' +
       '</div>' +
       (showLabel ? '<div class="shelf-caption">' + captionFor(state) + '</div>' : '')
     );
@@ -199,8 +216,8 @@
       const nextUD = resolveUD(state);
       applyFrame(card, state, size, lever);
       card.innerHTML = innerHTML(state, showLabel);
-      /* If a day just elapsed, stamp a fresh red X onto the day that
-         passed (the highest newly-elapsed cell). */
+      /* If a day just elapsed, flip the tile that passed (the highest
+         newly-elapsed cell) on the departure board. */
       const prevElapsed = Math.max(0, NUM_DAYS - prevUD.d);
       const newElapsed  = Math.max(0, NUM_DAYS - nextUD.d);
       if (newElapsed > prevElapsed) {
@@ -221,5 +238,10 @@
     return render(s || {}, opts);
   }
 
-  window.ShelfCard = { render, mount, fromIndex, ticketSVG, pipSVG, xSVG, moonSVG, calendarHTML, NUM_UNITS, NUM_DAYS };
+  window.ShelfCard = {
+    render, mount, fromIndex, NUM_UNITS, NUM_DAYS,
+    seatSVG, planeSVG, boardHTML,
+    /* legacy aliases (same functions, old names) */
+    ticketSVG, pipSVG, xSVG, moonSVG, calendarHTML,
+  };
 })();

@@ -54,7 +54,7 @@
         host.parentNode && host.parentNode.classList.add(soldout ? 'win' : 'loss');
         host.innerHTML =
           '<div class="tt-pr-final ' + (soldout ? 'soldout' : 'deadline') + '">' +
-            '<span class="tt-pr-glyph">' + (soldout ? '✓' : '☾') + '</span>' +
+            '<span class="tt-pr-glyph">' + (soldout ? '✓' : '✈') + '</span>' +
             '<span class="tt-pr-word">' +
               (soldout ? T('vocab.soldout') : T('vocab.midnight')) +
             '</span>' +

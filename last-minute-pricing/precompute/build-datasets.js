@@ -337,13 +337,13 @@ console.log('Demo trajectory (optimal policy, seed 7): ' + demoTrajectory.length
 /* ---------------- Recap cards (shelf-card voice) ---------------- */
 const recap = [
   { key: 'mdp', badge: 'MDP', title: 'THE MDP FRAME',
-    blurb: 'Four parts: the SITUATION (units left times days left), the LEVER you pull (a price tag), the part you do not control (the demand draw), and the PAYOFF (price times units sold). An empty shelf at midnight pays nothing.',
+    blurb: 'Four parts: the SITUATION (seats left times days left), the LEVER you pull (a price tag), the part you do not control (the demand draw), and the PAYOFF (price times seats sold). An empty cabin at gate-close pays nothing.',
     formula: '\\langle\\, S,\\; A,\\; P,\\; R \\,\\rangle' },
   { key: 'policy', badge: 'POLICY', title: 'YOUR PRICING PLAYBOOK',
     blurb: 'A policy assigns one lever to EVERY situation on the board, the SOP your whole team could follow without you in the room. When you priced by gut, you already were a policy; you just had not written it down.',
     formula: '\\pi : S \\rightarrow A' },
   { key: 'return', badge: 'RETURN', title: 'PAYOFF SUMMED TO THE DEADLINE',
-    blurb: 'The return is every dollar collected from now until midnight, not just today\'s sale. Played from the same shelf, the same lever can return very different amounts; its spread is the risk you carry into the deadline.',
+    blurb: 'The return is every dollar collected from now until gate-close, not just today\'s sale. Played from the same cabin, the same lever can return very different amounts; its spread is the risk you carry into the deadline.',
     formula: 'G_i \\;=\\; \\textstyle\\sum_{j \\ge i} r_j' },
   { key: 'qstar', badge: 'Q*', title: 'THE HONEST VALUE OF A LEVER',
     blurb: 'Q*(s, a) is the long-run revenue of pulling lever a in situation s, assuming you price smart every day afterward. The best lever is the argmax, and the star MOVES across the board: the whole lesson of revenue management.',

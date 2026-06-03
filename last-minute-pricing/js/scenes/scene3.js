@@ -214,7 +214,7 @@
         );
       } else if (step === 3) {
         window.Katex.render(
-          String.raw`P(s', r \mid s, a)\qquad r = \text{price}\times(\text{units sold})`,
+          String.raw`P(s', r \mid s, a)\qquad r = \text{price}\times(\text{seats sold})`,
           formula, true
         );
       } else {

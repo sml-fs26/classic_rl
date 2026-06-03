@@ -1,5 +1,5 @@
-/* scene2 -- PLAYTEST ("You run the shelf").
-   The live interactive board: a large shelf card + the demand deck on the
+/* scene2 -- PLAYTEST ("You run the cabin").
+   The live interactive board: a large flight card + the demand deck on the
    left with a DAY / REVENUE HUD; the dialog, three price-tag buttons, and
    RESTART on the right; a RETURN tape across the bottom. All colour is from
    the shared tokens so the CRT theme retints. No JS-injected styles. */
@@ -53,8 +53,8 @@
 .play-card { position: relative; }
 .play-deck { flex: 0 0 auto; }
 
-/* sale pulse: the live tickets brighten + lift briefly, then card.set()
-   swaps to the reduced inventory. (Variable inventory makes per-ticket
+/* sale pulse: the live seats brighten + lift briefly, then card.set()
+   swaps to the reduced inventory. (Variable inventory makes per-seat
    targeting fragile, so a stack-level "something sold" pulse reads cleanly,
    paired with the floating +$ receipt and the money bump.) */
 .play-card.play-sold .shelf-stack .shelf-ticket.is-live {
@@ -71,7 +71,7 @@
   30%  { transform: translateY(-3px) rotate(-2deg); }
   100% { transform: translateY(0)    rotate(0); }
 }
-/* midnight: leftover units crumble grey before the terminal icon lands */
+/* gate closed: unsold seats fly empty grey before the terminal icon lands */
 .play-card.play-midnight .shelf-stack .shelf-ticket.is-live {
   animation: play-crumble 880ms ease-in forwards;
 }

@@ -16,14 +16,14 @@
 
       /* board chrome */
       'scene4.board.title':    'ONE LEVER FOR EVERY SITUATION',
-      'scene4.cornerLabel':    'UNITS \\ DAYS',
+      'scene4.cornerLabel':    'SEATS \\ DAYS',
 
       /* the two hand-policy presets (a manager could write these in a minute) */
       'scene4.tabs.label':     'PICK A PLAYBOOK',
       'scene4.policyA.name':   'ALWAYS STANDARD',
       'scene4.policyA.sub':    'the safe default',
       'scene4.policyA.blurb':
-        'The simplest playbook: pull the steady middle price in every situation, full shelf or nearly sold out, lots of time or none. One rule, no thinking. It will not be the best, but it is a policy, and it is honest about being a complete rule.',
+        'The simplest playbook: pull the steady middle price in every situation, a full cabin or nearly a full flight, lots of time or none. One rule, no thinking. It will not be the best, but it is a policy, and it is honest about being a complete rule.',
 
       'scene4.policyB.name':   'HOLD, THEN DUMP',
       'scene4.policyB.sub':    'a gut-feel rule',
@@ -68,13 +68,13 @@
         'よみかた：ほうさく pi は どんな じょうきょう s も うけとり、そこで ひく レバーを かえす。',
 
       'scene4.board.title':    'すべての じょうきょうに ひとつの レバー',
-      'scene4.cornerLabel':    'ざいこ \\ にっすう',
+      'scene4.cornerLabel':    'ざせき \\ にっすう',
 
       'scene4.tabs.label':     'プレイブックを えらぶ',
       'scene4.policyA.name':   'つねに スタンダード',
       'scene4.policyA.sub':    'あんぜんな きほん',
       'scene4.policyA.blurb':
-        'もっとも たんじゅんな プレイブック：どの じょうきょうでも まんなかの ねだんを ひく。たなが まんぱいでも ほぼ うりきれでも、じかんが あっても なくても。ルール ひとつ、かんがえる ひつようなし。さいぜんでは ないが、これも れっきとした かんぜんな ルール ＝ ほうさく。',
+        'もっとも たんじゅんな プレイブック：どの じょうきょうでも まんなかの ねだんを ひく。きゃくしつが いっぱいでも ほぼ まんせきでも、じかんが あっても なくても。ルール ひとつ、かんがえる ひつようなし。さいぜんでは ないが、これも れっきとした かんぜんな ルール ＝ ほうさく。',
 
       'scene4.policyB.name':   'もって、なげうる',
       'scene4.policyB.sub':    'かんの ルール',

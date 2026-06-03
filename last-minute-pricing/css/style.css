@@ -87,18 +87,19 @@
   --lever-firesale-tint:  #F2D5C6;
   --lever-ink:            #FFFFFF;   /* text on a saturated lever tag */
 
-  /* The perishable thing: ticket sprite tokens. */
-  --ticket-fill:   #F0C24A;   /* a live ticket (warm gold) */
+  /* The perishable thing: airline-seat sprite tokens. */
+  --ticket-fill:   #F0C24A;   /* an empty seat still FOR SALE (warm gold) */
   --ticket-edge:   #181818;
-  --ticket-gone:   #B8B0A0;   /* a sold / crumbled ticket (greyed) */
+  --ticket-gone:   #B8B0A0;   /* a seat already SOLD (greyed) */
   --ticket-gone-edge: #6E665A;
-  --pip-on:        #181818;   /* a day still on the clock */
-  --pip-off:       #C8C0AC;   /* a day already spent */
-  --midnight-bg:   #2A2418;   /* the dark MIDNIGHT gutter (d=0) */
-  --cal-open-bg:   #FFFDF5;   /* an upcoming selling day (clean page) */
-  --cal-x-bg:      #ECE5D3;   /* a day already crossed off (aged) */
-  --cal-x-ink:     #B8323A;   /* the red X stamp */
-  --cal-moon:      #E6B23A;   /* the MIDNIGHT crescent */
+  /* Departure-board tokens (names kept; --pip-* now tint the board digits). */
+  --pip-on:        #F0C24A;   /* a lit board digit: a day still to go */
+  --pip-off:       #5A6172;   /* a flipped-dim digit: a day already gone */
+  --midnight-bg:   #11161F;   /* the dark GATE tile (d=0, departing plane) */
+  --cal-open-bg:   #1B2330;   /* a lit board tile (dark split-flap slate) */
+  --cal-x-bg:      #141A24;   /* a flipped-dim board tile (day departed) */
+  --cal-x-ink:     #B8323A;   /* the GATE CLOSED alert highlight (red) */
+  --cal-moon:      #E6B23A;   /* the departing plane (amber) */
 
   /* Battle-VFX colour tokens — used by the scene 1 attack overlays.
      Each theme overrides these so the lightning bolt / ember / rage
@@ -180,17 +181,17 @@
   --lever-firesale-tint:  #2A1206;
   --lever-ink:            #1a0d05;
 
-  --ticket-fill:   #FFC060;
+  --ticket-fill:   #FFC060;   /* seat for sale (CRT) */
   --ticket-edge:   #0a0500;
-  --ticket-gone:   #5A3010;
+  --ticket-gone:   #5A3010;   /* seat sold (CRT) */
   --ticket-gone-edge: #2A1606;
-  --pip-on:        #FFB350;
-  --pip-off:       #5A3010;
-  --midnight-bg:   #1a0d05;
-  --cal-open-bg:   #1F150A;   /* upcoming day (CRT) */
-  --cal-x-bg:      #140D05;   /* crossed-off day (CRT) */
-  --cal-x-ink:     #FF5A2A;   /* red X stamp (CRT neon) */
-  --cal-moon:      #FFC060;   /* MIDNIGHT crescent (CRT) */
+  --pip-on:        #FFB350;   /* lit board digit (CRT) */
+  --pip-off:       #5A3010;   /* flipped-dim digit (CRT) */
+  --midnight-bg:   #1a0d05;   /* GATE tile (CRT) */
+  --cal-open-bg:   #1F150A;   /* lit board tile (CRT) */
+  --cal-x-bg:      #140D05;   /* flipped-dim board tile (CRT) */
+  --cal-x-ink:     #FF5A2A;   /* GATE CLOSED alert highlight (CRT neon) */
+  --cal-moon:      #FFC060;   /* departing plane (CRT) */
 
   /* Battle VFX — all amber/orange so the THUNDERBOLT / EMBER /
      RAGE overlays stay inside the CRT palette. */
@@ -1384,7 +1385,7 @@ body.slide-mode .stage  { padding: 12px 18px; }
 .shelf-ticket.is-gone { opacity: 0.55; }
 
 .shelf-ribbon { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-/* X-off vintage calendar: NUM_DAYS day cells + a MIDNIGHT cell. */
+/* Split-flap DEPARTURE BOARD: NUM_DAYS day tiles + a GATE (departing-plane) tile. */
 .shelf-calendar { display: flex; gap: 3px; align-items: stretch; }
 .cal-cell {
   position: relative;
@@ -1393,26 +1394,32 @@ body.slide-mode .stage  { padding: 12px 18px; }
   background: var(--cal-x-bg);
   display: flex; align-items: center; justify-content: center;
   box-sizing: border-box;
+  overflow: hidden;
+}
+/* the split-flap seam across the middle of every tile */
+.cal-cell::after {
+  content: ''; position: absolute; left: 0; right: 0; top: 50%;
+  height: 2px; transform: translateY(-1px);
+  background: rgba(0, 0, 0, 0.42); pointer-events: none;
 }
 .cal-cell.is-open { background: var(--cal-open-bg); }
 .cal-num {
   font-family: 'Press Start 2P', monospace;
   font-size: 8px; line-height: 1;
-  color: var(--ink-secondary);
+  color: var(--pip-off);
 }
-.cal-cell.is-x .cal-num { opacity: 0.4; }
-.cal-x { position: absolute; inset: -1px; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-.cal-x-mark { width: 100%; height: 100%; display: block; }
+.cal-cell.is-open .cal-num { color: var(--pip-on); }
 .cal-midnight { background: var(--midnight-bg); border-color: var(--rule); }
 .cal-midnight .cal-moon-mark { width: 70%; height: 70%; display: block; }
 .cal-midnight.is-active { box-shadow: inset 0 0 0 2px var(--cal-x-ink); }
-@keyframes cal-stamp {
-  0%   { transform: scale(1.9) rotate(-14deg); opacity: 0; }
-  55%  { transform: scale(0.86) rotate(4deg);  opacity: 1; }
-  100% { transform: scale(1) rotate(0);        opacity: 1; }
+/* a tile "flips" when its day departs */
+@keyframes cal-flip {
+  0%   { transform: perspective(60px) rotateX(0);    }
+  45%  { transform: perspective(60px) rotateX(-88deg); }
+  100% { transform: perspective(60px) rotateX(0);    }
 }
-.cal-cell.is-stamping .cal-x { animation: cal-stamp 360ms cubic-bezier(.2,.8,.3,1.2); }
-@media (prefers-reduced-motion: reduce) { .cal-cell.is-stamping .cal-x { animation: none; } }
+.cal-cell.is-stamping { animation: cal-flip 360ms cubic-bezier(.3,.7,.3,1); }
+@media (prefers-reduced-motion: reduce) { .cal-cell.is-stamping { animation: none; } }
 
 .shelf-caption {
   font-family: 'Press Start 2P', monospace;

@@ -6,20 +6,20 @@
       'scene6.title': 'Return to the deadline',
 
       'scene6.lede':
-        'Do not judge a lever by one good night. The <b>return</b> is the ' +
+        'Do not judge a lever by one good day. The <b>return</b> is the ' +
         'total cash a run brings in from a chosen point to the deadline, and ' +
         'it is a <b>random number</b>: run the same opening many times and the ' +
         'payoff lands all over a range.',
 
       'scene6.formula.label': 'RETURN FROM A POINT',
       'scene6.formula.foot':
-        'The total revenue collected from day i onward, summed to midnight ' +
-        '(no discount, the clock does the work). A different run gives a ' +
+        'The total revenue collected from day i onward, summed to the gate ' +
+        'closing (no discount, the clock does the work). A different run gives a ' +
         'different G.',
 
       /* the trajectory-tree + weighted-leaf ledger (the heart of the scene) */
       'scene6.eg.label':
-        'AVERAGE G OVER EVERY RUN &mdash; the tree from <b>{u} units, {d} days</b> ' +
+        'AVERAGE G OVER EVERY RUN &mdash; the tree from <b>{u} seats, {d} days</b> ' +
         'pulling <b>{lever}</b>. Each leaf is a run; weight its total G by the ' +
         'path probability and sum:',
       'scene6.eg.tie':
@@ -65,10 +65,10 @@
         'PREMIUM here is a coin-flip: one buyer at most, so the run brings $5 ' +
         'or, more often, nothing. High ceiling, lots of zeros.',
       'scene6.take.standard':
-        'STANDARD clears a unit or two most nights: the return clusters in the ' +
+        'STANDARD clears a seat or two most days: the return clusters in the ' +
         'middle, rarely zero, rarely high.',
       'scene6.take.firesale':
-        'FIRE-SALE almost always moves stock before midnight: the return ' +
+        'FIRE-SALE almost always fills seats before the gate closes: the return ' +
         'clusters higher and tighter. Lower ceiling, far less risk.',
 
       'scene6.spread.note':
@@ -88,15 +88,15 @@
       'scene6.formula.label': 'ある じてん からの リターン',
       'scene6.formula.foot':
         'i にちめ いこうに あつめた うりあげの ごうけい、 ' +
-        'まよなか まで（わりびきなし、 とけいが やくわり）。 ' +
+        'ゲートが しまる まで（わりびきなし、 とけいが やくわり）。 ' +
         'ランが ちがえば G も ちがいます。',
 
       'scene6.eg.label':
-        'すべての ランでの G の へいきん &mdash; <b>{u}こ・{d}にち</b> で <b>{lever}</b> を ' +
+        'すべての ランでの G の へいきん &mdash; <b>{u}せき・{d}にち</b> で <b>{lever}</b> を ' +
         'ひく きの ぜんはっぱ。 はっぱ＝ラン、 その ごうけい G を みちの かくりつで おもみづけして たす：',
       'scene6.eg.tie':
         'その おもみづけ ごうけいが <b>E[G] = {eg}</b>。 これが ここでの ' +
-        'Q*({u}こ / {d}にち, {lever})、 レバーの しょうじきな かち です。 ' +
+        'Q*({u}せき / {d}にち, {lever})、 レバーの しょうじきな かち です。 ' +
         'G &rarr; E[G] &rarr; Q* が 1まいで。',
 
       'scene6.emp.title': 'じっけん で みる',
@@ -134,7 +134,7 @@
         'スタンダード は たいてい 1〜2こ うれる： ' +
         'リターンは まんなかに あつまり、 ゼロも たかねも まれ。',
       'scene6.take.firesale':
-        'おおやすうり は まよなか まえに ほぼ かならず ' +
+        'おおやすうり は ゲートが しまる まえに ほぼ かならず ' +
         'うりさばく： リターンは たかめに かたく あつまる。 ' +
         'てんじょうは ひくいが リスクは ずっと ちいさい。',
 
