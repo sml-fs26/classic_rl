@@ -51,14 +51,14 @@
         'may miss a better lever). The live run next lets you turn this dial.',
       'scene11.s2.sampleTitle': 'ONE SAMPLED STEP',
       'scene11.s2.sampleNote':
-        'You hold {u} units with {d} days left. You pull {lever}; the demand ' +
+        'You hold {u} seats with {d} days left. You pull {lever}; the demand ' +
         'draw shows {k}. That ONE (s, a, r, s′, a′) is all SARSA needs ' +
         'to make one update: no odds, no model.',
       'scene11.s2.drawBtn':  'DRAW A DAY',
-      'scene11.s2.tupleS':   's = {u} units, {d} days',
+      'scene11.s2.tupleS':   's = {u} seats, {d} days',
       'scene11.s2.tupleA':   'a = {lever}',
       'scene11.s2.tupleR':   'r = $ {r}',
-      'scene11.s2.tupleSn':  's′ = {un} units, {dn} days',
+      'scene11.s2.tupleSn':  's′ = {un} seats, {dn} days',
       'scene11.s2.tupleSnTerm': 's′ = {term}',
       'scene11.s2.tupleAn':  'a′ = {lever}',
       'scene11.s2.tupleAnTerm': 'a′ = (deadline, no next lever)',
@@ -93,7 +93,7 @@
         'two levers nearly tie and only the exact DP sweep splits them.',
       'scene11.s3.runningNote':
         'Learning... each season nudges a handful of cells. Watch FIRE-SALE ' +
-        'claim the full-shelf / no-time corner and PREMIUM claim the scarce / ' +
+        'claim the full-cabin / no-time corner and PREMIUM claim the scarce / ' +
         'lots-of-time corner, with no odds ever supplied.',
       'scene11.s3.oracleToggle': 'SHOW DP ORACLE',
       'scene11.s3.oracleOn':     'HIDE DP ORACLE',
@@ -150,14 +150,14 @@
         'ライブで この ダイヤルを まわせます。',
       'scene11.s2.sampleTitle': '1つの サンプルステップ',
       'scene11.s2.sampleNote':
-        'ざいこ {u}こ、のこり {d}にち。{lever} を ひくと、じゅようドローは ' +
+        'ざせき {u}せき、のこり {d}にち。{lever} を ひくと、じゅようドローは ' +
         '{k} を しめす。その 1つの (s, a, r, s′, a′) だけで SARSA は ' +
         '1かい こうしんできる：かくりつも モデルも なし。',
       'scene11.s2.drawBtn':  'いちにちを ひく',
-      'scene11.s2.tupleS':   's = {u}こ、{d}にち',
+      'scene11.s2.tupleS':   's = {u}せき、{d}にち',
       'scene11.s2.tupleA':   'a = {lever}',
       'scene11.s2.tupleR':   'r = $ {r}',
-      'scene11.s2.tupleSn':  's′ = {un}こ、{dn}にち',
+      'scene11.s2.tupleSn':  's′ = {un}せき、{dn}にち',
       'scene11.s2.tupleSnTerm': 's′ = {term}',
       'scene11.s2.tupleAn':  'a′ = {lever}',
       'scene11.s2.tupleAnTerm': 'a′ =（しめきり、つぎの レバー なし）',
@@ -191,7 +191,7 @@
         'DP スイープだけが わけられる、もっとも きわどい ところ。',
       'scene11.s3.runningNote':
         'がくしゅうちゅう... シーズンごとに いくつかの セルを うごかす。' +
-        'まんたな たな / じかんなし の かどを おおやすうりが、すくない / ' +
+        'まんせきの きゃくしつ / じかんなし の かどを おおやすうりが、すくない / ' +
         'じかん たっぷり の かどを プレミアムが とるのを みる：かくりつは ' +
         'いっさい あたえずに。',
       'scene11.s3.oracleToggle': 'DP オラクルを みる',

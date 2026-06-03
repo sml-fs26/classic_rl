@@ -9,7 +9,7 @@
         'You ran one quarter of selling, move by move. Written down, that ' +
         'whole run is a <b>trajectory</b>: the situation you were in, the ' +
         'lever you pulled, the cash it brought, then the next situation, all ' +
-        'the way to midnight.',
+        'the way to the gate closing.',
 
       'scene5.formula.label': 'A RUN, WRITTEN DOWN',
       'scene5.formula.foot':
@@ -19,19 +19,19 @@
 
       /* tree caption + tape column labels */
       'scene5.tree.caption':
-        'The tree of all runs from a fixed opening &mdash; <b>{u} units, {d} days</b>, ' +
+        'The tree of all runs from a fixed opening &mdash; <b>{u} seats, {d} days</b>, ' +
         'pulling <b>{lever}</b>. It branches only on the <b>demand draw</b>; each ' +
-        'leaf is a real ending (SOLD OUT or MIDNIGHT) carrying its run total G.',
+        'leaf is a real ending (FULL FLIGHT or GATE CLOSED) carrying its run total G.',
       'scene5.col.situation': 'SITUATION',
       'scene5.col.lever':     'LEVER',
       'scene5.col.cash':      'CASH',
 
-      'scene5.start':    'OPENING: {u} units, {d} days',
-      'scene5.midnight': 'MIDNIGHT',
-      'scene5.atmidnight':'reached the deadline',
-      'scene5.soldout':  'SOLD OUT',
-      'scene5.leftover': '{n} left, worth $0',
-      'scene5.cleared':  'shelf cleared',
+      'scene5.start':    'OPENING: {u} seats, {d} days',
+      'scene5.midnight': 'GATE CLOSED',
+      'scene5.atmidnight':'reached departure',
+      'scene5.soldout':  'FULL FLIGHT',
+      'scene5.leftover': '{n} seats left, worth $0',
+      'scene5.cleared':  'flight sold out',
 
       /* derived tape strip (the lit path as the old S,A,R tape) */
       'scene5.derived.label': 'THE LIT PATH, AS A TAPE',
@@ -60,7 +60,7 @@
         'かきとめると その いちれんが ' +
         '<b>トラジェクトリ</b> です： じょうきょう、 ' +
         'ひいた レバー、 はいった おかね、 ' +
-        'つぎの じょうきょう、 まよなか まで。',
+        'つぎの じょうきょう、 ゲートが しまる まで。',
 
       'scene5.formula.label': 'かきとめた 1かいの ラン',
       'scene5.formula.foot':
@@ -71,19 +71,19 @@
       'scene5.tree.foot': '1つの トラジェクトリ ＝ きの 1つの みち。',
 
       'scene5.tree.caption':
-        'きまった スタート（<b>{u}こ・{d}にち</b>、 <b>{lever}</b> を ひく）からの ' +
+        'きまった スタート（<b>{u}せき・{d}にち</b>、 <b>{lever}</b> を ひく）からの ' +
         'すべての ランの き。 わかれるのは <b>じゅようの ひき</b> だけ。 ' +
-        'はっぱは ほんものの おわり（うりきれ か まよなか）で、 その ランの ごうけい G を もつ。',
+        'はっぱは ほんものの おわり（まんせき か ゲートクローズ）で、 その ランの ごうけい G を もつ。',
       'scene5.col.situation': 'じょうきょう',
       'scene5.col.lever':     'レバー',
       'scene5.col.cash':      'うりあげ',
 
-      'scene5.start':    'スタート： {u}こ, {d}にち',
-      'scene5.midnight': 'まよなか',
-      'scene5.atmidnight':'しめきりに とうたつ',
-      'scene5.soldout':  'うりきれ',
-      'scene5.leftover': 'のこり {n}こ, $0',
-      'scene5.cleared':  'うりきり',
+      'scene5.start':    'スタート： {u}せき, {d}にち',
+      'scene5.midnight': 'ゲートクローズ',
+      'scene5.atmidnight':'しゅっぱつ した',
+      'scene5.soldout':  'まんせき',
+      'scene5.leftover': 'のこり {n}せき, $0',
+      'scene5.cleared':  'まんせき',
 
       'scene5.derived.label': 'ひかった みち を テープ で',
       'scene5.derived.empty': '「ランを みる」 で きの みちを 1つ サンプリング',

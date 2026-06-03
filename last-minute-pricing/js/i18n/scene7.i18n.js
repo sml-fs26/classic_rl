@@ -19,8 +19,8 @@
 
       /* state-picker buttons */
       'scene7.pick.label': 'SITUATION:',
-      'scene7.pick.a':     '5 units · 1 day',
-      'scene7.pick.b':     '1 unit · 4 days',
+      'scene7.pick.a':     '5 seats · 1 day',
+      'scene7.pick.b':     '1 seat · 4 days',
 
       /* the situation panel */
       'scene7.state.label': 'SITUATION s',
@@ -32,12 +32,12 @@
 
       /* the read-out under the table */
       'scene7.read.a':
-        'Five units, one day. You <b>cannot</b> move them all at a premium ' +
-        'before midnight, so FIRE-SALE tops the table: dumping at $2 beats ' +
-        'watching stock expire at $0. <i>Use it or lose it.</i>',
+        'Five seats, one day. You <b>cannot</b> move them all at a premium ' +
+        'before the gate closes, so FIRE-SALE tops the table: dumping at $2 beats ' +
+        'watching seats fly empty at $0. <i>Use it or lose it.</i>',
       'scene7.read.b':
-        'One scarce unit, four days of runway. PREMIUM tops the table: hold ' +
-        'out for the $5 buyer, and if today is quiet you carry the unit and ' +
+        'One scarce seat, four days of runway. PREMIUM tops the table: hold ' +
+        'out for the $5 buyer, and if today is quiet you carry the seat and ' +
         'try again tomorrow. <i>Scarcity plus runway equals patience.</i>',
 
       'scene7.move.note':
@@ -64,8 +64,8 @@
         'リターン。 Q* で レバーを じゅんいづけ、 1いが さいてき。',
 
       'scene7.pick.label': 'じょうきょう：',
-      'scene7.pick.a':     '5こ · 1にち',
-      'scene7.pick.b':     '1こ · 4にち',
+      'scene7.pick.a':     '5せき · 1にち',
+      'scene7.pick.b':     '1せき · 4にち',
 
       'scene7.state.label': 'じょうきょう s',
 
@@ -74,13 +74,13 @@
       'scene7.best.tag':   'さいてき',
 
       'scene7.read.a':
-        '5こ、 1にち。 まよなか まえに プレミアムで ' +
+        '5せき、 1にち。 ゲートが しまる まえに プレミアムで ' +
         'ぜんぶは <b>うれません</b>。 だから おおやすうりが ' +
         '1い： $2 で うりさばく ほうが、 $0 で きえるのを ' +
         'みている より まし。 <i>いま うるか、 うしなうか。</i>',
       'scene7.read.b':
-        '1こ だけ、 4にちの よゆう。 プレミアムが 1い： ' +
-        '$5 の かいてを まち、 きょう しずかでも その こを ' +
+        '1せき だけ、 4にちの よゆう。 プレミアムが 1い： ' +
+        '$5 の かいてを まち、 きょう しずかでも その せきを ' +
         'もちこして あす また ためす。 ' +
         '<i>きしょうさ ＋ よゆう ＝ にんたい。</i>',
 

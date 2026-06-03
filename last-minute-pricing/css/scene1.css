@@ -1,5 +1,5 @@
-/* scene1 -- TUTORIAL ("How to read the shelf").
-   Step-walked guided tour in the shelf-card visual language. All colour is
+/* scene1 -- TUTORIAL ("How to read the flight").
+   Step-walked guided tour in the flight-card visual language. All colour is
    from the shared tokens (--lever-*, --ticket-*, --ink, --rule, --bg-strong)
    so the CRT theme retints for free. No JS-injected styles. */
 
@@ -105,7 +105,7 @@
   color: var(--ink-secondary);
 }
 
-/* ---- steps 2 + 3: a strip of shelf cards with captions ---- */
+/* ---- steps 2 + 3: a strip of flight cards with captions ---- */
 .tut-strip {
   display: flex;
   align-items: flex-end;
@@ -129,7 +129,7 @@
   line-height: 1.6;
 }
 
-/* Focus rings: step 2 spotlights the ticket stack, step 3 the day ribbon.
+/* Focus rings: step 2 spotlights the seat stack, step 3 the day ribbon.
    A dashed accent box around the relevant sub-part of each card. */
 .tut-focus-stack .shelf-stack {
   outline: 3px dashed var(--lever-standard);
@@ -228,7 +228,7 @@
 }
 .tut-demo-card { position: relative; }
 
-/* the sold ticket slides up-and-off; the whole card "tears" a day */
+/* the sold seat slides up-and-off; the whole card flips a day off the board */
 .tut-demo-card.tut-sold .shelf-stack .shelf-slot:first-child .shelf-ticket {
   animation: tut-ticket-slide 360ms ease-in forwards;
 }
