@@ -177,32 +177,6 @@
   color: var(--ink);
   min-height: 2.6em;
 }
-.tut-lever-odds-title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  letter-spacing: 0.5px;
-  color: var(--ink-secondary);
-}
-.tut-lever-odds { display: flex; flex-direction: column; gap: 4px; }
-.tut-odds-row {
-  display: grid;
-  grid-template-columns: 14px 1fr 30px;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  color: var(--ink);
-}
-.tut-odds-k { text-align: center; }
-.tut-odds-bar {
-  height: 9px;
-  background: var(--bg-strong);
-  border: 2px solid var(--rule);
-  position: relative;
-  overflow: hidden;
-}
-.tut-odds-fill { display: block; height: 100%; }
-.tut-odds-p { text-align: right; font-variant-numeric: tabular-nums; }
 
 .tut-lever-axis {
   display: flex;
@@ -331,7 +305,6 @@
 .lang-jp .tut-welcome-small,
 .lang-jp .tut-strip-cap,
 .lang-jp .tut-lever-role,
-.lang-jp .tut-lever-odds-title,
 .lang-jp .tut-lever-axis,
 .lang-jp .tut-demo-pick-label,
 .lang-jp .tut-demo-step { font-family: 'DotGothic16', 'Press Start 2P', monospace; }

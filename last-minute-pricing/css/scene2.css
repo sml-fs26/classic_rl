@@ -114,8 +114,7 @@
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-areas:
-    "name price"
-    "odds odds";
+    "name price";
   gap: 3px 10px;
   align-items: center;
   text-align: left;
@@ -136,7 +135,6 @@
 .play-lever-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 .play-lever-name  { grid-area: name;  font-size: 11px; letter-spacing: 0.5px; }
 .play-lever-price { grid-area: price; font-size: 10px; opacity: 0.95; }
-.play-lever-odds  { grid-area: odds;  font-size: 8px; opacity: 0.85; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
 
 .play-ctrl.poke-menu-row::before { content: none; }
 
@@ -198,7 +196,6 @@
 .lang-jp .play-prompt,
 .lang-jp .play-lever-name,
 .lang-jp .play-lever-price,
-.lang-jp .play-lever-odds,
 .lang-jp .play-summary-title,
 .lang-jp .play-summary-line,
 .lang-jp .play-tape-label,

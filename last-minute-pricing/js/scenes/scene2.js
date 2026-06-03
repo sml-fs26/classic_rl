@@ -98,10 +98,11 @@
       btn.type = 'button';
       btn.className = 'play-lever-btn';
       btn.setAttribute('data-lever', lever.id);
+      /* Name + price only -- the demand odds are intentionally hidden, so the
+         player has to feel out each tag by playing it. */
       btn.innerHTML =
         '<span class="play-lever-name">' + T('lever.' + lever.id) + '</span>' +
-        '<span class="play-lever-price">$' + lever.price + T('scene2.perUnit') + '</span>' +
-        '<span class="play-lever-odds">' + oddsString(lever) + '</span>';
+        '<span class="play-lever-price">$' + lever.price + T('scene2.perUnit') + '</span>';
       btn.addEventListener('click', () => onPull(lever.id));
       menu.appendChild(btn);
       leverBtns[lever.id] = btn;
@@ -141,10 +142,6 @@
     /* Choreography delays are collapsed under &run so the autoplayed sequence
        settles inside the headless screenshot budget. */
     function A(ms) { return window.PRICING_AUTORUN ? Math.min(ms, 60) : ms; }
-
-    function oddsString(lever) {
-      return lever.demand.map(kp => kp[0] + ':' + Math.round(kp[1] * 100) + '%').join('  ');
-    }
 
     function setBusy(b) {
       busy = b;
