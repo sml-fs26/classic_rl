@@ -60,8 +60,8 @@
     skipBtn.title = T('scene1.skip_title');
     topbar.appendChild(skipBtn);
     skipBtn.addEventListener('click', () => {
-      if (window.PriceViz) window.PriceViz.goTo(2);
-      else window.location.hash = '#scene=2';
+      if (window.PriceViz) window.PriceViz.goTo(1);   /* -> the playtest */
+      else window.location.hash = '#scene=1';
     });
 
     /* ---------- Section title ---------- */
@@ -86,6 +86,28 @@
     navHint.innerHTML = T('scene1.nav.hint');
     root.appendChild(navHint);
 
+    /* ---------- In-scene step nav (BACK / NEXT) ----------
+       Big, tappable step controls sitting under the content. The arrow keys
+       (onPrevKey/onNextKey) and the topbar PREV/NEXT already walk the steps,
+       but on a phone there are no arrow keys and the topbar pager is detached
+       from the tutorial; without these buttons mobile users had no obvious way
+       to move through the five steps. */
+    const stepNav = document.createElement('div');
+    stepNav.className = 'tut-stepnav';
+    const backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.className = 'tut-step-back poke-btn';
+    backBtn.textContent = T('scene1.nav.back');
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'tut-step-next poke-btn';
+    nextBtn.textContent = T('scene1.nav.next');
+    stepNav.appendChild(backBtn);
+    stepNav.appendChild(nextBtn);
+    root.appendChild(stepNav);
+    backBtn.addEventListener('click', () => { if (cursor > 0) renderStep(cursor - 1); });
+    nextBtn.addEventListener('click', () => { if (cursor < STEPS.length - 1) renderStep(cursor + 1); });
+
     /* ---------- Step engine ---------- */
     let cursor = 0;
 
@@ -100,6 +122,9 @@
       dialog.say(T('scene1.' + step.id + '.dialog'));
       /* On the last step, the SKIP button becomes "RUN THE SHELF". */
       skipBtn.textContent = (c === STEPS.length - 1) ? T('scene1.go_play') : T('scene1.skip');
+      /* Step buttons disable at the two ends of the walk. */
+      backBtn.disabled = (c === 0);
+      nextBtn.disabled = (c === STEPS.length - 1);
     }
 
     /* `#…&tut=N` deep-links an internal step (headless capture / linking). */
@@ -212,9 +237,10 @@
     function cap(txt) { const d = document.createElement('div'); d.className = 'tut-strip-cap'; d.textContent = txt; return d; }
   }
 
-  /* Step 4 -- the three price tags. Each shows price, a one-line role, and the
-     printed demand odds (pulled live from window.Levers). A fewer-to-more
-     buyers axis sits under the row. */
+  /* Step 4 -- the three price tags. Each shows its price and a one-line role.
+     The demand odds are deliberately NOT printed (you can't see how many
+     buyers will show up); a fewer-to-more buyers axis under the row conveys
+     only the direction each tag leans. */
   function renderLevers(host) {
     const wrap = document.createElement('div');
     wrap.className = 'tut-levers';
@@ -242,8 +268,7 @@
     host.appendChild(note);
   }
 
-  /* One price-tag card: the chunky lever tag, its role line, and a demand
-     odds table built from the lever's printed distribution. */
+  /* One price-tag card: the chunky lever tag and its one-line role. No odds. */
   function leverCard(lever) {
     const card = document.createElement('div');
     card.className = 'tut-lever-card';
@@ -261,25 +286,8 @@
     role.textContent = T('scene1.levers.' + lever.id + '.tag');
     card.appendChild(role);
 
-    const oddsTitle = document.createElement('div');
-    oddsTitle.className = 'tut-lever-odds-title';
-    oddsTitle.textContent = T('scene1.levers.odds').toUpperCase();
-    card.appendChild(oddsTitle);
-
-    const odds = document.createElement('div');
-    odds.className = 'tut-lever-odds';
-    for (const kp of lever.demand) {
-      const k = kp[0], p = kp[1];
-      const r = document.createElement('div');
-      r.className = 'tut-odds-row';
-      const pct = Math.round(p * 100);
-      r.innerHTML =
-        '<span class="tut-odds-k">' + k + '</span>' +
-        '<span class="tut-odds-bar"><span class="tut-odds-fill lever-fill-' + lever.id + '" style="width:' + pct + '%"></span></span>' +
-        '<span class="tut-odds-p">' + pct + '%</span>';
-      odds.appendChild(r);
-    }
-    card.appendChild(odds);
+    /* No demand odds are printed on the tag: how many buyers show up is
+       hidden, something you only learn by pulling the lever. */
     return card;
   }
 

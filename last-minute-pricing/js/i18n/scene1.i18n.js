@@ -12,7 +12,9 @@
       'scene1.skip':      'SKIP',
       'scene1.skip_title':'Jump straight to running the shelf',
       'scene1.go_play':   'RUN THE SHELF',
-      'scene1.nav.hint':  'Use <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to step. SKIP jumps to the playtest.',
+      'scene1.nav.back':  'BACK',
+      'scene1.nav.next':  'NEXT',
+      'scene1.nav.hint':  'Tap <b>BACK</b> / <b>NEXT</b> (or use <kbd>&larr;</kbd> <kbd>&rarr;</kbd>) to step. SKIP jumps to the playtest.',
 
       /* step 1 -- welcome / the shelf card */
       'scene1.welcome.title':  'The shelf card',
@@ -38,15 +40,14 @@
 
       /* step 4 -- the three price tags + demand odds */
       'scene1.levers.title':  'Your three price tags',
-      'scene1.levers.dialog': 'Each day you pull ONE price tag. A high price moves few units; a deep cut clears the shelf. The odds on each tag say how many buyers show up, the part you do not control.',
+      'scene1.levers.dialog': 'Each day you pull ONE price tag. A high price tends to move few units; a deep cut tends to clear the shelf. But how many buyers actually show up is hidden, the part you neither control nor get to see in advance.',
       'scene1.levers.premium.tag':  'HOLD OUT FOR THE HIGH PRICE',
       'scene1.levers.standard.tag': 'THE STEADY MIDDLE',
       'scene1.levers.firesale.tag': 'CUT DEEP, CLEAR STOCK',
-      'scene1.levers.odds':         'units sold today',
       'scene1.levers.perUnit':      '/unit',
       'scene1.levers.axis.l':       'fewer buyers',
       'scene1.levers.axis.r':       'more buyers',
-      'scene1.levers.note':         'Cash you collect = price times units sold. The odds are printed so the dice are never hidden.',
+      'scene1.levers.note':         'Cash you collect = price times units sold. The odds are NOT printed: you only learn how a tag behaves by pulling it.',
 
       /* step 5 -- one slow demo day */
       'scene1.demo.title':   'One day, start to finish',
@@ -69,7 +70,9 @@
       'scene1.skip':      'スキップ',
       'scene1.skip_title':'たな うんえいへ すすむ',
       'scene1.go_play':   'たなを うごかす',
-      'scene1.nav.hint':  '<kbd>&larr;</kbd> <kbd>&rarr;</kbd> で すすむ。 スキップで プレイテストへ。',
+      'scene1.nav.back':  'もどる',
+      'scene1.nav.next':  'つぎへ',
+      'scene1.nav.hint':  '<b>もどる</b> / <b>つぎへ</b> を タップ（または <kbd>&larr;</kbd> <kbd>&rarr;</kbd>）で すすむ。 スキップで プレイテストへ。',
 
       'scene1.welcome.title':  'たなカード',
       'scene1.welcome.big':    '1まいの え、 2つの すうじ',
@@ -91,15 +94,14 @@
       'scene1.days.note':     'じかんは へるだけ: 1けってい 1にち。 のこった ざいこは まよなかに $0。',
 
       'scene1.levers.title':  '3つの ねふだ',
-      'scene1.levers.dialog': 'まいにち ねふだを 1つ ひく。 たかい ねだんは すこししか うれず、 おおやすうりは たなを はく。 ふだの かくりつが きゃくの かず、 それは あなたの しはいの そと。',
+      'scene1.levers.dialog': 'まいにち ねふだを 1つ ひく。 たかい ねだんは すこししか うれにくく、 おおやすうりは たなを はきやすい。 でも じっさいに きゃくが なんにん くるかは みえない。 しはいも できず、 まえもって しる ことも できない。',
       'scene1.levers.premium.tag':  'たかねを ねらう',
       'scene1.levers.standard.tag': 'てがたい まんなか',
       'scene1.levers.firesale.tag': 'おおきく きって はく',
-      'scene1.levers.odds':         'きょうの はんばいすう',
       'scene1.levers.perUnit':      '/こ',
       'scene1.levers.axis.l':       'きゃく すくない',
       'scene1.levers.axis.r':       'きゃく おおい',
-      'scene1.levers.note':         'うりあげ = ねだん かける はんばいすう。 かくりつは みえている。 さいころは かくさない。',
+      'scene1.levers.note':         'うりあげ = ねだん かける はんばいすう。 かくりつは ひょうじ されない: ひいて みて はじめて わかる。',
 
       'scene1.demo.title':   '1にち、 はじめから おわりまで',
       'scene1.demo.dialog':  '1にちぶん みてみる。 スタンダード ($3) を ひく。 じゅようデッキが カードを めくり、 なんこ うれるか きめる。 ここでは 1こ。 チケットが +$3 で スライドし、 ひが ちぎれ、 たなは あすへ。 これが ループの ぜんぶ。',

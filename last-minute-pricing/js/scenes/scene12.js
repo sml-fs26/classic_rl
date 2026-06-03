@@ -292,7 +292,7 @@
     foot.textContent = T('scene12.footnote');
     root.appendChild(foot);
 
-    /* Replay link back to the title. */
+    /* Replay link back to the start (the tutorial, now scene index 0). */
     const replayWrap = document.createElement('div');
     replayWrap.className = 'sc12-replay-wrap';
     const replay = document.createElement('button');
