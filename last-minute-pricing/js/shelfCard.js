@@ -55,23 +55,30 @@
     return 'md';
   }
 
-  /* A single pixel airplane seat as inline SVG (side profile). `filled` picks
-     the for-sale (bright) vs sold (greyed) token set. Geometry: a headrest +
-     reclined seat back + cushion -- a chunky chair silhouette that still reads
-     at the tiny Q-table size. Class name kept as `shelf-ticket` so the scene
-     sell / crumble animations keep targeting it. */
+  /* A single pixel seat as inline SVG, drawn FRONT-ON (an upholstered armchair
+     seen head-on) so it reads as a seat in the wide, short slot -- the old
+     side-profile glyph got vertically squashed into an L-shaped bar and stopped
+     reading as furniture. `filled` picks the for-sale (bright gold) vs sold
+     (greyed) token set. Geometry (viewBox 0 0 48 18 ~= the slot aspect, so
+     preserveAspectRatio="none" barely distorts it): a wide BACKREST band, a
+     broad SEAT CUSHION below it, and two ARMREST posts at the ends that poke
+     above the backrest -- the raised arms drive the outer silhouette so the seat
+     still reads at the 16-20px Q-table size. Class name kept as `shelf-ticket`
+     so the scene sell / crumble animations keep targeting it. */
   function seatSVG(filled) {
     const fill = filled ? 'var(--ticket-fill)' : 'var(--ticket-gone)';
     const edge = filled ? 'var(--ticket-edge)' : 'var(--ticket-gone-edge)';
     const cls = 'shelf-ticket' + (filled ? ' is-live' : ' is-gone');
     return (
       '<svg class="' + cls + '" viewBox="0 0 48 18" preserveAspectRatio="none" aria-hidden="true">' +
-        /* headrest cap */
-        '<rect x="9" y="1"  width="13" height="4"  fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
-        /* seat back */
-        '<rect x="11" y="3" width="10" height="12" fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
-        /* seat cushion */
-        '<rect x="11" y="11" width="26" height="5" fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
+        /* backrest band (drawn first so the arms overlap its ends) */
+        '<rect x="8"  y="4" width="32" height="5"  fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
+        /* seat cushion (the broad lower mass) */
+        '<rect x="8"  y="9" width="32" height="8"  fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
+        /* left armrest post (pokes above the backrest) */
+        '<rect x="2"  y="6" width="7"  height="11" fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
+        /* right armrest post */
+        '<rect x="39" y="6" width="7"  height="11" fill="' + fill + '" stroke="' + edge + '" stroke-width="2"/>' +
       '</svg>'
     );
   }
