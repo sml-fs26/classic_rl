@@ -1620,86 +1620,110 @@ body.slide-mode .stage  { padding: 12px 18px; }
    and the RETURN tape. All themeable via the existing tokens.
    ============================================================ */
 
-/* ---- The DEMAND DECK: a face-down deck with one flipping card ---- */
-.demand-deck {
-  position: relative;
-  display: inline-block;
-  width: 86px;
-  height: 112px;
-  /* the flipper rotates in 3D */
-  perspective: 520px;
-}
-.deck-stack { position: absolute; inset: 0; }
-.deck-card {
-  position: absolute;
-  inset: 0;
-  border: 3px solid var(--rule);
-  background: var(--bg-strong);
-  box-shadow: 3px 3px 0 var(--rule);
-}
-.deck-under-1 { transform: translate(3px, 3px); }
-.deck-under-2 { transform: translate(6px, 6px); opacity: 0.85; }
-
-.deck-flipper {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  transition: transform 420ms cubic-bezier(.45, .05, .55, .95);
-  transform: rotateY(0deg);
-}
-.deck-flipper.is-flipped { transform: rotateY(180deg); }
-/* a tiny "snap" pop as the card lands face-up */
-.deck-flipper.is-snap { animation: deck-snap 180ms ease-out; }
-@keyframes deck-snap {
-  0%   { transform: rotateY(180deg) scale(1); }
-  45%  { transform: rotateY(180deg) scale(1.08); }
-  100% { transform: rotateY(180deg) scale(1); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .deck-flipper { transition: none; }
-  .deck-flipper.is-snap { animation: none; }
-}
-
-.deck-face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border: 3px solid var(--rule);
-  box-shadow: 3px 3px 0 var(--rule);
+/* ---- The DEMAND JAR: a per-lever jar of outcome marbles; one rolls out ----
+   Root class stays `.demand-deck` so the per-scene size overrides keep working;
+   `.demand-jar` carries the new layout. PREMIUM pours a jar of mostly grey "0"
+   duds; STANDARD pours a jar of gold sales and no 0 -- the population you draw
+   from visibly changes with the lever, so the outcome is seen to depend on the
+   action (and the odds stay hidden: the pile is jumbled, not countable). */
+.demand-deck.demand-jar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: 'Press Start 2P', monospace;
+  width: 86px;
+  height: 112px;
+  perspective: none;
 }
-.deck-back {
+.jar-glass {
+  position: relative;
+  width: 100%;
+  height: 70%;
+  box-sizing: border-box;
+  border: 3px solid var(--rule);
+  border-radius: 8px 8px 4px 4px;
   background: var(--bg-strong);
-  /* a pixel cross-hatch on the card back */
-  background-image:
-    repeating-linear-gradient(45deg, var(--inner-highlight) 0 2px, transparent 2px 7px),
-    repeating-linear-gradient(-45deg, var(--inner-highlight) 0 2px, transparent 2px 7px);
+  background-image: repeating-linear-gradient(115deg, var(--inner-highlight) 0 1px, transparent 1px 10px);
+  box-shadow: 3px 3px 0 var(--rule);
+  overflow: hidden;
 }
-.deck-back-mark {
-  font-size: 30px;
-  color: var(--ink-secondary);
-  text-shadow: 2px 2px 0 var(--rule);
+.jar-lid {
+  position: absolute; left: 16%; right: 16%; top: -6px; height: 6px;
+  background: var(--rule); border-radius: 2px;
 }
-.deck-front {
-  transform: rotateY(180deg);
-  background: var(--lever-standard);
-  color: var(--lever-ink);
+.jar-marbles {
+  position: absolute; inset: 5px 4px 4px;
+  display: flex; flex-wrap: wrap; align-content: flex-end; justify-content: center;
+  gap: 2px;
 }
-.deck-front-k {
-  font-size: 26px;
-  line-height: 1;
-  letter-spacing: 1px;
+.jar-marble {
+  width: 15px; height: 15px; border-radius: 50%; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  border: 2px solid var(--ticket-edge);
+  transform: rotate(var(--tilt, 0deg));
 }
-.deck-front-label {
-  font-size: 8px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+.jar-marble.jar-dud {                 /* a "0" marble -- no sale */
+  background: var(--ticket-gone); border-color: var(--ticket-gone-edge);
+  color: var(--ticket-gone-edge);
+}
+.jar-marble.jar-sale {                /* sells one or more -- gold */
+  background: var(--ticket-fill); color: var(--ticket-edge);
+}
+.is-pouring .jar-marble { animation: jar-pour 240ms ease-out backwards; }
+@keyframes jar-pour {
+  0%   { opacity: 0; transform: translateY(-16px) rotate(var(--tilt, 0deg)); }
+  100% { opacity: 1; transform: translateY(0) rotate(var(--tilt, 0deg)); }
+}
+.is-shaking .jar-glass { animation: jar-shake 190ms ease-in-out; }
+@keyframes jar-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25%      { transform: translateX(-2px) rotate(-1.6deg); }
+  75%      { transform: translateX(2px)  rotate(1.6deg); }
+}
+
+.jar-spout {
+  width: 0; height: 0; margin-top: -1px;
+  border-left: 7px solid transparent; border-right: 7px solid transparent;
+  border-top: 8px solid var(--rule);
+}
+.jar-cup {
+  margin-top: 1px;
+  width: 32px; height: 22px; box-sizing: border-box;
+  border: 3px solid var(--rule); border-top: 0; border-radius: 0 0 7px 7px;
+  background: var(--bg-strong); box-shadow: 3px 3px 0 var(--rule);
+  display: flex; align-items: center; justify-content: center;
+}
+.jar-drawn {
+  width: 17px; height: 17px; border-radius: 50%; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  border: 2px solid var(--ticket-edge);
+  opacity: 0; transform: scale(0.2);
+}
+.jar-drawn.jar-dud { background: var(--ticket-gone); border-color: var(--ticket-gone-edge); color: var(--ticket-gone-edge); }
+.jar-drawn.jar-sale { background: var(--ticket-fill); color: var(--ticket-edge); }
+.jar-drawn.is-shown { animation: jar-drop 340ms cubic-bezier(.34, 1.56, .64, 1) forwards; }
+@keyframes jar-drop {
+  0%   { opacity: 0; transform: translateY(-22px) scale(0.4); }
+  60%  { opacity: 1; transform: translateY(2px) scale(1.12); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.jar-label {
+  margin-top: 4px; min-height: 8px;
+  font-family: 'Press Start 2P', monospace; font-size: 7px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--ink-secondary); text-align: center;
+}
+/* the jar frame takes the chosen lever's colour, so the action and its marble
+   population read together at a glance. */
+.demand-deck[data-lever="premium"] .jar-glass { border-color: var(--lever-premium); }
+.demand-deck[data-lever="standard"] .jar-glass { border-color: var(--lever-standard); }
+
+@media (prefers-reduced-motion: reduce) {
+  .is-pouring .jar-marble,
+  .is-shaking .jar-glass,
+  .jar-drawn.is-shown { animation: none; }
+  .jar-drawn.is-shown { opacity: 1; transform: none; }
 }
 
 /* ---- The MONEY counter (running revenue, mono, top-corner HUD) ---- */
