@@ -223,7 +223,10 @@
        slow speeds so the board paints cell by cell; large at fast speeds so
        the full 40k run completes in a few seconds. */
     const BATCH = [40, 120, 350, 900, 2000];
-    const TICK_MS = 70;
+    /* Tick period. Every speed level runs at BATCH[lvl] episodes per TICK_MS,
+       so tripling this period (70 -> 210) slows EVERY slider setting to ~1/3
+       of its former pace uniformly -- the run was reading too fast to follow. */
+    const TICK_MS = 210;
 
     let oracleShown = false;
 
