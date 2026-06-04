@@ -1377,10 +1377,13 @@ body.slide-mode .stage  { padding: 12px 18px; }
 .shelf-card[data-lever="standard"] { border-color: var(--lever-standard-rule); box-shadow: 4px 4px 0 var(--lever-standard-rule); }
 .shelf-card[data-lever="firesale"] { border-color: var(--lever-firesale-rule); box-shadow: 4px 4px 0 var(--lever-firesale-rule); }
 
-.shelf-body { display: flex; align-items: flex-end; gap: 12px; }
+.shelf-body { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 
-.shelf-stack { display: flex; flex-direction: column; gap: 3px; justify-content: flex-end; }
-.shelf-slot  { width: 48px; height: 18px; display: block; }
+/* The cabin: ONE airplane row seen from above -- two seats, an aisle, then
+   three. Each .shelf-slot is one seat; the bottom-u seats are still for sale. */
+.shelf-stack { display: flex; flex-direction: row; align-items: flex-start; justify-content: center; gap: 3px; }
+.shelf-slot  { width: 14px; height: 17px; display: block; }
+.shelf-slot:nth-child(2) { margin-right: 9px; }   /* the aisle, between the 2- and 3-seat blocks */
 .shelf-ticket { width: 100%; height: 100%; display: block; }
 .shelf-ticket.is-gone { opacity: 0.55; }
 
@@ -1433,11 +1436,13 @@ body.slide-mode .stage  { padding: 12px 18px; }
 .shelf-card.is-soldout  { opacity: 0.92; }
 
 /* size variants */
-.shelf-sm .shelf-slot { width: 30px; height: 11px; }
+.shelf-sm .shelf-slot { width: 10px; height: 12px; }
+.shelf-sm .shelf-slot:nth-child(2) { margin-right: 6px; }
 .shelf-sm .cal-cell { width: 15px; height: 18px; }
 .shelf-sm .cal-num  { font-size: 6px; }
 .shelf-sm .shelf-caption { font-size: 7px; }
-.shelf-lg .shelf-slot { width: 64px; height: 24px; }
+.shelf-lg .shelf-slot { width: 19px; height: 23px; }
+.shelf-lg .shelf-slot:nth-child(2) { margin-right: 12px; }
 .shelf-lg .cal-cell { width: 30px; height: 36px; }
 .shelf-lg .cal-num  { font-size: 11px; }
 .shelf-lg .shelf-caption { font-size: 10px; }
@@ -1453,8 +1458,9 @@ body.slide-mode .stage  { padding: 12px 18px; }
   box-shadow: none;
 }
 .shelf-mini .shelf-body { gap: 6px; }
-.shelf-mini .shelf-stack { gap: 1px; }
-.shelf-mini .shelf-slot { width: 20px; height: 7px; }
+.shelf-mini .shelf-stack { gap: 1.5px; }
+.shelf-mini .shelf-slot { width: 8px; height: 9px; }
+.shelf-mini .shelf-slot:nth-child(2) { margin-right: 4px; }
 .shelf-mini .shelf-calendar { gap: 1px; }
 .shelf-mini .cal-cell { width: 9px; height: 11px; border-width: 1px; }
 .shelf-mini .cal-num { display: none; }
@@ -1514,7 +1520,7 @@ body.slide-mode .stage  { padding: 12px 18px; }
 
 @media (max-width: 720px) {
   /* Shrink the descendant shelf cards so a depth-2 by 5-leaf tree fits 390px. */
-  .tt-node-icon .shelf-mini .shelf-slot { width: 16px; height: 6px; }
+  .tt-node-icon .shelf-mini .shelf-slot { width: 6px; height: 7px; }
   .tt-node-icon .shelf-mini .cal-cell { width: 8px; height: 10px; }
   .tt-pr-final { min-width: 50px; padding: 3px 5px; }
   .tt-pr-glyph { font-size: 14px; }
