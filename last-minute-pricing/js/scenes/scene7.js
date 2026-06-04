@@ -8,7 +8,7 @@
  *   The core reveal: the star MOVES. We show one situation's shelf-card icon
  *   beside a two-column table (lever a | Q*(s, a)) with the argmax STARRED,
  *   and let the learner flip between two situations where the winner differs:
- *     (5 units, 1 day)  -> FIRE-SALE  (use it or lose it)
+ *     (5 units, 1 day)  -> STANDARD  (use it or lose it)
  *     (1 unit,  4 days) -> PREMIUM    (scarcity + runway = patience)
  *
  *   Every Q* value is read from window.DATA.Qstar (indexed
@@ -24,7 +24,7 @@
   const T = (k, v) => window.I18N.t(k, v);
 
   const A = (window.DATA && window.DATA.dims && window.DATA.dims.A) || 3;
-  const LEVERS = L.LEVER_IDS;     // premium, standard, firesale
+  const LEVERS = L.LEVER_IDS;     // premium, standard
 
   /* The two situations where the optimal lever flips (the "star moves"). */
   const STATES = [

@@ -5,7 +5,7 @@
  *     old WIN/LOSS terminals): the DEADLINE (d hits 0; leftover units score
  *     nothing) and SOLD OUT (u hits 0; episode ends early). Both terminals
  *     have value 0.
- *   Action a: one of 3 price levers (premium / standard / firesale).
+ *   Action a: one of 2 price levers (premium / standard).
  *   Transition: set a lever, draw demand k (units that want to buy today),
  *     sell min(k, u). Time always ticks down one day; inventory drops by what
  *     sold. The demand draw is the only stochastic element. No opponent.

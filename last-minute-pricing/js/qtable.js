@@ -12,9 +12,9 @@
  *
  *   Each playable cell shows, top to bottom:
  *     - a MINI shelf-card icon for that (u, d) state (window.ShelfCard, mini),
- *     - the three lever rows (PREMIUM / STANDARD / FIRE-SALE) each with its
+ *     - the two lever rows (PREMIUM / STANDARD) each with its
  *       Q value; the argmax row is starred (★) and the whole cell is tinted
- *       with the winning lever's colour, so the 3-region optimal-policy
+ *       with the winning lever's colour, so the 2-region optimal-policy
  *       overlay with its diagonal seam reads at a glance.
  *
  *   API (window.QTable):
@@ -28,7 +28,7 @@
  *
  *     handle.update(Q, opts):
  *        Q is indexed Q[stateIndex * A + leverIdx] with leverIdx in the order
- *        window.Levers.LEVER_IDS = [premium, standard, firesale] (the same
+ *        window.Levers.LEVER_IDS = [premium, standard] (the same
  *        order window.Bellman.qFromV / window.DATA.Qstar use). Re-renders all
  *        values, flips the ★ star + the cell's lever-region tint, and (unless
  *        opts.suppressFlash) floats +/- deltas and pings a sound on argmax
@@ -38,8 +38,8 @@
  *   CRT retint is automatic. Styles live in css/qtable.css. */
 (function () {
   const P = window.Pricing;
-  const LEVER_IDS = window.Levers.LEVER_IDS;            // [premium, standard, firesale]
-  const A = LEVER_IDS.length;                            // 3
+  const LEVER_IDS = window.Levers.LEVER_IDS;            // [premium, standard]
+  const A = LEVER_IDS.length;                            // 2
   const ROWS = P.ROWS;                                   // 5 (units 5..1)
   const COLS = P.COLS;                                   // 4 (days 4..1)
   const N = P.N;                                          // 20
@@ -175,13 +175,13 @@
     const legend = document.createElement('div');
     legend.className = 'q-legend';
     legend.innerHTML =
-      '<span class="q-legend-item"><span class="q-legend-swatch lever-fill-premium"></span> ' + T('lever.premium') + '</span>' +
-      '<span class="q-legend-item"><span class="q-legend-swatch lever-fill-standard"></span> ' + T('lever.standard') + '</span>' +
-      '<span class="q-legend-item"><span class="q-legend-swatch lever-fill-firesale"></span> ' + T('lever.firesale') + '</span>' +
+      LEVER_IDS.map(function (id) {
+        return '<span class="q-legend-item"><span class="q-legend-swatch lever-fill-' + id + '"></span> ' + T('lever.' + id) + '</span>';
+      }).join('') +
       '<span class="q-legend-item">★ = ' + T('qtable.bestLever') + '</span>';
     host.appendChild(legend);
 
-    const ALL_LEVER_TINTS = ['lever-tint-premium', 'lever-tint-standard', 'lever-tint-firesale'];
+    const ALL_LEVER_TINTS = LEVER_IDS.map(function (id) { return 'lever-tint-' + id; });
     const HEAT_CLASSES = ['heat-zero', 'heat-1', 'heat-2', 'heat-3', 'heat-4'];
 
     function heatClassFor(maxQ, allZero) {

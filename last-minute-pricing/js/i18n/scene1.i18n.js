@@ -39,12 +39,11 @@
       'scene1.days.cap.mid':  'GATE CLOSED: the deadline',
       'scene1.days.note':     'Time only ticks DOWN: one day per decision. Unsold seats fly empty for $0 once the gate closes.',
 
-      /* step 4 -- the three price tags + demand odds */
-      'scene1.levers.title':  'Your three price tags',
+      /* step 4 -- the two price tags */
+      'scene1.levers.title':  'Your two price tags',
       'scene1.levers.dialog': 'Each day you pull ONE price tag. A high price tends to sell few seats; a deep cut tends to clear the cabin. But how many buyers actually show up is hidden, the part you neither control nor get to see in advance.',
       'scene1.levers.premium.tag':  'HOLD OUT FOR THE HIGH PRICE',
-      'scene1.levers.standard.tag': 'THE STEADY MIDDLE',
-      'scene1.levers.firesale.tag': 'CUT DEEP, CLEAR STOCK',
+      'scene1.levers.standard.tag': 'CUT THE PRICE, FILL THE CABIN',
       'scene1.levers.perUnit':      '/seat',
       'scene1.levers.axis.l':       'fewer buyers',
       'scene1.levers.axis.r':       'more buyers',
@@ -52,7 +51,7 @@
 
       /* step 5 -- one slow demo day */
       'scene1.demo.title':   'One day, start to finish',
-      'scene1.demo.dialog':  'Watch one full day. We pull STANDARD ($3). The DEMAND DECK flips a card to decide how many buy. Here, one. A seat sells with a +$3, a day flips off the board, and the flight moves one day closer. That is the whole loop.',
+      'scene1.demo.dialog':  'Watch one full day. We pull STANDARD ($2). The DEMAND DECK flips a card to decide how many buy. Here, one. A seat sells with a +$2, a day flips off the board, and the flight moves one day closer. That is the whole loop.',
       'scene1.demo.play':    'PLAY THE DAY',
       'scene1.demo.replay':  'REPLAY',
       'scene1.demo.picked':  "TODAY'S TAG",
@@ -94,18 +93,17 @@
       'scene1.days.cap.mid':  'ゲートクローズ: しめきり',
       'scene1.days.note':     'じかんは へるだけ: 1けってい 1にち。 のこった ざせきは ゲートが しまると $0。',
 
-      'scene1.levers.title':  '3つの ねふだ',
-      'scene1.levers.dialog': 'まいにち ねふだを 1つ ひく。 たかい ねだんは すこししか うれにくく、 おおやすうりは ざせきを はきやすい。 でも じっさいに きゃくが なんにん くるかは みえない。 しはいも できず、 まえもって しる ことも できない。',
+      'scene1.levers.title':  '2つの ねふだ',
+      'scene1.levers.dialog': 'まいにち ねふだを 1つ ひく。 たかい ねだんは すこししか うれにくく、 ねさげは ざせきを はきやすい。 でも じっさいに きゃくが なんにん くるかは みえない。 しはいも できず、 まえもって しる ことも できない。',
       'scene1.levers.premium.tag':  'たかねを ねらう',
-      'scene1.levers.standard.tag': 'てがたい まんなか',
-      'scene1.levers.firesale.tag': 'おおきく きって はく',
+      'scene1.levers.standard.tag': 'ねさげで ざせきを はく',
       'scene1.levers.perUnit':      '/せき',
       'scene1.levers.axis.l':       'きゃく すくない',
       'scene1.levers.axis.r':       'きゃく おおい',
       'scene1.levers.note':         'うりあげ = ねだん かける はんばいすう。 かくりつは ひょうじ されない: ひいて みて はじめて わかる。',
 
       'scene1.demo.title':   '1にち、 はじめから おわりまで',
-      'scene1.demo.dialog':  '1にちぶん みてみる。 スタンダード ($3) を ひく。 じゅようデッキが カードを めくり、 なんせき うれるか きめる。 ここでは 1せき。 ざせきが +$3 で スライドし、 ボードが 1ます くらくなり、 しゅっぱつが 1にち ちかづく。 これが ループの ぜんぶ。',
+      'scene1.demo.dialog':  '1にちぶん みてみる。 スタンダード ($2) を ひく。 じゅようデッキが カードを めくり、 なんせき うれるか きめる。 ここでは 1せき。 ざせきが +$2 で スライドし、 ボードが 1ます くらくなり、 しゅっぱつが 1にち ちかづく。 これが ループの ぜんぶ。',
       'scene1.demo.play':    'この1にちを みる',
       'scene1.demo.replay':  'もういちど',
       'scene1.demo.picked':  'きょうの ふだ',

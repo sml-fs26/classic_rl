@@ -372,7 +372,7 @@
 
     /* Headless / demo autoplay: pull a fixed lever sequence (with the seeded
        RNG above) so the capture shows a live, partway-through run. */
-    const AUTO_SEQ = ['standard', 'standard', 'firesale', 'firesale'];
+    const AUTO_SEQ = ['premium', 'standard', 'standard', 'standard'];
     function autoStep() {
       if (ended || busy) return;
       const idx = day - 1;

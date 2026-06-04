@@ -40,9 +40,9 @@
       /* step 2 -- ACTION */
       'scene3.s2.title':     'Action: the lever you pull',
       'scene3.s2.manager':
-        'One price tag per day. Hold out for the premium, take the steady middle, or cut deep to fill the cabin.',
+        'One price tag per day. Hold out for the premium, or cut the price to fill the cabin.',
       'scene3.s2.formal':
-        'The action set <b>A</b> = { PREMIUM, STANDARD, FIRE-SALE }. You choose one each day; that is your only control.',
+        'The action set <b>A</b> = { PREMIUM, STANDARD }. You choose one each day; that is your only control.',
 
       /* step 3 -- TRANSITION + REWARD (folded together) */
       'scene3.s3.title':     'Transition and reward: the part you do not control',
@@ -53,7 +53,7 @@
       'scene3.s3.formalR':
         '<b>R</b>: reward <b>r = price x seats sold today</b>. Seats still unsold at departure are worth <b>$0</b>, the whole sting in one number.',
       'scene3.s3.drawLabel': 'THE DEMAND DRAW',
-      'scene3.s3.foot':      'PREMIUM rarely moves seats; FIRE-SALE almost always fills several. Same dice, every time, you just see them.',
+      'scene3.s3.foot':      'PREMIUM rarely moves seats; STANDARD almost always fills several. Same dice, every time, you just see them.',
 
       /* step 4 -- the tuple */
       'scene3.s4.title':     'Put it together: the 4-tuple',
@@ -77,7 +77,7 @@
       'notes.scene3':
         '<b>Goal:</b> name the four MDP parts on the board they just played, no new mechanics, only vocabulary.<ul>' +
         '<li><b>State</b> = the flight card (u, d). Stress <i>Markov</i>: today’s right move needs only today’s situation, not the history of how you got here.</li>' +
-        '<li><b>Action</b> = the three levers; one per day.</li>' +
+        '<li><b>Action</b> = the two levers; one per day.</li>' +
         '<li><b>Transition + reward</b> are folded together: the demand draw both moves you and pays you. The probabilities are visible, that is the whole point, and it sets up DP later.</li>' +
         '<li>Reward = price x seats sold; leftover at departure = $0. Pause on the $0, it is the entire tension of revenue management.</li>' +
         '<li><b>gamma = 1:</b> finite 4-day horizon, so returns are bounded without discounting.</li></ul>' +
@@ -115,9 +115,9 @@
 
       'scene3.s2.title':     'こうどう：ひく レバー',
       'scene3.s2.manager':
-        '１にちに １つの ねふだ。プレミアムで まつか、まんなかで いくか、ふかく さげて きゃくしつを からにするか。',
+        '１にちに １つの ねふだ。プレミアムで たかく まつか、ねさげして きゃくしつを からにするか。',
       'scene3.s2.formal':
-        'こうどう しゅうごう <b>A</b> = { プレミアム, スタンダード, おおやすうり }。まいにち １つ えらぶ。これが ゆいいつの コントロール。',
+        'こうどう しゅうごう <b>A</b> = { プレミアム, スタンダード }。まいにち １つ えらぶ。これが ゆいいつの コントロール。',
 
       'scene3.s3.title':     'せんい と みかえり：コントロールできない ぶぶん',
       'scene3.s3.manager':
@@ -127,7 +127,7 @@
       'scene3.s3.formalR':
         '<b>R</b>：みかえり <b>r = ねだん x きょう うれた ざせき</b>。しゅっぱつに のこった ざせきは <b>$0</b>、すべての つらさが この１つの すうじに。',
       'scene3.s3.drawLabel': 'じゅようの ひき',
-      'scene3.s3.foot':      'プレミアムは めったに うごかず、おおやすうりは ほぼ いつも すうこ さばく。さいは いつも おなじ、ただ みえるだけ。',
+      'scene3.s3.foot':      'プレミアムは めったに うごかず、スタンダードは ほぼ いつも すうこ さばく。さいは いつも おなじ、ただ みえるだけ。',
 
       'scene3.s4.title':     'まとめ：４つぐみ',
       'scene3.s4.body':

@@ -23,8 +23,8 @@
   const T = (k, v) => (window.I18N ? window.I18N.t(k, v) : k);
   const P = window.Pricing;
   const L = window.Levers;
-  const LEVER_IDS = L.LEVER_IDS;            // [premium, standard, firesale]
-  const A = LEVER_IDS.length;               // 3
+  const LEVER_IDS = L.LEVER_IDS;            // [premium, standard]
+  const A = LEVER_IDS.length;               // 2
   const N = P.N;                            // 20
   const NUM_DAYS = P.NUM_DAYS;              // 4
   const NUM_UNITS = P.NUM_UNITS;            // 5
@@ -202,7 +202,7 @@
           T('scene9.done.title'),
           T('scene9.done.body'),
           T('scene9.done.counts', {
-            fire: counts.firesale, std: counts.standard, prem: counts.premium,
+            prem: counts.premium, std: counts.standard,
           })
         );
       }

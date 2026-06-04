@@ -92,7 +92,7 @@
         'misses sit right on the diagonal seam: the closest calls, where ' +
         'two levers nearly tie and only the exact DP sweep splits them.',
       'scene11.s3.runningNote':
-        'Learning... each season nudges a handful of cells. Watch FIRE-SALE ' +
+        'Learning... each season nudges a handful of cells. Watch STANDARD ' +
         'claim the full-cabin / no-time corner and PREMIUM claim the scarce / ' +
         'lots-of-time corner, with no odds ever supplied.',
       'scene11.s3.oracleToggle': 'SHOW DP ORACLE',
@@ -191,7 +191,7 @@
         'DP スイープだけが わけられる、もっとも きわどい ところ。',
       'scene11.s3.runningNote':
         'がくしゅうちゅう... シーズンごとに いくつかの セルを うごかす。' +
-        'まんせきの きゃくしつ / じかんなし の かどを おおやすうりが、すくない / ' +
+        'まんせきの きゃくしつ / じかんなし の かどを スタンダードが、すくない / ' +
         'じかん たっぷり の かどを プレミアムが とるのを みる：かくりつは ' +
         'いっさい あたえずに。',
       'scene11.s3.oracleToggle': 'DP オラクルを みる',

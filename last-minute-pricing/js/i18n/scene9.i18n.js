@@ -40,25 +40,24 @@
       'scene9.col.d1':
         '<b>Last day.</b> Every tomorrow is gate-close ($0), so each cell is just ' +
         'price &times; expected seats sold today. Full cabins cannot clear at a premium, ' +
-        'so they go <b>FIRE-SALE</b>.',
+        'so they go <b>STANDARD</b>.',
       'scene9.col.d2':
         '<b>Two days left.</b> Each cell reuses the day-1 values to its right: sell some ' +
-        'today, then carry the rest into a known tomorrow. <b>STANDARD</b> starts to win ' +
-        'as the cabin thins.',
+        'today, then carry the rest into a known tomorrow. With stock still to move ' +
+        '<b>STANDARD</b> clears it; a lone seat can wait for <b>PREMIUM</b>.',
       'scene9.col.d3':
         '<b>Three days left.</b> More runway means more patience. A single scarce seat can ' +
         'now afford to hold out for a <b>PREMIUM</b> buyer.',
       'scene9.col.d4':
-        '<b>Four days left.</b> The last sweep. The full board is now solved: three ' +
+        '<b>Four days left.</b> The last sweep. The full board is now solved: two ' +
         'coloured regions with a diagonal seam, the revenue-management surface.',
 
       'scene9.done.title': 'CONVERGED IN 4 SWEEPS',
       'scene9.done.body':
         'Known P gives exact Q* by backward sweeps to a fixed point. The star moves ' +
-        'across the board: <b>FIRE-SALE</b> when seats are plentiful and time is short, ' +
-        '<b>PREMIUM</b> when seats are scarce and time is long, <b>STANDARD</b> in the ' +
-        'comfortable middle.',
-      'scene9.done.counts': 'LEVER USAGE &middot; {fire} FIRE-SALE &middot; {std} STANDARD &middot; {prem} PREMIUM',
+        'across the board: <b>STANDARD</b> when seats are plentiful and time is short, ' +
+        '<b>PREMIUM</b> when seats are scarce or time is long.',
+      'scene9.done.counts': 'LEVER USAGE &middot; {prem} PREMIUM &middot; {std} STANDARD',
 
       /* bridge */
       'scene9.bridge':
@@ -95,24 +94,24 @@
       'scene9.col.d1':
         '<b>さいしゅうび。</b> あした すべてが しめきり（$0）なので、かくセルは かかく &times; ' +
         'きょう うれる きたい せきすう だけ。ざせき おおめでは プレミアムで さばけず、' +
-        '<b>おおやすうり</b> になる。',
+        '<b>スタンダード</b> になる。',
       'scene9.col.d2':
         '<b>のこり2にち。</b> かくセルは みぎの 1にち かちを さいりよう：きょう すこし うり、' +
-        'のこりを わかっている あすへ もちこす。ざせきが へると <b>スタンダード</b> が ' +
-        'かちはじめる。',
+        'のこりを わかっている あすへ もちこす。うる ざいこが あれば <b>スタンダード</b> で ' +
+        'はき、1こだけなら <b>プレミアム</b> を まてる。',
       'scene9.col.d3':
         '<b>のこり3にち。</b> よゆうが あると しんぼうできる。きちょうな 1こ なら ' +
         '<b>プレミアム</b> の かいてを まてる。',
       'scene9.col.d4':
-        '<b>のこり4にち。</b> さいごの スイープ。ぜんばんが とけた：3つの いろの りょういきと ' +
+        '<b>のこり4にち。</b> さいごの スイープ。ぜんばんが とけた：2つの いろの りょういきと ' +
         'たいかくせんの つぎめ、レベニューマネジメントの めん。',
 
       'scene9.done.title': '4スイープで しゅうそく',
       'scene9.done.body':
         'P が わかれば、うしろむきの スイープで せいかくな Q* が ふどうてんまで もとまる。' +
-        'スターが ばんを うごく：ざせき おおく じかん みじかい とき <b>おおやすうり</b>、' +
-        'ざせき すくなく じかん ながい とき <b>プレミアム</b>、まんなかは <b>スタンダード</b>。',
-      'scene9.done.counts': 'レバーしようすう &middot; {fire} おおやすうり &middot; {std} スタンダード &middot; {prem} プレミアム',
+        'スターが ばんを うごく：ざせき おおく じかん みじかい とき <b>スタンダード</b>、' +
+        'ざせき すくない か じかん ながい とき <b>プレミアム</b>。',
+      'scene9.done.counts': 'レバーしようすう &middot; {prem} プレミアム &middot; {std} スタンダード',
 
       'scene9.bridge':
         'せいかく だが、デッキを もっていた からだけ。じっさいの じゅようは かかれず、' +

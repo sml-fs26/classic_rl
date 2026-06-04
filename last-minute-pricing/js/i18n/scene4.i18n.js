@@ -23,12 +23,12 @@
       'scene4.policyA.name':   'ALWAYS STANDARD',
       'scene4.policyA.sub':    'the safe default',
       'scene4.policyA.blurb':
-        'The simplest playbook: pull the steady middle price in every situation, a full cabin or nearly a full flight, lots of time or none. One rule, no thinking. It will not be the best, but it is a policy, and it is honest about being a complete rule.',
+        'The simplest playbook: pull the everyday clearing price in every situation, a full cabin or nearly a full flight, lots of time or none. One rule, no thinking. It will not be the best, but it is a policy, and it is honest about being a complete rule.',
 
       'scene4.policyB.name':   'HOLD, THEN DUMP',
       'scene4.policyB.sub':    'a gut-feel rule',
       'scene4.policyB.blurb':
-        'A more human playbook: hold out for PREMIUM while there are still 2+ days left, then panic and FIRE-SALE on the very last day. It captures a real instinct, hold high, cut late, and it is still just a function from situation to lever.',
+        'A more human playbook: hold out for PREMIUM while there are still 2+ days left, then cut to STANDARD on the very last day. It captures a real instinct, hold high, cut late, and it is still just a function from situation to lever.',
 
       /* legend / read-out */
       'scene4.legend.title':   'THE LEVER THIS PLAYBOOK PULLS',
@@ -52,7 +52,7 @@
       'notes.scene4':
         '<b>Goal:</b> a policy is a COMPLETE map from situation to lever, not a single decision.<ul>' +
         '<li>Drive home <b>completeness</b>: every one of the 20 cells gets a lever. Toggle the two presets and let the colour regions land.</li>' +
-        '<li><b>Always-STANDARD</b> = one flat colour (the trivial constant policy). <b>Hold-then-dump</b> = a plausible human heuristic (PREMIUM while d>=2, FIRE-SALE at d=1).</li>' +
+        '<li><b>Always-STANDARD</b> = one flat colour (the trivial constant policy). <b>Hold-then-dump</b> = a plausible human heuristic (PREMIUM while d>=2, STANDARD at d=1).</li>' +
         '<li>The big callback: in the playtest they <i>were</i> a policy, pulling pi(s) each day by gut, just unwritten.</li>' +
         '<li>Do NOT reveal the optimal policy here, that is the payoff of the Q*/DP scenes. Tease only that one best map exists.</li></ul>' +
         '<b>Hook to next:</b> a run of a policy is a trajectory, a sequence of situation, lever, payoff.',
@@ -74,12 +74,12 @@
       'scene4.policyA.name':   'つねに スタンダード',
       'scene4.policyA.sub':    'あんぜんな きほん',
       'scene4.policyA.blurb':
-        'もっとも たんじゅんな プレイブック：どの じょうきょうでも まんなかの ねだんを ひく。きゃくしつが いっぱいでも ほぼ まんせきでも、じかんが あっても なくても。ルール ひとつ、かんがえる ひつようなし。さいぜんでは ないが、これも れっきとした かんぜんな ルール ＝ ほうさく。',
+        'もっとも たんじゅんな プレイブック：どの じょうきょうでも やすうりの ねだんを ひく。きゃくしつが いっぱいでも ほぼ まんせきでも、じかんが あっても なくても。ルール ひとつ、かんがえる ひつようなし。さいぜんでは ないが、これも れっきとした かんぜんな ルール ＝ ほうさく。',
 
       'scene4.policyB.name':   'もって、なげうる',
       'scene4.policyB.sub':    'かんの ルール',
       'scene4.policyB.blurb':
-        'より にんげんらしい プレイブック：のこり 2にち いじょう なら プレミアムで まち、さいごの 1にちで あわてて おおやすうり。「たかく もち、おそく さげる」という ほんとうの ほんのうを とらえているが、やはり じょうきょうから レバーへの かんすうに すぎない。',
+        'より にんげんらしい プレイブック：のこり 2にち いじょう なら プレミアムで まち、さいごの 1にちで あわてて スタンダード。「たかく もち、おそく さげる」という ほんとうの ほんのうを とらえているが、やはり じょうきょうから レバーへの かんすうに すぎない。',
 
       'scene4.legend.title':   'この プレイブックが ひく レバー',
       'scene4.cell.read':      '{u}こ / {d}にち で {lever}',
@@ -99,7 +99,7 @@
       'notes.scene4':
         '<b>ねらい：</b> ほうさくは じょうきょうから レバーへの かんぜんな ちず、ひとつの けってい では ない。<ul>' +
         '<li><b>かんぜんさ</b>を つよく：20マス すべてに レバーが つく。２つの プリセットを きりかえ、いろの りょういきを みせる。</li>' +
-        '<li><b>つねにスタンダード</b> = ひとつの たいらな いろ（じだんてきな ていすう ほうさく）。<b>もって、なげうる</b> = もっともらしい にんげんの ヒューリスティック（d>=2 で プレミアム、d=1 で おおやすうり）。</li>' +
+        '<li><b>つねにスタンダード</b> = ひとつの たいらな いろ（じだんてきな ていすう ほうさく）。<b>もって、なげうる</b> = もっともらしい にんげんの ヒューリスティック（d>=2 で プレミアム、d=1 で スタンダード）。</li>' +
         '<li>おおきな コールバック：プレイテストで かれらは <i>ほうさく だった</i>、まいにち かんで pi(s) を ひいていた、ただ かかれて いなかっただけ。</li>' +
         '<li>ここで さいてき ほうさくを みせては いけない、それは Q*/DP シーンの ごほうび。さいぜんの ちずが ひとつ ある とだけ ほのめかす。</li></ul>' +
         '<b>つぎへ：</b> ほうさくの じっこうは トラジェクトリー ＝ じょうきょう・レバー・みかえり の れつ。',

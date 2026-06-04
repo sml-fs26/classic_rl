@@ -33,8 +33,8 @@
   const P        = window.Pricing;
   const LEVERS   = window.Levers;
   const SARSA    = window.SARSA;
-  const LEVER_IDS = LEVERS.LEVER_IDS;            // [premium, standard, firesale]
-  const A        = LEVER_IDS.length;             // 3
+  const LEVER_IDS = LEVERS.LEVER_IDS;            // [premium, standard]
+  const A        = LEVER_IDS.length;             // 2
   const N        = P.N;                          // 20
   const GAMMA    = 1;
 

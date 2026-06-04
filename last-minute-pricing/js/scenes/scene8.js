@@ -6,11 +6,11 @@
  *   worked one-step backup on a LAST-DAY corner cell (3 units, 1 day). On the
  *   last day every "tomorrow" is the deadline (worth $0), so the future term
  *   vanishes and Q* is just the cash expected today:
- *       FIRE-SALE = 2 * (0.2*1 + 0.4*2 + 0.4*3) = 4.40.
+ *       STANDARD = 2 * (0.2*1 + 0.4*2 + 0.4*3) = 4.40.
  *
  *   The learner picks a lever; the term-by-term breakdown is computed live
  *   from window.Pricing.successors (never hand-typed). The verdict appears
- *   only after all three levers have been backed up, so no answer is shown
+ *   only after both levers have been backed up, so no answer is shown
  *   before the learner can attempt it.
  *
  *   Contract: window.scenes.scene8 = function(root){ ...; return {...}; }
@@ -21,7 +21,7 @@
   const T = (k, v) => (window.I18N ? window.I18N.t(k, v) : k);
   const P = window.Pricing;
   const L = window.Levers;
-  const LEVER_IDS = L.LEVER_IDS;                 // [premium, standard, firesale]
+  const LEVER_IDS = L.LEVER_IDS;                 // [premium, standard]
 
   /* The worked cell: 3 units, last day. All futures = deadline ($0). */
   const WORKED = { u: 3, d: 1 };

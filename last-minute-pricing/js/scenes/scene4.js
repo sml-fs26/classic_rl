@@ -5,7 +5,7 @@
  *   playbooks as coloured maps over the 5x4 grid so the learner sees a policy
  *   as a colour map, not a single decision:
  *     (a) ALWAYS STANDARD   -- the whole board amber (the constant policy)
- *     (b) HOLD, THEN DUMP   -- PREMIUM where d >= 2, FIRE-SALE on the last day
+ *     (b) HOLD, THEN DUMP   -- PREMIUM where d >= 2, STANDARD on the last day
  *
  *   Both are HAND policies a manager could write in a minute; neither is the
  *   optimal policy (that is the payoff of the Q-star / DP scenes, so we never
@@ -24,7 +24,7 @@
 
   const T = (k, v) => window.I18N.t(k, v);
   const P = window.Pricing;
-  const LEVER_IDS = window.Levers.LEVER_IDS;     // [premium, standard, firesale]
+  const LEVER_IDS = window.Levers.LEVER_IDS;     // [premium, standard]
   const ROWS = P.ROWS;   // 5 (units 5..1)
   const COLS = P.COLS;   // 4 (days 4..1)
   const N = P.N;         // 20
@@ -32,8 +32,8 @@
   /* ---- The two hand policies, computed by rule (NOT the optimal map) ---- */
   function policyAlwaysStandard(/* s */) { return 'standard'; }
   function policyHoldThenDump(s) {
-    /* Hold high while there is runway, dump on the last day. */
-    return s.d >= 2 ? 'premium' : 'firesale';
+    /* Hold high while there is runway, clear stock on the last day. */
+    return s.d >= 2 ? 'premium' : 'standard';
   }
   const PRESETS = [
     { id: 'A', fn: policyAlwaysStandard, nameKey: 'scene4.policyA.name', subKey: 'scene4.policyA.sub', blurbKey: 'scene4.policyA.blurb' },
@@ -204,7 +204,7 @@
     root.appendChild(hint);
 
     /* ---------- Painting a policy onto the board ---------- */
-    const ALL_FILLS = ['lever-fill-premium', 'lever-fill-standard', 'lever-fill-firesale'];
+    const ALL_FILLS = LEVER_IDS.map(function (id) { return 'lever-fill-' + id; });
 
     function paint(presetIdx, animate) {
       const preset = PRESETS[presetIdx];
@@ -249,7 +249,7 @@
 
     /* For the blurb tag colour, pick the lever this playbook leans on. */
     function dominantLever(preset) {
-      const counts = { premium: 0, standard: 0, firesale: 0 };
+      const counts = {}; for (const id of LEVER_IDS) counts[id] = 0;
       for (let s = 0; s < N; s++) counts[preset.fn(P.stateFromIndex(s))]++;
       let best = 'standard', m = -1;
       for (const id of LEVER_IDS) { if (counts[id] > m) { m = counts[id]; best = id; } }

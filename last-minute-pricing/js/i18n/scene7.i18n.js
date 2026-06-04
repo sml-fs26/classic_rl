@@ -33,7 +33,7 @@
       /* the read-out under the table */
       'scene7.read.a':
         'Five seats, one day. You <b>cannot</b> move them all at a premium ' +
-        'before the gate closes, so FIRE-SALE tops the table: dumping at $2 beats ' +
+        'before the gate closes, so STANDARD tops the table: dumping at $2 beats ' +
         'watching seats fly empty at $0. <i>Use it or lose it.</i>',
       'scene7.read.b':
         'One scarce seat, four days of runway. PREMIUM tops the table: hold ' +
@@ -41,7 +41,7 @@
         'try again tomorrow. <i>Scarcity plus runway equals patience.</i>',
 
       'scene7.move.note':
-        'Switch the situation and the star <b>moves</b>: same three levers, a ' +
+        'Switch the situation and the star <b>moves</b>: same two levers, a ' +
         'different winner. That is the whole job of Q*, ranking the levers ' +
         'situation by situation.',
     },
@@ -75,7 +75,7 @@
 
       'scene7.read.a':
         '5せき、 1にち。 ゲートが しまる まえに プレミアムで ' +
-        'ぜんぶは <b>うれません</b>。 だから おおやすうりが ' +
+        'ぜんぶは <b>うれません</b>。 だから スタンダードが ' +
         '1い： $2 で うりさばく ほうが、 $0 で きえるのを ' +
         'みている より まし。 <i>いま うるか、 うしなうか。</i>',
       'scene7.read.b':
@@ -86,7 +86,7 @@
 
       'scene7.move.note':
         'じょうきょうを かえると ★ が <b>うごき</b> ます： ' +
-        'おなじ 3つの レバー でも かちぐみが ちがう。 ' +
+        'おなじ 2つの レバー でも かちぐみが ちがう。 ' +
         'それが Q* の しごと、 じょうきょう ごとに レバーを ' +
         'じゅんいづける こと です。',
     },

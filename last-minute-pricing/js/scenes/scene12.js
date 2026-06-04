@@ -71,7 +71,7 @@
   }
   function glyphPolicy(host) {
     /* A mini shelf-card + an arrow + the chosen lever tag: pi(s)=a. */
-    const ids = (window.Levers && window.Levers.LEVER_IDS) || ['premium', 'standard', 'firesale'];
+    const ids = (window.Levers && window.Levers.LEVER_IDS) || ['premium', 'standard'];
     host.innerHTML = '<div class="sc12-policy-row"></div>';
     const row = host.querySelector('.sc12-policy-row');
     if (window.ShelfCard) {
@@ -118,11 +118,11 @@
     /* A per-state Q-row with the argmax starred. Pull the real Q* row for
        (u1,d4) from DATA.spotQ if present so the star sits on PREMIUM and
        the values are genuine; otherwise derive from DATA.Qstar. */
-    const ids = (window.Levers && window.Levers.LEVER_IDS) || ['premium', 'standard', 'firesale'];
+    const ids = (window.Levers && window.Levers.LEVER_IDS) || ['premium', 'standard'];
     let vals = null;
     const spot = window.DATA && window.DATA.spotQ && window.DATA.spotQ.u1d4;
     if (spot && spot.q) {
-      /* spotQ.u1d4 = { units, days, q:{ premium, standard, firesale }, best }. */
+      /* spotQ.u1d4 = { units, days, q:{ premium, standard }, best }. */
       vals = ids.map(id => (spot.q[id] != null ? +spot.q[id] : null));
     }
     if (!vals || vals.some(v => v == null)) {

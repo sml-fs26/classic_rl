@@ -87,7 +87,7 @@
 
     function applyReveal(lever, k) {
       /* Tint the revealed face in the lever's colour. */
-      front.classList.remove('lever-fill-premium', 'lever-fill-standard', 'lever-fill-firesale');
+      front.classList.remove('lever-fill-premium', 'lever-fill-standard');
       if (lever) front.classList.add('lever-fill-' + lever);
       kEl.textContent = (k && k > 0) ? ('+' + k) : '0';
       labelEl.textContent = revealText(k);
@@ -99,7 +99,7 @@
       root.removeAttribute('data-k');
       kEl.textContent = '';
       labelEl.textContent = '';
-      front.classList.remove('lever-fill-premium', 'lever-fill-standard', 'lever-fill-firesale');
+      front.classList.remove('lever-fill-premium', 'lever-fill-standard');
     }
 
     function flip(drawSpec) {
