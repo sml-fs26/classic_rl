@@ -1,0 +1,120 @@
+/* ============================================================
+   Scene 9 - Filling Q* with dynamic programming.
+   The shared concept-scene chrome (.concept-heading / .concept-formula-*)
+   lives in css/style.css; this file adds the scene-9 layout: a lede +
+   premise, the Bellman card, a STEP / RUN / RESET control bar with a sweep
+   status, and the 5x3 QTable beside a side narration panel that repaints
+   each sweep until the scorecard converges to Q*.
+   All colour comes from CSS tokens; no inline categorical colours.
+   ============================================================ */
+
+/* Body copy (pipeline-climb has no shared concept-lede class). */
+.pc-dp-scene .pc-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.9;
+  color: var(--ink);
+  max-width: 96ch;
+  margin: 0 0 8px;
+}
+.pc-dp-scene .pc-lede b { color: var(--lever-demo); }
+
+.pc-dp-scene .pc-dp-premise {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.85;
+  color: var(--ink-secondary);
+  max-width: 96ch;
+  margin: 0 0 14px;
+}
+.pc-dp-scene .pc-dp-premise b { color: var(--ink); }
+
+/* ---- Controls + status row ---- */
+.pc-dp-scene .pc-dp-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+.pc-dp-scene .pc-dp-controls { gap: 8px; margin: 0; }
+.pc-dp-scene .pc-dp-controls::before { content: none; }
+.pc-dp-scene .pc-dp-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.pc-dp-scene .pc-dp-status b {
+  color: var(--pikachu-cheek);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Board + side narration ---- */
+.pc-dp-scene .pc-dp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+}
+.pc-dp-scene .pc-dp-q { min-width: 0; overflow-x: auto; }
+
+/* The whole board pulses once when a fresh sweep lands. */
+.pc-dp-scene .pc-dp-q .qtable-host.pc-dp-pulse {
+  animation: pc-dp-sweep-pulse 620ms ease-out 1;
+}
+@keyframes pc-dp-sweep-pulse {
+  0%   { filter: brightness(1.5); }
+  100% { filter: brightness(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pc-dp-scene .pc-dp-q .qtable-host.pc-dp-pulse { animation: none; }
+}
+
+.pc-dp-scene .pc-dp-panel {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: 4px 4px 0 var(--rule);
+  padding: 12px 14px;
+  align-self: start;
+  position: sticky;
+  top: 8px;
+}
+.pc-dp-scene .pc-dp-panel-title {
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.pc-dp-scene .pc-dp-panel-body b { color: var(--ink-on-box); }
+.pc-dp-scene .pc-dp-panel-foot {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px solid var(--rule);
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+
+/* ---- Bridge footer (revealed on convergence) ---- */
+.pc-dp-scene .pc-dp-bridge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 10px;
+  margin-top: 14px;
+}
+.pc-dp-scene .pc-dp-bridge b { color: var(--ink); }
+
+/* ---- Responsive: stack the board + panel ---- */
+@media (max-width: 860px) {
+  .pc-dp-scene .pc-dp-row { grid-template-columns: minmax(0, 1fr); }
+  .pc-dp-scene .pc-dp-panel { position: static; }
+}

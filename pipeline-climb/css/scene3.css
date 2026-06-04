@@ -1,0 +1,263 @@
+/* Scene 3 - "What makes this an MDP?" (the formalization).
+   The five MDP ingredients slide over the LadderCard the learner just played:
+   a left "stage" (big LadderCard + floating part-tags + lever cards + STAGE
+   DIE) and a right "panel" (formula box + manager/formal copy + nav). All
+   colour comes from the foundation tokens (--ink / --bg-strong / --rule /
+   --lever-* / --warm-* / --signed-green), so both themes retint automatically
+   and no inline categorical colour is needed. */
+
+.sc3-scene { max-width: 980px; margin: 0 auto; }
+
+.sc3-head { margin: 0 2px 8px; }
+.sc3-title { margin: 0 0 6px; }
+.sc3-lede {
+  margin: 0;
+  max-width: 100ch;
+  line-height: 1.8;
+  color: var(--ink);
+}
+.sc3-lede b { color: var(--lever-demo); }
+
+/* ---- Two-column body ---- */
+.sc3-body {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(380px, 1.1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+/* ===== LEFT: the stage ===== */
+.sc3-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 14px 12px 16px;
+}
+.sc3-stage-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+/* The card + its floating part-tags share a positioned wrapper. */
+.sc3-card-wrap {
+  position: relative;
+  padding: 26px 64px;
+}
+.sc3-card-host { display: flex; justify-content: center; }
+.sc3-card-host .lc-ladder { min-width: 180px; }
+
+/* Floating MDP part-tags around the card. */
+.sc3-tag {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  padding: 5px 7px;
+  border: 3px solid var(--rule);
+  background: var(--card-bg);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--rule);
+  white-space: nowrap;
+  opacity: 0;
+  transform: scale(0.82);
+  transition: opacity 280ms ease, transform 280ms ease;
+  pointer-events: none;
+  z-index: 4;
+}
+.sc3-tag.show { opacity: 1; transform: scale(1); }
+.sc3-tag-s { left: -10px; top: 10px;    border-color: var(--lever-nurture);  color: var(--lever-nurture); }
+.sc3-tag-a { left: -10px; bottom: 10px; border-color: var(--lever-demo);     color: var(--lever-demo); }
+.sc3-tag-p { right: -10px; top: 10px;   border-color: var(--lever-hardclose); color: var(--lever-hardclose); }
+.sc3-tag-r { right: -10px; bottom: 38px; border-color: var(--signed-green);  color: var(--signed-green); }
+.sc3-tag-g { right: -10px; bottom: 6px;  border-color: var(--rule);          color: var(--ink); }
+
+/* The lever-card rail (action set). Hidden until step 2. */
+.sc3-levers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 260ms ease, max-height 260ms ease;
+}
+.sc3-levers.show { opacity: 1; max-height: 120px; }
+.sc3-lever {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  position: relative;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+/* Lever colour identity (the toneClass-driven tint). */
+.sc3-lever.lever-nurture   .sc3-lever-icon,
+.sc3-lever.lever-nurture   .sc3-lever-name { color: var(--lever-nurture); }
+.sc3-lever.lever-demo      .sc3-lever-icon,
+.sc3-lever.lever-demo      .sc3-lever-name { color: var(--lever-demo); }
+.sc3-lever.lever-hardclose .sc3-lever-icon,
+.sc3-lever.lever-hardclose .sc3-lever-name { color: var(--lever-hardclose); }
+.sc3-lever-icon { display: inline-flex; }
+.sc3-lever-icon svg { width: 14px; height: 14px; }
+.sc3-lever.is-demo {
+  transform: translateY(-3px) scale(1.06);
+  filter: brightness(1.08);
+  outline: 2px solid var(--lever-demo);
+  outline-offset: 2px;
+}
+
+/* The STAGE DIE row (die + roll button). Hidden until step 3. */
+.sc3-die-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 260ms ease, max-height 260ms ease;
+}
+.sc3-die-row.show { opacity: 1; max-height: 220px; }
+.sc3-die-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+}
+.sc3-die-host { display: flex; justify-content: center; }
+.sc3-die-host .sd-token { width: 64px; height: 64px; }
+.sc3-roll-btn {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+/* ===== RIGHT: the formula / copy panel ===== */
+.sc3-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Ingredient rail: the five parts as chips. */
+.sc3-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sc3-rail-chip {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  padding: 4px 6px;
+  border: 2px solid var(--ink-secondary);
+  color: var(--ink-secondary);
+  background: transparent;
+  opacity: 0.55;
+  transition: opacity 180ms, color 180ms, background 180ms, border-color 180ms;
+}
+.sc3-rail-chip.active {
+  opacity: 1;
+  color: #fff;
+  background: var(--lever-demo);
+  border-color: var(--lever-demo);
+}
+.sc3-rail-chip.done { opacity: 0.95; color: var(--ink-on-box); border-color: var(--rule); }
+
+.sc3-ptitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-on-box);
+  margin: 2px 0 2px;
+}
+
+/* The formula box. .poke-formula gives the chunky bordered look; centre it
+   and keep it from overflowing on narrow widths. */
+.sc3-formula.poke-formula {
+  display: block;
+  margin: 4px 0 6px;
+  text-align: center;
+  overflow-x: auto;
+}
+.sc3-formula .katex { font-size: 15px; }
+
+.sc3-manager {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9.5px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+.sc3-manager b { color: var(--lever-hardclose); }
+
+.sc3-formal {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+}
+.sc3-formal b { color: var(--ink-on-box); }
+
+.sc3-foot {
+  margin: 2px 0 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--inner-highlight);
+  padding-top: 8px;
+}
+
+/* Nav controls inside the panel. */
+.sc3-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.sc3-stepof {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-left: auto;
+}
+.sc3-nav.is-edge { opacity: 0.45; }
+
+.sc3-hint { margin-top: 12px; }
+
+/* JP font swap. */
+.lang-jp .sc3-tag,
+.lang-jp .sc3-rail-chip,
+.lang-jp .sc3-ptitle,
+.lang-jp .sc3-manager,
+.lang-jp .sc3-formal,
+.lang-jp .sc3-foot,
+.lang-jp .sc3-stepof,
+.lang-jp .sc3-stage-label,
+.lang-jp .sc3-die-label,
+.lang-jp .sc3-lever {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+/* Responsive: stack the columns on narrow viewports. */
+@media (max-width: 900px) {
+  .sc3-body { grid-template-columns: 1fr; }
+  .sc3-card-wrap { padding: 26px 52px; }
+}

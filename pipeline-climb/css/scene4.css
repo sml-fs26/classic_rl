@@ -1,0 +1,320 @@
+/* Scene 4 - "Policy: your playbook".
+   A playbook board on the left - the five rungs as rows, each with a mini
+   LadderCard state icon and a clickable lever chip the learner cycles - and a
+   control panel on the right (preset tabs + blurb + completeness note + the
+   scene-2 callback). All colour comes from the foundation tokens (--ink /
+   --bg-strong / --rule / --lever-* / --warm-* / --signed-green), so both
+   themes retint automatically and no inline categorical colour is needed. */
+
+.sc4-scene { max-width: 980px; margin: 0 auto; }
+
+.sc4-head { margin: 0 2px 8px; }
+.sc4-title { margin: 0 0 6px; }
+.sc4-lede {
+  margin: 0;
+  max-width: 112ch;
+  line-height: 1.8;
+  color: var(--ink);
+}
+.sc4-lede b { color: var(--lever-demo); }
+
+/* ---- Formula strip ---- */
+.sc4-formula-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 6px 2px 12px;
+}
+.sc4-formula.poke-formula { margin: 0; display: inline-block; }
+.sc4-formula .katex { font-size: 18px; }
+.sc4-formula-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 60ch;
+}
+
+/* ---- Two-column body ---- */
+.sc4-body {
+  display: grid;
+  grid-template-columns: minmax(380px, 1fr) minmax(340px, 0.95fr);
+  gap: 22px;
+  align-items: start;
+}
+
+/* ===== LEFT: the playbook board ===== */
+.sc4-board-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.sc4-board-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.sc4-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+.sc4-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px;
+}
+.sc4-row {
+  display: grid;
+  grid-template-columns: auto minmax(8ch, 1fr) 18px minmax(118px, auto);
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px;
+}
+.sc4-row + .sc4-row { border-top: 2px solid var(--inner-highlight); padding-top: 8px; }
+.sc4-row-card { display: flex; align-items: center; }
+.sc4-row-card .lc-ladder { min-width: 0; padding: 4px; }
+.sc4-row-card .lc-rung { height: 9px; }
+.sc4-row-card .lc-rung-bar { width: 5px; }
+.sc4-row-card .lc-rung-seat { width: 11px; height: 11px; }
+.sc4-row-card .lc-avatar svg { width: 10px; height: 10px; }
+
+.sc4-row-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  letter-spacing: 0.04em;
+}
+.sc4-row-arrow {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+
+/* The clickable lever chip - one decision per rung. */
+.sc4-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+  transition: transform 100ms ease, filter 120ms ease;
+}
+.sc4-chip:hover { filter: brightness(1.08); }
+.sc4-chip:active { transform: translate(2px, 2px); box-shadow: inset -1px -1px 0 0 var(--inner-highlight); }
+.sc4-chip:focus-visible { outline: 3px solid var(--lever-demo); outline-offset: 2px; }
+/* Lever colour identity: a left bar + icon/name tinted by the lever token. */
+.sc4-chip { position: relative; }
+.sc4-chip::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+}
+.sc4-chip.lever-nurture::before   { background: var(--lever-nurture); }
+.sc4-chip.lever-demo::before      { background: var(--lever-demo); }
+.sc4-chip.lever-hardclose::before { background: var(--lever-hardclose); }
+.sc4-chip.lever-nurture   .sc4-chip-icon, .sc4-chip.lever-nurture   .sc4-chip-name { color: var(--lever-nurture); }
+.sc4-chip.lever-demo      .sc4-chip-icon, .sc4-chip.lever-demo      .sc4-chip-name { color: var(--lever-demo); }
+.sc4-chip.lever-hardclose .sc4-chip-icon, .sc4-chip.lever-hardclose .sc4-chip-name { color: var(--lever-hardclose); }
+.sc4-chip-icon { display: inline-flex; margin-left: 3px; }
+.sc4-chip-icon svg { width: 13px; height: 13px; }
+.sc4-chip-name { min-width: 6ch; letter-spacing: 0.04em; }
+.sc4-chip-cycle { margin-left: auto; color: var(--ink-secondary); font-size: 10px; }
+
+/* Cycle flash when a chip changes lever (or a preset repaints). */
+@keyframes sc4-chip-flip {
+  0%   { transform: scale(1); filter: brightness(1); }
+  40%  { transform: scale(1.08); filter: brightness(1.25); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.sc4-chip.sc4-chip-flip { animation: sc4-chip-flip 0.42s ease-out; }
+@media (prefers-reduced-motion: reduce) { .sc4-chip.sc4-chip-flip { animation: none; } }
+
+/* Read-out under the board: pi(rung) = the lever for the focused rung. */
+.sc4-readout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  min-height: 22px;
+}
+.sc4-readout-label { color: var(--ink-secondary); letter-spacing: 0.04em; }
+.sc4-readout-val { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-on-box); }
+.sc4-readout-rung { color: var(--ink-on-box); letter-spacing: 0.04em; }
+.sc4-readout-arrow { color: var(--ink-secondary); }
+
+/* A small inline lever chiplet (used in the read-out). */
+.sc4-chiplet {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 7px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.sc4-chiplet-icon { display: inline-flex; }
+.sc4-chiplet-icon svg { width: 11px; height: 11px; }
+.sc4-chiplet.lever-nurture   { color: var(--lever-nurture); }
+.sc4-chiplet.lever-demo      { color: var(--lever-demo); }
+.sc4-chiplet.lever-hardclose { color: var(--lever-hardclose); }
+
+/* ===== RIGHT: the control panel ===== */
+.sc4-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.sc4-tabs-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.sc4-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+.sc4-tab {
+  flex: 1 1 0;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  padding: 9px 11px;
+}
+.sc4-tab-name { font-size: 9px; letter-spacing: 0.03em; }
+.sc4-tab-sub { font-size: 7px; opacity: 0.78; text-transform: none; letter-spacing: 0.02em; }
+.sc4-tab.active {
+  background: var(--lever-demo);
+  color: #fff;
+  border-color: var(--lever-demo);
+}
+.sc4-tab.active .sc4-tab-sub { opacity: 0.92; }
+
+/* Blurb describing the active (or hand-edited) playbook. */
+.sc4-blurb {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sc4-blurb-name {
+  align-self: flex-start;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.sc4-blurb-name.lever-nurture   { color: var(--lever-nurture); }
+.sc4-blurb-name.lever-demo      { color: var(--lever-demo); }
+.sc4-blurb-name.lever-hardclose { color: var(--lever-hardclose); }
+.sc4-blurb-text {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+
+.sc4-complete-note {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.75;
+  color: var(--ink-secondary);
+  padding-left: 10px;
+  border-left: 3px solid var(--lever-hardclose);
+}
+
+/* The scene-2 callback card. */
+.sc4-callback {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 12px 14px;
+}
+.sc4-callback-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--lever-hardclose);
+  margin-bottom: 8px;
+}
+.sc4-callback-body {
+  margin: 0 0 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+.sc4-callback-body b { color: var(--lever-demo); }
+.sc4-callback-tease {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  font-style: italic;
+}
+
+.sc4-hint { margin-top: 12px; }
+
+/* JP font swap. */
+.lang-jp .sc4-board-title,
+.lang-jp .sc4-col-head,
+.lang-jp .sc4-row-name,
+.lang-jp .sc4-chip,
+.lang-jp .sc4-chiplet,
+.lang-jp .sc4-readout,
+.lang-jp .sc4-tabs-label,
+.lang-jp .sc4-tab,
+.lang-jp .sc4-blurb-name,
+.lang-jp .sc4-blurb-text,
+.lang-jp .sc4-complete-note,
+.lang-jp .sc4-callback-title,
+.lang-jp .sc4-callback-body,
+.lang-jp .sc4-callback-tease,
+.lang-jp .sc4-formula-foot {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+/* Responsive: stack the columns on narrow viewports. */
+@media (max-width: 900px) {
+  .sc4-body { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .sc4-row { grid-template-columns: auto 1fr; row-gap: 4px; }
+  .sc4-row-arrow { display: none; }
+}

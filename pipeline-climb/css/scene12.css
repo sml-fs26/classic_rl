@@ -1,0 +1,168 @@
+/* Scene 12 - Recap ("You have climbed the ladder").
+   Six concept cards from window.DATA.recap, echoing the title screen's
+   wordmark drop. All colour via shared theme tokens (--ink, --bg-strong,
+   --rule, --inner-highlight, --pikachu-cheek, --signed-green) and the
+   shared .concept-badge.badge-<hue>.earned hues; light + crt retint
+   automatically. */
+
+.sc12-scene {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+/* ---- banner + heading ---- */
+.sc12-banner {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--ink-secondary);
+  margin: 6px auto 14px;
+}
+
+.sc12-title {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 4px 0 10px;
+}
+/* letter-by-letter drop, echoing the title screen */
+.sc12-title-letter {
+  display: inline-block;
+  animation: sc12-letter-drop 360ms steps(4) backwards;
+  animation-delay: calc(var(--i) * 42ms + 80ms);
+}
+.sc12-title-space { display: inline-block; width: 0.4em; }
+@keyframes sc12-letter-drop {
+  0%   { opacity: 0; transform: translateY(-14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.sc12-sub {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  max-width: 70ch;
+  margin: 0 auto 20px;
+}
+
+/* ---- the six-card grid ---- */
+.sc12-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 920px) {
+  .sc12-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .sc12-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.sc12-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 16px;
+  animation: sc12-card-in 460ms ease-out backwards;
+  animation-delay: calc(var(--i) * 90ms + 220ms);
+}
+@keyframes sc12-card-in {
+  0%   { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.sc12-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sc12-card-badge {
+  font-size: 8px;
+  height: auto;
+  min-width: 34px;
+  padding: 5px 7px;
+  flex: 0 0 auto;
+}
+.sc12-card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--ink-on-box);
+}
+
+/* ---- symbol plate (KaTeX) ---- */
+.sc12-card-symbol {
+  padding: 10px 8px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  overflow-x: auto;
+  text-align: center;
+}
+.sc12-card-symbol .katex-display { margin: 0; }
+.sc12-card-symbol .katex { color: var(--ink-on-box); font-size: 0.96em; }
+
+/* ---- caption + anchor ---- */
+.sc12-card-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.85;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+}
+.sc12-card-anchor {
+  margin-top: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+  background: var(--bg);
+  border: 2px solid var(--inner-highlight);
+  padding: 5px 7px;
+  text-align: center;
+}
+
+/* ---- closing line ---- */
+.sc12-close {
+  margin: 18px auto 0;
+  padding: 14px 16px;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.9;
+  color: var(--ink-on-box);
+}
+
+.sc12-foot {
+  max-width: 74ch;
+  margin: 14px auto 0;
+  text-align: center;
+}
+
+/* ---- replay ---- */
+.sc12-replay-wrap { text-align: center; margin-top: 18px; }
+.sc12-replay { font-size: 10px; padding: 10px 18px; }
+.sc12-replay-mark { color: var(--signed-green); }
+
+/* JP gets the rounded gothic face for prose */
+.lang-jp .sc12-banner,
+.lang-jp .sc12-sub,
+.lang-jp .sc12-card-title,
+.lang-jp .sc12-card-caption,
+.lang-jp .sc12-card-anchor,
+.lang-jp .sc12-close,
+.lang-jp .sc12-foot,
+.lang-jp .sc12-replay {
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sc12-card,
+  .sc12-title-letter { animation: none; }
+}

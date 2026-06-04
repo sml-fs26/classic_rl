@@ -1,0 +1,309 @@
+/* scene2 -- PLAYTEST ("You run the deal").
+   The live interactive board: a large LadderCard + the STAGE DIE on the left
+   with a TOUCH / RETURN HUD; the dialog, the three lever buttons, and RESTART
+   on the right; a RETURN tape across the bottom. All colour is from the shared
+   tokens (--ink, --bg-strong, --rule, --lever-*, --warm-*, --signed-green,
+   --lost-grey) so both the light + crt themes retint. No JS-injected styles. */
+
+.scene2-scene { display: flex; flex-direction: column; gap: 12px; }
+
+.s2-section-title { font-size: 14px; margin: 0 0 4px; }
+
+/* ---- main row ---- */
+.s2-row {
+  display: flex;
+  gap: 26px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* ---- left: the board ---- */
+.s2-board {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s2-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.s2-touch {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--ink-on-box);
+  letter-spacing: 1px;
+  padding: 6px 10px;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  box-shadow: 2px 2px 0 var(--rule);
+}
+
+/* RETURN HUD: a running signed integer (no currency). */
+.s2-return {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.s2-return-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s2-return-amount {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.s2-return.s2-return-pos .s2-return-num { color: var(--signed-green); }
+.s2-return.s2-return-neg .s2-return-num { color: var(--lost-grey); }
+.s2-return-bump { animation: s2-return-bump 360ms ease-out; }
+@keyframes s2-return-bump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+.s2-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 8px 6px;
+}
+.s2-card { position: relative; }
+/* Big ladder for the playtest; widen the rung labels so they read. */
+.s2-card .lc-ladder { min-width: 230px; }
+.s2-card .lc-rung { height: 34px; }
+.s2-card .lc-rung-label { font-size: 9px; min-width: 11ch; }
+.s2-card .lc-rung-bar { width: 8px; }
+.s2-card .lc-rung-seat { width: 22px; height: 22px; }
+.s2-card .lc-avatar svg { width: 18px; height: 18px; }
+
+.s2-die { flex: 0 0 auto; }
+.s2-die .sd-token { width: 76px; height: 76px; }
+
+/* ---- right: dialog + lever menu + restart ---- */
+.s2-right {
+  flex: 1 1 360px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.s2-dialog { min-height: 92px; }
+.s2-prompt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+.s2-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* Lever button: soft tinted fill, tone-coloured border + icon + name, a
+   touch-cost chip on the right. Identity entirely from the lever tone token. */
+.s2-lever-btn {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "icon name cost";
+  gap: 3px 12px;
+  align-items: center;
+  text-align: left;
+  padding: 11px 14px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: 4px 4px 0 var(--rule);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.s2-lever-btn.lever-nurture   { background: var(--lever-nurture-soft);   border-color: var(--lever-nurture); }
+.s2-lever-btn.lever-demo      { background: var(--lever-demo-soft);      border-color: var(--lever-demo); }
+.s2-lever-btn.lever-hardclose { background: var(--lever-hardclose-soft); border-color: var(--lever-hardclose); }
+.s2-lever-btn:hover:not(:disabled) { filter: brightness(1.06); }
+.s2-lever-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--rule); }
+.s2-lever-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.s2-lever-icon { grid-area: icon; display: inline-flex; }
+.s2-lever-icon svg { width: 16px; height: 16px; }
+.s2-lever-btn.lever-nurture   .s2-lever-icon, .s2-lever-btn.lever-nurture   .s2-lever-name { color: var(--lever-nurture); }
+.s2-lever-btn.lever-demo      .s2-lever-icon, .s2-lever-btn.lever-demo      .s2-lever-name { color: var(--lever-demo); }
+.s2-lever-btn.lever-hardclose .s2-lever-icon, .s2-lever-btn.lever-hardclose .s2-lever-name { color: var(--lever-hardclose); }
+.s2-lever-name { grid-area: name; font-size: 11px; letter-spacing: 0.5px; }
+.s2-lever-cost {
+  grid-area: cost;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  padding: 3px 7px;
+  background: var(--bg);
+}
+
+.s2-ctrl.poke-menu-row::before { content: none; }
+
+/* ---- end-of-run summary (overlays the right column) ---- */
+.s2-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 18px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: 5px 5px 0 var(--rule);
+}
+.s2-summary-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--ink-on-box);
+}
+.s2-summary-return {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  gap: 3px;
+}
+.s2-summary-return-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s2-summary-return-amount {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 26px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.s2-summary-return.is-good .s2-summary-return-amount { color: var(--signed-green); }
+.s2-summary-return.is-bad  .s2-summary-return-amount { color: var(--lost-grey); }
+.s2-summary-line {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  max-width: 42ch;
+}
+.s2-summary-line.is-good { color: var(--signed-green); }
+.s2-summary-line.is-bad  { color: var(--lost-grey); }
+.s2-summary .s2-again { align-self: flex-start; }
+.s2-summary-hint { margin: 0; max-width: 42ch; }
+
+/* ---- the RETURN tape ---- */
+.s2-tape-wrap { display: flex; flex-direction: column; gap: 6px; }
+.s2-tape-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s2-tape {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-height: 58px;
+  overflow-x: auto;
+  padding: 4px 2px 6px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s2-tape-step {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 60px;
+  padding: 6px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+/* colour each played step by the lever pulled */
+.s2-tape-step[data-lever="nurture"]   { box-shadow: inset 0 0 0 2px var(--lever-nurture); }
+.s2-tape-step[data-lever="demo"]      { box-shadow: inset 0 0 0 2px var(--lever-demo); }
+.s2-tape-step[data-lever="hardclose"] { box-shadow: inset 0 0 0 2px var(--lever-hardclose); }
+.s2-tape-move {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s2-tape-reward {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.s2-tape-step.s2-tape-terminal.s2-win  { border-color: var(--signed-green); box-shadow: none; }
+.s2-tape-step.s2-tape-terminal.s2-win  .s2-tape-move,
+.s2-tape-step.s2-tape-terminal.s2-win  .s2-tape-reward { color: var(--signed-green); }
+.s2-tape-step.s2-tape-terminal.s2-loss { border-color: var(--lost-grey); box-shadow: none; }
+.s2-tape-step.s2-tape-terminal.s2-loss .s2-tape-move,
+.s2-tape-step.s2-tape-terminal.s2-loss .s2-tape-reward { color: var(--lost-grey); }
+.s2-tape-total {
+  flex: 0 0 auto;
+  align-self: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--signed-green);
+  border: 2px solid var(--signed-green);
+  background: var(--bg);
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+.s2-tape-step.s2-tape-ph {
+  box-shadow: none;
+  border-style: dashed;
+  color: var(--ink-secondary);
+  font-size: 8px;
+  justify-content: center;
+  min-width: 170px;
+}
+
+.s2-caption { margin-top: 0; }
+
+/* Japanese bitmap font where Press Start 2P lacks glyphs. */
+.lang-jp .s2-touch,
+.lang-jp .s2-return-label,
+.lang-jp .s2-prompt,
+.lang-jp .s2-lever-name,
+.lang-jp .s2-lever-cost,
+.lang-jp .s2-summary-title,
+.lang-jp .s2-summary-return-label,
+.lang-jp .s2-summary-line,
+.lang-jp .s2-tape-label,
+.lang-jp .s2-tape-move,
+.lang-jp .s2-tape-step.s2-tape-ph { font-family: 'DotGothic16', 'Press Start 2P', monospace; }
+
+/* ---- Mobile ---- */
+@media (max-width: 720px) {
+  .s2-row { gap: 18px; }
+  .s2-board { width: 100%; }
+  .s2-stage { gap: 18px; justify-content: center; }
+  .s2-card .lc-ladder { min-width: 200px; }
+  .s2-right { flex-basis: 100%; min-width: 0; }
+}

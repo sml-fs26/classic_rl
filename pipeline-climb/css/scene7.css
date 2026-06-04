@@ -1,0 +1,138 @@
+/* ============================================================
+   Scene 7 - Q*, the lever scorecard.
+   The shared concept-scene chrome (.concept-heading / .concept-formula-*)
+   lives in css/style.css; this file adds only the scene-7 reveal: a
+   LadderCard icon beside the 5x3 QTable, revealed rung by rung so the
+   argmax star is seen to walk up the ladder.
+   All colour comes from CSS tokens; no inline categorical colours.
+   ============================================================ */
+
+/* Body copy (pipeline-climb has no shared concept-lede class). */
+.pc-qstar-scene .pc-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.9;
+  color: var(--ink);
+  max-width: 92ch;
+  margin: 0 0 14px;
+}
+.pc-qstar-scene .pc-lede b { color: var(--lever-demo); }
+.pc-qstar-scene .pc-lede i { font-style: italic; }
+
+/* ---- Reveal panel: ladder icon | scorecard ---- */
+.pc-qstar-scene .pc-qstar-panel {
+  display: flex;
+  align-items: stretch;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin: 4px 0 0;
+}
+
+.pc-qstar-scene .pc-qstar-icon-col {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: 4px 4px 0 var(--rule);
+}
+.pc-qstar-scene .pc-qstar-icon-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.pc-qstar-scene .pc-qstar-icon-host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pc-qstar-scene .pc-qstar-icon-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  text-align: center;
+  max-width: 22ch;
+}
+.pc-qstar-scene .pc-qstar-icon-caption b { color: var(--pikachu-cheek); }
+
+.pc-qstar-scene .pc-qstar-table-col {
+  flex: 1 1 360px;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pc-qstar-scene .pc-qstar-table-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.pc-qstar-scene .pc-qstar-q { min-width: 0; overflow-x: auto; }
+
+/* ---- Reveal states layered on the shared QTable cells ---- */
+.pc-qstar-scene .q-cell.pc-pending,
+.pc-qstar-scene .q-row-head.pc-pending { opacity: 0.3; }
+.pc-qstar-scene .q-cell.pc-just-filled {
+  animation: pc-qstar-fill-in 720ms ease-out 1;
+}
+@keyframes pc-qstar-fill-in {
+  0%   { box-shadow: inset 0 0 0 200px var(--inner-highlight); }
+  100% { box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pc-qstar-scene .q-cell.pc-just-filled { animation: none; }
+}
+
+/* ---- Read-out under the panel ---- */
+.pc-qstar-scene .pc-qstar-read {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  max-width: 88ch;
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--lever-demo);
+  background: var(--bg-strong);
+}
+.pc-qstar-scene .pc-qstar-read b { color: var(--ink); }
+.pc-qstar-scene .pc-qstar-read i { font-style: italic; color: var(--ink); }
+
+/* ---- Step hint + FILL ALL button ---- */
+.pc-qstar-scene .pc-qstar-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin: 12px 0 0;
+}
+.pc-qstar-scene .pc-qstar-fill { font-size: 8px; }
+
+/* ---- The "star walks up" punchline ---- */
+.pc-qstar-scene .pc-qstar-note {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 10px;
+  margin: 14px 0 0;
+}
+.pc-qstar-scene .pc-qstar-note b { color: var(--ink); }
+
+@media (max-width: 720px) {
+  .pc-qstar-scene .pc-qstar-panel { gap: 14px; }
+  .pc-qstar-scene .pc-qstar-icon-caption { max-width: none; }
+}
