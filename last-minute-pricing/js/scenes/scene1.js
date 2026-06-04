@@ -60,8 +60,8 @@
     skipBtn.title = T('scene1.skip_title');
     topbar.appendChild(skipBtn);
     skipBtn.addEventListener('click', () => {
-      if (window.PriceViz) window.PriceViz.goTo(1);   /* -> the playtest */
-      else window.location.hash = '#scene=1';
+      if (window.PriceViz) window.PriceViz.goTo(2);   /* -> the playtest */
+      else window.location.hash = '#scene=2';
     });
 
     /* ---------- Section title ---------- */

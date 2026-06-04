@@ -1,13 +1,9 @@
 /* Click-step scene engine for Last-Minute Pricing.
  *
- *   12 scenes, 0-indexed, the canonical RL arc (the title scene was retired,
- *   so the run opens straight on the tutorial):
- *     0 tutorial · 1 playtest · 2 formalization (MDP) · 3 policy ·
- *     4 trajectory · 5 return G_t · 6 Q* · 7 Bellman · 8 DP ·
- *     9 why-DP-fails · 10 SARSA · 11 recap.
- *
- *   The array index drives the pager/hash; the per-scene `key` (sceneN) is
- *   decoupled from it, so the scene*files* keep their historical names.
+ *   13 scenes, 0-indexed (scene0..scene12), the canonical RL arc:
+ *     0 title · 1 tutorial · 2 playtest · 3 formalization (MDP) ·
+ *     4 policy · 5 trajectory · 6 return G_t · 7 Q* · 8 Bellman ·
+ *     9 DP · 10 why-DP-fails · 11 SARSA · 12 recap.
  *
  *   Each scene file at js/scenes/sceneN.js registers
  *     window.scenes.sceneN = function(root){ return { onEnter?, onLeave?, onNextKey?, onPrevKey? }; };
@@ -26,6 +22,7 @@
   /* titleKey is looked up live on each render via I18N; `title` is a
      fallback for builds without i18n. `music` is the soundtrack mood. */
   const SCENES = [
+    { key: 'scene0',  titleKey: 'scene0.title',  title: 'Last-Minute Pricing',           music: 'title'    },
     { key: 'scene1',  titleKey: 'scene1.title',  title: 'How to read the shelf',         music: 'tutorial' },
     { key: 'scene2',  titleKey: 'scene2.title',  title: 'You run the shelf',             music: 'battle'   },
     { key: 'scene3',  titleKey: 'scene3.title',  title: 'What makes this an MDP?',        music: 'concept'  },
