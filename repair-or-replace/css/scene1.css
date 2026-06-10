@@ -1,0 +1,302 @@
+/* Scene 1: Tutorial, "How it works".
+   A step-driven printed fleet sheet: OLD BESSIE + the wear strip on top,
+   the three call cards (RUN / SERVICE / REPLACE) below, dialog + nav.
+   Reuses the foundation tokens (--ink, --bg-strong, --rule, --lever-*,
+   --wear-*, --profit-green); no inline categorical colours. */
+
+.scene1-scene { max-width: 1020px; margin: 0 auto; }
+
+/* ---- top bar: step counter + SKIP ---- */
+.tut-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.tut-counter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+}
+.tut-skip { font-size: 8px; padding: 6px 10px; }
+
+.tut-title { font-size: 13px; margin: 0 0 10px; }
+
+/* ---- demo area ---- */
+.tut-demo { margin-bottom: 12px; }
+
+/* top row: van + wear strip */
+.tut-top {
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.tut-van { display: flex; flex-direction: column; align-items: center; }
+
+.tut-strip-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+.tut-strip-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+}
+.tut-strip { display: flex; align-items: stretch; gap: 7px; }
+.tut-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 7px 9px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+}
+.tut-wn { font-family: 'Press Start 2P', monospace; font-size: 7px; }
+.tut-wn-0 { color: var(--wear-0); }
+.tut-wn-1 { color: var(--wear-1); }
+.tut-wn-2 { color: var(--wear-2); }
+.tut-wn-3 { color: var(--wear-3); }
+.tut-arrow {
+  align-self: center;
+  color: var(--ink-secondary);
+  font-size: 11px;
+}
+.tut-drift {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+}
+.tut-chip-q {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--pikachu-cheek);
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 2px 6px;
+  margin-top: 2px;
+}
+.tut-ask {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  border: 2px solid var(--pikachu-cheek);
+  background: var(--bg-strong);
+  padding: 5px 9px;
+}
+
+/* ---- the three call cards ---- */
+.tut-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.tut-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-height: 238px;
+  padding: 12px 12px 12px 18px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.tut-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+}
+.tut-card.lever-run::before     { background: var(--lever-run); }
+.tut-card.lever-service::before { background: var(--lever-service); }
+.tut-card.lever-replace::before { background: var(--lever-replace); }
+
+.tut-card-head { display: flex; align-items: center; gap: 8px; }
+.tut-card-icon { display: inline-flex; }
+.tut-card-icon svg { width: 14px; height: 14px; }
+.tut-card-name { font-size: 11px; letter-spacing: 0.04em; }
+.tut-card.lever-run .tut-card-icon,
+.tut-card.lever-run .tut-card-name     { color: var(--lever-run); }
+.tut-card.lever-service .tut-card-icon,
+.tut-card.lever-service .tut-card-name { color: var(--lever-service); }
+.tut-card.lever-replace .tut-card-icon,
+.tut-card.lever-replace .tut-card-name { color: var(--lever-replace); }
+.tut-card-gloss {
+  margin-left: auto;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  text-align: right;
+  line-height: 1.5;
+}
+
+/* RUN card: the per-state mini table */
+.tut-rgrid {
+  display: grid;
+  grid-template-columns: 58px repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  align-items: stretch;
+}
+.tut-rlab {
+  font-size: 6.5px;
+  color: var(--ink-secondary);
+  display: flex;
+  align-items: center;
+  line-height: 1.4;
+}
+.tut-rstate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 2px;
+  border: 2px solid var(--inner-highlight);
+  background: var(--bg);
+}
+.tut-rsname { font-size: 6px; }
+.tut-sw {
+  width: 16px;
+  height: 8px;
+  border: 1px solid var(--rule);
+  display: inline-block;
+}
+.tut-sw-0 { background: var(--wear-0); }
+.tut-sw-1 { background: var(--wear-1); }
+.tut-sw-2 { background: var(--wear-2); }
+.tut-sw-3 { background: var(--wear-3); }
+.tut-rcell {
+  font-size: 10px;
+  text-align: center;
+  padding: 6px 2px;
+  border: 2px solid var(--inner-highlight);
+  background: var(--bg);
+  font-variant-numeric: tabular-nums;
+}
+.tut-profit { color: var(--profit-green); }
+.tut-risk   { color: var(--ink-on-box); }
+
+/* the WORN -> SHAKY double cliff */
+.tut-cliff { background: var(--lever-replace-soft); }
+.tut-cliffchip {
+  grid-column: 3 / 5;
+  border: 3px solid var(--lever-replace);
+  background: var(--bg);
+  padding: 5px 4px;
+  text-align: center;
+  font-size: 7px;
+  color: var(--lever-replace);
+  line-height: 1.6;
+}
+.tut-cliffchip small {
+  display: block;
+  font-size: 6.5px;
+  color: var(--ink-on-box);
+}
+
+.tut-card-foot {
+  margin-top: auto;
+  font-size: 7.5px;
+  color: var(--ink-secondary);
+  line-height: 1.7;
+}
+.tut-foot-warn { color: var(--lever-replace); }
+
+/* SERVICE / REPLACE shared bits */
+.tut-cost-row { display: flex; align-items: baseline; gap: 8px; }
+.tut-cost { font-size: 14px; }
+.tut-card.lever-service .tut-cost { color: var(--lever-service); }
+.tut-card.lever-replace .tut-cost { color: var(--lever-replace); }
+.tut-cost-sub { font-size: 7.5px; color: var(--ink-secondary); }
+
+.tut-sgrid {
+  display: grid;
+  grid-template-columns: 18px 58px minmax(0, 1fr);
+  gap: 7px 8px;
+  align-items: center;
+}
+.tut-srow-name { font-size: 7px; }
+.tut-srow-txt { font-size: 7.5px; color: var(--ink-on-box); line-height: 1.5; }
+
+.tut-rep-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 0 2px;
+}
+.tut-rep-arrow { font-size: 13px; color: var(--ink-secondary); }
+.tut-rep-line {
+  font-size: 7.5px;
+  color: var(--ink-on-box);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* locked slot */
+.tut-locked {
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--bg);
+  opacity: 0.6;
+  padding-left: 12px;
+}
+.tut-locked::before { background: var(--ink-secondary); }
+.tut-locked-q { font-size: 30px; color: var(--ink-secondary); }
+.tut-locked-lab { font-size: 8px; color: var(--ink-secondary); letter-spacing: 0.06em; }
+
+/* forward-step pop-in (suppressed on rewind / &run / reduced motion) */
+.tut-pop { animation: tut-pop-in 320ms steps(4) backwards; }
+@keyframes tut-pop-in {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- dialog + nav ---- */
+.tut-dialog { margin-bottom: 10px; }
+.tut-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.tut-hint {
+  flex: 1 1 auto;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+}
+.tut-prev, .tut-next { font-size: 9px; padding: 8px 14px; }
+
+/* the shared .poke-btn hover references a token this viz does not
+   define; give scene-1 buttons a working hover */
+.scene1-scene .poke-btn:hover:not(:disabled) {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .tut-pop { animation: none; }
+}
+
+/* ---- mobile ---- */
+@media (max-width: 720px) {
+  .tut-top { gap: 14px; }
+  .tut-cards { grid-template-columns: minmax(0, 1fr); }
+  .tut-card { min-height: 0; }
+  .tut-strip { flex-wrap: wrap; justify-content: center; }
+}

@@ -1,0 +1,172 @@
+/* Scene 0: REPAIR OR REPLACE title screen.
+   A composed, centered poster: stacked wordmark, the lg VanCard hero,
+   the three-call teaser row, one poke-box tagline, PRESS START.
+   All colour via theme tokens (light paper / crt amber retint free). */
+
+.scene0-scene { overflow: hidden; }
+
+.sc0-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 10px 8px 26px;
+}
+
+/* ---- wordmark: two stacked lines, per-letter spans ---- */
+.sc0-title {
+  font-size: 40px;
+  line-height: 1.35;
+  letter-spacing: 6px;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.sc0-line { display: block; white-space: nowrap; }
+.sc0-letter { display: inline-block; }
+.sc0-sp { display: inline-block; width: 0.5em; }
+.sc0-first .sc0-letter {
+  animation: sc0-letter-drop 480ms cubic-bezier(.34, 1.56, .64, 1) backwards;
+  animation-delay: calc(var(--i) * 55ms + 120ms);
+}
+@keyframes sc0-letter-drop {
+  0%   { transform: translateY(-64px) rotate(-8deg); opacity: 0; }
+  60%  { transform: translateY(5px)   rotate(2deg);  opacity: 1; }
+  100% { transform: translateY(0)     rotate(0);     opacity: 1; }
+}
+
+.sc0-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-secondary);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+/* ---- hero stage: the van + the three-call teaser ---- */
+.sc0-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 2px 0 4px;
+}
+.sc0-van-host { filter: drop-shadow(4px 4px 0 var(--rule)); }
+
+.sc0-levers {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.sc0-lever {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+.sc0-lever-ic { display: inline-flex; }
+.sc0-lever-ic svg { width: 13px; height: 13px; }
+.sc0-lever.lever-run .sc0-lever-ic,
+.sc0-lever.lever-run .sc0-lever-name { color: var(--lever-run); }
+.sc0-lever.lever-service .sc0-lever-ic,
+.sc0-lever.lever-service .sc0-lever-name { color: var(--lever-service); }
+.sc0-lever.lever-replace .sc0-lever-ic,
+.sc0-lever.lever-replace .sc0-lever-name { color: var(--lever-replace); }
+
+/* ---- tagline ---- */
+.sc0-tagline {
+  font-size: 10px;
+  line-height: 1.9;
+  max-width: 52ch;
+  margin-top: 4px;
+}
+
+/* ---- PRESS START ---- */
+.sc0-start {
+  font-size: 12px;
+  padding: 12px 22px;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    4px 4px 0 var(--rule);
+  animation: sc0-blink 1.0s steps(2, end) infinite;
+}
+.sc0-start:hover:not(:disabled) {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+  animation: none;
+}
+.sc0-chevron {
+  display: inline-block;
+  color: var(--pikachu-cheek);
+  animation: sc0-chevron 0.7s ease-in-out infinite;
+}
+@keyframes sc0-chevron {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
+}
+@keyframes sc0-blink {
+  0%, 60%   { opacity: 1; }
+  61%, 100% { opacity: 0.5; }
+}
+
+.sc0-credits {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+  letter-spacing: 1px;
+  margin-top: 14px;
+}
+.sc0-credits.sc0-credits-by { margin-top: 2px; color: var(--pikachu-cheek); }
+
+/* ---- first-visit staged fade for everything after the wordmark ---- */
+.sc0-first .sc0-subtitle { animation: sc0-fade 380ms ease-out 800ms backwards; }
+.sc0-first .sc0-stage    { animation: sc0-fade 460ms ease-out 1000ms backwards; }
+.sc0-first .sc0-tagline  { animation: sc0-fade 380ms ease-out 1250ms backwards; }
+.sc0-first .sc0-start    { animation: sc0-fade 380ms ease-out 1450ms backwards, sc0-blink 1.0s steps(2, end) 1850ms infinite; }
+.sc0-first .sc0-credits  { animation: sc0-fade 380ms ease-out 1600ms backwards; }
+@keyframes sc0-fade {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- the START dissolve ---- */
+.sc0-dissolving {
+  opacity: 0;
+  transform: scale(0.96);
+  filter: blur(2px);
+  transition: opacity 300ms ease-in, transform 300ms ease-in, filter 300ms ease-in;
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .sc0-first .sc0-letter,
+  .sc0-first .sc0-subtitle,
+  .sc0-first .sc0-stage,
+  .sc0-first .sc0-tagline,
+  .sc0-first .sc0-start,
+  .sc0-first .sc0-credits,
+  .sc0-start,
+  .sc0-chevron { animation: none; }
+  .sc0-dissolving { transition: none; }
+}
+
+/* ---- mobile ---- */
+@media (max-width: 720px) {
+  .sc0-title { font-size: 26px; letter-spacing: 3px; }
+  .sc0-levers { gap: 6px; }
+}

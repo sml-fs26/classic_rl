@@ -1,0 +1,248 @@
+/* Scene 12: Recap ("You ran the fleet").
+   Six concept cards from window.DATA.recap, face-down in a 3x2 grid,
+   flipped one per NEXT press. Chrome colour via shared theme tokens;
+   the six hue accents reuse the concept-badge palette hexes from
+   style.css (.concept-badge.badge-* rules) so pips and cards agree. */
+
+.scene12-scene {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding-bottom: 36px;
+}
+
+/* ---- the six concept hues (badge palette, theme-independent) ---- */
+.recap-hue-mdp    { --hue: #D55E00; }
+.recap-hue-policy { --hue: #6A3D9A; }
+.recap-hue-return { --hue: #0072B2; }
+.recap-hue-qstar  { --hue: #B8860B; }
+.recap-hue-dp     { --hue: #009E73; }
+.recap-hue-sarsa  { --hue: #CC79A7; }
+
+/* ---- banner + heading ---- */
+.sc12-banner {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--ink-secondary);
+  margin: 4px auto 12px;
+}
+.sc12-title {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 2px 0 8px;
+}
+.sc12-title-letter {
+  display: inline-block;
+  animation: sc12-letter-drop 360ms steps(4) backwards;
+  animation-delay: calc(var(--i) * 42ms + 80ms);
+}
+.sc12-title-space { display: inline-block; width: 0.4em; }
+.sc12-title.sc12-noanim .sc12-title-letter { animation: none; }
+@keyframes sc12-letter-drop {
+  0%   { opacity: 0; transform: translateY(-14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.sc12-sub {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  max-width: 70ch;
+  margin: 0 auto 12px;
+}
+
+/* ---- flip counter + hint ---- */
+.sc12-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto 14px;
+  font-family: 'Press Start 2P', monospace;
+}
+.sc12-count {
+  font-size: 9px;
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  padding: 4px 8px;
+}
+.sc12-hint-txt { font-size: 8px; color: var(--ink-secondary); }
+
+/* ---- the card grid ---- */
+.sc12-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 920px) {
+  .sc12-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .sc12-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.sc12-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 252px;
+  padding: 18px 14px 16px;
+}
+/* hue strip across the top of every card */
+.sc12-card::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 6px;
+  background: var(--hue);
+}
+.sc12-card:not(.revealed)::after { opacity: 0.3; }
+
+/* face-down side */
+.sc12-card:not(.revealed) { background: var(--bg); }
+.sc12-back {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.sc12-back-q {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 38px;
+  color: var(--ink-secondary);
+  opacity: 0.7;
+}
+.sc12-back-lab {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: var(--ink-secondary);
+}
+.sc12-card.revealed .sc12-back { display: none; }
+
+/* face-up side */
+.sc12-face {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 1 auto;
+  transform-origin: 50% 0;
+}
+.sc12-card.revealed .sc12-face { display: flex; }
+.sc12-card.sc12-just .sc12-face { animation: sc12-flip-in 340ms steps(4) backwards; }
+.sc12-grid.sc12-noanim .sc12-face { animation: none; }
+@keyframes sc12-flip-in {
+  0%   { opacity: 0; transform: scaleY(0.2); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+.sc12-card-head { display: flex; align-items: center; gap: 10px; }
+.sc12-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  padding: 5px 7px;
+  border: 2px solid var(--rule);
+  background: var(--hue);
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  flex: 0 0 auto;
+}
+.sc12-card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--ink-on-box);
+}
+
+.sc12-card-symbol {
+  padding: 10px 8px;
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  overflow-x: auto;
+  text-align: center;
+}
+.sc12-card-symbol .katex-display { margin: 0; }
+.sc12-card-symbol .katex { color: var(--ink-on-box); font-size: 0.92em; }
+
+.sc12-card-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.85;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+}
+.sc12-card-anchor {
+  margin-top: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-on-box);
+  background: var(--bg);
+  border: 2px solid var(--inner-highlight);
+  padding: 5px 7px;
+  text-align: center;
+}
+
+/* ---- FLIP control ---- */
+.sc12-ctrl {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+.sc12-flip { font-size: 10px; padding: 10px 18px; }
+.sc12-flip.sc12-hidden { display: none; }
+
+/* ---- sign-off + replay (after the sixth flip) ---- */
+.sc12-signoff {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.sc12-signoff.sc12-shown { display: flex; }
+.sc12-signoff-box {
+  max-width: 52ch;
+  font-size: 10px;
+  line-height: 1.9;
+}
+.sc12-replay-wrap {
+  display: none;
+  text-align: center;
+  margin-top: 16px;
+}
+.sc12-replay-wrap.sc12-shown { display: block; }
+.sc12-replay { font-size: 10px; padding: 10px 18px; }
+.sc12-replay-mark { color: var(--profit-green); }
+
+.sc12-foot {
+  max-width: 74ch;
+  margin: 16px auto 0;
+  text-align: center;
+}
+
+/* the shared .poke-btn hover references a token this viz does not
+   define; give scene-12 buttons a working hover */
+.scene12-scene .poke-btn:hover:not(:disabled) {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .sc12-title-letter,
+  .sc12-card.sc12-just .sc12-face { animation: none; }
+}
