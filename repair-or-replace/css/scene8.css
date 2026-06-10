@@ -1,0 +1,288 @@
+/* ============================================================
+   Scene 8, "The Bellman equation".
+   The identity card on top; then the picked cell (WORN, SERVICE)
+   highlighted on a shrunken QTable beside the one-week branch fan;
+   then the substitution line built from source-coloured chips
+   (cost / gamma / prob / V) and the evaluation ledger that lands
+   back on the table's own 226.1; finally the 12-unknowns catch.
+   Shared chrome lives in css/style.css + css/qtable.css.
+   All colour comes from CSS tokens.
+   ============================================================ */
+
+/* ---- Panel: picked cell | branch fan ---- */
+.scene8-scene .s8-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 2px 0 14px;
+}
+.scene8-scene .s8-col-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  margin-bottom: 8px;
+}
+.scene8-scene .s8-col-label b { color: var(--ink); font-size: 9px; }
+
+.scene8-scene .s8-table-col { flex: 0 1 auto; min-width: 0; }
+
+/* shrink the shared QTable a notch: scene 8 only reads one cell */
+.scene8-scene .qtable-host .q-col-heads,
+.scene8-scene .qtable-host .q-grid {
+  grid-template-columns: 10ch repeat(var(--na), 9ch);
+}
+.scene8-scene .qtable-host .q-cell,
+.scene8-scene .qtable-host .q-row-head { min-height: 32px; }
+.scene8-scene .qtable-host .q-cell { font-size: 9px; }
+.scene8-scene .s8-q { overflow-x: auto; }
+
+/* the picked cell + dimming of everything else */
+.scene8-scene .s8-q .q-cell.s8-pick {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: 1px;
+  position: relative;
+  z-index: 2;
+}
+.scene8-scene .s8-q.s8-dimcells .q-cell:not(.s8-pick) { opacity: 0.38; }
+.scene8-scene .s8-q.s8-dimcells .q-row-head.s8-dim { opacity: 0.38; }
+
+/* ---- The branch fan ---- */
+.scene8-scene .s8-tree-col { flex: 1 1 360px; min-width: 300px; }
+.scene8-scene .s8-tree {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 14px 14px;
+  font-family: 'Press Start 2P', monospace;
+}
+.scene8-scene .s8-st {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 5px 7px;
+  font-size: 8px;
+  color: var(--ink-on-box);
+}
+.scene8-scene .s8-st.w0 { border-color: var(--wear-0); }
+.scene8-scene .s8-st.w1 { border-color: var(--wear-1); }
+.scene8-scene .s8-st-gauge { display: inline-flex; line-height: 0; }
+
+.scene8-scene .s8-edge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.scene8-scene .s8-edge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 2px solid var(--lever-service);
+  background: var(--lever-service-soft);
+  color: var(--lever-service);
+  padding: 5px 7px;
+  font-size: 8px;
+}
+.scene8-scene .s8-edge-chip span { color: var(--ink-on-box); }
+.scene8-scene .s8-edge-arrow,
+.scene8-scene .s8-branch-arrow { font-size: 11px; color: var(--ink); }
+
+.scene8-scene .s8-branches {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.scene8-scene .s8-branch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.scene8-scene .s8-prob {
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 4px 6px;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.scene8-scene .s8-prob.w0 { border-color: var(--wear-0); }
+.scene8-scene .s8-prob.w1 { border-color: var(--wear-1); }
+.scene8-scene .s8-branch-note {
+  font-size: 7px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 26ch;
+}
+.scene8-scene .s8-tree-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  margin: 8px 2px 0;
+}
+
+/* ---- Substitution + evaluation card ---- */
+.scene8-scene .s8-math {
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  padding: 12px 14px;
+  margin: 0 0 14px;
+}
+.scene8-scene .s8-math-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  margin-bottom: 10px;
+}
+.scene8-scene .s8-eq {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+}
+.scene8-scene .s8-eq-lhs { font-size: 9px; margin-right: 2px; }
+.scene8-scene .s8-op { color: var(--ink-secondary); }
+.scene8-scene .s8-chip {
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 4px 7px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.scene8-scene .s8-chip.cost { border-color: var(--lever-service); background: var(--lever-service-soft); }
+.scene8-scene .s8-chip.gam  { border-color: var(--pikachu-yellow); box-shadow: 2px 2px 0 var(--rule); }
+.scene8-scene .s8-chip.w0   { border-color: var(--wear-0); }
+.scene8-scene .s8-chip.w1   { border-color: var(--wear-1); }
+.scene8-scene .s8-chip.pr   { border-style: dashed; font-size: 9px; }
+
+.scene8-scene .s8-eq-legend {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  margin: 10px 0 0;
+  max-width: 88ch;
+}
+.scene8-scene .s8-eq-legend b { color: var(--ink-on-box); }
+
+/* the evaluation ledger */
+.scene8-scene .s8-eval {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border-top: 2px solid var(--rule);
+  margin-top: 12px;
+  padding-top: 12px;
+}
+.scene8-scene .s8-eval-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: 'Press Start 2P', monospace;
+  animation: s8-rise 240ms ease-out both;
+}
+.scene8-scene .s8-eval-line:nth-child(2) { animation-delay: 120ms; }
+.scene8-scene .s8-eval-line:nth-child(3) { animation-delay: 240ms; }
+.scene8-scene .s8-eval-line:nth-child(4) { animation-delay: 360ms; }
+.scene8-scene .s8-eval-line:nth-child(5) { animation-delay: 480ms; }
+.scene8-scene .s8-verdict { animation: s8-rise 240ms ease-out 640ms both; }
+@keyframes s8-rise {
+  0%   { opacity: 0; transform: translateY(3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene8-scene .s8-eval-line, .scene8-scene .s8-verdict { animation: none; }
+}
+.scene8-scene.s8-instant .s8-eval-line,
+.scene8-scene.s8-instant .s8-verdict { animation: none; }
+
+.scene8-scene .s8-expr {
+  font-size: 9px;
+  color: var(--ink-secondary);
+  min-width: 18ch;
+  font-variant-numeric: tabular-nums;
+}
+.scene8-scene .s8-val {
+  font-size: 11px;
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.scene8-scene .s8-note { font-size: 7px; color: var(--ink-secondary); }
+
+.scene8-scene .s8-verdict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+  margin-top: 4px;
+}
+.scene8-scene .s8-verdict b { color: var(--profit-green); font-size: 11px; }
+.scene8-scene .s8-check {
+  font-size: 15px;
+  color: var(--profit-green);
+}
+.scene8-scene .s8-consistency {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  margin: 10px 0 0;
+  max-width: 88ch;
+}
+.scene8-scene .s8-consistency b { color: var(--ink-on-box); }
+
+/* ---- The catch ---- */
+.scene8-scene .s8-catch {
+  font-size: 9px;
+  line-height: 1.9;
+  max-width: 980px;
+  margin: 0 0 4px;
+}
+.scene8-scene .s8-catch b { color: var(--pikachu-cheek); }
+.scene8-scene .s8-catch .s8-iterate { color: var(--charmander-orange); }
+
+/* ---- Step hint + RUN THE CHECK ---- */
+.scene8-scene .s8-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-top: 12px;
+}
+.scene8-scene .s8-run { font-size: 8px; padding: 6px 10px; }
+
+@media (max-width: 720px) {
+  .scene8-scene .s8-panel { gap: 14px; }
+  .scene8-scene .s8-expr { min-width: 0; }
+}
+
+/* Utility hide, last so the doubled class beats every display-setting
+   rule above regardless of source order. */
+.scene8-scene .s8-hidden.s8-hidden { display: none; }

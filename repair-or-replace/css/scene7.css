@@ -1,0 +1,184 @@
+/* ============================================================
+   Scene 7, "Q*: the action scorecard".
+   A md VanCard beside the shared 4x3 QTable, revealed row by row
+   (HEALTHY down to FAILING) so the star is seen to slide from RUN
+   to SERVICE to a wide REPLACE block; step 5 paints the vertical
+   band strip beside the table. Shared chrome (concept-heading /
+   concept-formula-* / qtable q-*) lives in css/style.css and
+   css/qtable.css. All colour comes from CSS tokens.
+   ============================================================ */
+
+/* ---- Panel: van icon | scorecard + bands ---- */
+.scene7-scene .s7-panel {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 4px 0 0;
+}
+
+.scene7-scene .s7-icon-col {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: 4px 4px 0 var(--rule);
+  max-width: 250px;
+}
+.scene7-scene .s7-icon-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.scene7-scene .s7-icon-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-on-box);
+  text-align: center;
+  max-width: 24ch;
+}
+.scene7-scene .s7-icon-caption b { color: var(--pikachu-cheek); }
+
+/* the SHAKY callout (step 3): scrap her anyway */
+.scene7-scene .s7-callout {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  text-align: center;
+  border: 3px solid var(--lever-replace);
+  background: var(--lever-replace-soft);
+  color: var(--ink-on-box);
+  padding: 7px 9px;
+}
+.scene7-scene .s7-callout b { color: var(--lever-replace); font-size: 10px; }
+
+.scene7-scene .s7-table-col {
+  flex: 1 1 380px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.scene7-scene .s7-table-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
+.scene7-scene .s7-table-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.scene7-scene .s7-q { min-width: 0; overflow-x: auto; }
+
+/* ---- Reveal states layered on the shared QTable cells ---- */
+.scene7-scene .q-cell.s7-pending,
+.scene7-scene .q-row-head.s7-pending { opacity: 0.3; }
+.scene7-scene .q-cell.s7-just-filled {
+  animation: s7-fill-in 760ms ease-out 1;
+}
+@keyframes s7-fill-in {
+  0%   { box-shadow: inset 0 0 0 200px var(--inner-highlight); }
+  100% { box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene7-scene .q-cell.s7-just-filled { animation: none; }
+}
+.scene7-scene.s7-instant .q-cell.s7-just-filled { animation: none; }
+
+/* ---- The vertical band strip (step 5) ---- */
+.scene7-scene .s7-bands {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 0 0 auto;
+}
+.scene7-scene .s7-bands-spacer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  padding-bottom: 4px;
+  height: 32px;
+}
+.scene7-scene .s7-band-cell {
+  width: 60px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--rule);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  font-weight: bold;
+}
+.scene7-scene .s7-band-cell.lever-run     { background: var(--lever-run-soft);     color: var(--lever-run); }
+.scene7-scene .s7-band-cell.lever-service { background: var(--lever-service-soft); color: var(--lever-service); }
+.scene7-scene .s7-band-cell.lever-replace { background: var(--lever-replace-soft); color: var(--lever-replace); }
+
+/* ---- Read-out under the panel ---- */
+.scene7-scene .s7-read {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  max-width: 88ch;
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--pikachu-yellow);
+  background: var(--bg-strong);
+}
+.scene7-scene .s7-read b { color: var(--ink-on-box); }
+.scene7-scene .s7-read .s7-neg { color: var(--lever-replace); }
+
+/* ---- Step hint + FILL ALL ---- */
+.scene7-scene .s7-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin: 12px 0 0;
+}
+.scene7-scene .s7-fill { font-size: 8px; padding: 6px 10px; }
+
+/* ---- Closer ---- */
+.scene7-scene .s7-note {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 10px;
+  margin: 14px 0 0;
+  max-width: 88ch;
+}
+.scene7-scene .s7-note b { color: var(--ink); }
+
+/* inline KaTeX gamma inside the table label */
+.scene7-scene .s7-table-label .katex { font-size: 12px; }
+
+@media (max-width: 720px) {
+  .scene7-scene .s7-panel { gap: 14px; }
+  .scene7-scene .s7-icon-col { max-width: none; flex: 1 1 100%; }
+  .scene7-scene .s7-icon-caption { max-width: none; }
+}
+
+/* Utility hide, last so the doubled class beats every display-setting
+   rule above regardless of source order. */
+.scene7-scene .s7-hidden.s7-hidden { display: none; }
