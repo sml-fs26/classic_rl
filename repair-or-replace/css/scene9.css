@@ -1,0 +1,145 @@
+/* Scene 9, "Filling Q* with DP": the live value-iteration stepper.
+   Layout: lede, a control row with the sweep HUD and the POLICY LOCKED chip,
+   then a two-column board: the 4x3 QTable + V-chip row on the left, the
+   Bellman backup card + narrative banner + closing caption on the right.
+   All colour from shared tokens (style.css / qtable.css); both themes
+   retint automatically; no inline colours. */
+
+.scene9-scene .s9-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  max-width: 96ch;
+  margin: 0 0 12px;
+}
+.scene9-scene .s9-lede b { color: var(--ink); }
+
+/* ---- controls + HUD ---- */
+.scene9-scene .s9-ctrl-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  margin: 0 0 14px;
+}
+.scene9-scene .s9-hud {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-left: 6px;
+}
+.scene9-scene .s9-hud b {
+  color: var(--pikachu-cheek);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the POLICY LOCKED chip, flashed once when the live greedy policy first
+   equals DATA.policy */
+.scene9-scene .s9-lock {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  padding: 4px 8px;
+  border: 2px solid var(--rule);
+  background: var(--pikachu-yellow);
+  color: #181818;
+  white-space: nowrap;
+}
+:root[data-theme="crt"] .scene9-scene .s9-lock {
+  background: var(--pikachu-yellow);
+  color: var(--bg);
+}
+.scene9-scene .s9-lock[hidden] { display: none; }
+.scene9-scene .s9-lock.s9-lock-flash { animation: s9-lock-flash 1.2s steps(2) 1; }
+@keyframes s9-lock-flash { 50% { filter: brightness(1.9); transform: scale(1.08); } }
+
+/* ---- main two-column row ---- */
+.scene9-scene .s9-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.scene9-scene .s9-board { min-width: 0; }
+.scene9-scene .s9-qhost { overflow-x: auto; }
+
+/* V-chip row: one chip per state, tinted by the wear ramp */
+.scene9-scene .s9-vchips-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  color: var(--ink-secondary);
+  margin: 10px 0 5px;
+}
+.scene9-scene .s9-vchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.scene9-scene .s9-vchip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 2px solid var(--rule);
+  border-left-width: 6px;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  padding: 5px 8px;
+  min-width: 76px;
+}
+.scene9-scene .s9-vchip-name { font-size: 7px; color: var(--ink-secondary); }
+.scene9-scene .s9-vchip b {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.scene9-scene .s9-vchip.s9-w0 { border-left-color: var(--wear-0); }
+.scene9-scene .s9-vchip.s9-w1 { border-left-color: var(--wear-1); }
+.scene9-scene .s9-vchip.s9-w2 { border-left-color: var(--wear-2); }
+.scene9-scene .s9-vchip.s9-w3 { border-left-color: var(--wear-3); }
+
+/* ---- right column: formula + banner + closing ---- */
+.scene9-scene .s9-side {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.scene9-scene .s9-formula { margin: 0; }
+.scene9-scene .s9-formula .katex { font-size: 14px; }
+
+.scene9-scene .s9-banner { min-height: 86px; }
+.scene9-scene .s9-banner-title {
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 8px;
+}
+.scene9-scene .s9-banner-body {
+  font-size: 9px;
+  line-height: 1.9;
+  color: var(--ink-on-box);
+}
+.scene9-scene .s9-banner-body b { color: var(--pikachu-cheek); }
+
+.scene9-scene .s9-closing {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 10px;
+}
+.scene9-scene .s9-closing b { color: var(--ink); }
+.scene9-scene .s9-closing[hidden] { display: none; }
+
+/* ---- responsive ---- */
+@media (max-width: 900px) {
+  .scene9-scene .s9-main { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene9-scene .s9-lock.s9-lock-flash { animation: none; }
+}

@@ -1,0 +1,272 @@
+/* scene5 -- THE TRAJECTORY (the canonical six-week tape).
+   Left: a md VanCard board that follows the tape. Right: the horizontal tape
+   of week cards (SEE / PICK / PAID / LAND) with a RAW SUM readout. Below: the
+   KaTeX notation strip building one (s, a, r) triple per step, the caption
+   beats, and the STEP / PLAY ALL / RESET controls. All colour from the shared
+   tokens (--wear-*, --lever-*, --profit-green); no JS-injected styles. */
+
+.scene5-scene { display: flex; flex-direction: column; gap: 12px; }
+
+.s5-section-title { font-size: 14px; margin: 0 0 2px; }
+.s5-lede { margin: 0; }
+
+/* ---- main row: van board | tape flow ---- */
+.s5-row {
+  display: flex;
+  gap: 18px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.s5-board {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 14px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s5-board-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  align-self: flex-start;
+}
+.s5-board-week {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+.s5-flow {
+  flex: 1 1 520px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* legend (the loop vocabulary) + the raw-sum readout */
+.s5-legend-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.s5-legend {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  max-width: 52ch;
+}
+.s5-legend .s5-arrow { color: var(--lever-service); }
+.s5-sum {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  padding: 6px 10px;
+  box-shadow: 2px 2px 0 var(--rule);
+}
+.s5-sum-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s5-sum-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.s5-sum.is-pos .s5-sum-num { color: var(--profit-green); }
+.s5-sum.is-neg .s5-sum-num { color: var(--lever-replace); }
+.s5-sum-bump { animation: s5-sum-bump 360ms ease-out; }
+@keyframes s5-sum-bump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+
+/* ---- the tape of week cards ---- */
+.s5-tape {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  overflow-x: auto;
+  min-height: 132px;
+  padding: 8px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s5-week-card {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 122px;
+  padding: 6px 8px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+.s5-week-card.s5-pop { animation: s5-pop 260ms steps(3, end); }
+@keyframes s5-pop {
+  0%   { transform: scale(0.75); opacity: 0.2; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.s5-card-week {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--ink-on-box);
+  margin-bottom: 2px;
+}
+.s5-card-row {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 6px;
+  align-items: center;
+}
+.s5-row-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+
+/* chips: state tinted by wear token, action tinted by lever token */
+.s5-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  padding: 3px 5px;
+  white-space: nowrap;
+}
+.s5-chip svg { width: 10px; height: 10px; }
+.s5-chip-state.vc-wear-0 { border-color: var(--wear-0); color: var(--wear-0); }
+.s5-chip-state.vc-wear-1 { border-color: var(--wear-1); color: var(--wear-1); }
+.s5-chip-state.vc-wear-2 { border-color: var(--wear-2); color: var(--wear-2); }
+.s5-chip-state.vc-wear-3 { border-color: var(--wear-3); color: var(--wear-3); }
+.s5-chip-action.lever-run     { border-color: var(--lever-run);     color: var(--lever-run);     background: var(--lever-run-soft); }
+.s5-chip-action.lever-service { border-color: var(--lever-service); color: var(--lever-service); background: var(--lever-service-soft); }
+.s5-chip-action.lever-replace { border-color: var(--lever-replace); color: var(--lever-replace); background: var(--lever-replace-soft); }
+
+.s5-reward {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.s5-reward.is-pos { color: var(--profit-green); }
+.s5-reward.is-neg { color: var(--lever-replace); }
+
+.s5-week-card.s5-tape-ph {
+  border-style: dashed;
+  justify-content: center;
+  min-width: 200px;
+}
+.s5-tape-ph .s5-card-week {
+  color: var(--ink-secondary);
+  font-size: 8px;
+  line-height: 1.7;
+  text-transform: lowercase;
+}
+/* ---- the notation strip ---- */
+.s5-notation {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 12px 12px;
+}
+.s5-notation-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.s5-chunks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+}
+.s5-chunk {
+  padding: 3px 6px;
+  border: 2px solid transparent;
+}
+.s5-chunk.current {
+  border-color: var(--pikachu-yellow);
+  background: var(--bg);
+}
+.s5-chunks .katex { font-size: 13px; color: var(--ink-on-box); }
+.s5-chunks-ph {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  line-height: 1.7;
+}
+
+/* ---- caption beats ---- */
+.s5-beat,
+.s5-close {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.8;
+  color: var(--ink);
+  border-left: 5px solid var(--lever-replace);
+  padding: 2px 0 2px 12px;
+  max-width: 76ch;
+}
+.s5-close { border-left-color: var(--profit-green); }
+
+/* ---- controls ---- */
+.s5-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.s5-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+/* ---- Mobile / narrow ---- */
+@media (max-width: 760px) {
+  .s5-row { gap: 14px; }
+  .s5-board { width: 100%; flex-direction: row; justify-content: space-between; flex-wrap: wrap; }
+  .s5-flow { flex-basis: 100%; }
+}

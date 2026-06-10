@@ -1,0 +1,338 @@
+/* Scene 4 ("Policy: your maintenance playbook") styles.
+   Left: the editable playbook card (state chip -> call slot per wear
+   level), the "this Monday" lookup line and the two preset buttons.
+   Right: blurb + completeness note + the 3^4 = 81 count + closing hook.
+   All colour from tokens (--wear-*, --lever-*, chrome tokens). */
+
+.scene4-scene { max-width: 1040px; margin: 0 auto; }
+
+.s4-head { margin: 0 2px 8px; }
+.s4-title { margin: 0 0 6px; }
+.s4-lede { margin: 0; max-width: 104ch; }
+.s4-lede b { color: var(--cb-vermillion); }
+
+/* ---- Formula strip ---- */
+.s4-formula-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 6px 2px 12px;
+}
+.s4-formula.poke-formula { margin: 0; display: inline-block; }
+.s4-formula .katex { font-size: 17px; }
+.s4-formula .katex-display { margin: 2px 0; }
+.s4-formula-foot {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 52ch;
+}
+
+/* ---- Two-column body ---- */
+.s4-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(330px, 0.9fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* ===== LEFT: the playbook card ===== */
+.s4-board-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.s4-board-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.s4-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+.s4-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.s4-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 20px minmax(132px, auto);
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+}
+.s4-row + .s4-row { border-top: 2px solid var(--inner-highlight); }
+
+.s4-state { display: inline-flex; align-items: center; gap: 8px; }
+.s4-state-gauge { display: inline-flex; }
+.s4-state-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.03em;
+}
+.s4-w0 { color: var(--wear-0); }
+.s4-w1 { color: var(--wear-1); }
+.s4-w2 { color: var(--wear-2); }
+.s4-w3 { color: var(--wear-3); }
+
+.s4-row-arrow {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+
+/* The clickable call slot: one decision per state. */
+.s4-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 9px 7px 12px;
+  border: 3px solid var(--rule);
+  background: var(--card-bg);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+  transition: transform 100ms ease, filter 120ms ease;
+}
+.s4-slot:hover { filter: brightness(1.08); }
+.s4-slot:active { transform: translate(2px, 2px); box-shadow: none; }
+.s4-slot:focus-visible { outline: 3px solid var(--pikachu-yellow); outline-offset: 2px; }
+.s4-slot::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+}
+.s4-slot.lever-run::before     { background: var(--lever-run); }
+.s4-slot.lever-service::before { background: var(--lever-service); }
+.s4-slot.lever-replace::before { background: var(--lever-replace); }
+.s4-slot.lever-run     .s4-slot-icon, .s4-slot.lever-run     .s4-slot-name { color: var(--lever-run); }
+.s4-slot.lever-service .s4-slot-icon, .s4-slot.lever-service .s4-slot-name { color: var(--lever-service); }
+.s4-slot.lever-replace .s4-slot-icon, .s4-slot.lever-replace .s4-slot-name { color: var(--lever-replace); }
+.s4-slot-icon { display: inline-flex; }
+.s4-slot-icon svg { width: 13px; height: 13px; }
+.s4-slot-name { min-width: 4ch; letter-spacing: 0.04em; text-align: left; }
+.s4-slot-cycle { margin-left: auto; color: var(--ink-secondary); font-size: 11px; }
+
+@keyframes s4-flip {
+  0%   { transform: scale(1);    filter: brightness(1); }
+  40%  { transform: scale(1.08); filter: brightness(1.3); }
+  100% { transform: scale(1);    filter: brightness(1); }
+}
+.s4-slot.s4-flip { animation: s4-flip 0.42s ease-out; }
+@media (prefers-reduced-motion: reduce) { .s4-slot.s4-flip { animation: none; } }
+
+/* ---- "This playbook, this Monday" lookup ---- */
+.s4-monday {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+  padding: 9px 11px 10px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s4-monday-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+}
+.s4-monday-pick { display: flex; gap: 6px; flex-wrap: wrap; }
+.s4-pick {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.03em;
+  padding: 4px 7px;
+  border: 2px solid var(--rule);
+  background: var(--card-bg);
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 140ms ease, box-shadow 140ms ease;
+}
+.s4-pick:hover { opacity: 1; }
+.s4-pick.active {
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--pikachu-yellow);
+  border-color: var(--pikachu-yellow);
+}
+.s4-monday-line {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  min-height: 24px;
+}
+.s4-monday-pi .katex { font-size: 12px; color: var(--ink-on-box); }
+.s4-monday-tail { color: var(--ink-secondary); font-size: 7px; }
+
+/* Small lever chiplet used in the lookup line. */
+.s4-chiplet {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 2px solid var(--rule);
+  background: var(--card-bg);
+  font-size: 8px;
+}
+.s4-chiplet-icon { display: inline-flex; }
+.s4-chiplet-icon svg { width: 11px; height: 11px; }
+.s4-chiplet.lever-run     { color: var(--lever-run); }
+.s4-chiplet.lever-service { color: var(--lever-service); }
+.s4-chiplet.lever-replace { color: var(--lever-replace); }
+
+/* ---- Preset buttons ---- */
+.s4-seed-label {
+  margin-top: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s4-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+.s4-tab {
+  flex: 1 1 0;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  padding: 9px 11px;
+}
+.s4-tab-name { font-size: 9px; letter-spacing: 0.03em; }
+.s4-tab-sub { font-size: 7px; opacity: 0.75; text-transform: none; letter-spacing: 0.02em; }
+.s4-tab.active {
+  background: var(--pikachu-yellow);
+  color: #181818;
+  box-shadow: inset 2px 2px 0 0 var(--inner-highlight);
+}
+.s4-tab.active .s4-tab-sub { opacity: 0.85; }
+
+/* The shared .poke-btn hover rule points at a token this viz does not
+   define (--lever-demo); give this scene's buttons a real hover. */
+.scene4-scene .poke-btn:hover:not(:disabled) {
+  background: var(--pikachu-yellow);
+  color: #181818;
+}
+
+/* ===== RIGHT: the reading panel ===== */
+.s4-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.s4-blurb { display: flex; flex-direction: column; gap: 8px; }
+.s4-blurb-name {
+  align-self: flex-start;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border: 2px solid var(--rule);
+  background: var(--pikachu-yellow);
+  color: #181818;
+}
+.s4-blurb-text {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+
+.s4-complete-note {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  padding-left: 10px;
+  border-left: 3px solid var(--cb-vermillion);
+}
+.s4-complete-note b { color: var(--cb-vermillion); }
+
+/* The 81-playbooks count card. */
+.s4-count {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 14px 12px;
+}
+.s4-count-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: var(--ink-on-box);
+  margin-bottom: 4px;
+}
+.s4-count-formula { text-align: center; overflow-x: auto; }
+.s4-count-formula .katex { font-size: 16px; color: var(--ink-on-box); }
+.s4-count-formula .katex-display { margin: 6px 0; }
+.s4-count-body {
+  margin: 2px 0 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+}
+
+/* Closing hook. */
+.s4-hook {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 14px 12px;
+}
+.s4-hook-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: var(--pikachu-cheek);
+  margin-bottom: 7px;
+}
+.s4-hook-body {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+.s4-hook-body b { color: var(--profit-green); }
+
+.s4-hint { margin-top: 12px; }
+
+/* Responsive: stack the columns. */
+@media (max-width: 940px) {
+  .s4-body { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .s4-row { grid-template-columns: 1fr; row-gap: 5px; }
+  .s4-row-arrow { display: none; }
+}

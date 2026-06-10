@@ -1,0 +1,369 @@
+/* Scene 3 ("What makes this an MDP?") styles.
+   Tuple rail on top (the assembling <S, A, P, R, gamma>), board on the
+   left (wear strip + breakdown arcs + call chips + money row), copy panel
+   on the right. All colour from tokens (--wear-*, --lever-*, --cb-*,
+   --profit-green, --smoke-grey, chrome tokens), so both themes retint. */
+
+.scene3-scene { max-width: 1040px; margin: 0 auto; }
+
+.s3-head { margin: 0 2px 6px; }
+.s3-title { margin: 0 0 6px; }
+.s3-lede { margin: 0; max-width: 100ch; }
+
+/* ---- The assembling tuple rail ---- */
+.s3-tuple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 8px 0 14px;
+}
+.s3-tbrk .katex { font-size: 24px; color: var(--ink); }
+.s3-tcomma .katex { font-size: 18px; color: var(--ink-secondary); }
+.s3-tchip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 74px;
+  padding: 7px 10px 6px;
+  border: 3px solid var(--rule);
+  background: var(--card-bg);
+  transition: opacity 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+.s3-tchip .katex { font-size: 18px; color: var(--ink-on-box); }
+.s3-tlab {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+}
+.s3-tchip.ghost { opacity: 0.38; border-style: dashed; }
+.s3-tchip.now {
+  border-color: var(--pikachu-yellow);
+  box-shadow: 0 0 0 3px var(--pikachu-yellow);
+}
+.s3-tchip.now .s3-tlab { color: var(--ink-on-box); }
+.s3-tuple.complete .s3-tbrk .katex { color: var(--pikachu-cheek); }
+
+/* ---- Two-column body ---- */
+.s3-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(348px, 0.9fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+/* ===== LEFT: the board ===== */
+.s3-board {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 12px 14px 14px;
+  min-width: 0;
+}
+.s3-board-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--ink-secondary);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Board sections dim when another part is in focus. */
+.s3-sec { padding: 5px 6px 6px; transition: opacity 250ms ease; }
+.s3-sec-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  margin-bottom: 7px;
+  text-transform: uppercase;
+}
+.s3-sec.hot, .s3-sec.arrows-hot {
+  outline: 3px solid var(--pikachu-yellow);
+  outline-offset: 1px;
+}
+.s3-board[data-hot="state"]  .s3-sec-actions,
+.s3-board[data-hot="state"]  .s3-sec-money,
+.s3-board[data-hot="action"] .s3-sec-strip,
+.s3-board[data-hot="action"] .s3-sec-money,
+.s3-board[data-hot="trans"]  .s3-sec-actions,
+.s3-board[data-hot="trans"]  .s3-sec-money,
+.s3-board[data-hot="reward"] .s3-sec-strip,
+.s3-board[data-hot="reward"] .s3-sec-actions { opacity: 0.4; }
+
+/* --- Wear strip --- */
+.s3-striprow {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+.s3-chip {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 2px 8px;
+  border: 3px solid var(--rule);
+  border-top-width: 6px;
+  background: var(--card-bg);
+  transition: opacity 200ms ease;
+}
+.s3-chipw0 { border-top-color: var(--wear-0); }
+.s3-chipw1 { border-top-color: var(--wear-1); }
+.s3-chipw2 { border-top-color: var(--wear-2); }
+.s3-chipw3 { border-top-color: var(--wear-3); }
+.s3-chip-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.02em;
+}
+.s3-chipw0 .s3-chip-name { color: var(--wear-0); }
+.s3-chipw1 .s3-chip-name { color: var(--wear-1); }
+.s3-chipw2 .s3-chip-name { color: var(--wear-2); }
+.s3-chipw3 .s3-chip-name { color: var(--wear-3); }
+
+/* Thin degradation arrows between neighbouring chips. */
+.s3-deg {
+  flex: 0 0 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--smoke-grey);
+  transition: color 200ms ease;
+}
+.s3-sec-strip.arrows-hot .s3-deg { color: var(--cb-orange); }
+.s3-sec-strip.arrows-hot .s3-chip { opacity: 0.55; }
+
+/* Breakdown-arc band under the chips. */
+.s3-band { line-height: 0; margin-top: 2px; }
+.s3-arcsvg { display: block; }
+.s3-arc {
+  fill: none;
+  stroke: var(--cb-vermillion);
+  stroke-width: 2;
+  stroke-dasharray: 5 3;
+  opacity: 0.8;
+}
+.s3-arc-head { fill: var(--cb-vermillion); }
+.s3-arc-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  fill: var(--cb-vermillion);
+  /* Halo so the label stays legible wherever an arc passes underneath. */
+  paint-order: stroke;
+  stroke: var(--bg-strong);
+  stroke-width: 3px;
+}
+.s3-sec-strip.arrows-hot .s3-arc {
+  stroke-width: 3;
+  opacity: 1;
+  animation: s3-dash 1.1s linear infinite;
+}
+@keyframes s3-dash { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) {
+  .s3-sec-strip.arrows-hot .s3-arc { animation: none; }
+}
+
+/* Tiny arrow legend. */
+.s3-legend {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+}
+.s3-leg { display: inline-flex; align-items: center; gap: 6px; }
+.s3-leg-deg { display: inline-flex; color: var(--smoke-grey); }
+.s3-leg-deg svg { width: 18px; height: 8px; }
+.s3-leg-arc {
+  display: inline-block;
+  width: 18px;
+  border-top: 3px dashed var(--cb-vermillion);
+}
+
+/* --- The three call chips --- */
+.s3-actrow {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.s3-act {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 11px;
+  border: 3px solid var(--rule);
+  background: var(--card-bg);
+  min-width: 128px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.s3-act-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+}
+.s3-act-icon { display: inline-flex; }
+.s3-act-icon svg { width: 13px; height: 13px; }
+.s3-act.lever-run     .s3-act-top { color: var(--lever-run); }
+.s3-act.lever-service .s3-act-top { color: var(--lever-service); }
+.s3-act.lever-replace .s3-act-top { color: var(--lever-replace); }
+.s3-act-gloss {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+}
+.s3-sec-actions.hot .s3-act {
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0 var(--rule);
+}
+
+/* --- The money row --- */
+.s3-moneyrow {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.s3-money {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 7px 10px;
+  border: 3px solid var(--rule);
+  border-bottom-width: 5px;
+  background: var(--card-bg);
+  min-width: 92px;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.s3-money-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.s3-money-lab {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--ink-secondary);
+}
+.s3-money.m-run { border-bottom-color: var(--profit-green); }
+.s3-money.m-svc { border-bottom-color: var(--lever-service); }
+.s3-money.m-new { border-bottom-color: var(--lever-replace); }
+.s3-money.m-tow { border-bottom-color: var(--cb-vermillion); }
+.s3-money.m-run .s3-money-val { color: var(--profit-green); }
+.s3-money.m-svc .s3-money-val { color: var(--lever-service); }
+.s3-money.m-new .s3-money-val { color: var(--lever-replace); }
+.s3-money.m-tow .s3-money-val { color: var(--cb-vermillion); }
+.s3-sec-money.hot .s3-money {
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0 var(--rule);
+}
+
+/* ===== RIGHT: the panel ===== */
+.s3-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+.s3-ptitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-on-box);
+  margin: 0;
+}
+.s3-formula.poke-formula {
+  display: block;
+  margin: 2px 0;
+  text-align: center;
+  overflow-x: auto;
+  transition: opacity 200ms ease;
+}
+.s3-formula .katex { font-size: 14px; }
+.s3-formula .katex-display { margin: 4px 0; }
+.s3-formula.ghosted { opacity: 0.55; }
+.s3-pbody {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.85;
+  color: var(--ink-on-box);
+}
+.s3-pbody b { color: var(--cb-vermillion); }
+
+/* The printed-odds example card (step 3). */
+.s3-odds {
+  border: 3px solid var(--rule);
+  background: var(--card-bg);
+  padding: 8px 10px 9px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.8;
+  color: var(--ink-on-box);
+}
+.s3-odds-head {
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--inner-highlight);
+  padding-bottom: 5px;
+  margin-bottom: 6px;
+}
+.s3-odds-line b { font-size: 9px; }
+.s3-odds-bd { color: var(--cb-vermillion); }
+.s3-odds-sub { color: var(--ink-secondary); }
+.s3-odds-sub b { color: var(--ink-on-box); }
+
+.s3-pfoot {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--inner-highlight);
+  padding-top: 7px;
+}
+
+.s3-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+.s3-stepof {
+  margin-left: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+
+/* The shared .poke-btn hover rule points at a token this viz does not
+   define (--lever-demo); give this scene's buttons a real hover. */
+.scene3-scene .poke-btn:hover:not(:disabled) {
+  background: var(--pikachu-yellow);
+  color: var(--ink);
+}
+
+.s3-hint { margin-top: 12px; }
+
+/* Responsive: stack the columns. */
+@media (max-width: 940px) {
+  .s3-body { grid-template-columns: 1fr; }
+}

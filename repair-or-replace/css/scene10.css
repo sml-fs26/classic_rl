@@ -1,0 +1,242 @@
+/* Scene 10, "Why DP doesn't scale": the typographic blow-up.
+   One huge running product (poke-title scale), a rail of factor chips that
+   land one per beat, then the second wall (no printed odds) and the bridge
+   to SARSA. All colour from shared tokens; both themes retint; the only
+   animations are chip landings and number pops, disabled under
+   prefers-reduced-motion. */
+
+.scene10-scene {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.scene10-scene .s10-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  margin: 0;
+  max-width: 96ch;
+}
+.scene10-scene .s10-lede b { color: var(--ink); }
+
+/* ---- the big running product ---- */
+.scene10-scene .s10-bigwrap {
+  text-align: center;
+  padding: 8px 0 2px;
+}
+.scene10-scene .s10-bigtag {
+  display: inline-block;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: var(--pikachu-cheek);
+  border: 2px solid var(--rule);
+  padding: 3px 6px;
+  margin-bottom: 10px;
+}
+:root[data-theme="crt"] .scene10-scene .s10-bigtag { color: var(--bg); }
+.scene10-scene .s10-bigtag[hidden] { display: none; }
+
+.scene10-scene .s10-big {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 40px;
+  line-height: 1.15;
+  letter-spacing: 3px;
+  color: var(--pikachu-yellow);
+  text-shadow:
+    2px 0 0 var(--ink), -2px 0 0 var(--ink),
+    0 2px 0 var(--ink), 0 -2px 0 var(--ink),
+    2px 2px 0 var(--ink), -2px -2px 0 var(--ink),
+    -2px 2px 0 var(--ink), 2px -2px 0 var(--ink),
+    4px 4px 0 var(--charmander-orange);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.scene10-scene .s10-big.s10-pop { animation: s10-pop 360ms steps(3) 1; }
+@keyframes s10-pop {
+  0%   { transform: scale(0.82); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.scene10-scene .s10-unit {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  margin-top: 8px;
+}
+.scene10-scene .s10-note {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  margin-top: 8px;
+  min-height: 32px;
+}
+.scene10-scene .s10-note b { color: var(--pikachu-cheek); }
+
+/* ---- factor chip rail ---- */
+.scene10-scene .s10-rail {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+}
+.scene10-scene .s10-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  padding: 7px 10px;
+  box-shadow: 2px 2px 0 var(--inner-highlight);
+}
+.scene10-scene .s10-chip[hidden] { display: none; }
+.scene10-scene .s10-chip b {
+  font-size: 13px;
+  color: var(--hue-ghost);
+  font-variant-numeric: tabular-nums;
+}
+.scene10-scene .s10-chip-x {
+  font-size: 12px;
+  color: var(--ink-secondary);
+}
+.scene10-scene .s10-chip-lab {
+  font-size: 6.5px;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--ink-secondary);
+}
+.scene10-scene .s10-chip-toy b { color: var(--profit-green); }
+.scene10-scene .s10-chip-fleet b { color: var(--pikachu-cheek); }
+.scene10-scene .s10-chip.s10-retired {
+  opacity: 0.45;
+}
+.scene10-scene .s10-chip.s10-retired b,
+.scene10-scene .s10-chip.s10-retired .s10-chip-lab {
+  text-decoration: line-through;
+}
+.scene10-scene .s10-chip.s10-land { animation: s10-land 300ms steps(3) 1; }
+@keyframes s10-land {
+  0%   { transform: translateY(-10px) scale(1.15); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.scene10-scene .s10-disclaim { text-align: center; margin: 0 auto; }
+.scene10-scene .s10-disclaim[hidden] { display: none; }
+
+/* ---- WALL 2 + the bridge ---- */
+.scene10-scene .s10-tag {
+  display: inline-block;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: var(--pikachu-cheek);
+  border: 2px solid var(--rule);
+  padding: 3px 6px;
+}
+:root[data-theme="crt"] .scene10-scene .s10-tag { color: var(--bg); }
+
+.scene10-scene .s10-wall {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 12px 16px 14px;
+}
+.scene10-scene .s10-wall[hidden] { display: none; }
+.scene10-scene .s10-wall-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.scene10-scene .s10-wall-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--ink-on-box);
+}
+.scene10-scene .s10-wall-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.scene10-scene .s10-wall-formula {
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  padding: 8px 14px;
+}
+.scene10-scene .s10-wall-formula .katex { color: var(--ink-on-box); font-size: 15px; }
+.scene10-scene .s10-wall-formula .katex-display { margin: 0; }
+.scene10-scene .s10-wall-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.9;
+  color: var(--ink-on-box);
+  margin: 0;
+  flex: 1 1 320px;
+}
+.scene10-scene .s10-wall-body b { color: var(--pikachu-cheek); }
+
+.scene10-scene .s10-bridge {
+  border: 3px solid var(--profit-green);
+  background: var(--bg-strong);
+  padding: 12px 16px 14px;
+}
+.scene10-scene .s10-bridge[hidden] { display: none; }
+.scene10-scene .s10-tag-bridge { background: var(--profit-green); }
+.scene10-scene .s10-bridge-body {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 2;
+  color: var(--ink-on-box);
+  margin: 10px 0 8px;
+}
+.scene10-scene .s10-bridge-body b { color: var(--profit-green); }
+.scene10-scene .s10-logline {
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.scene10-scene .s10-bridge-next {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-align: right;
+  color: var(--profit-green);
+}
+
+.scene10-scene .s10-reveal { animation: s10-reveal 320ms steps(4) 1; }
+@keyframes s10-reveal {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- controls ---- */
+.scene10-scene .s10-ctrl {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+
+/* ---- responsive / reduced motion ---- */
+@media (max-width: 720px) {
+  .scene10-scene .s10-big { font-size: 26px; letter-spacing: 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene10-scene .s10-big.s10-pop,
+  .scene10-scene .s10-chip.s10-land,
+  .scene10-scene .s10-reveal { animation: none; }
+}

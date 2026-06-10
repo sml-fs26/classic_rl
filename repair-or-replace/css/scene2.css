@@ -1,0 +1,304 @@
+/* scene2 -- PLAYTEST ("You run the fleet").
+   The live interactive board: a large VanCard with a WEEK / BANK HUD on the
+   left; the dialog, the three call buttons, and RESTART on the right; a money
+   tape across the bottom. All colour from the shared tokens (--ink,
+   --bg-strong, --rule, --lever-*, --wear-*, --profit-green) so both the light
+   and crt themes retint. No JS-injected styles. */
+
+.scene2-scene { display: flex; flex-direction: column; gap: 12px; }
+
+.s2-section-title { font-size: 14px; margin: 0 0 4px; }
+
+/* ---- main row ---- */
+.s2-row {
+  display: flex;
+  gap: 26px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* ---- left: the board ---- */
+.s2-board {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 18px 16px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s2-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.s2-week {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  color: var(--ink-on-box);
+  letter-spacing: 1px;
+  padding: 6px 10px;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  box-shadow: 2px 2px 0 var(--rule);
+  white-space: nowrap;
+}
+
+/* BANK HUD: the running quarter total, signed. */
+.s2-bank {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.s2-bank-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s2-bank-amount {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.s2-bank.s2-bank-pos .s2-bank-num { color: var(--profit-green); }
+.s2-bank.s2-bank-neg .s2-bank-num { color: var(--lever-replace); }
+.s2-bank-bump { animation: s2-bank-bump 360ms ease-out; }
+@keyframes s2-bank-bump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* the van itself */
+.s2-card {
+  display: flex;
+  justify-content: center;
+  padding: 6px 10px 2px;
+  min-width: 300px;
+}
+
+/* ---- right: dialog + call menu + restart ---- */
+.s2-right {
+  flex: 1 1 360px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.s2-dialog { min-height: 96px; }
+.s2-prompt {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+
+.s2-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* Call button: soft tinted fill, tone-coloured border + icon + name, the
+   printed price on the right. Identity entirely from the lever tokens. */
+.s2-call-btn {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "icon name tag";
+  gap: 3px 12px;
+  align-items: center;
+  text-align: left;
+  padding: 11px 14px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: 4px 4px 0 var(--rule);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.s2-call-btn.lever-run     { background: var(--lever-run-soft);     border-color: var(--lever-run); }
+.s2-call-btn.lever-service { background: var(--lever-service-soft); border-color: var(--lever-service); }
+.s2-call-btn.lever-replace { background: var(--lever-replace-soft); border-color: var(--lever-replace); }
+.s2-call-btn:hover:not(:disabled) { filter: brightness(1.06); }
+.s2-call-btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--rule); }
+.s2-call-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.s2-call-icon { grid-area: icon; display: inline-flex; }
+.s2-call-icon svg { width: 16px; height: 16px; }
+.s2-call-btn.lever-run     .s2-call-icon, .s2-call-btn.lever-run     .s2-call-name { color: var(--lever-run); }
+.s2-call-btn.lever-service .s2-call-icon, .s2-call-btn.lever-service .s2-call-name { color: var(--lever-service); }
+.s2-call-btn.lever-replace .s2-call-icon, .s2-call-btn.lever-replace .s2-call-name { color: var(--lever-replace); }
+.s2-call-name { grid-area: name; font-size: 11px; letter-spacing: 0.5px; }
+.s2-call-tag {
+  grid-area: tag;
+  font-size: 8px;
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  padding: 3px 7px;
+  background: var(--bg);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.s2-ctrl.poke-menu-row::before { content: none; }
+
+/* ---- end-of-quarter summary (overlays the right column) ---- */
+.s2-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 18px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: 5px 5px 0 var(--rule);
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 3;
+}
+.s2-summary-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--ink-on-box);
+}
+.s2-summary-bank {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  gap: 3px;
+}
+.s2-summary-bank-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s2-summary-bank-amount {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 26px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.s2-summary-bank.is-good .s2-summary-bank-amount { color: var(--profit-green); }
+.s2-summary-bank.is-bad  .s2-summary-bank-amount { color: var(--lever-replace); }
+
+.s2-summary-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.s2-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+  padding: 6px 9px;
+}
+.s2-stat-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.s2-stat-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  line-height: 1.5;
+}
+.s2-summary .s2-again { align-self: flex-start; }
+.s2-summary-hint { margin: 0; max-width: 46ch; }
+
+/* ---- the money tape ---- */
+.s2-tape-wrap { display: flex; flex-direction: column; gap: 6px; }
+.s2-tape-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+}
+.s2-tape {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-height: 58px;
+  overflow-x: auto;
+  padding: 6px 6px 8px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.s2-tape-step {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 64px;
+  padding: 6px 8px;
+  border: 2px solid var(--rule);
+  background: var(--bg);
+}
+/* colour each played week by the call made */
+.s2-tape-step.lever-run     { box-shadow: inset 0 0 0 2px var(--lever-run); }
+.s2-tape-step.lever-service { box-shadow: inset 0 0 0 2px var(--lever-service); }
+.s2-tape-step.lever-replace { box-shadow: inset 0 0 0 2px var(--lever-replace); }
+.s2-tape-wk {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.s2-tape-reward {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+}
+.s2-tape-reward.is-pos { color: var(--profit-green); }
+.s2-tape-reward.is-neg { color: var(--lever-replace); }
+.s2-tape-total {
+  flex: 0 0 auto;
+  align-self: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--profit-green);
+  border: 2px solid var(--profit-green);
+  background: var(--bg);
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+.s2-tape-total.is-neg { color: var(--lever-replace); border-color: var(--lever-replace); }
+.s2-tape-step.s2-tape-ph {
+  box-shadow: none;
+  border-style: dashed;
+  justify-content: center;
+  min-width: 180px;
+}
+
+.s2-caption { margin-top: 0; }
+
+/* ---- Mobile / narrow ---- */
+@media (max-width: 760px) {
+  .s2-row { gap: 18px; }
+  .s2-board { width: 100%; }
+  .s2-card { min-width: 0; }
+  .s2-right { flex-basis: 100%; min-width: 0; }
+}
