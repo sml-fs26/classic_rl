@@ -1,0 +1,62 @@
+name: Deploy <TOPIC> teaching site to Pages
+
+# Publishes a small static site (PRE-COMPILED slide/notes PDFs + an optional
+# interactive page + a landing index.html) to GitHub Pages.
+#
+# Why this shape:
+#   * GitHub Pages here is build_type=workflow with NO pre-existing workflow, so
+#     we ADD this deploy. NO LaTeX runs in CI: the PDFs are compiled locally and
+#     committed (they are the readable deliverable), and CI only gathers files.
+#   * The trigger is PATH-FILTERED to the deliverables, so unrelated commits do
+#     not redeploy. Keep the paths in sync with what "Assemble _site" copies.
+#   * touch _site/.nojekyll so Pages serves the files verbatim (no Jekyll pass).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '<path/to>/slides/*.pdf'
+      - '<path/to>/lecture-notes/*.pdf'
+      - '<path/to>/interactive/index.html'   # optional; drop if no interactive page
+      - 'site/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble _site
+        run: |
+          set -euo pipefail
+          mkdir -p _site/interactive
+          cp site/index.html                          _site/index.html
+          cp <path/to>/slides/<deck-a>.pdf            _site/<deck-a>.pdf
+          cp <path/to>/slides/<deck-b>.pdf            _site/<deck-b>.pdf
+          cp <path/to>/lecture-notes/<notes-a>.pdf    _site/<notes-a>.pdf
+          cp <path/to>/lecture-notes/<notes-b>.pdf    _site/<notes-b>.pdf
+          # optional interactive page; drop this line if there is none
+          cp <path/to>/interactive/index.html         _site/interactive/index.html
+          touch _site/.nojekyll
+          echo "Assembled:" && find _site -type f | sort
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

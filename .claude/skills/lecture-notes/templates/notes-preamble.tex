@@ -1,0 +1,107 @@
+% ============================================================================
+% notes-preamble.tex : shared preamble for a self-contained lecture-notes set.
+%
+% This is the LINCHPIN. Author it FIRST, compile a 2-page smoke test, render
+% the smoke test to PNG, and EYEBALL it BEFORE fanning out the build. A broken
+% preamble fanned out in parallel wastes every parallel artifact. The smoke-test
+% command is in SKILL.md; this file is meant to be \input by each notes.tex.
+%
+% Both (all) lecture-note documents for a topic \input or copy this block, so
+% they render identically. Generalized from the LATS/MCTS notes; rename the
+% colors, macros, and examplebox title to the new topic.
+%
+% PUNCTUATION: ASCII only. A repo write hook REJECTS Unicode em/en dashes
+% (U+2014, U+2013). In LaTeX prose NEVER type a triple hyphen run (it renders an
+% em dash) or a prose double hyphen run (it renders an en dash); use a comma,
+% colon, parentheses, or the word "to". The one exempt double hyphen is a TikZ
+% line segment inside a tikzpicture (an edge between two named coordinates,
+% written backslash-draw, the source node, space, two hyphens, space, the
+% target node). After compiling, verify the RENDERED pdf is dash-free:
+%     pdftotext notes.pdf - | grep -c $'EMDASH-OR-ENDASH'   # must print 0
+% ============================================================================
+\documentclass[11pt]{article}
+
+% math
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}    % \mathds{1} indicator. THE \mathbb{1} TRAP: amssymb has
+                       % NO blackboard-bold digit 1, so \mathbb{1} renders a junk
+                       % (logic-looking) glyph. Use \mathds{1} for an indicator.
+\usepackage{amsthm}
+\usepackage{mathtools}
+
+% figures, boxes, color
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc}
+\usepackage[most]{tcolorbox}
+
+% layout, links
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+% absorb the few hard-to-break inline-math lines (avoids tiny overfull boxes)
+\setlength{\emergencystretch}{2em}
+
+% a calm, low-saturation color scheme (rename per topic if desired)
+\definecolor{calmblue}{RGB}{38, 70, 110}     % headings, structure
+\definecolor{calmteal}{RGB}{38, 110, 102}    % definitions
+\definecolor{calmsand}{RGB}{120, 95, 40}     % remarks, sidebars
+\definecolor{calmgray}{RGB}{90, 90, 90}      % muted text
+\definecolor{calmbg}{RGB}{245, 247, 250}     % box backgrounds
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=calmblue,
+  citecolor=calmteal,
+  urlcolor=calmblue
+}
+
+% theorem-like environments.
+% theorems, lemmas, propositions share one (italic) style and one counter.
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+
+% definitions, examples, remarks share the (upright) definition style.
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+% a tcolorbox to visually set off the running example (rename the title)
+\newtcolorbox{examplebox}[1][]{
+  colback=calmbg,
+  colframe=calmblue,
+  fonttitle=\bfseries\color{white},
+  coltitle=white,
+  title={Running example: REPLACE-WITH-YOUR-EXAMPLE-NAME},
+  sharp corners,
+  boxrule=0.6pt,
+  #1
+}
+
+% TikZ styles shared by every figure. (The one place an ASCII double hyphen is
+% legal is a line segment between two named coordinates inside a tikzpicture.)
+\tikzset{
+  treenode/.style={
+    draw=calmblue, rounded corners, align=center,
+    inner sep=3pt, font=\small, fill=white, minimum width=15mm
+  },
+  rootnode/.style={treenode, draw=calmteal, very thick},
+  termnode/.style={treenode, fill=calmbg},
+  ghost/.style={treenode, draw=calmgray, densely dashed, text=calmgray},
+  treeedge/.style={-{Stealth[length=2mm]}, calmgray, thick},
+  ghostedge/.style={-{Stealth[length=2mm]}, calmgray, densely dashed}
+}
+
+% convenience macros: define each KEY FORMULA ONCE so every document and every
+% cross-reference renders the identical symbol. (Topic-specific; replace these
+% with your topic's notation. The point is a single source of truth for numbers
+% and notation: type the formula here, cite it everywhere.)
+% \newcommand{\Foo}{...}
+% \newcommand{\KeyFormula}{ ... typed once here ... }
+% ============================================================================
+% end shared preamble
+% ============================================================================

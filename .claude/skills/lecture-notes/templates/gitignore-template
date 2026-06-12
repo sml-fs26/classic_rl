@@ -1,0 +1,26 @@
+# Drop this in the lecture-notes folder (and/or the slides folder) as `.gitignore`.
+# COMMIT the compiled .pdf files (they are the readable deliverable) and the
+# .ipynb (it is a deliverable too). Ignore only regenerated build artifacts.
+
+# LaTeX build artifacts (article notes)
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Beamer build artifacts (if you also build a slide deck)
+*.nav
+*.snm
+*.vrb
+
+# theme / preamble smoke-test scratch
+_smoketest.*
+smoke.*
+
+# Python / notebook
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

@@ -1,0 +1,172 @@
+\documentclass[aspectratio=169]{beamer}
+\input{beamer-preamble}
+
+% ===== <DECK TITLE> animated slide deck (skeleton) =====
+% Engine: LuaLaTeX. Compile FROM the slides/ directory so \input resolves:
+%   lualatex <thisfile>.tex   (run twice for the nav/toc)
+%
+% House rules baked into this skeleton:
+%   * MINIMAL TEXT: a few words per slide, no paragraphs, no bullet walls.
+%   * A DIAGRAM on essentially every content slide (TikZ, styled light-on-dark).
+%   * EVERY piece appears on its own click: [<+->] on lists, \pause between
+%     blocks, \only<n->/\onslide<n-> on TikZ elements.
+%   * AT MOST ONE big formula per slide, built up term by term with \only.
+%   * Follow the section structure of the source lecture note.
+%   * NO prose "---" or "--". The only allowed "--" is a TikZ "(a) -- (b)" segment.
+%   * Every number is grounded in the source notes / spec; do not invent values.
+
+\title{<DECK TITLE>}
+\subtitle{<one-line subtitle, lower case is fine>}
+\author{<Course / Weekend>}
+\date{}
+
+\begin{document}
+
+% ------------------------------------------------------------------ 1. title
+\maketitle
+
+% ------------------------------------------------------------------ 2. a section per source-note section
+\section{<First section of the source note>}
+
+% PATTERN A: diagram first, one takeaway revealed on the second click.
+\begin{frame}{<short frame title, sentence case>}
+  \centering
+  \begin{tikzpicture}[node distance=8mm and 16mm]
+    \node[acc fill, nodebox] (a) {<thing>};
+    \node[nodebox, right=of a] (b) {<thing>};
+    % the edge is hidden until click 2 so the relation appears piece by piece
+    \only<2->{\draw[edge] (a) -- (b);}
+  \end{tikzpicture}
+
+  \only<2->{\takeaway{<the one idea of this slide, a few words>}}
+\end{frame}
+
+% PATTERN B: [<+->] reveals each bullet on its own click; diagram alongside.
+\begin{frame}{<short frame title>}
+  \centering
+  \begin{tikzpicture}[x=20mm]
+    \foreach \i/\lab in {0/A,1/B,2/C} {
+      \node[nodebox, minimum width=15mm, minimum height=18mm] (n\i) at (\i,0) {};
+      \node at (\i,0.5) {\small \lab};
+    }
+    % a labelled detail that only appears on click 2, styled light-on-dark
+    \only<2->{\node[text=muted] at (1,-0.05) {\small <detail>};}
+  \end{tikzpicture}
+
+  \begin{itemize}[<+->]
+    \item <first point, a few words>
+    \item \textbf{<contrast>}: <a few words>
+    \item \textbf{<contrast>}: <a few words>
+  \end{itemize}
+\end{frame}
+
+% ------------------------------------------------------------------ 3. one formula, built term by term
+\section{<The formula section>}
+
+% PATTERN C: at most ONE big formula, assembled one \only-term at a time.
+% Each \only<n> REPLACES the previous so only one version shows per click.
+% \underbrace names each term as it lands. The "%" after each \only suppresses
+% a spurious space so the formula does not jump horizontally between clicks.
+\begin{frame}{<the rule, in words>}
+  \centering
+  \only<1>{\Large $\mathrm{SCORE}(x) \;=\; \bar V(x)$}%
+  \only<2>{\Large $\mathrm{SCORE}(x) \;=\; \underbrace{\bar V(x)}_{\text{exploit}}$}%
+  \only<3->{\Large $\mathrm{SCORE}(x) \;=\; \underbrace{\bar V(x)}_{\text{exploit}}
+      \;+\; \underbrace{w\sqrt{\dfrac{\ln N}{n(x)}}}_{\text{explore}}$}
+
+  \vspace{4mm}
+  \begin{itemize}[<+->]
+    \item <what the first term does, a few words>
+    \item <what the second term does, a few words>
+    \item <the knob / the consequence>
+  \end{itemize}
+
+  \only<5->{\takeaway{<the punchline, a few words>}}
+\end{frame}
+
+% ------------------------------------------------------------------ 4. a multi-step diagram (phases)
+\section{<The process section>}
+
+% PATTERN D: ONE fixed diagram, each phase layered with \only on TikZ + a
+% synchronized description list. Build each \item<n-> to match the \only<n>.
+\begin{frame}{<process>, step by step}
+  \centering
+  \begin{tikzpicture}[node distance=9mm and 13mm]
+    \node[treenode, acc fill] (r) {};
+    \node[treenode, below left=of r] (l) {};
+    \node[treenode, below right=of r] (m) {};
+    \draw[edge] (r) -- (l);
+    \draw[edge] (r) -- (m);
+
+    % step 1: highlight a path
+    \only<1>{\draw[edge, accent, line width=1.4pt] (r) -- (m);}
+    \only<2->{\draw[edge] (r) -- (m);}
+    % step 2: add a new node
+    \only<2->{\node[treenode, good fill, below=9mm of m] (leaf) {};
+              \draw[edge] (m) -- (leaf);}
+    % step 3: a dashed action arrow (positioned so its label clears other nodes)
+    \only<3>{\draw[edge, accent2, densely dashed] (leaf) -- ++(0.9,-1.1)
+               node[right, text=accent2]{\scriptsize <action>};}
+    % step 4: arrows climbing back
+    \only<4>{\draw[edge, good, line width=1.2pt] (leaf) to[bend left=12] (m);
+             \draw[edge, good, line width=1.2pt] (m) to[bend left=12] (r);}
+  \end{tikzpicture}
+
+  \medskip
+  \begin{description}
+    \item<1->[\alert{1 <step>}] <a few words>
+    \item<2->[\alert{2 <step>}] <a few words>
+    \item<3->[\alert{3 <step>}] <a few words>
+    \item<4->[\alert{4 <step>}] <a few words>
+  \end{description}
+\end{frame}
+
+% ------------------------------------------------------------------ 5. a worked example with REAL numbers
+\section{<The worked example>}
+
+% PATTERN E: two columns, the running example. Build the figure click by click
+% with \only; keep every number identical to the source spec. Place node labels
+% with care (see the dark-background collision rule in the skill) so a caption
+% never lands on top of another label or runs through a node.
+\begin{frame}{<the running example>}
+  \begin{columns}[c]
+    \column{0.46\textwidth}
+      \centering
+      \begin{tikzpicture}[x=11mm, y=11mm]
+        \foreach \r in {0,1,2,3}{ \foreach \c in {0,1}{
+          \node[gridcell, minimum size=0.95cm] at (\c, -\r) {};
+        }}
+        \only<2->{\node[text=accent, font=\bfseries] at (0,0) {<S>};}
+        \only<3->{\node[good fill, gridcell, minimum size=0.95cm] at (0,-3) {};
+                  \node[text=good, font=\bfseries] at (0,-3) {<T>};}
+      \end{tikzpicture}
+    \column{0.50\textwidth}
+      \begin{itemize}[<+->]
+        \item <label> $=(0,0)$
+        \item <label> $=(3,0)$, reward $1.0$
+      \end{itemize}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------------ 6. the bridge / takeaway
+\section{<Bridge or punchline>}
+
+\begin{frame}{<the closing idea>}
+  \centering
+  \begin{tikzpicture}[node distance=6mm and 14mm, every node/.style={font=\scriptsize}]
+    \node[treenode, acc fill] (s) {<from>};
+    \node[bad fill, nodebox, below left=10mm and 8mm of s] (a) {<old way>};
+    \node[good fill, nodebox, below right=10mm and 8mm of s] (b) {<new way>};
+    \draw[dimedge] (s) -- (a);
+    \only<2->{\draw[edge, good, line width=1.2pt] (s) -- (b);}
+  \end{tikzpicture}
+
+  \begin{itemize}[<+->]
+    \item <what stays the same>
+    \item <what changes>
+  \end{itemize}
+
+  \only<4->{\takeaway{<the one sentence to remember>}}
+\end{frame}
+
+\end{document}

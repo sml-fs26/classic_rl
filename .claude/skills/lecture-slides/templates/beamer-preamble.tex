@@ -1,0 +1,67 @@
+% ===== shared Beamer preamble: "fancy dimmer" Metropolis (dark) =====
+% Engine: LuaLaTeX. luaotfload finds the TeX-tree Fira fonts reliably.
+% Do NOT compile with pdflatex (no Fira/fontspec) or xelatex (its fontconfig
+% path may miss the texmf-installed Fira and fail). LuaLaTeX only.
+%
+% Each deck does:
+%   \documentclass[aspectratio=169]{beamer}
+%   \input{beamer-preamble}
+% and is compiled FROM the directory that holds this file so \input resolves.
+%
+% House rule: ASCII punctuation only. No prose "---" (renders an em dash) and
+% no prose "--" (renders an en dash). The ONLY allowed "--" is a TikZ line
+% segment, e.g. \draw (a) -- (b). Use a comma, colon, parentheses, or "to".
+
+\usetheme{metropolis}
+\metroset{
+  background=dark,            % the "fancy dimmer" look
+  sectionpage=progressbar,
+  numbering=fraction,
+  progressbar=foot,
+  block=fill
+}
+
+% --- distinctive accents on the dark canvas (the "style"); retune per course ---
+\definecolor{accent}{HTML}{38BDF8}    % sky cyan (primary accent)
+\definecolor{accent2}{HTML}{FBBF24}   % amber (secondary highlight)
+\definecolor{good}{HTML}{34D399}      % green (success / positive state)
+\definecolor{bad}{HTML}{FB7185}       % rose (failure / negative state)
+\definecolor{panel}{HTML}{2A2D3A}     % a panel slightly lighter than the bg
+
+\setbeamercolor{alerted text}{fg=accent}
+\setbeamercolor{progress bar in head/foot}{fg=accent}
+\setbeamercolor{progress bar in section page}{fg=accent}
+\setbeamercolor{title separator}{fg=accent}
+% CRITICAL: Metropolis dark still ships a LIGHT frametitle bar by default.
+% Override it so the title strip is a seamless dark panel, not a white band.
+\setbeamercolor{frametitle}{fg=white!95!black, bg=panel}
+\setbeamercolor{frametitle right}{fg=white!95!black, bg=panel}
+
+% --- math (keep consistent with the lecture notes the deck derives from) ---
+\usepackage{amsmath, amssymb}
+\usepackage{dsfont}   % \mathds{1} indicator (amssymb has no blackboard-bold digit 1)
+
+% --- TikZ, styled for a dark background so every diagram reads light-on-dark ---
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc, backgrounds, fit, shapes.geometric}
+\tikzset{>={Stealth[round]}}
+\colorlet{fg}{white!92!black}
+% NOTE on the muted color: keep it LIGHT enough on the dark background.
+% white!66!black is the floor that stays legible; white!48!black is TOO DARK
+% (it made captions and a built-up formula nearly invisible). Do not lower it.
+\colorlet{muted}{white!66!black}
+\tikzset{
+  every node/.style={text=fg, font=\footnotesize},
+  edge/.style={draw=fg, thick, ->},
+  dimedge/.style={draw=muted, thick, ->},
+  nodebox/.style={draw=fg, thick, rounded corners=2pt, inner sep=5pt, text=fg},
+  accentbox/.style={draw=accent, line width=1pt, rounded corners=2pt, inner sep=5pt, text=fg},
+  gridcell/.style={draw=muted, minimum size=1.05cm, anchor=center, text=fg},
+  treenode/.style={circle, draw=fg, thick, minimum size=0.9cm, inner sep=1pt, text=fg},
+  good fill/.style={fill=good!22!panel, draw=good, text=fg},
+  bad fill/.style={fill=bad!22!panel, draw=bad, text=fg},
+  acc fill/.style={fill=accent!22!panel, draw=accent, text=fg},
+}
+
+% --- minimal-text helper: one big centered takeaway line ---
+\newcommand{\takeaway}[1]{\vfill\begin{center}\Large\alert{#1}\end{center}\vfill}

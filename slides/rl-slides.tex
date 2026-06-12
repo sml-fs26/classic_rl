@@ -1,0 +1,472 @@
+% Reinforcement Learning: animated deck distilled from
+% lecture_notes/reinforcement_learning.tex (same section order, same numbers).
+% Engine: LuaLaTeX ONLY. Compile from this directory, twice:
+%   lualatex rl-slides.tex && lualatex rl-slides.tex
+\documentclass[aspectratio=169]{beamer}
+\input{beamer-preamble}
+\usepackage{mathtools} % \mathclap: zero-width underbrace captions (after amsmath in the preamble)
+
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+% fixed-height centered slot for a formula built with an \only chain,
+% so the layout never jumps between overlay steps
+\newcommand{\formulaslot}[2]{\begin{minipage}[c][#1][c]{\linewidth}\centering #2\end{minipage}}
+
+\title{Reinforcement Learning}
+\subtitle{from one delivery van to the Bellman equation}
+\author{Carlos Cotrini, ETH Zurich}
+\date{}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+% ===================== 1. Motivation =====================
+\section{Motivation}
+
+\begin{frame}{One van, one call a week}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-1.6,-2.7) rectangle (11.8,2.5);
+    \node[accentbox, minimum width=2.2cm, minimum height=1.2cm] (van) at (0,0) {the van};
+    \node[below=2mm of van, text=muted] {every week: exactly one call};
+    \only<2->{%
+      \node[nodebox, good fill] (run) at (6.0,1.7) {RUN};
+      \node[right=3mm of run, text=muted, align=left] {collect the week's profit\\ risk: breakdown, wear};
+      \draw[edge] (van.east) -- (run.west);}%
+    \only<3->{%
+      \node[nodebox] (svc) at (6.0,0) {SERVICE};
+      \node[right=3mm of svc, text=muted, align=left] {a week in the shop\\ fails less often afterwards};
+      \draw[edge] (van.east) -- (svc.west);}%
+    \only<4->{%
+      \node[nodebox, bad fill] (rep) at (6.0,-1.7) {REPLACE};
+      \node[right=3mm of rep, text=muted, align=left] {a large expense\\ a fresh start};
+      \draw[edge] (van.east) -- (rep.west);}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{short-term cost against long-term payoff, chance at every step}}
+\end{frame}
+
+% ===================== 2. Markov decision processes =====================
+\section{Markov decision processes}
+
+\begin{frame}{The model: four ingredients}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-1.0,-1.6) rectangle (12.4,0.6);
+    \only<1->{\node[accentbox, minimum width=2.6cm] (S) at (0.6,0) {$S$: states};
+      \node[below=2mm of S, text=muted, align=center] {four wear\\ levels};}%
+    \only<2->{\node[accentbox, minimum width=2.6cm] (A) at (4.0,0) {$A$: actions};
+      \node[below=2mm of A, text=muted, align=center] {three\\ calls};}%
+    \only<3->{\node[accentbox, minimum width=2.6cm] (T) at (7.4,0) {$T$: dynamics};
+      \node[below=2mm of T, text=muted, align=center] {how the world\\ reacts};}%
+    \only<4->{\node[accentbox, minimum width=2.6cm] (g) at (10.8,0) {$\gamma = 0.9$};
+      \node[below=2mm of g, text=muted, align=center] {how much the\\ future counts};}%
+  \end{tikzpicture}
+
+  \formulaslot{2.3cm}{%
+    \only<5>{\Large $(s', r) = T(s, a)$}%
+    \only<6->{\Large $(\underbrace{s'}_{\text{the state next week}},\ \underbrace{r}_{\text{the reward}}) = T(s, a)$}%
+  }
+\end{frame}
+
+\begin{frame}{The fleet sheet}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-2.9,-3.2) rectangle (11.1,2.6);
+    % legend for the two caption rows (under RUN)
+    \only<1->{\node[text=muted, anchor=east] at (-1.1,-0.85) {RUN profit};
+      \node[text=muted, anchor=east] at (-1.1,-1.4) {breakdown};}%
+    \only<1->{\node[nodebox, good fill, minimum width=1.9cm] (h) at (0,0) {HEALTHY};
+      \node at (0,-0.85) {$+95$};
+      \node[text=muted] at (0,-1.4) {$2\%$};}%
+    \only<2->{\node[nodebox, fill=accent2!18!panel, draw=accent2, minimum width=1.9cm] (w) at (3.3,0) {WORN};
+      \node at (3.3,-0.85) {$+72$};
+      \node[text=muted] at (3.3,-1.4) {$8\%$};
+      \draw[dimedge] (h.east) -- (w.west);
+      \node[text=muted, font=\scriptsize] at (1.65,0.6) {wear slips};}%
+    \only<3->{\node[nodebox, fill=bad!10!panel, draw=bad, minimum width=1.9cm] (s) at (6.6,0) {SHAKY};
+      \node at (6.6,-0.85) {$+40$};
+      \node[text=muted] at (6.6,-1.4) {$28\%$};
+      \draw[dimedge] (w.east) -- (s.west);}%
+    \only<4->{\node[nodebox, bad fill, minimum width=1.9cm] (f) at (9.9,0) {FAILING};
+      \node at (9.9,-0.85) {$+16$};
+      \node[text=muted] at (9.9,-1.4) {$55\%$};
+      \draw[dimedge] (s.east) -- (f.west);}%
+    \only<5->{\node[align=center, text=bad] (bd) at (3.6,1.9)
+        {breakdown under RUN: one net reward, profit minus $280$\\
+         {\color{muted}from HEALTHY: $95 - 280 = -185$}};
+      \draw[->, draw=bad, thick, dashed] (bd.east) to[out=-10, in=120] (f.north);}%
+    \only<6->{\node at (4.1,-2.3) {\textcolor{accent}{SERVICE}: $-50$, a week in the shop
+        \ {\color{muted}(WORN back to HEALTHY $95\%$ of the time)}};}%
+    \only<7->{\node at (4.1,-2.95) {\textcolor{accent}{REPLACE}: $-130$, a brand-new HEALTHY van next week};}%
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Same pair in, different week out}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-1.0,-2.4) rectangle (12.2,2.4);
+    \node[nodebox] (in) at (0.9,0) {(WORN, RUN)};
+    \node[accentbox, minimum size=1.5cm, font=\large] (T) at (4.8,0) {$T$};
+    \draw[edge] (in.east) -- (T.west);
+    \only<2->{%
+      \node[nodebox, good fill] (o1) at (8.7,1.3) {(SHAKY, $+72$)};
+      \node[right=3mm of o1, text=muted] {one week};
+      \draw[edge] (T.north east) -- (o1.west);}%
+    \only<3->{%
+      \node[nodebox, bad fill] (o2) at (8.7,-1.3) {(FAILING, $-208$)};
+      \node[right=3mm of o2, text=muted] {another week};
+      \draw[edge] (T.south east) -- (o2.west);}%
+  \end{tikzpicture}
+  \takeaway{\uncover<4->{same input, different output: the dynamics $T$ is random}}
+\end{frame}
+
+% ===================== 3. Policies and trajectories =====================
+\section{Policies and trajectories}
+
+\begin{frame}{Playbook in, tape out}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.0) rectangle (13.4,2.6);
+    \only<1->{\node at (6.4,2.3) {a policy (the playbook): \ $\pi : S \to A$, \ one call per state};}%
+    \only<2->{%
+      \node[nodebox, font=\scriptsize] at (1.6,1.45) {HEALTHY $\to$ RUN};
+      \node[nodebox, font=\scriptsize] at (4.8,1.45) {WORN $\to$ SERVICE};
+      \node[nodebox, font=\scriptsize] at (8.0,1.45) {SHAKY $\to$ REPLACE};
+      \node[nodebox, font=\scriptsize] at (11.2,1.45) {FAILING $\to$ REPLACE};
+      \node[text=muted, font=\scriptsize] at (6.4,0.75)
+        {each week: $a_i = \pi(s_i)$, then $(s_{i+1}, r_i) = T(s_i, a_i)$};}%
+    \only<3->{\node[nodebox, align=center, font=\scriptsize] (c1) at (1.2,-0.6)
+        {wk 1\\ HEALTHY, RUN\\ \textcolor{good}{$+95$}};}%
+    \only<4->{\node[nodebox, align=center, font=\scriptsize] (c2) at (4.2,-0.6)
+        {wk 2\\ WORN, SERVICE\\ \textcolor{bad}{$-50$}};
+      \draw[edge] (c1.east) -- (c2.west);}%
+    \only<5->{\node[nodebox, align=center, font=\scriptsize] (c3) at (7.2,-0.6)
+        {wk 3\\ HEALTHY, RUN\\ \textcolor{good}{$+95$}};
+      \draw[edge] (c2.east) -- (c3.west);}%
+    \only<6->{\node[nodebox, align=center, font=\scriptsize] (c4) at (10.2,-0.6)
+        {wk 4\\ HEALTHY, RUN\\ \textcolor{good}{$+95$}};
+      \draw[edge] (c3.east) -- (c4.west);}%
+    \only<7->{\node[nodebox, align=center, font=\scriptsize, draw=muted] (c5) at (12.5,-0.6)
+        {wk 5\\ WORN};
+      \draw[dimedge] (c4.east) -- (c5.west);
+      \node[text=muted, font=\scriptsize] at (6.4,-1.85)
+        {the trajectory: $s_1, a_1, r_1,\ s_2, a_2, r_2,\ \dots$ \ one week per step, forever};}%
+    \only<8->{\node[font=\scriptsize] at (6.4,-2.6)
+        {{\color{muted}the tape is random; another run, same start:} \
+         (HEALTHY, RUN, \textcolor{bad}{$-185$}) $\to$ FAILING};}%
+  \end{tikzpicture}
+\end{frame}
+
+% ===================== 4. The goal: accumulating reward =====================
+\section{The goal: accumulating reward}
+
+\begin{frame}{The return: one number per tape}
+  \formulaslot{1.9cm}{%
+    \only<1>{\Large $G_1 = r_1$}%
+    \only<2>{\Large $G_1 = \underbrace{r_1}_{\text{in full}} + \underbrace{\gamma\, r_2}_{\text{at } 90\%}$}%
+    \only<3->{\Large $G_1 = \underbrace{r_1}_{\text{in full}} + \underbrace{\gamma\, r_2}_{\text{at } 90\%} + \underbrace{\gamma^2 r_3}_{\text{at } 81\%} + \cdots$}%
+  }
+  \formulaslot{0.8cm}{%
+    \uncover<4->{$G_1 = 95 + 0.9\,(-50) + 0.81 \cdot 95 + 0.729 \cdot 95 + \cdots
+      = 95 - 45 + 76.95 + 69.255 + \cdots$}%
+  }
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.8,-1.5) rectangle (10.6,2.3);
+    \draw[draw=muted] (-0.6,0) -- (5.8,0);
+    \only<1->{\draw[draw=good, fill=good!22!panel] (0,0) rectangle (0.9,1.71);
+      \node[font=\scriptsize] at (0.45,1.95) {$+95$};}%
+    \only<2->{\draw[draw=bad, fill=bad!22!panel] (1.4,0) rectangle (2.3,-0.81);
+      \node[font=\scriptsize] at (1.85,-1.1) {$-45$};}%
+    \only<3->{\draw[draw=good, fill=good!22!panel] (2.8,0) rectangle (3.7,1.39);
+      \node[font=\scriptsize] at (3.25,1.63) {$+76.95$};
+      \draw[draw=good, fill=good!22!panel] (4.2,0) rectangle (5.1,1.25);
+      \node[font=\scriptsize] at (4.65,1.49) {$+69.255$};
+      \node[text=muted] at (5.5,0.35) {$\cdots$};}%
+    \only<2->{\node[text=muted, align=left, anchor=west] at (7.0,1.0) {each week shrunk\\ by $\gamma = 0.9$};}%
+    \only<5->{\node[text=accent, anchor=west] at (7.0,-0.4) {the shrinking factors keep};
+      \node[text=accent, anchor=west] at (7.0,-0.95) {the never-ending sum finite};}%
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{The recurrence}
+  \formulaslot{2.1cm}{%
+    \only<1>{\Large $G_i = r_i + \gamma\, r_{i+1} + \gamma^2 r_{i+2} + \cdots$}%
+    \only<2>{\Large $G_i = r_i + \gamma \bigl(\, r_{i+1} + \gamma\, r_{i+2} + \cdots \bigr)$}%
+    \only<3->{\Large $G_i = \underbrace{r_i}_{\text{this week}} + \ \gamma\, \underbrace{G_{i+1}}_{\text{everything after}}$}%
+  }
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-2.1) rectangle (10.4,1.0);
+    \node[nodebox, acc fill, minimum width=1.5cm] (r1) at (0,0) {$r_i$};
+    \node[nodebox, minimum width=1.5cm] (r2) at (2.2,0) {$r_{i+1}$};
+    \node[nodebox, minimum width=1.5cm] (r3) at (4.4,0) {$r_{i+2}$};
+    \node[nodebox, draw=muted, minimum width=1.5cm] (r4) at (6.6,0) {$\cdots$};
+    \only<2->{\node[draw=accent2, dashed, rounded corners=3pt, inner sep=5pt, fit=(r2)(r4)] (tail) {};
+      \node[text=accent2] at (4.4,-1.0) {$G_{i+1}$, discounted once by $\gamma$};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<4->{this week's reward $+\ \gamma\,\times$ all the rest}}
+\end{frame}
+
+\begin{frame}{Maximize the average}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.4,-2.5) rectangle (12.4,2.3);
+    \only<1->{%
+      \foreach \y/\k in {1.5/1, 0.6/2, -0.3/3} {
+        \foreach \x in {0, 0.65, 1.3, 1.95} {
+          \node[draw=muted, minimum size=0.5cm] at (\x,\y) {};
+        }
+        \draw[dimedge] (2.4,\y) -- (3.1,\y);
+        \node[anchor=west] at (3.15,\y) {$G_1^{(\k)}$};
+      }
+      \node[text=muted] at (1.95,-1.35) {same playbook, same start: a different $G_1$ every run};}%
+    \only<2->{%
+      \node[nodebox, acc fill, align=center, minimum width=2.9cm] (avg) at (8.3,0.6) {$\E[G_1]$\\ the average};
+      \foreach \y in {1.5, 0.6, -0.3} {\draw[edge] (4.3,\y) -- (avg.west);}
+      \node[text=muted, align=center] at (8.3,-0.8) {over a sufficiently large\\ set of trajectories};}%
+    \only<3->{\node[align=center, anchor=west] at (10.4,0.6) {one plain\\ number};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<4->{the goal: find the policy $\pi$ that maximizes $\E[G_1]$}}
+\end{frame}
+
+% ===================== 5. The Q-function and the Bellman equation =====================
+\section{The $Q$-function and the Bellman equation}
+
+\begin{frame}{The scorecard $Q^\star$}
+  \formulaslot{1.6cm}{%
+    \only<1>{\Large $Q^\star(s, a) = \E\bigl[\, G_i \bigm| s_i = s,\ a_i = a \,\bigr]$}%
+    \only<2->{\Large $Q^\star(s, a) = \E\bigl[\, G_i \bigm| \underbrace{s_i = s,\ a_i = a}_{\mathclap{\text{in } s\text{, play } a\text{, optimal afterwards}}} \,\bigr]$}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<3->{$\pi^\star(s) = \argmax_a Q^\star(s, a)$ \quad {\color{muted}read each row, keep the best}}%
+  }
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.1,-3.9) rectangle (10.4,0.4);
+    \only<4->{%
+      \node[text=muted] at (2.51,0) {RUN};
+      \node[text=muted] at (4.13,0) {SERVICE};
+      \node[text=muted] at (5.75,0) {REPLACE};
+      \node[anchor=east, font=\scriptsize] at (1.66,-0.72) {HEALTHY};
+      \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-0.72) {$311.0$};
+      \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-0.72) {$229.9$};
+      \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (5.75,-0.72) {$149.9$};}%
+    \only<5->{%
+      \node[anchor=east, font=\scriptsize] at (1.66,-1.44) {WORN};
+      \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-1.44) {$203.4$};
+      \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-1.44) {$226.1$};
+      \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (5.75,-1.44) {$149.9$};}%
+    \only<6->{%
+      \node[anchor=east, font=\scriptsize] at (1.66,-2.16) {SHAKY};
+      \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-2.16) {$96.5$};
+      \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-2.16) {$126.4$};
+      \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (5.75,-2.16) {$149.9$};}%
+    \only<7->{%
+      \node[anchor=east, font=\scriptsize] at (1.66,-2.88) {FAILING};
+      \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-2.88) {$-3.1$};
+      \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-2.88) {$86.9$};
+      \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (5.75,-2.88) {$149.9$};}%
+    \only<8->{%
+      \draw[draw=accent2, thick, rounded corners=3pt] (3.28,-2.56) rectangle (6.60,-1.76);
+      \node[text=accent2, anchor=west] at (6.85,-2.16) {$149.9$ beats $126.4$ by $23.5$};
+      \node[text=accent] at (5.2,-3.6) {the optimal playbook replaces a van that still starts every morning};}%
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{The Bellman equation}
+  \formulaslot{2.4cm}{%
+    \only<1>{\Large $G_i = r_i + \gamma\, G_{i+1}$ \quad {\normalsize\color{muted}(every single week)}}%
+    \only<2>{\Large $Q^\star(s_i, a_i) = \E\bigl[\, r_i + \gamma\, G_{i+1} \,\bigr]$ \quad {\normalsize\color{muted}(average both sides)}}%
+    \only<3->{\Large $\boxed{\; Q^\star(s_i, a_i) = \E\bigl[\, \underbrace{r_i}_{\text{this week's cash}} + \ \gamma\, \underbrace{Q^\star(s_{i+1}, a_{i+1})}_{\text{next week's value}} \,\bigr] \;}$}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<3->{{\color{muted}replacing $G_{i+1}$ by its average $Q^\star(s_{i+1}, a_{i+1})$: averaging in two rounds}}%
+  }
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.4,-1.1) rectangle (10.6,0.7);
+    \node[nodebox, acc fill] (p1) at (1.6,0) {$(s_i,\ a_i)$};
+    \node[nodebox] (p2) at (7.4,0) {$(s_{i+1},\ a_{i+1})$};
+    \draw[edge] (p1.east) -- (p2.west) node[midway, above, text=muted] {pays $r_i$};
+    \node[text=muted, anchor=west] at (9.0,0) {counted at $\gamma$};
+  \end{tikzpicture}
+  \takeaway{\uncover<4->{one equation per cell: twelve equations pin down the table}}
+\end{frame}
+
+% ===================== 6. SARSA: learning from the logbook =====================
+\section{SARSA: learning from the logbook}
+
+\begin{frame}{No odds? Average the logbook}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.4,-1.9) rectangle (12.0,0.7);
+    \only<1->{\node[text=muted] at (5.8,0.4)
+      {the Bellman average needs the odds, and nobody prints them for your van};}%
+    \only<2->{%
+      \node[anchor=east] at (3.0,-1.0) {(WORN, RUN) paid:};
+      \node[nodebox, good fill, font=\scriptsize] at (3.9,-1.0) {$+72$};
+      \node[nodebox, good fill, font=\scriptsize] at (5.3,-1.0) {$+72$};
+      \node[nodebox, good fill, font=\scriptsize] at (6.7,-1.0) {$+72$};
+      \node[nodebox, bad fill, font=\scriptsize] at (8.2,-1.0) {$-208$};
+      \node[nodebox, good fill, font=\scriptsize] at (9.7,-1.0) {$+72$};
+      \node[text=muted] at (10.8,-1.0) {$\cdots$};}%
+  \end{tikzpicture}
+  \formulaslot{1.9cm}{%
+    \only<3>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr]$}%
+    \only<4>{\Large $q(s_i, a_i) \leftarrow \underbrace{q(s_i, a_i)}_{\text{old guess}} + \underbrace{\alpha}_{0.15} \bigl[\, \underbrace{r_i}_{\text{what the week paid}} - \ q(s_i, a_i) \,\bigr]$}%
+    \only<5->{\Large $q(s_i, a_i) \leftarrow \underbrace{q(s_i, a_i)}_{\text{old guess}} + \underbrace{\alpha}_{0.15} \underbrace{\bigl[\, r_i - q(s_i, a_i) \,\bigr]}_{\text{the miss: move a fraction toward it}}$}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<6->{{\color{muted}exponential smoothing: new forecast $=$ old forecast $+\ \alpha \times ($actual $-$ old forecast$)$}}%
+  }
+  \takeaway{\uncover<7->{nudge, never overwrite: one bad week must not erase a year}}
+\end{frame}
+
+\begin{frame}{The actual grows up: SARSA}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-1.4,-0.9) rectangle (12.2,1.2);
+    \only<1->{%
+      \node[text=accent2, font=\bfseries] at (2.4,0.8) {S};
+      \node[text=accent2, font=\bfseries] at (4.0,0.8) {A};
+      \node[text=accent2, font=\bfseries] at (5.6,0.8) {R};
+      \node[text=accent2, font=\bfseries] at (7.2,0.8) {S};
+      \node[text=accent2, font=\bfseries] at (8.8,0.8) {A};
+      \node[nodebox, minimum width=1.2cm] at (2.4,0) {$s_i$};
+      \node[nodebox, minimum width=1.2cm] at (4.0,0) {$a_i$};
+      \node[nodebox, minimum width=1.2cm] at (5.6,0) {$r_i$};
+      \node[nodebox, minimum width=1.2cm] at (7.2,0) {$s_{i+1}$};
+      \node[nodebox, minimum width=1.2cm] at (8.8,0) {$a_{i+1}$};
+      \node[text=muted, anchor=west] at (9.8,0) {one logbook line};}%
+  \end{tikzpicture}
+  \formulaslot{2.0cm}{%
+    \only<2>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr]$ \quad {\normalsize\color{muted}(cash only)}}%
+    \only<3>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, \underbrace{r_i + \gamma\, q(s_{i+1}, a_{i+1})}_{\text{the actual, grown up}} - \ q(s_i, a_i) \,\bigr]$}%
+    \only<4->{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \underbrace{\bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr]}_{\text{the surprise}}$}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<3->{{\color{muted}the future has not happened yet: the guess $q(s_{i+1}, a_{i+1})$ stands in for $Q^\star$}}%
+  }
+  \formulaslot{0.8cm}{%
+    \uncover<5->{\footnotesize $\alpha = 0.15$, constant
+      \ {\color{muted}$\cdot$} \ $\varepsilon$-greedy: a random call in $15\%$ of weeks
+      \ {\color{muted}$\cdot$} \ $a_{i+1}$: actually executed, never a max}%
+  }
+  \takeaway{\uncover<6->{Bellman, with the expectation replaced by an arriving average}}
+\end{frame}
+
+\begin{frame}{One week, one nudge}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-4.0) rectangle (12.4,2.2);
+    \only<2->{\node at (5.5,1.9) {week one in the logbook: \ (HEALTHY, RUN, $+95$, WORN, SERVICE)};}%
+    \only<3->{\node at (5.5,1.2) {evidence $= r_i + \gamma\, q(\text{WORN}, \text{SERVICE}) = 95 + 0.9 \times 0 = 95$};}%
+    \only<4->{\node (sur) at (5.5,0.5) {surprise $= 95 - 0 = 95$};
+      \draw[->, draw=accent2, thick] (sur.south) to[out=-70, in=100]
+        node[pos=0.35, anchor=east, xshift=-2mm, text=accent2, font=\scriptsize] {nudge: $+\,0.15 \times 95$} (6.6,-0.8);}%
+    % the q-table: col headers and row labels as plain text, 12 gridcells
+    \only<1->{%
+      \node[text=muted] at (7.0,-0.55) {RUN};
+      \node[text=muted] at (8.6,-0.55) {SERVICE};
+      \node[text=muted] at (10.2,-0.55) {REPLACE};
+      \node[anchor=east, font=\scriptsize] at (6.15,-1.16) {HEALTHY};
+      \node[anchor=east, font=\scriptsize] at (6.15,-1.82) {WORN};
+      \node[anchor=east, font=\scriptsize] at (6.15,-2.48) {SHAKY};
+      \node[anchor=east, font=\scriptsize] at (6.15,-3.14) {FAILING};
+      \only<-4>{\node[gridcell, minimum width=1.5cm, minimum height=0.66cm] at (7.0,-1.16) {$0$};}%
+      \only<5->{\node[gridcell, acc fill, minimum width=1.5cm, minimum height=0.66cm] at (7.0,-1.16) {$14.25$};}%
+      \node[gridcell, minimum width=1.5cm, minimum height=0.66cm] at (8.6,-1.16) {$0$};
+      \node[gridcell, minimum width=1.5cm, minimum height=0.66cm] at (10.2,-1.16) {$0$};
+      \foreach \y in {-1.82, -2.48, -3.14} {
+        \node[gridcell, minimum width=1.5cm, minimum height=0.66cm] at (7.0,\y) {$0$};
+        \node[gridcell, minimum width=1.5cm, minimum height=0.66cm] at (8.6,\y) {$0$};
+        \node[gridcell, minimum width=1.5cm, minimum height=0.66cm] at (10.2,\y) {$0$};
+      }
+      \node[text=muted] at (2.6,-1.16) {twelve guesses, all start at $0$};}%
+    \only<5->{\node[text=muted] at (2.6,-1.9) {one cell moves, eleven stay put};}%
+    \only<6->{%
+      \draw[draw=good, line width=1.4pt, rounded corners=3pt] (6.22,-1.52) rectangle (7.78,-0.80);
+      \draw[draw=good, line width=1.4pt, rounded corners=3pt] (7.82,-2.18) rectangle (9.38,-1.46);
+      \draw[draw=good, line width=1.4pt, rounded corners=3pt] (9.42,-2.84) rectangle (10.98,-2.12);
+      \draw[draw=good, line width=1.4pt, rounded corners=3pt] (9.42,-3.50) rectangle (10.98,-2.78);
+      \node[text=good] at (2.6,-2.64) {a few hundred weeks later:};
+      \node[text=good] at (2.6,-3.14) {the three bands emerge};}%
+    \only<7->{\node[text=accent] at (5.5,-3.85)
+      {the cells settle below $Q^\star$ and keep jittering, but the argmax per row comes out right};}%
+  \end{tikzpicture}
+\end{frame}
+
+% ===================== Closing =====================
+
+\begin{frame}{The whole story}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-1.5) rectangle (12.6,2.1);
+    \only<1->{%
+      \node[nodebox, align=center, font=\scriptsize] (k1) at (1.2,1.3) {MDP\\ $(S, A, T, \gamma)$};
+      \node[nodebox, align=center, font=\scriptsize] (k2) at (4.4,1.3) {playbook\\ $\pi : S \to A$};
+      \draw[edge] (k1.east) -- (k2.west);}%
+    \only<2->{%
+      \node[nodebox, align=center, font=\scriptsize] (k3) at (7.6,1.3) {tape\\ $s_1, a_1, r_1, \dots$};
+      \node[nodebox, align=center, font=\scriptsize] (k4) at (10.8,1.3) {return\\ $G_1$};
+      \draw[edge] (k2.east) -- (k3.west);
+      \draw[edge] (k3.east) -- (k4.west);}%
+    \only<3->{%
+      \node[nodebox, align=center, font=\scriptsize] (k5) at (1.2,-0.7) {average\\ $\E[G_1]$};
+      \node[nodebox, align=center, font=\scriptsize] (k6) at (4.4,-0.7) {scorecard\\ $Q^\star(s, a)$};
+      \draw[dimedge, rounded corners=7pt] (k4.south) -- (10.8,0.3) -- (1.2,0.3) -- (k5.north);
+      \draw[edge] (k5.east) -- (k6.west);}%
+    \only<4->{%
+      \node[nodebox, align=center, font=\scriptsize] (k7) at (7.6,-0.7) {Bellman\\ equation};
+      \node[nodebox, acc fill, align=center, font=\scriptsize] (k8) at (10.8,-0.7) {SARSA\\ nudge by nudge};
+      \draw[edge] (k6.east) -- (k7.west);
+      \draw[edge] (k7.east) -- (k8.west);}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{SARSA solves the Bellman equation by averaging evidence\\ instead of computing expectations}}
+  \begin{center}
+    \uncover<6->{\footnotesize play it: \url{https://sml-fs26.github.io/classic_rl/repair-or-replace/}}
+  \end{center}
+\end{frame}
+
+% ===================== Appendix =====================
+\section{Appendix: why the nudge works}
+
+\begin{frame}{The Robbins-Monro iteration}
+  \formulaslot{0.8cm}{%
+    {\color{muted}find the number $x^\star$ that equals the average of noisy samples, one at a time}%
+  }
+  \formulaslot{1.9cm}{%
+    \only<2>{\Large $x \leftarrow x + \alpha_n \, (\text{sample} - x)$}%
+    \only<3->{\Large $x \leftarrow x + \underbrace{\alpha_n}_{\text{step } n} \, \underbrace{(\text{sample} - x)}_{\text{the miss}}$}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<4->{$\alpha_1 + \alpha_2 + \alpha_3 + \cdots$ unbounded \quad {\color{muted}(can travel from any start)}}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<5->{$\alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \cdots$ finite \quad {\color{muted}(the noise eventually cancels)}}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<6->{$\alpha_n = 1/n$ satisfies both demands}%
+  }
+  \takeaway{\uncover<7->{SARSA is Robbins-Monro on the Bellman equation, cell by cell}}
+\end{frame}
+
+\begin{frame}{The running average}
+  \formulaslot{0.8cm}{%
+    {\color{muted}$A_n$: the average of the first $n$ observations $x_1, \dots, x_n$}%
+  }
+  \formulaslot{1.9cm}{%
+    \only<2>{\Large $A_n = A_{n-1} + \tfrac{1}{n} \, \bigl( x_n - A_{n-1} \bigr)$}%
+    \only<3->{\Large $A_n = \underbrace{\vphantom{\bigl(} A_{n-1}}_{\text{average so far}} + \ \tfrac{1}{n} \, \underbrace{\bigl( x_n - A_{n-1} \bigr)}_{\text{one share of the surprise}}$}%
+  }
+  \formulaslot{0.8cm}{%
+    \uncover<4->{hold $\alpha$ constant instead of $1/n$: each old week fades by $(1 - \alpha)$}%
+  }
+  \takeaway{\uncover<5->{SARSA is a running average of the weekly evidence}}
+\end{frame}
+
+\end{document}

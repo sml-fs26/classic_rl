@@ -1,0 +1,111 @@
+<!doctype html>
+<!--
+  Mobile-first landing page for a Pages teaching site. Mirrors the dark
+  Metropolis palette of the slides (same accents). Self-contained: one inline
+  <style>, no build, no external assets. Each card links to a deliverable.
+  House rule: no Unicode dashes anywhere. Never use the HTML dash entities
+  (m-dash, n-dash) or their numeric forms; use a comma, "to", parentheses,
+  or a middot (the &middot; entity).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><TOPIC> Teaching Materials</title>
+<style>
+  :root{
+    --bg:#1b1e2b; --panel:#2a2d3a; --panel2:#323647;
+    --fg:#e8eaf0; --muted:#9aa3b8; --accent:#38bdf8; --accent2:#fbbf24;
+    --good:#34d399; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 70% -10%, #243049 0%, var(--bg) 55%) no-repeat, var(--bg);
+    color:var(--fg);
+    font-family:"Fira Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased; min-height:100vh;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:clamp(20px,5vw,56px)}
+  header{margin-bottom:8px}
+  .eyebrow{color:var(--accent);font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600}
+  h1{font-size:clamp(1.7rem,6vw,2.6rem);line-height:1.1;margin:.25em 0 .15em}
+  .lede{color:var(--muted);font-size:clamp(1rem,2.6vw,1.12rem);max-width:46ch;margin:0}
+  h2{font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+     margin:38px 0 14px;font-weight:600}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .card{
+    display:block;text-decoration:none;color:inherit;background:var(--panel);
+    border:1px solid #ffffff14;border-radius:var(--radius);padding:18px 18px 16px;
+    transition:transform .12s ease,border-color .12s ease,background .12s ease;
+  }
+  .card:hover,.card:focus-visible{transform:translateY(-3px);border-color:var(--accent);background:var(--panel2);outline:none}
+  .card .ico{font-size:1.5rem}
+  .card h3{margin:.4em 0 .15em;font-size:1.12rem}
+  .card p{margin:0;color:var(--muted);font-size:.92rem}
+  .tag{display:inline-block;margin-top:10px;font-size:.72rem;color:var(--accent);
+       border:1px solid var(--accent);border-radius:999px;padding:2px 10px}
+  .tag.alt{color:var(--accent2);border-color:var(--accent2)}
+  .tag.go{color:var(--good);border-color:var(--good)}
+  footer{margin-top:44px;padding-top:18px;border-top:1px solid #ffffff14;color:var(--muted);font-size:.85rem}
+  footer a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow"><COURSE> &middot; <WEEKEND></div>
+    <h1><TOPIC TITLE></h1>
+    <p class="lede">Teaching materials: animated slides, self-contained lecture notes, and an interactive playground. Tap any card.</p>
+  </header>
+
+  <h2>Slides</h2>
+  <div class="grid">
+    <a class="card" href="<deck-a>.pdf">
+      <div class="ico">&#127922;</div>
+      <h3><deck A title></h3>
+      <p><one-line description of deck A></p>
+      <span class="tag">PDF, click to advance</span>
+    </a>
+    <a class="card" href="<deck-b>.pdf">
+      <div class="ico">&#127795;</div>
+      <h3><deck B title></h3>
+      <p><one-line description of deck B></p>
+      <span class="tag">PDF, click to advance</span>
+    </a>
+  </div>
+
+  <h2>Lecture notes</h2>
+  <div class="grid">
+    <a class="card" href="<notes-a>.pdf">
+      <div class="ico">&#128214;</div>
+      <h3><notes A title></h3>
+      <p><one-line description></p>
+      <span class="tag alt">PDF</span>
+    </a>
+    <a class="card" href="<notes-b>.pdf">
+      <div class="ico">&#128214;</div>
+      <h3><notes B title></h3>
+      <p><one-line description></p>
+      <span class="tag alt">PDF</span>
+    </a>
+  </div>
+
+  <!-- optional; drop this whole block if there is no interactive page -->
+  <h2>Interactive</h2>
+  <div class="grid">
+    <a class="card" href="interactive/">
+      <div class="ico">&#9889;</div>
+      <h3><interactive title></h3>
+      <p><one-line description></p>
+      <span class="tag go">Open in browser</span>
+    </a>
+  </div>
+
+  <footer>
+    Built for the <COURSE> workshop.
+    Source: <a href="https://github.com/<org>/<repo>/tree/main/<path>"><org>/<repo></a>
+  </footer>
+</div>
+</body>
+</html>
