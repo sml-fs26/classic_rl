@@ -3624,7 +3624,7 @@
         "title": "Return over the van’s life",
         "symbol": "G_i = \\sum_{j \\ge i} \\gamma^{\\,j-i}\\, r_j",
         "caption": "The money summed over every week ahead, future weeks discounted by gamma. Patience is a dial: short-sighted owners patch forever; patient owners replace while it still starts.",
-        "anchor": "Scene 6: the gamma slider"
+        "anchor": "Scenes 6 and 7: return, then the patience knob"
       },
       {
         "key": "qstar",
@@ -3632,7 +3632,7 @@
         "title": "Q* = the action scorecard",
         "symbol": "Q^*(s, a) = \\max_\\pi \\mathbb{E}\\,[\\,G \\mid s, a\\,]",
         "caption": "The true long-run value of each call in each state, if you play smart afterwards. Twelve cells, three bands, and the stars say: scrap the van at SHAKY, while it still runs.",
-        "anchor": "Scene 7: the 12-cell scorecard"
+        "anchor": "Scene 8: the 12-cell scorecard"
       },
       {
         "key": "dp",
@@ -3640,7 +3640,7 @@
         "title": "DP: compute it if you know the odds",
         "symbol": "Q^*(s, a) = \\mathbb{E}\\,[\\,R + \\gamma \\max_{a'} Q^*(S', a')\\,]",
         "caption": "With the wear and breakdown odds printed, repeated Bellman backups fill the whole scorecard; the bands lock in within a handful of sweeps. You usually do not have the odds.",
-        "anchor": "Scene 9: filling Q* with DP"
+        "anchor": "Scene 10: filling Q* with DP"
       },
       {
         "key": "sarsa",
@@ -3648,7 +3648,7 @@
         "title": "SARSA: learn it from the logbook",
         "symbol": "q[s,a] \\leftarrow q[s,a] + \\alpha\\,(\\,r + \\gamma\\, q[s',a'] - q[s,a]\\,)",
         "caption": "No odds needed: nudge each cell toward what last week actually paid, exploring a little. The same three bands emerge from nothing but driving, billing, and breakdowns.",
-        "anchor": "Scene 11: the live SARSA demo"
+        "anchor": "Scenes 12 and 13: the SARSA nudge, then the live drive"
       }
     ]
   };

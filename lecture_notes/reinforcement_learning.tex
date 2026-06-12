@@ -4,11 +4,10 @@
 \usepackage[margin=2.7cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb,amsthm,mathtools}
-\usepackage{newpxtext,newpxmath}
+\usepackage{lmodern}
 \usepackage{microtype}
 \usepackage{booktabs}
 \usepackage{xcolor}
-\usepackage{tcolorbox}
 \definecolor{inknavy}{RGB}{18,52,98}
 \usepackage[colorlinks=true,linkcolor=inknavy,urlcolor=inknavy,citecolor=inknavy]{hyperref}
 \hypersetup{pdftitle={Reinforcement Learning: Lecture Notes},pdfauthor={Carlos Cotrini}}
@@ -237,7 +236,7 @@ differently after every execution of the policy starting from state $s_i$.
 
 A quantity that changes from run to run cannot be maximized directly; we average it instead.
 
-\begin{definition}[expectation]
+\begin{definition}[expectation]\label{def:expectation}
 The \emph{expectation} $\E[G_i]$, read ``the expected value of $G_i$,'' is the average of
 $G_i$ over a sufficiently large set of trajectories: execute the policy many times, always
 starting from the same first state $s_1$ (for the fleet: a \sa{healthy} van), record the
@@ -251,7 +250,7 @@ not depend on the trajectory, because the averaging has removed the randomness. 
 $\E[G_i]$ is \emph{not} random.
 
 % 5: the scorecard and the equation that pins it down.
-\section{The \texorpdfstring{$Q$}{Q}-function and the Bellman equation}
+\section{The \texorpdfstring{$Q$}{Q}-function and the Bellman equation}\label{sec:qfunction}
 
 How can the best policy be discovered? The classical route goes through an auxiliary function
 that scores every pair of a state and an action.
@@ -293,15 +292,10 @@ $\pi^\star$ denotes the optimal policy.
 It remains to compute the table. Suppose an optimal policy produced the trajectory
 $\dots, s_i, a_i, r_i, s_{i+1}, a_{i+1}, \dots$. Averaging both sides of the
 recurrence~\eqref{eq:recurrence}, $G_i = r_i + \gamma\, G_{i+1}$, over many such executions,
-it must be the case that
-\begin{tcolorbox}[colback=inknavy!4!white,colframe=inknavy!80!black,boxrule=0.6pt,arc=2pt,
-                  left=8pt,right=8pt,top=2pt,bottom=6pt,title={The Bellman equation},
-                  fonttitle=\bfseries\small]
+it must be the case that the \emph{Bellman equation} holds:
 \begin{equation}\label{eq:bellman}
-Q^\star(s_i, a_i) \;=\; \E\bigl[\, r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1}) \,\bigr].
+\boxed{\;Q^\star(s_i, a_i) \;=\; \E\bigl[\, r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1}) \,\bigr]\;}
 \end{equation}
-\end{tcolorbox}
-\noindent
 In words: the value of this week's state and action equals this week's reward plus $\gamma$
 times the value of next week's state and action, averaged over the randomness of the week.
 Replacing $G_{i+1}$ by its average $Q^\star(s_{i+1}, a_{i+1})$ is legitimate: averaging in
@@ -321,14 +315,145 @@ $Q^\star(\sa{shaky}, \sa{service}) = 126.4$, while
 $Q^\star(\sa{shaky}, \sa{replace}) = 149.9$. The optimal playbook replaces a van that still
 starts every morning.
 
+% 6: when nobody prints the odds, learn the table from the lived weeks.
+\section{SARSA: learning from the logbook}
+
+Solving the Bellman equations requires knowing the odds. The average
+in~\eqref{eq:bellman} runs over the randomness of the week, and computing an average over
+outcomes means knowing how likely each outcome is: the transition dynamics $T$ itself. In
+the visualization those odds are printed on the fleet sheet; in reality nobody hands them
+to you, because no manual lists the breakdown odds for \emph{your} van on \emph{your}
+routes. And for realistic fleets the table of states explodes anyway (count odometer
+readings, age, weeks since the last service, route load, then forty vans, and the
+visualization's illustrative tally reaches some four million states for a single van and
+half a billion scorecard cells for a modest fleet).\footnote{Scene ``Why DP doesn't
+scale'' of the interactive \vizhref{visualization} prices this out.} What the manager does
+have is the \emph{logbook}, week after week of lived experience: the state the van was
+in, the call made, the money booked, the state it landed in, and the call made there.
+
+SARSA needs nothing else. Maintain a table $q(s, a)$ of \emph{estimates}, current best
+guesses of $Q^\star(s, a)$, one cell per state-action pair, twelve for the fleet, with
+every cell starting at $0$, as in the visualization. Then, after every lived week, improve
+the single cell just used.
+
+The evidence for that improvement comes from the recurrence~\eqref{eq:recurrence}: what is
+accumulated from week $i$ on equals this week's reward plus $\gamma$ times what is
+accumulated from week $i+1$ on. One week of experience
+$(s_i,\, a_i,\, r_i,\, s_{i+1},\, a_{i+1})$, one logbook line, therefore reports: ``this
+week, the value of the pair $(s_i, a_i)$ looked like
+$r_i + \gamma\, q(s_{i+1}, a_{i+1})$,'' that is, this week's money plus $\gamma$ times the
+current estimate of the pair the van moved on to. SARSA folds that report into the one
+cell it concerns:
+\begin{equation}\label{eq:sarsa}
+q(s_i, a_i) \;\leftarrow\; q(s_i, a_i)
+\;+\; \alpha \bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr].
+\end{equation}
+In words: the arrow is an instruction, not an equation; compute the right side and replace
+the left side by it. Three steps unpack the instruction. First, name the bracket: it is
+the \emph{surprise}, the gap between what this week's evidence says the pair is worth and
+what the table currently believes. A positive surprise means the week looked better than
+the table believed; a negative one, worse. Second, the move: shift the belief a small
+fraction $\alpha$ of the way toward the evidence. The number $\alpha$ is the
+\emph{learning rate}, $0.15$ in the visualization. Never overwrite, only nudge: one lucky
+week must not erase a year of evidence. Third, the punchline. The Bellman
+equation~\eqref{eq:bellman} says that $Q^\star(s_i, a_i)$ is the \emph{average} of the
+evidence $r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1})$ over many weeks, and an average over
+many executions is exactly how the expectation was defined in
+Definition~\ref{def:expectation}. SARSA computes that average the only way available
+without the odds: incrementally, as the weeks arrive. The update rule is the standard
+recipe for a running average (Appendix~\ref{app:runavg} derives it;
+Appendix~\ref{app:rm} states the general principle). Set \eqref{eq:sarsa}
+beside~\eqref{eq:bellman}: the update rule is the Bellman equation with the expectation
+replaced by an arriving average and $Q^\star$ replaced by the current guess $q$. SARSA
+solves the Bellman equation by averaging evidence instead of computing expectations.
+
+\begin{remark}
+The name SARSA spells the five logbook entries each update consumes: State, Action,
+Reward, State, Action.
+\end{remark}
+
+Which calls should be made while the table is still being learned? Mostly the one the
+table currently favors: at state $s$, play the action with the largest $q(s, a)$. But in a
+small random share of the weeks (a fraction $\varepsilon = 0.15$ in the visualization,
+held constant, like $\alpha$) the call is instead drawn at random, because a cell that is
+never visited is never improved: you cannot learn the value of servicing if you never
+service. The $a_{i+1}$ in the update is the action \emph{actually} chosen at $s_{i+1}$ by
+this very playbook, so SARSA learns the value of what it really does, occasional
+experiments included.
+
+Run this, week after week, on one endless stream of lived weeks: drive, get billed, nudge
+one cell. The table drifts toward $Q^\star$, and reading off the best action in each row
+recovers the playbook. In the visualization the same three bands as in the scorecard of
+Section~\ref{sec:qfunction} (\sa{run} when \sa{healthy}, \sa{service} when \sa{worn},
+\sa{replace} when \sa{shaky} or \sa{failing}) emerge within a few hundred weeks of raw
+experience, the odds never shown.\footnote{Scene ``SARSA: learn from the logbook'' of the
+interactive \vizhref{visualization}: slow it down and watch one week nudge one cell.} One
+honest caveat: with $\alpha$ and $\varepsilon$ held constant, the twelve numbers
+themselves stay rough; the experiments cost money, so the cells settle below the
+$Q^\star$ values and keep jittering. But the order within each row, which is all the
+playbook reads, comes out right.
+
 % Closing: recap and invitation.
 \section*{Closing}
 
 These notes modeled sequential decision problems as Markov decision processes, let policies
 generate random trajectories, scored each trajectory by its cumulative reward, averaged that
 score to obtain something maximizable, and characterized the best policy through the
-$Q$-function and the Bellman equation. The fastest way to make all of this concrete is to
+$Q$-function and the Bellman equation. When the odds are unknown, SARSA learns the same
+scorecard from the logbook alone. The fastest way to make all of this concrete is to
 play: open \vizurl, run the fleet for a quarter, drag the $\gamma$ slider, and watch the
 $Q^\star$ scorecard fill in, scene by scene, in the same order as these notes.
+
+% Appendices: the averaging machinery behind the update rule.
+\appendix
+
+\section{The Robbins-Monro algorithm}\label{app:rm}
+
+Strip the fleet away and a bare problem remains: find the number $x^\star$ that
+\emph{equals the average} of noisy evidence, when the average cannot be computed directly
+and the evidence arrives one sample at a time. The Robbins-Monro algorithm keeps a running
+guess $x$ and, when the $n$-th sample arrives, nudges it:
+\[
+x \;\leftarrow\; x + \alpha_n\,(\text{sample} - x).
+\]
+In words: move the guess a fraction $\alpha_n$ of the way toward each sample as it
+arrives. The step sizes $\alpha_1, \alpha_2, \alpha_3, \dots$ must satisfy two demands.
+The nudges must add up without bound, meaning that
+$\alpha_1 + \alpha_2 + \alpha_3 + \cdots$ grows past any number, so that the iteration can
+travel from any bad start all the way to $x^\star$. And their squares must add up to
+something finite, meaning that $\alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \cdots$ stays
+finite, so that the noise in the samples eventually cancels out instead of jiggling the
+guess forever. The choice $\alpha_n = 1/n$ satisfies both demands.
+
+The SARSA update~\eqref{eq:sarsa} is exactly a Robbins-Monro iteration applied cell by
+cell to the Bellman equation~\eqref{eq:bellman}: the guess is the cell $q(s_i, a_i)$, and
+the arriving sample is the evidence $r_i + \gamma\, q(s_{i+1}, a_{i+1})$. With one honest
+extra: that sample is itself measured with the current table $q$, so the algorithm pulls
+itself up by its own bootstraps, and making this rigorous took decades. The recipe is due
+to Herbert Robbins and Sutton Monro, who published it in 1951.
+
+\section{The running average}\label{app:runavg}
+
+Appendix~\ref{app:rm} gave the general principle; here is the alternative, elementary
+explanation, needing nothing beyond school algebra. Let $A_n$ be the average of the first
+$n$ observations $x_1, \dots, x_n$, that is, $A_n = (x_1 + \cdots + x_n)/n$. Then
+\[
+n\,A_n \;=\; x_1 + \cdots + x_n \;=\; (n-1)\,A_{n-1} + x_n.
+\]
+In words: $n$ times the average is the total of all $n$ observations, and that total is
+the total of the first $n-1$ of them, which is $(n-1)\,A_{n-1}$ (average times count),
+plus the newest one. Dividing by $n$ and rearranging,
+\[
+A_n \;=\; A_{n-1} + \frac{1}{n}\,\bigl(x_n - A_{n-1}\bigr).
+\]
+In words: each new observation moves the average by $1/n$ of the surprise, the gap between
+the newcomer and the average so far.
+
+Now replace the shrinking $1/n$ by a small constant $\alpha$. The result is an average
+that gently favors recent observations: each old observation's influence shrinks by a
+factor $1 - \alpha$ with every new week. That is the right choice here, because the early
+evidence was measured against a poor table $q$ and should fade. With that one
+substitution, the running-average recipe \emph{is} the SARSA update~\eqref{eq:sarsa}: the
+rule is nothing more exotic than a running average of the weekly evidence.
 
 \end{document}

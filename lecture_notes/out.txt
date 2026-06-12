@@ -1,0 +1,367 @@
+                                     Reinforcement Learning
+                                                 Lecture Notes
+
+                                                 Carlos Cotrini
+                                                  ETH Zürich
+
+                                                 June 12, 2026
+
+
+These notes accompany the interactive visualization Repair or Replace, available at
+                         https://sml-fs26.github.io/classic_rl/repair-or-replace/
+The concepts developed below map one-to-one onto its scenes.
+
+
+1        Motivation
+Many decisions a manager faces are sequential. What is decided today changes what must be
+decided tomorrow, and the consequences unfold over weeks and months rather than at once.
+The outcomes are uncertain on top: the same decision may turn out well one time and badly
+the next. Picture the scenario behind these notes. You operate a delivery business with a
+single van, and each week you make exactly one call about that machine: keep running it and
+collect the week’s profit, at the risk of a breakdown and of gradual wear; repair it, paying for
+a week in the shop so that it fails less often afterwards; or replace it outright, a large expense
+that buys a fresh start. Every option trades a short-term cost against a long-term payoff, and
+chance interferes at every step.
+    Reinforcement learning is a framework for computing decision strategies that maximize
+the reward accumulated over time in precisely such problems. One running example, the
+repair-or-replace problem of the visualization, carries everything.
+
+
+2        Markov decision processes
+The first step is a precise model of the decision problem. The standard model is the Markov
+decision process.1
+Definition 2.1 (Markov decision process). A Markov decision process (MDP) is a quadruple,
+a package of four ingredients, (S, A, T, γ), where S is the set of states the system can be in;
+A is the set of actions available to the decision maker; T is the transition dynamics, which
+describes how the system reacts when an action is taken; and γ ∈ [0, 1], the discount factor, is
+a number between 0 and 1. (γ is the Greek letter gamma.)
+    The sets S and A are defined a priori: they are fixed in advance, part of the problem
+description, and writing them down is the modeler’s first task. The transition dynamics is
+then defined on top of them. It is a randomized function T that consumes a state s and an
+action a and produces a new state s′ and a reward r:
+
+                                                (s′ , r) = T (s, a).
+    1
+        The name records that the next state depends only on the current state and action, not on the past.
+
+
+                                                         1
+In words: feed the current state and the chosen action into the dynamics, and out come the
+state the system lands in next and the reward, a number measuring the immediate gain or
+loss of that step.
+Remark 2.2. The transition dynamics is random: feeding the same state and action (s, a) in
+twice may produce different new states and different rewards.2
+        The discount factor γ is just a number between 0 and 1; its use will be explained later.
+Example 2.3 (the repair-or-replace MDP). You manage a one-van delivery fleet; the visual-
+ization calls the van Old Bessie. Each week the van sits at one of four wear levels, and you
+make exactly one call:
+
+             S = {healthy, worn, shaky, failing},                         A = {run, service, replace}.
+
+In words: four wear levels, from factory-fresh to nearly dead, and three possible calls (service
+is the “repair” of the title). Rewards are weekly net money, in plain units. The numbers
+governing run are:
+
+                                 state           weekly profit         breakdown odds
+                                 healthy                +95                      2%
+                                 worn                   +72                      8%
+                                 shaky                  +40                     28%
+                                 failing                +16                     55%
+
+Under run the van drives the route and earns the profit in the table, unless it breaks down,
+with the odds in the table: the week then books a single net reward equal to the profit minus
+a breakdown cost of 280 (from healthy: 95 − 280 = −185), and the van ends the week at
+failing. Even without a breakdown, wear tends to slip by one or two levels over the weeks.
+Under service the van spends the week in the shop: reward −50, no deliveries, and the wear
+often improves; from worn, the van returns to healthy 95% of the time. Under replace
+the reward is −130, and the next week starts with a brand-new van at healthy, whatever the
+old one looked like. The dynamics is random in the sense of Remark 2.2: feeding (worn, run)
+into T may return (shaky, +72) one week and (failing, −208) another. There is no final
+week (the fleet runs indefinitely), and the visualization fixes γ = 0.9.
+
+
+3        Policies and trajectories
+An MDP describes the world the manager operates in; it does not say how to operate. That is
+the job of a policy.
+Definition 3.1 (policy). A policy defines how to act at each state. Formally, a policy is a
+function π : S → A: it takes a state s and returns the action π(s) to be played whenever the
+system is in s. (π is the Greek letter pi.)
+   Executing a policy on the MDP, week after week, generates a record of everything that
+happened. That record is the central object of these notes.
+Definition 3.2 (trajectory). The trajectory of a policy π is the sequence
+
+                                   s1 , a1 , r1 , s2 , a2 , r2 , . . . , si , ai , ri , . . .
+
+produced by executing π on the MDP starting from state s1 . In words: states, actions, and
+rewards alternate, and the subscript counts the weeks. The mechanics are as follows. The first
+    2
+        Scene “You run the fleet” of the interactive visualization lets you sample these dynamics.
+
+
+                                                               2
+action results from applying the policy to the first state, a1 = π(s1 ). The first reward and the
+second state result from applying the transition dynamics to that pair, (s2 , r1 ) = T (s1 , a1 ).
+Then a2 = π(s2 ), the dynamics produce (s3 , r2 ) = T (s2 , a2 ), and so on without end.
+
+Remark 3.3. The trajectory is random: starting again from the same s1 and executing the
+same policy may produce a different trajectory, because the transition dynamics is random
+(and so, possibly, is the policy, if one allows policies that randomize their choices).
+
+Example 3.4 (a trajectory of the fleet). Consider the playbook π with π(healthy) = run,
+π(worn) = service, and π(shaky) = π(failing) = replace. One execution of π from
+s1 = healthy produced3
+
+                   s1 = healthy,                     a1 = run,                         r1 = +95,
+                   s2 = worn,                        a2 = service,                     r2 = −50,
+                   s3 = healthy,                     a3 = run,                         r3 = +95,
+                   s4 = healthy,                     a4 = run,                         r4 = +95,
+
+after which s5 = worn and the walk continues, one week per step, forever. In words: the van
+started healthy and earned 95 but slipped to worn; a 50 service restored it; two profitable runs
+followed; by week five it was worn again. Remark 3.3 is at work here: another execution of the
+same π from the same s1 might open with a first-week breakdown, s1 = healthy, a1 = run,
+r1 = −185, s2 = failing.
+
+
+4        The goal: accumulating reward
+A policy is good if it produces trajectories that accumulate as much reward as possible. The
+first task is to make “accumulate” precise.
+
+Definition 4.1 (cumulative reward). Take one particular trajectory s1 , a1 , r1 , s2 , a2 , r2 , . . . .
+Its cumulative reward, also called its return, is
+
+                                G1 = r1 + γ r2 + γ 2 r3 + · · · + γ i−1 ri + · · · .                (4.1)
+
+In words: add up the rewards of all weeks, forever (that is what the dots mean), scaling the
+reward of week i by γ i−1 : week one counts in full, week two is scaled by γ, week three by γ 2 ,
+and so on. (G stands for gain.)
+
+    Here the discount factor plays its very important role: it specifies how much we care about
+future rewards. With γ close to 0, the scaling factors die out almost immediately and only
+near-term rewards matter; with γ close to 1, they fade slowly and rewards far in the future count
+almost as much as immediate ones. Managers will recognize the device: it is the discounting
+of future cash flows familiar from net-present-value calculations, and, as with the NPV of a
+perpetuity, the shrinking factors keep the never-ending total finite. With the visualization’s
+γ = 0.9, next week’s reward counts 90% of this week’s, the week after 81%, and so on.4 For the
+trajectory of Example 3.4, formula (4.1) gives G1 = 95 + 0.9 · (−50) + 0.92 · 95 + 0.93 · 95 + · · · =
+95 − 45 + 76.95 + 69.255 + · · · .
+    The same accounting can be started at any week, not only the first. For an arbitrary week
+i, define Gi as the cumulative reward from week i on:
+
+                                       Gi = ri + γ ri+1 + γ 2 ri+2 + · · · .                        (4.2)
+    3
+        Scene “The trajectory” of the interactive visualization replays such a tape week by week.
+    4
+        Scene “Return over the van’s life” of the interactive visualization has a slider for γ.
+
+
+                                                          3
+In words: Gi is what the trajectory accumulates from week i onward, with the discounting
+restarted there. Comparing (4.2) at weeks i and i + 1 yields a recurrence that carries the rest
+of these notes:
+                                     Gi = ri + γ Gi+1 .                                   (4.3)
+In words: what is accumulated from week i on equals this week’s reward plus γ times what is
+accumulated from week i + 1 on.
+Remark 4.2. Gi is random. Because of the randomness of the transition dynamics, Gi comes
+out differently after every execution of the policy starting from state si .
+    A quantity that changes from run to run cannot be maximized directly; we average it
+instead.
+
+Definition 4.3 (expectation). The expectation E[Gi ], read “the expected value of Gi ,” is the
+average of Gi over a sufficiently large set of trajectories: execute the policy many times, always
+starting from the same first state s1 (for the fleet: a healthy van), record the value of Gi of
+each execution, and average the records.
+
+    We can now state the ultimate objective of reinforcement learning: find the policy π that
+maximizes E[G1 ], the policy whose trajectories accumulate, on average, the most reward. A
+policy achieving this maximum is called optimal. Note the contrast with Gi itself: E[Gi ] is a
+single real number that does not depend on the trajectory, because the averaging has removed
+the randomness. Therefore E[Gi ] is not random.
+
+
+5    The Q-function and the Bellman equation
+How can the best policy be discovered? The classical route goes through an auxiliary function
+that scores every pair of a state and an action.
+
+Definition 5.1 (the Q-function). For a state s and an action a, Q⋆ (s, a) is the cumulative
+reward one can expect when executing an optimal policy from state s, where the first action
+taken there is a. In notation,
+
+                              Q⋆ (s, a) = E Gi si = s, ai = a .
+                                                                 
+
+
+In words: the expected value of Gi conditioned on si being s and ai being a (the vertical bar
+is read “given that”); that is, the average of Gi over many executions, counting only those
+executions that are in state s at week i and take action a there as a one-off, even when an
+optimal policy would choose differently, acting optimally afterwards. (The star in Q⋆ marks
+optimality.)
+
+   Which week i? It does not matter: the fleet has no final week, so it looks the same from
+week 3 as from week 30, and every week gives the same average.
+Remark 5.2. Q⋆ (s, a) is different from E[Gi ]. The number E[Gi ] averages over all executions
+of the policy, whatever state they happen to be in at week i. Q⋆ (s, a) restricts the average to
+the executions that pass through s at week i and are made to play a there, acting optimally
+afterwards. And while E[Gi ] is a single number, Q⋆ is a whole table of numbers, one per
+state-action pair: for the fleet, 4 × 3 = 12 entries.
+   The table is worth the trouble because the optimal policy can be read off it: at state s,
+the optimal action is simply the action a that maximizes Q⋆ (s, a). In notation,
+
+                                  π ⋆ (s) = arg max Q⋆ (s, a).
+                                                a
+
+
+
+                                                4
+In words: in state s, compare the values Q⋆ (s, a) of all available actions a and play an action
+with the largest value; arg max denotes exactly that action, and π ⋆ denotes the optimal policy.
+       It remains to compute the table. Suppose an optimal policy produced the trajectory
+. . . , si , ai , ri , si+1 , ai+1 , . . . . Averaging both sides of the recurrence (4.3), Gi = ri + γ Gi+1 , over
+many such executions, it must be the case that the Bellman equation holds:
+
+                                    Q⋆ (si , ai ) = E ri + γ Q⋆ (si+1 , ai+1 )
+                                                                                
+                                                                                                            (5.1)
+
+In words: the value of this week’s state and action equals this week’s reward plus γ times the
+value of next week’s state and action, averaged over the randomness of the week. Replacing
+Gi+1 by its average Q⋆ (si+1 , ai+1 ) is legitimate: averaging in two rounds (first among the
+executions that share next week’s state and action, then across the week’s outcomes) gives the
+same result, just as a company-wide average can be computed branch by branch.
+    We can therefore find Q⋆ by solving the Bellman equations, one equation per state-action
+pair, twelve for the fleet. Since the optimal policy at si+1 picks the action with the largest
+Q⋆ -value, the right-hand side of (5.1) involves the same unknowns Q⋆ (s, a) as the left-hand side,
+so this is a system of equations in the entries of the table. The visualization solves it iteratively;
+its Q⋆ -scorecard and Bellman-check scenes display the solution for the fleet at γ = 0.9.5 Two
+entries tell the story: Q⋆ (shaky, service) = 126.4, while Q⋆ (shaky, replace) = 149.9. The
+optimal playbook replaces a van that still starts every morning.
+
+
+6        SARSA: learning from the logbook
+Solving the Bellman equations requires knowing the odds. The average in (5.1) runs over the
+randomness of the week, and computing an average over outcomes means knowing how likely
+each outcome is: the transition dynamics T itself. In the visualization those odds are printed
+on the fleet sheet; in reality nobody hands them to you, because no manual lists the breakdown
+odds for your van on your routes. And for realistic fleets the table of states explodes anyway
+(count odometer readings, age, weeks since the last service, route load, then forty vans, and
+the visualization’s illustrative tally reaches some four million states for a single van and half a
+billion scorecard cells for a modest fleet).6 What the manager does have is the logbook, week
+after week of lived experience: the state the van was in, the call made, the money booked, the
+state it landed in, and the call made there.
+     SARSA needs nothing else. Maintain a table q(s, a) of estimates, current best guesses of
+Q⋆ (s, a), one cell per state-action pair, twelve for the fleet, with every cell starting at 0, as in
+the visualization. Then, after every lived week, improve the single cell just used.
+     The evidence for that improvement comes from the recurrence (4.3): what is accumulated
+from week i on equals this week’s reward plus γ times what is accumulated from week i + 1
+on. One week of experience (si , ai , ri , si+1 , ai+1 ), one logbook line, therefore reports: “this
+week, the value of the pair (si , ai ) looked like ri + γ q(si+1 , ai+1 ),” that is, this week’s money
+plus γ times the current estimate of the pair the van moved on to. SARSA folds that report
+into the one cell it concerns:
+                                                                                         
+                        q(si , ai ) ← q(si , ai ) + α ri + γ q(si+1 , ai+1 ) − q(si , ai ) .                (6.1)
+
+In words: the arrow is an instruction, not an equation; compute the right side and replace
+the left side by it. Three steps unpack the instruction. First, name the bracket: it is the
+surprise, the gap between what this week’s evidence says the pair is worth and what the table
+currently believes. A positive surprise means the week looked better than the table believed; a
+    5
+        Scenes “Q⋆ : the action scorecard” and “The Bellman equation,” interactive in the visualization.
+    6
+        Scene “Why DP doesn’t scale” of the interactive visualization prices this out.
+
+
+                                                          5
+negative one, worse. Second, the move: shift the belief a small fraction α of the way toward
+the evidence. The number α is the learning rate, 0.15 in the visualization. Never overwrite,
+only nudge: one lucky week must not erase a year of evidence. Third, the punchline. The
+Bellman equation (5.1) says that Q⋆ (si , ai ) is the average of the evidence ri + γ Q⋆ (si+1 , ai+1 )
+over many weeks, and an average over many executions is exactly how the expectation was
+defined in Definition 4.3. SARSA computes that average the only way available without
+the odds: incrementally, as the weeks arrive. The update rule is the standard recipe for a
+running average (Appendix B derives it; Appendix A states the general principle). Set (6.1)
+beside (5.1): the update rule is the Bellman equation with the expectation replaced by an
+arriving average and Q⋆ replaced by the current guess q. SARSA solves the Bellman equation
+by averaging evidence instead of computing expectations.
+Remark 6.1. The name SARSA spells the five logbook entries each update consumes: State,
+Action, Reward, State, Action.
+    Which calls should be made while the table is still being learned? Mostly the one the
+table currently favors: at state s, play the action with the largest q(s, a). But in a small
+random share of the weeks (a fraction ε = 0.15 in the visualization, held constant, like α) the
+call is instead drawn at random, because a cell that is never visited is never improved: you
+cannot learn the value of servicing if you never service. The ai+1 in the update is the action
+actually chosen at si+1 by this very playbook, so SARSA learns the value of what it really
+does, occasional experiments included.
+    Run this, week after week, on one endless stream of lived weeks: drive, get billed, nudge
+one cell. The table drifts toward Q⋆ , and reading off the best action in each row recovers the
+playbook. In the visualization the same three bands as in the scorecard of Section 5 (run
+when healthy, service when worn, replace when shaky or failing) emerge within a few
+hundred weeks of raw experience, the odds never shown.7 One honest caveat: with α and ε
+held constant, the twelve numbers themselves stay rough; the experiments cost money, so the
+cells settle below the Q⋆ values and keep jittering. But the order within each row, which is all
+the playbook reads, comes out right.
+
+
+Closing
+These notes modeled sequential decision problems as Markov decision processes, let policies
+generate random trajectories, scored each trajectory by its cumulative reward, averaged that
+score to obtain something maximizable, and characterized the best policy through the Q-
+function and the Bellman equation. When the odds are unknown, SARSA learns the same
+scorecard from the logbook alone. The fastest way to make all of this concrete is to play: open
+https://sml-fs26.github.io/classic_rl/repair-or-replace/, run the fleet for a quarter, drag the γ
+slider, and watch the Q⋆ scorecard fill in, scene by scene, in the same order as these notes.
+
+
+A       The Robbins-Monro algorithm
+Strip the fleet away and a bare problem remains: find the number x⋆ that equals the average
+of noisy evidence, when the average cannot be computed directly and the evidence arrives one
+sample at a time. The Robbins-Monro algorithm keeps a running guess x and, when the n-th
+sample arrives, nudges it:
+                                 x ← x + αn (sample − x).
+    7
+   Scene “SARSA: learn from the logbook” of the interactive visualization: slow it down and watch one week
+nudge one cell.
+
+
+
+
+                                                    6
+In words: move the guess a fraction αn of the way toward each sample as it arrives. The
+step sizes α1 , α2 , α3 , . . . must satisfy two demands. The nudges must add up without bound,
+meaning that α1 + α2 + α3 + · · · grows past any number, so that the iteration can travel from
+any bad start all the way to x⋆ . And their squares must add up to something finite, meaning
+that α12 + α22 + α32 + · · · stays finite, so that the noise in the samples eventually cancels out
+instead of jiggling the guess forever. The choice αn = 1/n satisfies both demands.
+    The SARSA update (6.1) is exactly a Robbins-Monro iteration applied cell by cell to the
+Bellman equation (5.1): the guess is the cell q(si , ai ), and the arriving sample is the evidence
+ri + γ q(si+1 , ai+1 ). With one honest extra: that sample is itself measured with the current
+table q, so the algorithm pulls itself up by its own bootstraps, and making this rigorous took
+decades. The recipe is due to Herbert Robbins and Sutton Monro, who published it in 1951.
+
+
+B     The running average
+Appendix A gave the general principle; here is the alternative, elementary explanation, needing
+nothing beyond school algebra. Let An be the average of the first n observations x1 , . . . , xn ,
+that is, An = (x1 + · · · + xn )/n. Then
+
+                         n An = x1 + · · · + xn = (n − 1) An−1 + xn .
+
+In words: n times the average is the total of all n observations, and that total is the total
+of the first n − 1 of them, which is (n − 1) An−1 (average times count), plus the newest one.
+Dividing by n and rearranging,
+                                                 1          
+                                An = An−1 +        xn − An−1 .
+                                                 n
+In words: each new observation moves the average by 1/n of the surprise, the gap between the
+newcomer and the average so far.
+    Now replace the shrinking 1/n by a small constant α. The result is an average that gently
+favors recent observations: each old observation’s influence shrinks by a factor 1 − α with every
+new week. That is the right choice here, because the early evidence was measured against a
+poor table q and should fade. With that one substitution, the running-average recipe is the
+SARSA update (6.1): the rule is nothing more exotic than a running average of the weekly
+evidence.
+
+
+
+
+                                                7
+

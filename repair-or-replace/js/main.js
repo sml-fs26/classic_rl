@@ -32,11 +32,13 @@
     { key: 'scene4',  title: 'Policy: your maintenance playbook', music: 'concept' },
     { key: 'scene5',  title: 'The trajectory',            music: 'concept'  },
     { key: 'scene6',  title: "Return over the van's life", music: 'concept' },
+    { key: 'scene13', title: 'Turn the patience knob',    music: 'concept'  },
     { key: 'scene7',  title: 'Q*: the action scorecard',  music: 'discover' },
     { key: 'scene8',  title: 'The Bellman equation',      music: 'concept'  },
     { key: 'scene9',  title: 'Filling Q* with DP',        music: 'dp'       },
     { key: 'scene10', title: "Why DP doesn't scale",      music: 'bridge'   },
-    { key: 'scene11', title: 'SARSA: learn from the logbook', music: 'sarsa' },
+    { key: 'scene11', title: 'SARSA: the one-cell nudge', music: 'sarsa'    },
+    { key: 'scene14', title: 'SARSA: let her drive',      music: 'sarsa'    },
     { key: 'scene12', title: 'Recap',                     music: 'champion' },
   ];
 
@@ -105,6 +107,28 @@
     }, 220);
   }
 
+  /* &autostep=K: fire the scene's onNextKey() K times after build, for
+     headless capture of internal steps on scenes without a native &step
+     deep link. Dev affordance only, like &run. */
+  function maybeAutoStep(idx) {
+    const m = (window.location.hash || '').match(/[#&?]autostep=(\d+)/);
+    if (!m) return;
+    const k = parseInt(m[1], 10);
+    if (!Number.isFinite(k) || k <= 0) return;
+    setTimeout(() => {
+      const st = sceneState[idx];
+      if (!st || typeof st.onNextKey !== 'function') return;
+      let fired = 0;
+      (function tick() {
+        if (fired >= k) return;
+        fired++;
+        let consumed = false;
+        try { consumed = st.onNextKey(); } catch (_e) { return; }
+        if (consumed) setTimeout(tick, 140);
+      })();
+    }, 450);
+  }
+
   function goTo(idx) {
     if (idx < 0 || idx >= SCENES.length) return;
     if (idx === current) { syncHash(idx); return; }
@@ -167,7 +191,7 @@
     updateButtons(idx);
     updateTitle(idx);
     syncHash(idx);
-    if (freshlyBuilt) maybeAutoRun(idx);
+    if (freshlyBuilt) { maybeAutoRun(idx); maybeAutoStep(idx); }
     window.dispatchEvent(new CustomEvent('scene-change', { detail: { idx, key: SCENES[idx].key } }));
   }
 
@@ -381,6 +405,7 @@
           '<div class="help-row"><kbd>Esc</kbd><span>close overlays</span></div>' +
           '<div class="help-card-section">FOR ROBOTS</div>' +
           '<div class="help-row"><kbd>&amp;run</kbd><span>auto-press a scene\'s primary button (headless capture)</span></div>' +
+          '<div class="help-row"><kbd>&amp;autostep=K</kbd><span>fire onNextKey K times after build (headless capture)</span></div>' +
         '</div>';
     }
     renderHelpOverlay();
