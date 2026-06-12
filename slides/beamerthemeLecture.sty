@@ -1,0 +1,441 @@
+% Dennis Komm  2019-02-07
+% Based on LaTex ETH Presentation Templates by Dieter Hennig and Karl Wuest
+
+% Felix Friedrich 2019-09-02 
+% made this a pure style file and moved all other definitions into slides.tex
+
+\RequirePackage{import}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{ifthen}
+\usepackage{pgffor}
+
+\usepackage[light,lining]{FiraSans}
+\usefonttheme[onlymath]{serif} 
+
+
+\usepackage[normalem]{ulem}
+\usepackage{microtype}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{relsize}
+\usepackage{tikz,datetime,textpos}
+\usepackage{calc}
+\usepackage{xspace}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{pgfplots}
+\usepgfplotslibrary{fillbetween}
+\usepackage{dsfont}
+\usepackage{pifont}
+\usepackage{fancyvrb}
+
+
+%\usepackage[fleqn]{mathtools}
+\usepackage{amsmath}
+
+
+% COLORS
+
+\definecolor{ETHblue}{RGB}{31,64,122}
+\definecolor{ETHred}{rgb}{0.9,0,0}
+\definecolor{ETHgreen}{RGB}{64,122,31}
+\definecolor{lightorange}{RGB}{255,165,0}
+
+
+\let\leftold\left
+\let\rightold\right
+\renewcommand{\left}{\mathopen{}\mathclose\bgroup\leftold}
+\renewcommand{\right}{\aftergroup\egroup\rightold}
+
+
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}[square]
+\setbeamertemplate{itemize subitem}[square]
+\setbeamertemplate{itemize subsubitem}[triangle]
+
+\setbeamercolor*{author}{fg=white}
+\setbeamercolor*{placeanddate}{fg=white}
+\setbeamercolor*{item}{fg=ETHblue}
+\setbeamercolor*{subitem}{fg=ETHblue!70}
+\alt<beamer>{\setbeamercolor*{frametitle}{fg=white,bg=ETHblue}}{\setbeamercolor*{frametitle}{fg=black,bg=white}}
+\setbeamercolor*{section in toc}{fg=black}
+\setbeamercolor*{section page}{fg=black}
+
+% font weights
+% \firathin
+% \firaultralight
+% \firaextralight
+% \firalight
+% \firabook
+% \firamedium
+% \firasemibold
+% \firaextrabold
+% \firaheavy
+
+\renewcommand<>{\textmd}[1]{%
+  \only#2{{\firamedium{#1}}}%
+}
+\renewcommand{\bf}{\firasemibold}
+
+
+\setbeamerfont*{frametitle}{size=\Large,shape=\firabook}
+\setbeamerfont{section page}{size=\Large}
+\setbeamercolor{subtitle}{fg=black}
+\setbeamerfont{title}{size=\firabook\LARGE}
+\setbeamercolor{title}{fg=ETHblue}
+\setbeamerfont{subtitle}{size=\mdseries\normalsize}
+\setbeamerfont{author}{size=\small}
+\setbeamerfont{placeanddate}{size=\footnotesize}
+\setbeamerfont{text}{size=\normalsize,shape=\firalight}
+
+\newenvironment{xplainframe}{\bgroup\begin{frame}[plain]}{\end{frame}\egroup}
+\newcommand{\headline}[1]{\frametitle{\boldmath #1\unboldmath}}
+\renewcommand{\cite}[2]{\hfill {\slshape [#1,\ #2]}\hspace*{-0.7mm}}
+\newcommand{\citetwo}[4]{\hfill {\slshape [#1,\ #2;\ #3,\ #4]}\hspace*{-0.7mm}}
+
+\newcommand*{\eth@barbreit}{\paperwidth-4mm}
+\newcommand*{\eth@barhoch}{10.75mm}
+\newcommand*{\eth@baruhh}{3.5mm}
+\newcommand*{\eth@baruhb}{2.5mm}
+\newcommand*{\eth@shiftx}{9.5mm-\paperwidth}
+\newcommand*{\eth@shifty}{5.5mm-\paperheight}
+\newcommand*{\anchorheight}{\the\paperheight-\eth@barhoch-2mm}
+\newcommand*{\titleanchorheight}{7.5mm}
+
+\pgfplotsset{
+  every axis/.append style={font=\footnotesize},  
+}
+
+\newcommand*{\eth@hintergrundbreite}{\paperwidth-9mm}
+\newcommand*{\eth@hintergrundhoehe}{0.5\paperheight-12mm}
+
+\newcommand{\bfnum}[1]{{\boldmath\textcolor{ETHblue!70!black}{\bfseries #1}\unboldmath}}
+\newcommand{\p}{\ding{239}}
+\newcommand{\pg}{\p\ }
+\newcommand{\bfblue}[1]{\textcolor{ETHblue}{\boldmath\textbf{#1}\unboldmath}}
+\newcommand{\bfred}[1]{\textcolor{ETHred}{\boldmath\textbf{#1}\unboldmath}}
+\newcommand{\bfgreen}[1]{\textcolor{ETHgreen}{\boldmath\textbf{#1}\unboldmath}}
+
+\newcommand{\pictureat}[4][\empty]{%
+  \begin{tikzpicture}[overlay,remember picture,shift={(current page.north west)},y=-1cm]%
+    \node[align=left] at (#2) {\includegraphics[#3]{#4}%
+    \ifthenelse{\equal{#1}{\empty}}{}{\\[-0.75em]\tiny #1}};%
+  \end{tikzpicture}%
+}
+
+\newenvironment{overlaytikzpicture}{%
+  \begin{tikzpicture}[overlay,remember picture,shift={(current page.north west)},y=-1cm]%
+}{
+  \end{tikzpicture}%
+}
+
+\defbeamertemplate*{background}{xplainframe}{}
+
+\newcommand{\setdefaultbg}{
+  \setbeamertemplate{background}[xplainframe]
+}
+
+\newcommand{\settitlebg}{
+  \setbeamercolor*{title page header}{fg=white}
+  \setbeamercolor*{title}{fg=white}
+  \setbeamertemplate{background} {
+    \begin{tikzpicture}
+      \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+      \node[shift={(-0.5\paperwidth+4.5mm,-\paperheight-22mm + \anchorheight)}]  at (current page.north east)
+           {\includegraphics[width=\the\paperwidth-9mm]{../img/bg.jpg}};
+      \hspace{2mm}\draw[ETHblue,fill=ETHblue] (0,\eth@barhoch + \anchorheight)--   %
+          (\eth@barbreit,\eth@barhoch + \anchorheight)--(\eth@barbreit, \anchorheight)-- %
+          (\eth@barbreit-\eth@baruhb, \anchorheight)-- (\eth@barbreit-\eth@baruhb,\eth@baruhh + \anchorheight) -- %
+          (\eth@baruhb,\eth@baruhh + \anchorheight)--(\eth@baruhb, \anchorheight)-- (0, \anchorheight) -- %
+          (0,\eth@barhoch + \anchorheight); %
+      \hspace{2.5mm}\draw[ETHblue,fill=ETHblue]%
+        (0,\eth@hintergrundhoehe+\titleanchorheight)--(\eth@hintergrundbreite,\eth@hintergrundhoehe+\titleanchorheight)%
+        --(\eth@hintergrundbreite,\titleanchorheight)--(0,\titleanchorheight)--(0,\eth@hintergrundhoehe+\titleanchorheight); 
+      \node at (1.0,8.45) {\includegraphics[width=2.0cm]{../img/eth.png}};
+    \end{tikzpicture}
+  }
+}
+
+
+% ------ frames ----------
+
+\newcommand{\titleframe}{
+  {\setbeamertemplate{footline}{} 
+  \settitlebg
+  \frame{\maketitle}}
+  \addtocounter{framenumber}{-1}
+  \setdefaultbg
+}
+
+\newcommand{\partframe}[2][\empty]{
+  {\setbeamertemplate{footline}{}
+  \begin{frame}
+    \addtocounter{framenumber}{-1}
+    \vfill
+    \begin{center}
+      \LARGE\bfseries\boldmath\color{ETHblue} #2 \unboldmath
+      \ifthenelse{\equal{#1}{\empty}}{}{%
+        \\
+        \Large\bfseries\boldmath\color{ETHblue!60} #1 \unboldmath
+      }
+    \end{center}
+    \vfill
+  \end{frame}}
+}
+
+\newcommand{\thanksframe}[1]{
+  \ifthenelse{\equal{\multiSlides}{1}}{}{%
+    {\setbeamertemplate{footline}{}
+    \begin{frame}
+      \addtocounter{framenumber}{-1}
+      \vfill
+      \begin{center}
+        \LARGE\bfseries\boldmath\color{ETHblue} #1 \unboldmath
+      \end{center}
+      \vfill
+    \end{frame}}%
+  }
+}
+
+%a section frame: displays current section name plus some subcaption as separate slide
+\newcommand{\sectionframe}[1]
+{{
+\setbeamercolor*{frametitle}{fg=normal text.fg, bg=normal text.bg} % set bg to green (or so) when adjusting..
+\begin{frame}[c]
+%    \begin{center}
+    \usebeamerfont*{title}
+    \usebeamercolor*[fg]{title}
+    \LARGE \arabic{section}. \insertsection
+	\hrule\relax
+	~\\[1em]
+    \usebeamerfont*{subtitle}
+    \usebeamercolor*[fg]{subtitle}
+    \raggedright \normalsize
+    #1
+%    \end{center}
+\end{frame}
+}}
+
+\newcommand{\subsectionframe}[1]
+{{
+\setbeamercolor*{frametitle}{fg=normal text.fg, bg=normal text.bg} % set bg to green (or so) when adjusting..
+\begin{frame}[c]
+    %\begin{center}
+    \usebeamerfont*{title}
+    \usebeamercolor*[fg]{title}
+    \Large \arabic{section}.\arabic{subsection} \insertsubsection 
+	\hrule\relax
+	~\\[1em]
+    \usebeamerfont*{subtitle}
+    \usebeamercolor*[fg]{subtitle}
+    \raggedright \normalsize
+    \small #1
+    %\end{center}
+\end{frame}
+}}
+
+
+
+% ---------------- BOXES ------------------
+
+	
+\alt<beamer>{\colorlet{lboxTitleBg}{ETHblue}}{\colorlet{lboxTitleBg}{ETHblue!20}}
+\alt<beamer>{\colorlet{lboxTitleFg}{white}}{\colorlet{lboxTitleFg}{black}}
+\alt<beamer>{\colorlet{lboxBg}{ETHblue!30}}{\colorlet{lboxBg}{ETHblue!10}}
+
+\newenvironment{lbox}[1][]{
+  \ifthenelse{\equal{#1}{\empty}}{
+	  \begin{mdframed}[linewidth=0px,backgroundcolor=lboxBg,skipabove=0.2cm,skipbelow=0.2cm]%
+  }{%
+    \begin{mdframed}[linewidth=0px,backgroundcolor=lboxTitleBg,skipabove=0.2cm,skipbelow=0cm]%
+     \color{lboxTitleFg}%
+     #1%
+    \end{mdframed}%
+  \begin{mdframed}[linewidth=0px,backgroundcolor=lboxBg,skipabove=0cm,skipbelow=0.2cm]%
+  }
+}{%
+  \end{mdframed}%
+}
+
+\newenvironment{alertbox}[1][]{
+  \setbeamercolor*{item}{fg=ETHred}
+  \setbeamercolor*{subitem}{fg=ETHred!80}
+  \renewcommand{\bfnum}[1]{\textcolor{ETHred!70!black}{\bfseries ##1}}
+  \ifthenelse{\equal{#1}{\empty}}{
+  \begin{mdframed}[linewidth=0px,backgroundcolor=ETHred!20,skipabove=0.2m,skipbelow=0.2cm]%  
+  }{%
+    \begin{mdframed}[linewidth=0px,backgroundcolor=ETHred!80!black,skipabove=0.2cm, skipbelow=0cm]%
+     \color{white}%
+     #1%
+    \end{mdframed}
+  \begin{mdframed}[linewidth=0px,backgroundcolor=ETHred!20,skipabove=0cm,skipbelow=0.2cm]%
+  }%
+}{%
+  \end{mdframed}%
+}
+
+
+\alt<beamer>{\colorlet{exampleboxTitleBg}{ETHgreen!80!black}}{\colorlet{exampleboxTitleBg}{ETHgreen!20}}
+\alt<beamer>{\colorlet{exampleboxTitleFg}{white}}{\colorlet{exampleboxTitleFg}{black}}
+\alt<beamer>{\colorlet{exampleboxBg}{ETHgreen!20}}{\colorlet{exampleboxBg}{ETHgreen!10}}
+%% TODO: Use exampleboxOuterSkip/exampleboxInnerSkip also for our other boxes (lbox, alertbox)
+\newcommand*{\exampleboxOuterSkip}{0.2cm} 
+\newcommand*{\exampleboxInnerSkip}{0.2cm} 
+\newenvironment{examplebox}[1][]{
+  \setbeamercolor*{item}{fg=fcb}
+  \setbeamercolor*{subitem}{fg=fcb}
+  \renewcommand{\bfnum}[1]{\textcolor{fcd!70!black}{\bfseries ##1}}
+  \ifthenelse{\equal{#1}{\empty}}{
+	  \begin{mdframed}[
+      linewidth=0px,
+      backgroundcolor=exampleboxBg,
+      skipabove=\exampleboxOuterSkip,
+      skipbelow=\exampleboxOuterSkip,
+      innertopmargin=\exampleboxInnerSkip,
+      innerbottommargin=\exampleboxInnerSkip
+    ]%
+  }{%
+    \begin{mdframed}[
+      linewidth=0px,
+      backgroundcolor=exampleboxTitleBg,
+      skipabove=\exampleboxOuterSkip,
+      skipbelow=\exampleboxOuterSkip
+    ]%
+     \color{exampleboxTitleFg}%
+     #1%
+    \end{mdframed}%\vspace{-0.35cm}
+	  \begin{mdframed}[
+      linewidth=0px,
+      backgroundcolor=exampleboxBg,
+      skipabove=0pt,
+      skipbelow=\exampleboxOuterSkip,
+      innertopmargin=\exampleboxInnerSkip,
+      innerbottommargin=\exampleboxInnerSkip
+    ]%
+  }%
+}{%
+  \end{mdframed}%
+}
+
+\newenvironment{examplebox*}[1][]{
+  \renewcommand*{\exampleboxInnerSkip}{0.0cm}
+  \begin{examplebox}[#1]%
+}{%
+  \end{examplebox}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MANUELA
+\newenvironment{classbox}[2][]{
+  %\renewcommand*{\exampleboxInnerSkip}{0.2cm}
+	\colorlet{exampleboxTitleFg}{white}
+	\colorlet{exampleboxTitleBg}{fcb}
+	\colorlet{exampleboxBg}{bcb!20}
+  \begin{examplebox}[#1] #2
+}{%
+  \end{examplebox}%
+}
+
+%\newenvironment{codebox}[1][]{
+%  \renewcommand*{\exampleboxInnerSkip}{0.0cm}
+%	\colorlet{exampleboxBg}{black!7}
+%  \begin{examplebox}[#1]%
+%}{%
+%  \end{examplebox}%
+%}
+
+
+\newenvironment{shellbox}[1][]{
+  \renewcommand*{\exampleboxInnerSkip}{0.0cm}
+	\colorlet{exampleboxBg}{black}
+  \begin{examplebox}[#1]%
+}{%
+  \end{examplebox}%
+}
+
+
+\newenvironment{outputbox}[1][]{
+  \renewcommand*{\exampleboxInnerSkip}{0.0cm}
+	\colorlet{exampleboxBg}{white}
+	\vspace{-0.1cm}
+  \begin{examplebox}[#1]%
+}{%
+  \end{examplebox}%
+	\vspace{0.2cm}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\frameheight}{\textheight}
+
+\newcommand{\cright}[1]{\\[-8pt]\textcolor{black!70}{\scalebox{0.4}{#1}}}
+
+\setbeamertemplate{title page}{
+  \setbeamertemplate{background}[title page]
+  \begin{textblock*}{\textwidth}(-0.3cm,2.0cm)
+    \begin{beamercolorbox}{title page header}
+      \begin{beamercolorbox}{author}
+        \usebeamerfont{author}\insertauthor\\[-1.4mm]%
+      \end{beamercolorbox}
+      \usebeamerfont{title}\usebeamercolor{title}\inserttitle\\[1mm]%
+      \usebeamerfont{subtitle}\insertsubtitle\\[1mm]%
+    \end{beamercolorbox}%
+    
+    \begin{beamercolorbox}{placeanddate}
+      \usebeamerfont{placeanddate}\insertdate%
+    \end{beamercolorbox}
+  \end{textblock*}
+}
+
+\setbeamertemplate{frametitle}{
+  %\vspace*{-0.1mm}
+  \begin{beamercolorbox}[wd=\paperwidth, ht=0.85cm, dp=0.4cm]{frametitle}
+	%\vspace{-1.6em}
+	\centerline{
+	\begin{minipage}{\textwidth}
+	\strut\insertframetitle\strut
+    %% Using \strut prevents jumpy frame titles when (not) having ascender/descender letters.
+    %% See also https://bloerg.net/2012/06/21/customizing-the-frametitle-of-beamer-presentation.html.
+  %
+  %% TODO: Marking handout titles with a special symbol.
+  %%       Current problem: since handouts are created in handout mode, the marker appears on every slide.
+  % \only<0|handout>{%
+  %   %% Mark handout slides with a circled H that is pushed into the right margin 
+  %   \hfill
+  %   \makebox[0pt]{\hspace{1cm}\raisebox{.5pt}{\textcircled{\raisebox{-2pt} {H}}}}
+  % } 
+	\end{minipage}
+	}
+    %\centerline{\insertframetitle}
+  \end{beamercolorbox}
+}
+
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.5ex,dp=3ex,left]{fg=black,bg=white}%
+    \hspace{4.5mm}\insertshorttitle\  \insertshortsubtitle%
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.25\paperwidth,ht=2.5ex,dp=3ex,left]{fg=black,bg=white}%
+    \centering \usebeamerfont{author in head/foot}\insertshortdate
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.15\paperwidth,ht=2.5ex,dp=3ex,left]{fg=black,bg=white}%
+    \centering \insertshortauthor
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.1\paperwidth,ht=2.5ex,dp=2ex,right]{fg=black,bg=white}%
+    \raggedleft \insertframenumber%\,/\,\inserttotalframenumber
+    \hspace*{4.5mm}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+
+\endinput

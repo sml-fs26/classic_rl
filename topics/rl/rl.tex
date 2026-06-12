@@ -1,0 +1,471 @@
+% Reinforcement learning for managers: slides following the lecture notes
+% (lecture_notes/reinforcement_learning.pdf) and the interactive visualization
+% https://sml-fs26.github.io/classic_rl/repair-or-replace/
+% Frames are English-only; the course's \trans macro is not needed here.
+
+\newcommand{\demoref}[1]{\vfill\begin{flushright}{\footnotesize\color{black!60}\ding{229}~Live demo: #1}\end{flushright}}
+\newcommand{\vizurl}{\href{https://sml-fs26.github.io/classic_rl/repair-or-replace/}{\texttt{sml-fs26.github.io/classic\_rl/repair-or-replace}}}
+\newcommand{\statename}[1]{\textsc{#1}}
+
+% ---------------------------------------------------------------- motivation
+
+\begin{frame}{One van, one call per week}
+\begin{bullets}
+\item You run a delivery business with a single van: \bfblue{Old Bessie}.
+\pause
+\item Each week she sits at one of four wear levels, and you make \bfblue{exactly one call}:
+\begin{bullets}
+\item \bfgreen{run} the route: collect the week's profit, risk a breakdown, add wear
+\item \bfgreen{service} her: pay for a week in the shop, she fails less often afterwards
+\item \bfgreen{replace} her: a large expense that buys a fresh start
+\end{bullets}
+\pause
+\item Every option trades a \bfred{short-term cost} against a \bfblue{long-term payoff}, and chance interferes at every step.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Decisions that pay off over months}
+\begin{bullets}
+\item What is decided today changes what must be decided tomorrow.
+\item Outcomes are uncertain: the same decision may turn out well one week and badly the next.
+\pause
+\item \bfblue{Reinforcement learning}: a framework for computing decision strategies that maximize the reward accumulated over time in precisely such problems.
+\pause
+\item Our single running example today: the \bfblue{repair-or-replace} problem of the interactive visualization at\\[1mm]
+\centerline{\vizurl}
+\end{bullets}
+\demoref{the title scene and ``You run the fleet''}
+\end{frame}
+
+% ---------------------------------------------------------------- MDPs
+
+\begin{frame}{The model: Markov decision processes}
+\begin{lbox}[{\bf Definition: Markov decision process (MDP)}]
+A package of four ingredients $(S, A, T, \gamma)$:
+\begin{bullets}
+\item $S$: the set of \bfblue{states} the system can be in
+\item $A$: the set of \bfblue{actions} available to the decision maker
+\item $T$: the \bfblue{transition dynamics}, describing how the system reacts when an action is taken
+\item $\gamma$: the \bfblue{discount factor}, a number between $0$ and $1$
+\end{bullets}
+\end{lbox}
+\pause
+\begin{bullets}
+\item $S$ and $A$ are defined \bfblue{a priori}: fixed in advance, part of the problem description. Writing them down is the modeler's first task. $T$ is then defined on top of them.
+\item $\gamma$'s use will be explained later.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{The transition dynamics is a randomized function}
+\begin{bullets}
+\item $T$ consumes a state $s$ and an action $a$, and produces a \bfblue{new state} $s'$ and a \bfblue{reward} $r$:
+\[ (s', r) \;=\; T(s, a). \]
+\item In words: feed in where you are and what you do; out come where you land and the immediate gain or loss of that step.
+\end{bullets}
+\pause
+\begin{alertbox}[{\bf The dynamics are random}]
+Feeding the \emph{same} state and action $(s,a)$ in twice may produce \emph{different} new states and different rewards.
+\end{alertbox}
+\pause
+\begin{bullets}
+\item Fleet: feeding $(\statename{worn}, \statename{run})$ into $T$ may return $(\statename{shaky}, +72)$ one week and $(\statename{failing}, -208)$ another.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Example: the repair-or-replace MDP}
+\begin{center}\small
+$S = \{\statename{healthy}, \statename{worn}, \statename{shaky}, \statename{failing}\}$, \quad
+$A = \{\statename{run}, \statename{service}, \statename{replace}\}$
+\end{center}
+\small
+\begin{minipage}{0.5\textwidth}
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+state & profit & breakdown \\
+\midrule
+\statename{healthy} & $+95$ & $2\,\%$ \\
+\statename{worn}    & $+72$ & $8\,\%$ \\
+\statename{shaky}   & $+40$ & $28\,\%$ \\
+\statename{failing} & $+16$ & $55\,\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+\hfill
+\begin{minipage}{0.46\textwidth}
+\begin{bullets}
+\item \statename{run}: earn the profit; a breakdown costs $280$ on top and dumps the van to \statename{failing}; wear slips over the weeks
+\item \statename{service}: $-50$, wear often improves
+\item \statename{replace}: $-130$, new \statename{healthy} van next week
+\item no final week; the visualization fixes $\gamma = 0.9$
+\end{bullets}
+\end{minipage}
+\demoref{``How it works'': the fleet sheet with all the odds}
+\end{frame}
+
+% ---------------------------------------------------------------- policies and trajectories
+
+\begin{frame}{Policies: your maintenance playbook}
+\begin{lbox}[{\bf Definition: policy}]
+A \bfblue{policy} defines how to act at each state. Formally, a function $\pi\colon S \to A$ that takes a state $s$ and returns the action $\pi(s)$ to be played whenever the system is in $s$.
+\end{lbox}
+\pause
+\begin{examplebox}[{\bf Example: a playbook for the fleet}]
+$\pi(\statename{healthy}) = \statename{run}, \quad \pi(\statename{worn}) = \statename{service}, \quad \pi(\statename{shaky}) = \pi(\statename{failing}) = \statename{replace}$ \\
+One call per wear level: a complete standing instruction for every Monday.
+\end{examplebox}
+\demoref{``Policy: your maintenance playbook''}
+\end{frame}
+
+\begin{frame}{Executing a policy: the trajectory}
+\begin{lbox}[{\bf Definition: trajectory}]
+The \bfblue{trajectory} of a policy $\pi$ is the sequence
+\[ s_1,\; a_1,\; r_1,\; s_2,\; a_2,\; r_2,\; \ldots,\; s_i,\; a_i,\; r_i,\; \ldots \]
+produced by executing $\pi$ on the MDP starting from state $s_1$.
+\end{lbox}
+\pause
+\begin{bullets}
+\item $a_1 = \pi(s_1)$: the first action results from applying the policy to the first state
+\pause
+\item $(s_2, r_1) = T(s_1, a_1)$: the first reward and the second state result from the dynamics
+\pause
+\item then $a_2 = \pi(s_2)$, the dynamics produce $(s_3, r_2) = T(s_2, a_2)$, and so on.
+\end{bullets}
+\vspace{-2mm}
+\demoref{``The trajectory'': the six-week tape}
+\end{frame}
+
+\begin{frame}{Four weeks of Old Bessie}
+One execution of the playbook from $s_1 = \statename{healthy}$:
+\begin{center}
+\begin{tabular}{lll}
+$s_1 = \statename{healthy}$ & $a_1 = \statename{run}$     & $r_1 = +95$ \\
+$s_2 = \statename{worn}$    & $a_2 = \statename{service}$ & $r_2 = -50$ \\
+$s_3 = \statename{healthy}$ & $a_3 = \statename{run}$     & $r_3 = +95$ \\
+$s_4 = \statename{healthy}$ & $a_4 = \statename{run}$     & $r_4 = +95$ \\
+\end{tabular}
+\end{center}
+then $s_5 = \statename{worn}$, and the walk continues, one week per step, forever.
+\pause
+\begin{alertbox}[{\bf The trajectory is random}]
+Starting again from the same $s_1$ may produce a \emph{different} trajectory: another execution might open with a first-week breakdown ($r_1 = -185$, $s_2 = \statename{failing}$).
+\end{alertbox}
+\end{frame}
+
+% ---------------------------------------------------------------- the return
+
+\begin{frame}{Scoring a trajectory: the cumulative reward}
+A policy is good if its trajectories accumulate as much reward as possible.
+\begin{lbox}[{\bf Definition: cumulative reward (the return)}]
+Take one particular trajectory $s_1, a_1, r_1, s_2, a_2, r_2, \ldots$ Its \bfblue{cumulative reward} is
+\[ G_1 \;=\; r_1 + \gamma\, r_2 + \gamma^2 r_3 + \cdots + \gamma^{\,i-1} r_i + \cdots \]
+\end{lbox}
+\pause
+\begin{bullets}
+\item In words: add up the rewards of all weeks, forever, scaling week $i$ by $\gamma^{\,i-1}$. Week one counts in full, week two is scaled by $\gamma$, week three by $\gamma^2$, and so on.
+\item $G$ stands for \emph{gain}.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Here $\gamma$ plays its very important role}
+$\gamma$ specifies \bfblue{how much we care about future rewards}:
+\begin{bullets}
+\item $\gamma$ close to $0$: the scaling factors die out almost immediately, only near-term rewards matter
+\item $\gamma$ close to $1$: they fade slowly, rewards far in the future count almost as much as immediate ones
+\end{bullets}
+\pause
+\begin{examplebox}[{\bf Managers will recognize the device}]
+It is the discounting of future cash flows from \bfgreen{net-present-value} calculations; as with the NPV of a perpetuity, the shrinking factors keep the never-ending total finite.
+\end{examplebox}
+\demoref{``Return over the van's life'': drag the $\gamma$ slider}
+\end{frame}
+
+\begin{frame}{The return of our four-week tape}
+For the trajectory we saw, with $\gamma = 0.9$:
+\[ G_1 \;=\; 95 \;+\; 0.9 \cdot (-50) \;+\; 0.9^2 \cdot 95 \;+\; 0.9^3 \cdot 95 \;+\; \cdots \]
+\pause
+\[ \phantom{G_1} \;=\; 95 \;-\; 45 \;+\; 76.95 \;+\; 69.255 \;+\; \cdots \]
+\pause
+\begin{bullets}
+\item The $50$ spent on the service is felt at $90\,\%$ of its face value; the profits it enabled in weeks~3 and~4 still count for a lot.
+\item Exactly the arithmetic of discounted cash flows.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Start the accounting at any week}
+For an arbitrary week $i$, define $G_i$ as the cumulative reward from week $i$ on:
+\[ G_i \;=\; r_i + \gamma\, r_{i+1} + \gamma^2 r_{i+2} + \cdots \]
+\pause
+Comparing the accounting at weeks $i$ and $i+1$ yields a recurrence that carries the rest of this lecture:
+\begin{lbox}[{\bf The recurrence}]
+\[ G_i \;=\; r_i + \gamma\, G_{i+1} \]
+In words: what is accumulated from week $i$ on equals this week's reward plus $\gamma$ times what is accumulated from week $i+1$ on.
+\end{lbox}
+\end{frame}
+
+\begin{frame}{$G_i$ is random, so we average it}
+\begin{alertbox}[{\bf $G_i$ is random}]
+Because of the randomness of the transition dynamics, $G_i$ comes out differently after every execution starting from state $s_i$.
+\end{alertbox}
+\vspace{-1.5mm}
+A quantity that changes from run to run cannot be maximized directly.
+\pause
+\begin{lbox}[{\bf Definition: expectation}]
+$\mathbb{E}[G_i]$, the \bfblue{expected value} of $G_i$, is the \bfblue{average} of $G_i$ over a sufficiently large set of trajectories: execute the policy many times, record $G_i$, average the records.
+\end{lbox}
+\pause
+\begin{bullets}
+\item \bfblue{The ultimate objective of RL}: find the policy $\pi$ maximizing $\mathbb{E}[G_1]$. Note: $\mathbb{E}[G_i]$ is a single real number, \emph{not} random: the averaging removed the randomness.
+\end{bullets}
+\end{frame}
+
+% ---------------------------------------------------------------- Q* and Bellman
+
+\begin{frame}{$Q^\star$: scoring every state-action pair}
+How can the best policy be discovered? Through an auxiliary function that scores every pair of a state and an action.
+\begin{lbox}[{\bf Definition: the $Q$-function}]
+$Q^\star(s,a)$ is the cumulative reward one can expect when executing an \bfblue{optimal} policy from state $s$, where the \emph{first} action taken there is $a$. In notation,
+\[ Q^\star(s, a) \;=\; \mathbb{E}\left[\, G_i \;\middle|\; s_i = s,\; a_i = a \,\right]. \]
+\end{lbox}
+\pause
+\begin{bullets}
+\item The vertical bar is read ``\bfblue{given that}'': the average of $G_i$ over many executions, counting only those that are in state $s$ at week $i$ and take action $a$ there, acting optimally afterwards.
+\item The star marks optimality.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{$Q^\star$ is a table, not one number}
+\begin{bullets}
+\item $\mathbb{E}[G_i]$ averages over \emph{all} executions of the policy, whatever state they happen to be in at week $i$: one single number.
+\pause
+\item $Q^\star(s,a)$ restricts the average to executions that pass through $s$ and play $a$ there: \bfblue{one number per state-action pair}.
+\pause
+\item For the fleet: $4 \times 3 = 12$ entries. A scorecard.
+\item Which week is $i$? It does not matter: the fleet has no final week, so it looks the same from week 3 as from week 30.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{The scorecard for the fleet}
+Converged values at $\gamma = 0.9$ (computed by the visualization):
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+state & \statename{run} & \statename{service} & \statename{replace} \\
+\midrule
+\statename{healthy} & \cellcolor{ETHgreen!25}$311.0$ & $229.9$ & $149.9$ \\
+\statename{worn}    & $203.4$ & \cellcolor{ETHgreen!25}$226.1$ & $149.9$ \\
+\statename{shaky}   & $96.5$  & $126.4$ & \cellcolor{ETHgreen!25}$149.9$ \\
+\statename{failing} & $-3.1$  & $86.9$  & \cellcolor{ETHgreen!25}$149.9$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\pause
+\begin{bullets}
+\item \statename{shaky}: \statename{replace} beats \statename{service} by $23.5$. \bfred{The optimal playbook scraps a van that still starts every morning.}
+\item \statename{failing}: running a dead van \emph{loses} money on average ($-3.1$).
+\end{bullets}
+\demoref{``$Q^\star$: the action scorecard'', revealed row by row}
+\end{frame}
+
+\begin{frame}{If you know $Q^\star$, you know what to do}
+The table is worth the trouble because the optimal policy can be \bfblue{read off} it:
+\[ \pi^\star(s) \;=\; \arg\max_{a}\, Q^\star(s, a). \]
+\pause
+\begin{bullets}
+\item In words: at state $s$, compare the values $Q^\star(s,a)$ of all available actions and play an action with the largest value; $\arg\max$ denotes exactly that action.
+\pause
+\item For the fleet: \statename{run} when \statename{healthy}, \statename{service} when \statename{worn}, \statename{replace} when \statename{shaky} or \statename{failing}.
+\item It remains to \bfblue{compute the table}.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{The Bellman equation}
+Suppose an optimal policy produced the trajectory $\ldots, s_i, a_i, r_i, s_{i+1}, a_{i+1}, \ldots$\\
+Averaging both sides of the recurrence $G_i = r_i + \gamma\, G_{i+1}$ over many such executions:
+\pause
+\begin{lbox}[{\bf The Bellman equation}]
+\[ Q^\star(s_i, a_i) \;=\; \mathbb{E}\left[\, r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1}) \,\right] \]
+In words: the value of this week's state and action equals this week's reward plus $\gamma$ times the value of next week's state and action, averaged over the randomness of the week.
+\end{lbox}
+\end{frame}
+
+\begin{frame}{Twelve equations, twelve unknowns}
+\begin{bullets}
+\item One Bellman equation per state-action pair: twelve for the fleet.
+\item The right-hand side involves the same unknowns $Q^\star(s,a)$ as the left-hand side: a system of equations in the entries of the table.
+\pause
+\item We can find $Q^\star$ by \bfblue{solving the Bellman equations}. The visualization solves them iteratively, sweeping the table until the numbers settle.
+\pause
+\item Notable: the \emph{decisions} settle long before the \emph{values} do. The greedy playbook is already optimal after two sweeps.
+\end{bullets}
+\demoref{``The Bellman equation'' and ``Filling $Q^\star$ with DP''}
+\end{frame}
+
+% ---------------------------------------------------------------- SARSA
+
+\begin{frame}{Two walls between us and the scorecard}
+Solving the Bellman equations requires \bfblue{knowing the odds}: averaging over the week's outcomes means knowing how likely each outcome is.
+\pause
+\begin{alertbox}[{\bf Two walls}]
+\begin{bullets}
+\item \bfred{Nobody hands you the odds}: no manual lists the breakdown odds for \emph{your} van on \emph{your} routes.
+\item \bfred{Real tables explode}: odometer, age, weeks since service, route load, forty vans: millions of states, half a billion scorecard cells.
+\end{bullets}
+\end{alertbox}
+\pause
+What the manager \emph{does} have is the \bfblue{logbook}: week after week of lived experience. The state the van was in, the call made, the money booked, the state it landed in, the call made there.
+\demoref{``Why DP doesn't scale''}
+\end{frame}
+
+\begin{frame}{SARSA's idea: estimate, then nudge}
+\begin{bullets}
+\item Maintain a table $q(s,a)$ of \bfblue{estimates}: current best guesses of $Q^\star(s,a)$.
+\item Twelve cells for the fleet, every cell starting at $0$.
+\pause
+\item After every lived week, \bfblue{improve the single cell just used}.
+\item No odds anywhere: the logbook alone feeds the table.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Pass one: forget the future for a moment}
+Simplest version of the question: what does \emph{one} week of a given pair pay on average, say $(\statename{worn}, \statename{run})$?
+\begin{bullets}
+\item The odds are unknown, but the logbook shows what those weeks actually paid (mostly profits, the occasional breakdown):
+\[ +72,\; +72,\; +72,\; -208,\; +72,\; \ldots \]
+\pause
+\item Averaging them is the manager's reflex. \bfblue{No filing cabinet} needed: keep one number per cell and nudge it toward each new week:
+\end{bullets}
+\begin{lbox}
+\vspace{-2mm}
+\[ q(s_i, a_i) \;\leftarrow\; q(s_i, a_i) \;+\; \alpha \left[\, r_i - q(s_i, a_i) \,\right] \]
+\vspace{-5mm}
+\end{lbox}
+\begin{bullets}
+\item The arrow is an instruction (replace the left side by the right side). $\alpha$ is the \bfblue{learning rate} ($0.15$ in the visualization). Never overwrite, only nudge.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{You already run this formula}
+\begin{examplebox}[{\bf It is exponential smoothing}]
+The standard forecast-revision update from demand planning and spreadsheet forecasting:
+\begin{center}
+new forecast \;=\; old forecast \;+\; $\alpha$ $\times$ (actual $-$ old forecast)
+\end{center}
+Revise the plan by a fraction of the miss, and never bet everything on the latest data point.
+\end{examplebox}
+\pause
+\begin{bullets}
+\item SARSA forecasts the \bfblue{value of a decision} the way a planner forecasts sales.
+\item If $\alpha$ shrinks like $1/n$, the nudges reproduce \emph{exactly} the average of the weeks seen so far; held at a small constant such as $0.15$, they produce an average that gently favors recent weeks.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Pass two: the ``actual'' grows up}
+But $Q^\star(s_i, a_i)$ is not the average of one week's cash alone. By the recurrence $G_i = r_i + \gamma\, G_{i+1}$, a week is its cash \emph{plus} $\gamma$ times the value accumulated from the pair where the van lands.
+\pause
+\begin{bullets}
+\item The future has not happened yet, and $Q^\star$ is exactly what we do not know. So the table's \bfblue{current best guess} $q(s_{i+1}, a_{i+1})$ stands in for it: the same move as plugging a forecasted cash flow into an NPV calculation.
+\end{bullets}
+\pause
+\begin{lbox}[{\bf The SARSA update}]
+\[ q(s_i, a_i) \;\leftarrow\; q(s_i, a_i) \;+\; \alpha \left[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\right] \]
+In words: the same forecast revision, only the ``actual'' grew up: this week's money plus the discounted value of where the week left you.
+\end{lbox}
+\end{frame}
+
+\begin{frame}{Watch one nudge land}
+The bracket is the \bfblue{surprise} (the planner's ``miss''): the gap between what this week's evidence says the pair is worth and what the table currently believes.
+\pause
+\begin{examplebox}[{\bf Week one, table still all zeros}]
+Logbook line: $(\statename{healthy}, \statename{run}, +95, \statename{worn}, \statename{service})$.
+\begin{bullets}
+\item evidence: $95 + 0.9 \cdot q(\statename{worn}, \statename{service}) = 95 + 0.9 \cdot 0 = 95$
+\item surprise: $95 - 0 = 95$
+\item the cell moves: $q(\statename{healthy}, \statename{run})\colon\; 0 \;\to\; 0 + 0.15 \cdot 95 = 14.25$
+\end{bullets}
+One cell moves; the other eleven stay put.
+\end{examplebox}
+\demoref{``SARSA: learn from the logbook'' at slow speed, one update per week}
+\end{frame}
+
+\begin{frame}{Why this solves the Bellman equation}
+\begin{center}
+Bellman: \quad $Q^\star(s_i, a_i) \;=\; \mathbb{E}\left[\, r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1}) \,\right]$
+\\[3mm]
+\pause
+SARSA: \quad $q(s_i, a_i) \;\leftarrow\; q(s_i, a_i) + \alpha \left[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\right]$
+\end{center}
+\vspace{2mm}
+\pause
+\begin{bullets}
+\item The Bellman equation says $Q^\star$ is the \bfblue{average} of the evidence $r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1})$ over many weeks. An average over many executions is exactly how the expectation was defined.
+\item SARSA computes that average the only way available without the odds: \bfblue{incrementally, as the weeks arrive}. The expectation replaced by an arriving average, $Q^\star$ replaced by the current guess $q$.
+\pause
+\item The name spells the five logbook entries each update consumes:\\ \bfblue{S}tate, \bfblue{A}ction, \bfblue{R}eward, \bfblue{S}tate, \bfblue{A}ction.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Explore a little}
+Which calls should be made while the table is still being learned?
+\begin{bullets}
+\item Mostly the one the table currently favors: at state $s$, play the action with the largest $q(s,a)$.
+\pause
+\item But in a small random share of the weeks (a fraction $\varepsilon = 0.15$ in the visualization) the call is drawn at random.
+\end{bullets}
+\pause
+\begin{alertbox}[{\bf Why experiment at all?}]
+A cell that is never visited is never improved: you cannot learn the value of servicing if you never service.
+\end{alertbox}
+\pause
+\begin{bullets}
+\item The $a_{i+1}$ in the update is the action \emph{actually} chosen at $s_{i+1}$ by this very playbook. SARSA learns the value of what it really does, occasional experiments included.
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Does it work?}
+Run this, week after week, on one endless stream of lived weeks: \bfblue{drive, get billed, nudge one cell}.
+\begin{bullets}
+\item The table drifts toward $Q^\star$; reading off the best action in each row recovers the playbook.
+\item In the visualization the same three policy bands emerge within a few hundred weeks of raw experience, \bfblue{the odds never shown}.
+\end{bullets}
+\pause
+\begin{alertbox}[{\bf One honest caveat}]
+With $\alpha$ and $\varepsilon$ held constant, the twelve numbers stay rough: the cells settle below $Q^\star$ and keep jittering. But which call tops each row (all the playbook reads) comes out right.
+\end{alertbox}
+\demoref{``SARSA: learn from the logbook'' at turbo speed, the bands appear}
+\end{frame}
+
+% ---------------------------------------------------------------- wrap-up
+
+\begin{frame}{The whole journey}
+\begin{bullets}
+\item \bfblue{MDP} $(S, A, T, \gamma)$: states, actions, randomized dynamics, discounting
+\item \bfblue{Policy} $\pi\colon S \to A$: a standing instruction for every state
+\item \bfblue{Trajectory}: the random record of executing the policy, week by week
+\item \bfblue{Return} $G_1 = r_1 + \gamma r_2 + \gamma^2 r_3 + \cdots$: the discounted score of one trajectory
+\item \bfblue{Objective}: maximize the average score $\mathbb{E}[G_1]$
+\item \bfblue{$Q^\star(s,a)$}: the scorecard, the expected return of acting optimally after starting with $a$ in $s$
+\item \bfblue{Bellman}: $Q^\star(s_i,a_i) = \mathbb{E}[\, r_i + \gamma Q^\star(s_{i+1},a_{i+1})\,]$, twelve equations that pin down the table
+\item \bfblue{SARSA}: when the odds are unknown, learn the same scorecard from the logbook alone, exponential smoothing applied to the Bellman equation
+\end{bullets}
+\end{frame}
+
+\begin{frame}{Play with it}
+The fastest way to make all of this concrete:
+\begin{center}
+{\large \vizurl}
+\end{center}
+\vspace{2mm}
+\begin{bullets}
+\item run the fleet for a quarter with hidden odds
+\item drag the $\gamma$ slider and watch patience change the playbook
+\item watch the $Q^\star$ scorecard fill in, row by row
+\item let SARSA rediscover the three bands from nothing but driving, billing, and breakdowns
+\end{bullets}
+\vspace{2mm}
+\pause
+\begin{center}
+\bfblue{Same twelve numbers, same three bands, scene by scene, in the same order as this lecture.}
+\end{center}
+\end{frame}

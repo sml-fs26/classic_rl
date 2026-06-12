@@ -1,0 +1,20 @@
+% Reinforcement-learning lecture for CAS Building ML AI Applications.
+% Self-contained main file following the course slide system
+% (beamerthemeLecture.sty + slides.tex preamble + topics/ content).
+% Build: latexmk -pdf lecture_rl.tex          (slides)
+%        make handout                          (4-up handout)
+\documentclass[12pt,c, german, aspectratio=169]{beamer}
+\date[]{}
+\input{slides}
+\usepackage{ifthen}
+\usepackage{amssymb}
+
+\begin{document}
+
+\settopicbasepath{../topics/}
+
+\include{title}
+
+\include{week_rl}
+
+\end{document}
