@@ -1,0 +1,334 @@
+% Lecture notes accompanying the "Repair or Replace" visualization (SML, ETH Zurich).
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.7cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{newpxtext,newpxmath}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\definecolor{inknavy}{RGB}{18,52,98}
+\usepackage[colorlinks=true,linkcolor=inknavy,urlcolor=inknavy,citecolor=inknavy]{hyperref}
+\hypersetup{pdftitle={Reinforcement Learning: Lecture Notes},pdfauthor={Carlos Cotrini}}
+\urlstyle{same}
+
+% Definitions, examples, and remarks share one counter, numbered within sections.
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}[definition]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[definition]{Remark}
+\numberwithin{equation}{section}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\sa}[1]{\textsc{#1}}   % state and action names, e.g. \sa{healthy}
+\newcommand{\vizurl}{\url{https://sml-fs26.github.io/classic_rl/repair-or-replace/}}
+\newcommand{\vizhref}[1]{\href{https://sml-fs26.github.io/classic_rl/repair-or-replace/}{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\title{Reinforcement Learning\\[0.5ex]\large Lecture Notes}
+\author{Carlos Cotrini\\ETH Zürich}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent
+These notes accompany the interactive visualization \emph{Repair or Replace}, available at
+\begin{center}
+\vizurl
+\end{center}
+\noindent
+The concepts developed below map one-to-one onto its scenes.
+
+\medskip
+
+% 1: the hook -- sequential decisions under uncertainty.
+\section{Motivation}
+
+Many decisions a manager faces are sequential. What is decided today changes what must be
+decided tomorrow, and the consequences unfold over weeks and months rather than at once. The
+outcomes are uncertain on top: the same decision may turn out well one time and badly the
+next. Picture the scenario behind these notes. You operate a delivery business with a single
+van, and each week you make exactly one call about that machine: keep running it and collect
+the week's profit, at the risk of a breakdown and of gradual wear; repair it, paying for a
+week in the shop so that it fails less often afterwards; or replace it outright, a large
+expense that buys a fresh start. Every option trades a short-term cost against a long-term
+payoff, and chance interferes at every step.
+
+Reinforcement learning is a framework for computing decision strategies that maximize the
+reward accumulated over time in precisely such problems. One running example, the
+repair-or-replace problem of the visualization, carries everything.
+
+% 2: the model.
+\section{Markov decision processes}
+
+The first step is a precise model of the decision problem. The standard model is the
+\emph{Markov decision process}.\footnote{The name records that the next state depends only on
+the current state and action, not on the past.}
+
+\begin{definition}[Markov decision process]
+A \emph{Markov decision process} (MDP) is a quadruple, a package of four ingredients,
+$(S, A, T, \gamma)$, where $S$ is the set of \emph{states} the system can be in; $A$ is the
+set of \emph{actions} available to the decision maker; $T$ is the \emph{transition dynamics},
+which describes how the system reacts when an action is taken; and $\gamma \in [0,1]$, the
+\emph{discount factor}, is a number between $0$ and $1$. ($\gamma$ is the Greek letter
+gamma.)
+\end{definition}
+
+The sets $S$ and $A$ are defined a priori: they are fixed in advance, part of the problem
+description, and writing them down is the modeler's first task. The transition dynamics is
+then defined on top of them. It is a \emph{randomized function} $T$ that consumes a state $s$
+and an action $a$ and produces a new state $s'$ and a reward $r$:
+\[
+(s', r) = T(s, a).
+\]
+In words: feed the current state and the chosen action into the dynamics, and out come the
+state the system lands in next and the reward, a number measuring the immediate gain or loss
+of that step.
+
+\begin{remark}\label{rem:randomdyn}
+The transition dynamics is \emph{random}: feeding the same state and action $(s, a)$ in twice
+may produce different new states and different rewards.\footnote{Scene ``You run the fleet''
+of the interactive \vizhref{visualization} lets you sample these dynamics.}
+\end{remark}
+
+The discount factor $\gamma$ is just a number between $0$ and $1$; its use will be explained
+later.
+
+\begin{example}[the repair-or-replace MDP]
+You manage a one-van delivery fleet; the visualization calls the van \emph{Old Bessie}. Each
+week the van sits at one of four wear levels, and you make exactly one call:
+\[
+S = \{\sa{healthy}, \sa{worn}, \sa{shaky}, \sa{failing}\},
+\qquad
+A = \{\sa{run}, \sa{service}, \sa{replace}\}.
+\]
+In words: four wear levels, from factory-fresh to nearly dead, and three possible calls
+(\sa{service} is the ``repair'' of the title). Rewards are weekly net money, in plain units. The numbers governing \sa{run} are:
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+state & weekly profit & breakdown odds \\
+\midrule
+\sa{healthy} & $+95$ & $2\%$  \\
+\sa{worn}    & $+72$ & $8\%$  \\
+\sa{shaky}   & $+40$ & $28\%$ \\
+\sa{failing} & $+16$ & $55\%$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+Under \sa{run} the van drives the route and earns the profit in the table, unless it breaks
+down, with the odds in the table: the week then books a single net reward equal to the profit
+minus a breakdown cost of $280$ (from \sa{healthy}: $95 - 280 = -185$), and the van ends the
+week at \sa{failing}. Even without a breakdown, wear tends to slip by one or two levels over
+the weeks. Under \sa{service} the van spends the week in the shop: reward $-50$, no
+deliveries, and the wear often improves; from \sa{worn}, the van returns to \sa{healthy} $95\%$ of the
+time. Under \sa{replace} the reward is $-130$, and the next week starts with a
+brand-new van at \sa{healthy}, whatever the old one looked like. The dynamics is random in
+the sense of Remark~\ref{rem:randomdyn}: feeding $(\sa{worn}, \sa{run})$ into $T$ may return
+$(\sa{shaky}, +72)$ one week and $(\sa{failing}, -208)$ another. There is no final week (the
+fleet runs indefinitely), and the visualization fixes $\gamma = 0.9$.
+\end{example}
+
+% 3: strategies and the histories they generate.
+\section{Policies and trajectories}
+
+An MDP describes the world the manager operates in; it does not say how to operate. That is
+the job of a policy.
+
+\begin{definition}[policy]
+A \emph{policy} defines how to act at each state. Formally, a policy is a function
+$\pi \colon S \to A$: it takes a state $s$ and returns the action $\pi(s)$ to be played
+whenever the system is in $s$. ($\pi$ is the Greek letter pi.)
+\end{definition}
+
+Executing a policy on the MDP, week after week, generates a record of everything that
+happened. That record is the central object of these notes.
+
+\begin{definition}[trajectory]
+The \emph{trajectory} of a policy $\pi$ is the sequence
+\[
+s_1,\; a_1,\; r_1,\; s_2,\; a_2,\; r_2,\; \dots,\; s_i,\; a_i,\; r_i,\; \dots
+\]
+produced by executing $\pi$ on the MDP starting from state $s_1$. In words: states, actions,
+and rewards alternate, and the subscript counts the weeks. The mechanics are as follows. The
+first action results from applying the policy to the first state, $a_1 = \pi(s_1)$. The first
+reward and the second state result from applying the transition dynamics to that pair,
+$(s_2, r_1) = T(s_1, a_1)$. Then $a_2 = \pi(s_2)$, the dynamics produce
+$(s_3, r_2) = T(s_2, a_2)$, and so on without end.
+\end{definition}
+
+\begin{remark}\label{rem:randomtraj}
+The trajectory is \emph{random}: starting again from the same $s_1$ and executing the same
+policy may produce a different trajectory, because the transition dynamics is random (and so,
+possibly, is the policy, if one allows policies that randomize their choices).
+\end{remark}
+
+\begin{example}[a trajectory of the fleet]\label{ex:trajectory}
+Consider the playbook $\pi$ with $\pi(\sa{healthy}) = \sa{run}$,
+$\pi(\sa{worn}) = \sa{service}$, and $\pi(\sa{shaky}) = \pi(\sa{failing}) = \sa{replace}$.
+One execution of $\pi$ from $s_1 = \sa{healthy}$ produced\footnote{Scene ``The trajectory''
+of the interactive \vizhref{visualization} replays such a tape week by week.}
+\begin{align*}
+s_1 &= \sa{healthy}, & a_1 &= \sa{run},     & r_1 &= +95,\\
+s_2 &= \sa{worn},    & a_2 &= \sa{service}, & r_2 &= -50,\\
+s_3 &= \sa{healthy}, & a_3 &= \sa{run},     & r_3 &= +95,\\
+s_4 &= \sa{healthy}, & a_4 &= \sa{run},     & r_4 &= +95,
+\end{align*}
+after which $s_5 = \sa{worn}$ and the walk continues, one week per step, forever. In words:
+the van started healthy and earned $95$ but slipped to worn; a $50$ service restored it; two
+profitable runs followed; by week five it was worn again. Remark~\ref{rem:randomtraj} is at
+work here: another execution of the same $\pi$ from the same $s_1$ might open with a
+first-week breakdown, $s_1 = \sa{healthy}$, $a_1 = \sa{run}$, $r_1 = -185$,
+$s_2 = \sa{failing}$.
+\end{example}
+
+% 4: scoring a trajectory, and what to maximize.
+\section{The goal: accumulating reward}
+
+A policy is good if it produces trajectories that accumulate as much reward as possible. The
+first task is to make ``accumulate'' precise.
+
+\begin{definition}[cumulative reward]
+Take one particular trajectory $s_1, a_1, r_1, s_2, a_2, r_2, \dots$. Its \emph{cumulative
+reward}, also called its \emph{return}, is
+\begin{equation}\label{eq:return}
+G_1 \;=\; r_1 + \gamma\, r_2 + \gamma^2 r_3 + \cdots + \gamma^{\,i-1} r_i + \cdots.
+\end{equation}
+In words: add up the rewards of all weeks, forever (that is what the dots mean), scaling the
+reward of week $i$ by $\gamma^{\,i-1}$: week one counts in full, week two is scaled by
+$\gamma$, week three by $\gamma^2$, and so on. ($G$ stands for \emph{gain}.)
+\end{definition}
+
+Here the discount factor plays its very important role: it specifies how much we care about
+future rewards. With $\gamma$ close to $0$, the scaling factors die out almost immediately
+and only near-term rewards matter; with $\gamma$ close to $1$, they fade slowly and rewards
+far in the future count almost as much as immediate ones. Managers will recognize the device:
+it is the discounting of future cash flows familiar from net-present-value calculations, and,
+as with the NPV of a perpetuity, the shrinking factors keep the never-ending total finite.
+With the visualization's $\gamma = 0.9$, next week's reward counts $90\%$ of this week's, the
+week after $81\%$, and so on.\footnote{Scene ``Return over the van's life'' of the
+interactive \vizhref{visualization} has a slider for $\gamma$.} For the trajectory of
+Example~\ref{ex:trajectory}, formula~\eqref{eq:return} gives
+$G_1 = 95 + 0.9 \cdot (-50) + 0.9^2 \cdot 95 + 0.9^3 \cdot 95 + \cdots
+= 95 - 45 + 76.95 + 69.255 + \cdots$.
+
+The same accounting can be started at any week, not only the first. For an arbitrary week
+$i$, define $G_i$ as the cumulative reward from week $i$ on:
+\begin{equation}\label{eq:gi}
+G_i \;=\; r_i + \gamma\, r_{i+1} + \gamma^2 r_{i+2} + \cdots.
+\end{equation}
+In words: $G_i$ is what the trajectory accumulates from week $i$ onward, with the discounting
+restarted there. Comparing \eqref{eq:gi} at weeks $i$ and $i+1$ yields a recurrence that
+carries the rest of these notes:
+\begin{equation}\label{eq:recurrence}
+G_i \;=\; r_i + \gamma\, G_{i+1}.
+\end{equation}
+In words: what is accumulated from week $i$ on equals this week's reward plus $\gamma$ times
+what is accumulated from week $i+1$ on.
+
+\begin{remark}
+$G_i$ is \emph{random}. Because of the randomness of the transition dynamics, $G_i$ comes out
+differently after every execution of the policy starting from state $s_i$.
+\end{remark}
+
+A quantity that changes from run to run cannot be maximized directly; we average it instead.
+
+\begin{definition}[expectation]
+The \emph{expectation} $\E[G_i]$, read ``the expected value of $G_i$,'' is the average of
+$G_i$ over a sufficiently large set of trajectories: execute the policy many times, always
+starting from the same first state $s_1$ (for the fleet: a \sa{healthy} van), record the
+value of $G_i$ of each execution, and average the records.
+\end{definition}
+
+We can now state the ultimate objective of reinforcement learning: \emph{find the policy
+$\pi$ that maximizes $\E[G_1]$}, the policy whose trajectories accumulate, on average, the
+most reward. A policy achieving this maximum is called \emph{optimal}. Note the contrast with $G_i$ itself: $\E[G_i]$ is a single real number that does
+not depend on the trajectory, because the averaging has removed the randomness. Therefore
+$\E[G_i]$ is \emph{not} random.
+
+% 5: the scorecard and the equation that pins it down.
+\section{The \texorpdfstring{$Q$}{Q}-function and the Bellman equation}
+
+How can the best policy be discovered? The classical route goes through an auxiliary function
+that scores every pair of a state and an action.
+
+\begin{definition}[the $Q$-function]
+For a state $s$ and an action $a$, $Q^\star(s, a)$ is the cumulative reward one can expect
+when executing an optimal policy from state $s$, where the \emph{first} action taken there is
+$a$. In notation,
+\[
+Q^\star(s, a) \;=\; \E\bigl[\, G_i \bigm| s_i = s,\ a_i = a \,\bigr].
+\]
+In words: the expected value of $G_i$ conditioned on $s_i$ being $s$ and $a_i$ being $a$ (the
+vertical bar is read ``given that''); that is, the average of $G_i$ over many executions,
+counting only those executions that are in state $s$ at week $i$ and take action $a$ there as
+a one-off, even when an optimal policy would choose differently, acting optimally afterwards.
+(The star in $Q^\star$ marks optimality.)
+\end{definition}
+
+Which week $i$? It does not matter: the fleet has no final week, so it looks the same from
+week $3$ as from week $30$, and every week gives the same average.
+
+\begin{remark}
+$Q^\star(s, a)$ is different from $\E[G_i]$. The number $\E[G_i]$ averages over \emph{all}
+executions of the policy, whatever state they happen to be in at week $i$. $Q^\star(s, a)$
+restricts the average to the executions that pass through $s$ at week $i$ and are made to
+play $a$ there, acting optimally afterwards. And while $\E[G_i]$ is a single number, $Q^\star$ is a whole table of numbers, one per
+state-action pair: for the fleet, $4 \times 3 = 12$ entries.
+\end{remark}
+
+The table is worth the trouble because the optimal policy can be read off it: at state $s$,
+the optimal action is simply the action $a$ that maximizes $Q^\star(s, a)$. In notation,
+\[
+\pi^\star(s) \;=\; \argmax_{a}\, Q^\star(s, a).
+\]
+In words: in state $s$, compare the values $Q^\star(s, a)$ of all available actions $a$ and
+play an action with the largest value; $\argmax$ denotes exactly that action, and
+$\pi^\star$ denotes the optimal policy.
+
+It remains to compute the table. Suppose an optimal policy produced the trajectory
+$\dots, s_i, a_i, r_i, s_{i+1}, a_{i+1}, \dots$. Averaging both sides of the
+recurrence~\eqref{eq:recurrence}, $G_i = r_i + \gamma\, G_{i+1}$, over many such executions,
+it must be the case that
+\begin{tcolorbox}[colback=inknavy!4!white,colframe=inknavy!80!black,boxrule=0.6pt,arc=2pt,
+                  left=8pt,right=8pt,top=2pt,bottom=6pt,title={The Bellman equation},
+                  fonttitle=\bfseries\small]
+\begin{equation}\label{eq:bellman}
+Q^\star(s_i, a_i) \;=\; \E\bigl[\, r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1}) \,\bigr].
+\end{equation}
+\end{tcolorbox}
+\noindent
+In words: the value of this week's state and action equals this week's reward plus $\gamma$
+times the value of next week's state and action, averaged over the randomness of the week.
+Replacing $G_{i+1}$ by its average $Q^\star(s_{i+1}, a_{i+1})$ is legitimate: averaging in
+two rounds (first among the executions that share next week's state and action, then across
+the week's outcomes) gives the same result, just as a company-wide average can be computed
+branch by branch.
+
+We can therefore find $Q^\star$ by solving the Bellman equations, one equation per
+state-action pair, twelve for the fleet. Since the optimal policy at $s_{i+1}$ picks the
+action with the largest $Q^\star$-value, the right-hand side of \eqref{eq:bellman} involves
+the same unknowns $Q^\star(s, a)$ as the left-hand side, so this is a system of equations in
+the entries of the table. The visualization solves it iteratively; its $Q^\star$-scorecard
+and Bellman-check scenes display the solution for the fleet at
+$\gamma = 0.9$.\footnote{Scenes ``$Q^\star$: the action scorecard'' and ``The Bellman
+equation,'' interactive in the \vizhref{visualization}.} Two entries tell the story:
+$Q^\star(\sa{shaky}, \sa{service}) = 126.4$, while
+$Q^\star(\sa{shaky}, \sa{replace}) = 149.9$. The optimal playbook replaces a van that still
+starts every morning.
+
+% Closing: recap and invitation.
+\section*{Closing}
+
+These notes modeled sequential decision problems as Markov decision processes, let policies
+generate random trajectories, scored each trajectory by its cumulative reward, averaged that
+score to obtain something maximizable, and characterized the best policy through the
+$Q$-function and the Bellman equation. The fastest way to make all of this concrete is to
+play: open \vizurl, run the fleet for a quarter, drag the $\gamma$ slider, and watch the
+$Q^\star$ scorecard fill in, scene by scene, in the same order as these notes.
+
+\end{document}
