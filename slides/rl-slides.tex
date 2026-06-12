@@ -7,7 +7,6 @@
 \usepackage{mathtools} % \mathclap: zero-width underbrace captions (after amsmath in the preamble)
 
 \newcommand{\E}{\mathbb{E}}
-\DeclareMathOperator*{\argmax}{arg\,max}
 % fixed-height centered slot for a formula built with an \only chain,
 % so the layout never jumps between overlay steps
 \newcommand{\formulaslot}[2]{\begin{minipage}[c][#1][c]{\linewidth}\centering #2\end{minipage}}
@@ -55,13 +54,13 @@
   \centering
   \begin{tikzpicture}
     \useasboundingbox (-1.0,-1.6) rectangle (12.4,0.6);
-    \only<1->{\node[accentbox, minimum width=2.6cm] (S) at (0.6,0) {$S$: states};
+    \only<1->{\node[accentbox, minimum width=2.6cm, text height=1.7ex, text depth=.5ex] (S) at (0.6,0) {$S$: states};
       \node[below=2mm of S, text=muted, align=center] {four wear\\ levels};}%
-    \only<2->{\node[accentbox, minimum width=2.6cm] (A) at (4.0,0) {$A$: actions};
+    \only<2->{\node[accentbox, minimum width=2.6cm, text height=1.7ex, text depth=.5ex] (A) at (4.0,0) {$A$: actions};
       \node[below=2mm of A, text=muted, align=center] {three\\ calls};}%
-    \only<3->{\node[accentbox, minimum width=2.6cm] (T) at (7.4,0) {$T$: dynamics};
+    \only<3->{\node[accentbox, minimum width=2.6cm, text height=1.7ex, text depth=.5ex] (T) at (7.4,0) {$T$: dynamics};
       \node[below=2mm of T, text=muted, align=center] {how the world\\ reacts};}%
-    \only<4->{\node[accentbox, minimum width=2.6cm] (g) at (10.8,0) {$\gamma = 0.9$};
+    \only<4->{\node[accentbox, minimum width=2.6cm, text height=1.7ex, text depth=.5ex] (g) at (10.8,0) {$\gamma = 0.9$};
       \node[below=2mm of g, text=muted, align=center] {how much the\\ future counts};}%
   \end{tikzpicture}
 
@@ -242,12 +241,12 @@
     \only<2->{\Large $Q^\star(s, a) = \E\bigl[\, G_i \bigm| \underbrace{s_i = s,\ a_i = a}_{\mathclap{\text{in } s\text{, play } a\text{, optimal afterwards}}} \,\bigr]$}%
   }
   \formulaslot{0.7cm}{%
-    \uncover<3->{$\pi^\star(s) = \argmax_a Q^\star(s, a)$ \quad {\color{muted}read each row, keep the best}}%
+    \uncover<7->{$\pi^\star$: \ {\color{muted}read each row, keep the call with the largest value}}%
   }
   \centering
   \begin{tikzpicture}
     \useasboundingbox (-0.1,-3.9) rectangle (10.4,0.4);
-    \only<4->{%
+    \only<3->{%
       \node[text=muted] at (2.51,0) {RUN};
       \node[text=muted] at (4.13,0) {SERVICE};
       \node[text=muted] at (5.75,0) {REPLACE};
@@ -255,24 +254,31 @@
       \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-0.72) {$311.0$};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-0.72) {$229.9$};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (5.75,-0.72) {$149.9$};}%
-    \only<5->{%
+    \only<4->{%
       \node[anchor=east, font=\scriptsize] at (1.66,-1.44) {WORN};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-1.44) {$203.4$};
       \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-1.44) {$226.1$};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (5.75,-1.44) {$149.9$};}%
-    \only<6->{%
+    \only<5->{%
       \node[anchor=east, font=\scriptsize] at (1.66,-2.16) {SHAKY};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-2.16) {$96.5$};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-2.16) {$126.4$};
       \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (5.75,-2.16) {$149.9$};}%
-    \only<7->{%
+    \only<6->{%
       \node[anchor=east, font=\scriptsize] at (1.66,-2.88) {FAILING};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-2.88) {$-3.1$};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-2.88) {$86.9$};
       \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (5.75,-2.88) {$149.9$};}%
+    \only<7->{%
+      \draw[draw=good, line width=1.6pt, rounded corners=3pt] (1.70,-1.08) rectangle (3.32,-0.36);
+      \draw[draw=good, line width=1.6pt, rounded corners=3pt] (3.32,-1.80) rectangle (4.94,-1.08);
+      \draw[draw=good, line width=1.6pt, rounded corners=3pt] (4.94,-2.52) rectangle (6.56,-1.80);
+      \draw[draw=good, line width=1.6pt, rounded corners=3pt] (4.94,-3.24) rectangle (6.56,-2.52);
+      \node[text=good, anchor=west] at (6.85,-0.72) {row by row: the kept call};}%
     \only<8->{%
       \draw[draw=accent2, thick, rounded corners=3pt] (3.28,-2.56) rectangle (6.60,-1.76);
-      \node[text=accent2, anchor=west] at (6.85,-2.16) {$149.9$ beats $126.4$ by $23.5$};
+      \node[text=accent2, anchor=west] at (6.85,-2.16) {$149.9$ beats $126.4$ by $23.5$};}%
+    \only<9->{%
       \node[text=accent] at (5.2,-3.6) {the optimal playbook replaces a van that still starts every morning};}%
   \end{tikzpicture}
 \end{frame}
@@ -300,36 +306,154 @@
 % ===================== 6. SARSA: learning from the logbook =====================
 \section{SARSA: learning from the logbook}
 
-\begin{frame}{No odds? Average the logbook}
+\begin{frame}{Three bookkeepers, one bad week}
   \centering
   \begin{tikzpicture}
-    \useasboundingbox (-0.4,-1.9) rectangle (12.0,0.7);
-    \only<1->{\node[text=muted] at (5.8,0.4)
-      {the Bellman average needs the odds, and nobody prints them for your van};}%
+    \useasboundingbox (0.3,-1.78) rectangle (12.9,2.30);
+    \node[text=muted] at (6.55,2.05) {nobody prints the odds for your van: fill the (WORN, RUN) card from lived weeks};
+    \node[anchor=east, text=muted, font=\scriptsize] at (3.0,1.35) {(WORN, RUN) pays};
+    \node[anchor=east, align=right] at (3.0,0.45)
+      {Overwriter\\ {\scriptsize\color{muted}card $=$ last week}};
+    \node[anchor=east, align=right] at (3.0,-0.5)
+      {Filing cabinet\\ {\scriptsize\color{muted}true average of every week}};
+    \node[anchor=east, align=right] at (3.0,-1.45)
+      {Nudger\\ {\scriptsize\color{muted}move $15\%$ toward the week}};
+    % week 1
+    \only<1->{%
+      \node[nodebox, good fill, font=\scriptsize, minimum width=1.15cm] at (3.7,1.35) {$+72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (3.7,0.45) {$72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (3.7,-0.5) {$72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (3.7,-1.45) {$72$};}%
+    % week 2
     \only<2->{%
-      \node[anchor=east] at (3.0,-1.0) {(WORN, RUN) paid:};
-      \node[nodebox, good fill, font=\scriptsize] at (3.9,-1.0) {$+72$};
-      \node[nodebox, good fill, font=\scriptsize] at (5.3,-1.0) {$+72$};
-      \node[nodebox, good fill, font=\scriptsize] at (6.7,-1.0) {$+72$};
-      \node[nodebox, bad fill, font=\scriptsize] at (8.2,-1.0) {$-208$};
-      \node[nodebox, good fill, font=\scriptsize] at (9.7,-1.0) {$+72$};
-      \node[text=muted] at (10.8,-1.0) {$\cdots$};}%
+      \node[nodebox, good fill, font=\scriptsize, minimum width=1.15cm] at (5.15,1.35) {$+72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (5.15,0.45) {$72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (5.15,-0.5) {$72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (5.15,-1.45) {$72$};}%
+    % week 3
+    \only<3->{%
+      \node[nodebox, good fill, font=\scriptsize, minimum width=1.15cm] at (6.6,1.35) {$+72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (6.6,0.45) {$72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (6.6,-0.5) {$72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (6.6,-1.45) {$72$};}%
+    % week 4: the breakdown, 72 profit minus 280
+    \only<4->{%
+      \node[nodebox, bad fill, font=\scriptsize, minimum width=1.15cm] at (8.05,1.35) {$-208$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm, text=bad] at (8.05,0.45) {$-208$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (8.05,-0.5) {$2$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (8.05,-1.45) {$30$};}%
+    % week 5
+    \only<5->{%
+      \node[nodebox, good fill, font=\scriptsize, minimum width=1.15cm] at (9.5,1.35) {$+72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (9.5,0.45) {$72$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (9.5,-0.5) {$16$};
+      \node[gridcell, minimum width=1.25cm, minimum height=0.6cm] at (9.5,-1.45) {$36.3$};}%
+    % verdicts
+    \only<6->{%
+      \node[anchor=west, text=bad, font=\scriptsize] at (10.45,0.45) {hysterical};
+      \node[anchor=west, text=muted, font=\scriptsize, align=left] at (10.45,-0.5) {right, but stores\\ every card};
+      \node[anchor=west, text=good, font=\scriptsize, align=left] at (10.45,-1.45) {calm, and\\ no cabinet};}%
   \end{tikzpicture}
-  \formulaslot{1.9cm}{%
-    \only<3>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr]$}%
-    \only<4>{\Large $q(s_i, a_i) \leftarrow \underbrace{q(s_i, a_i)}_{\text{old guess}} + \underbrace{\alpha}_{0.15} \bigl[\, \underbrace{r_i}_{\text{what the week paid}} - \ q(s_i, a_i) \,\bigr]$}%
-    \only<5->{\Large $q(s_i, a_i) \leftarrow \underbrace{q(s_i, a_i)}_{\text{old guess}} + \underbrace{\alpha}_{0.15} \underbrace{\bigl[\, r_i - q(s_i, a_i) \,\bigr]}_{\text{the miss: move a fraction toward it}}$}%
+  \formulaslot{1.5cm}{%
+    \only<7>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr]$ \quad {\normalsize\color{muted}(the Nudger, written down)}}%
+    \only<8->{\Large $q(s_i, a_i) \leftarrow \underbrace{q(s_i, a_i)}_{\text{the card}} + \underbrace{\alpha}_{0.15} \underbrace{\bigl[\, r_i - q(s_i, a_i) \,\bigr]}_{\text{the surprise}}$}%
   }
-  \formulaslot{0.7cm}{%
-    \uncover<6->{{\color{muted}exponential smoothing: new forecast $=$ old forecast $+\ \alpha \times ($actual $-$ old forecast$)$}}%
-  }
-  \takeaway{\uncover<7->{nudge, never overwrite: one bad week must not erase a year}}
+  \takeaway{\uncover<9->{nudge, never overwrite: one bad week must not erase a year}}
 \end{frame}
 
-\begin{frame}{The actual grows up: SARSA}
+\begin{frame}{The alpha knob}
   \centering
   \begin{tikzpicture}
-    \useasboundingbox (-1.4,-0.9) rectangle (12.2,1.2);
+    \useasboundingbox (-0.2,-2.55) rectangle (12.4,2.62);
+    \node[text=muted] at (6.1,2.40) {same five weeks, three step sizes};
+    \only<2->{\node[anchor=east, text=muted, font=\scriptsize] at (2.3,0.55) {the $-208$ week lands};}%
+    \only<2->{\node[anchor=east, text=muted, font=\scriptsize] at (2.3,-0.75) {then $+72$ lands};}%
+    % alpha = 0.9 (left)
+    \only<2->{%
+      \node[accentbox, minimum width=1.9cm] at (4.0,1.85) {$\alpha = 0.9$};
+      \node[nodebox, minimum width=1.4cm] (a1) at (4.0,1.15) {$72$};
+      \node[nodebox, minimum width=1.4cm] (a2) at (4.0,-0.05) {$-180$};
+      \node[nodebox, minimum width=1.4cm] (a3) at (4.0,-1.45) {$46.8$};
+      \draw[dimedge] (a1.south) -- (a2.north);
+      \draw[dimedge] (a2.south) -- (a3.north);
+      \node[text=bad, text height=1.7ex, text depth=.5ex] at (4.0,-2.25) {whiplash};}%
+    % alpha = 0.05 (right)
+    \only<3->{%
+      \node[accentbox, minimum width=1.9cm] at (10.6,1.85) {$\alpha = 0.05$};
+      \node[nodebox, minimum width=1.4cm] (c1) at (10.6,1.15) {$72$};
+      \node[nodebox, minimum width=1.4cm] (c2) at (10.6,-0.05) {$58$};
+      \node[nodebox, minimum width=1.4cm] (c3) at (10.6,-1.45) {$58.7$};
+      \draw[dimedge] (c1.south) -- (c2.north);
+      \draw[dimedge] (c2.south) -- (c3.north);
+      \node[text=muted, text height=1.7ex, text depth=.5ex] at (10.6,-2.25) {barely notices};}%
+    % alpha = 0.15 (middle, revealed last)
+    \only<4->{%
+      \node[accentbox, minimum width=1.9cm] at (7.3,1.85) {$\alpha = 0.15$};
+      \node[nodebox, minimum width=1.4cm] (b1) at (7.3,1.15) {$72$};
+      \node[nodebox, minimum width=1.4cm] (b2) at (7.3,-0.05) {$30$};
+      \node[nodebox, minimum width=1.4cm] (b3) at (7.3,-1.45) {$36.3$};
+      \draw[dimedge] (b1.south) -- (b2.north);
+      \draw[dimedge] (b2.south) -- (b3.north);
+      \node[text=good, text height=1.7ex, text depth=.5ex] at (7.3,-2.25) {the calm middle};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{small steady steps, never overwrite}}
+\end{frame}
+
+\begin{frame}{The planner's Monday}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.4,-0.52) rectangle (12.0,2.72);
+    \draw[draw=muted] (0.4,0) -- (8.4,0);
+    \only<1->{\draw[draw=accent, fill=accent!22!panel] (1.0,0) rectangle (2.2,2.0);
+      \node[font=\scriptsize] at (1.6,2.25) {Monday forecast: $100$};}%
+    \only<2->{\draw[draw=fg, fill=panel] (3.2,0) rectangle (4.4,1.6);
+      \node[font=\scriptsize] at (3.8,-0.35) {the week sells: $80$};}%
+    \only<3->{\draw[dashed, draw=bad] (2.2,2.0) -- (5.5,2.0);
+      \draw[dashed, draw=bad] (4.4,1.6) -- (5.5,1.6);
+      \draw[<->, draw=bad, thick] (5.5,1.6) -- (5.5,2.0);
+      \node[text=bad, font=\scriptsize, align=center] at (5.5,1.1) {the miss\\ $80 - 100 = -20$};}%
+    \only<4->{\draw[draw=good, fill=good!22!panel] (6.6,0) rectangle (7.8,1.94);
+      \node[font=\scriptsize] at (7.2,2.25) {next Monday: $97$};
+      \node[text=muted, font=\scriptsize] at (7.2,-0.35) {$100 + 0.15 \times (-20) = 97$};}%
+    \only<7->{\node[text=accent2, anchor=west] at (8.8,1.0) {the planner's name:};
+      \node[text=accent2, anchor=west] at (8.8,0.45) {exponential smoothing};}%
+  \end{tikzpicture}
+  \formulaslot{1.7cm}{%
+    \only<5>{\Large $\text{new forecast} = \text{old forecast} + 0.15 \times \text{miss}$}%
+    \only<6->{\Large $\text{new forecast} = \underbrace{\text{old forecast}}_{q(s_i,\, a_i)} + \underbrace{0.15}_{\alpha} \times \underbrace{\text{miss}}_{r_i - q(s_i, a_i)}$}%
+  }
+  \takeaway{\uncover<8->{SARSA forecasts the value of a call the way a planner forecasts sales}}
+\end{frame}
+
+\begin{frame}{The cash-only ledger lies}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.4,-2.68) rectangle (12.6,2.62);
+    \only<1->{\node[text=accent2] at (2.9,2.45) {the cash-only ledger};
+      \node[nodebox, bad fill, font=\scriptsize] at (2.9,1.75) {REPLACE: $-130$, every single week};
+      \node[text=muted, font=\scriptsize] at (2.9,1.15) {worst call on the sheet};}%
+    \only<2->{\node[nodebox, font=\scriptsize] at (2.9,0.5) {SERVICE: $-50$};}%
+    \only<3->{\node[text=accent2] at (9.3,2.45) {the scorecard $Q^\star$ you saw};
+      \node[nodebox, good fill, font=\scriptsize] at (9.3,1.75) {REPLACE crowned at SHAKY and FAILING: $149.9$};}%
+    \only<4->{\node[nodebox, good fill, font=\scriptsize] at (9.3,1.15) {SERVICE crowned at WORN: $226.1$};}%
+    \only<5->{\node at (6.25,-0.15) {what does the cash-only ledger miss?};}%
+    \only<6->{%
+      \node[nodebox] (wk) at (2.2,-1.7) {one week};
+      \node[nodebox, good fill, font=\scriptsize] (vA) at (8.3,-1.0) {a HEALTHY van left in the lot};
+      \draw[edge] (wk.east) -- (vA.west)
+        node[midway, above=2pt, draw=fg, rounded corners=2pt, inner sep=2.5pt, font=\scriptsize, fill=panel] {the same cash};}%
+    \only<7->{%
+      \node[nodebox, bad fill, font=\scriptsize] (vB) at (8.3,-2.4) {a FAILING van left in the lot};
+      \draw[edge] (wk.east) -- (vB.west)
+        node[midway, below=2pt, draw=fg, rounded corners=2pt, inner sep=2.5pt, font=\scriptsize, fill=panel] {the same cash};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<8->{the week leaves you a van: same cash, different futures}}
+\end{frame}
+
+\begin{frame}{Grade the week like a trade-in}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-1.4,-1.85) rectangle (12.2,0.95);
     \only<1->{%
       \node[text=accent2, font=\bfseries] at (2.4,0.8) {S};
       \node[text=accent2, font=\bfseries] at (4.0,0.8) {A};
@@ -342,21 +466,28 @@
       \node[nodebox, minimum width=1.2cm] at (7.2,0) {$s_{i+1}$};
       \node[nodebox, minimum width=1.2cm] at (8.8,0) {$a_{i+1}$};
       \node[text=muted, anchor=west] at (9.8,0) {one logbook line};}%
+    \only<2->{%
+      \node[text=muted, font=\scriptsize] at (5.6,-0.62) {cash};
+      \draw[draw=accent2, dashed, rounded corners=3pt] (6.45,-0.42) rectangle (9.55,0.42);
+      \node[text=accent2, font=\scriptsize] at (8.0,-0.72) {the pair you land on};
+      \node[accentbox, font=\scriptsize] (tag) at (8.0,-1.55) {trade-in price: $\gamma \times q(s_{i+1}, a_{i+1})$};
+      \draw[dimedge] (8.0,-0.95) -- (tag.north);}%
   \end{tikzpicture}
-  \formulaslot{2.0cm}{%
-    \only<2>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr]$ \quad {\normalsize\color{muted}(cash only)}}%
-    \only<3>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, \underbrace{r_i + \gamma\, q(s_{i+1}, a_{i+1})}_{\text{the actual, grown up}} - \ q(s_i, a_i) \,\bigr]$}%
-    \only<4->{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \underbrace{\bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr]}_{\text{the surprise}}$}%
+  \formulaslot{1.6cm}{%
+    \only<3>{\Large $\text{the week's worth} = \underbrace{r_i}_{\text{cash}} + \ \gamma\, \underbrace{q(s_{i+1}, a_{i+1})}_{\text{trade-in, at your own price}}$}%
+    \only<4>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr]$ \quad {\normalsize\color{muted}(cash only)}}%
+    \only<5>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, \underbrace{r_i + \gamma\, q(s_{i+1}, a_{i+1})}_{\text{the actual, grown up}} - \ q(s_i, a_i) \,\bigr]$}%
+    \only<6->{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \underbrace{\bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr]}_{\text{the surprise}}$}%
   }
-  \formulaslot{0.7cm}{%
-    \uncover<3->{{\color{muted}the future has not happened yet: the guess $q(s_{i+1}, a_{i+1})$ stands in for $Q^\star$}}%
+  \formulaslot{0.5cm}{%
+    \uncover<3->{{\color{muted}\footnotesize priced from your own card wall: $q(s_{i+1}, a_{i+1})$ stands in for the unknown $Q^\star$ (the NPV move)}}%
   }
-  \formulaslot{0.8cm}{%
-    \uncover<5->{\footnotesize $\alpha = 0.15$, constant
-      \ {\color{muted}$\cdot$} \ $\varepsilon$-greedy: a random call in $15\%$ of weeks
+  \formulaslot{0.6cm}{%
+    \uncover<7->{\footnotesize $\alpha = 0.15$, constant
+      \ {\color{muted}$\cdot$} \ $\varepsilon = 0.15$: a random call in $15\%$ of weeks
       \ {\color{muted}$\cdot$} \ $a_{i+1}$: actually executed, never a max}%
   }
-  \takeaway{\uncover<6->{Bellman, with the expectation replaced by an arriving average}}
+  \takeaway{\uncover<8->{Bellman, with the expectation replaced by an arriving average}}
 \end{frame}
 
 \begin{frame}{One week, one nudge}
@@ -396,7 +527,7 @@
       \node[text=good] at (2.6,-2.64) {a few hundred weeks later:};
       \node[text=good] at (2.6,-3.14) {the three bands emerge};}%
     \only<7->{\node[text=accent] at (5.5,-3.85)
-      {the cells settle below $Q^\star$ and keep jittering, but the argmax per row comes out right};}%
+      {the cells settle below $Q^\star$ and keep jittering, but each row keeps the right call};}%
   \end{tikzpicture}
 \end{frame}
 

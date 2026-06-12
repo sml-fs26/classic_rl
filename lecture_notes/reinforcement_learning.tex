@@ -25,7 +25,6 @@
 \newcommand{\sa}[1]{\textsc{#1}}   % state and action names, e.g. \sa{healthy}
 \newcommand{\vizurl}{\url{https://sml-fs26.github.io/classic_rl/repair-or-replace/}}
 \newcommand{\vizhref}[1]{\href{https://sml-fs26.github.io/classic_rl/repair-or-replace/}{#1}}
-\DeclareMathOperator*{\argmax}{arg\,max}
 
 \title{Reinforcement Learning\\[0.5ex]\large Lecture Notes}
 \author{Carlos Cotrini\\ETH Zürich}
@@ -284,13 +283,8 @@ $4 \times 3 = 12$ entries.
 \end{remark}
 
 The table is worth the trouble because the optimal policy can be read off it: at state $s$,
-the optimal action is simply the action $a$ that maximizes $Q^\star(s, a)$. In notation,
-\[
-\pi^\star(s) \;=\; \argmax_{a}\, Q^\star(s, a).
-\]
-In words: in state $s$, compare the values $Q^\star(s, a)$ of all available actions $a$ and
-play an action with the largest value; $\argmax$ denotes exactly that action, and
-$\pi^\star$ denotes the optimal policy.
+the optimal action is the action $a$ for which $Q^\star(s, a)$ is largest. We write
+$\pi^\star(s)$ for this action, and $\pi^\star$ for the resulting optimal policy.
 
 It remains to compute the table. Suppose an optimal policy produced the trajectory
 $\dots, s_i, a_i, r_i, s_{i+1}, a_{i+1}, \dots$. Averaging both sides of the
