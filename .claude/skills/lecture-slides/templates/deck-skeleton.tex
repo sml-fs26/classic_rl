@@ -2,12 +2,15 @@
 \input{beamer-preamble}
 
 % ===== <DECK TITLE> animated slide deck (skeleton) =====
-% Engine: LuaLaTeX. Compile FROM the slides/ directory so \input resolves:
-%   lualatex <thisfile>.tex   (run twice for the nav/toc)
+% Engine: pdflatex (standard light theme). Compile FROM the slides/ directory
+% so \input resolves:
+%   pdflatex <thisfile>.tex   (run twice for the nav/toc)
+% (Only the explicit-request dark Fira variant needs lualatex.)
 %
 % House rules baked into this skeleton:
 %   * MINIMAL TEXT: a few words per slide, no paragraphs, no bullet walls.
-%   * A DIAGRAM on essentially every content slide (TikZ, styled light-on-dark).
+%   * A DIAGRAM on essentially every content slide (TikZ, shared styles).
+%   * WORDS, not operator notation: no argmax on a slide for managers.
 %   * EVERY piece appears on its own click: [<+->] on lists, \pause between
 %     blocks, \only<n->/\onslide<n-> on TikZ elements.
 %   * AT MOST ONE big formula per slide, built up term by term with \only.

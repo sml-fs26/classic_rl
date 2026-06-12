@@ -1,13 +1,13 @@
 ---
 name: lecture-slides
-description: Build animated, minimal-text, diagram-driven Beamer slide decks from existing lecture notes in the dark "fancy dimmer" Metropolis style, then publish them to GitHub Pages. Use when the user asks for "slides", a "deck", a "Beamer presentation", "lecture slides", or to "turn the notes into slides" and/or to "put the slides online" / "deploy to Pages" for a course topic. Defines the LuaLaTeX dark theme, the overlay-animation patterns (one click per piece, one formula built term by term, a diagram on every slide), the render-and-eyeball style critic that catches dark-background TikZ label collisions, and the no-LaTeX-in-CI Pages deploy of pre-compiled PDFs.
+description: Build animated, minimal-text, diagram-driven Beamer slide decks from existing lecture notes in a light, projection-first Metropolis style with the standard LaTeX fonts, then publish them to GitHub Pages. Use when the user asks for "slides", a "deck", a "Beamer presentation", "lecture slides", or to "turn the notes into slides" and/or to "put the slides online" / "deploy to Pages" for a course topic. Defines the pdflatex light theme (dark is a screen-only variant on explicit request: it washes out on projectors), the overlay-animation patterns (one click per piece, one formula built term by term, a diagram on every slide), the render-and-eyeball style critic that catches TikZ label collisions, the words-not-argmax rule for manager audiences, and the no-LaTeX-in-CI Pages deploy of pre-compiled PDFs.
 ---
 
 # lecture-slides
 
-Conventions for building **animated, minimal-text, diagram-driven Beamer decks** from existing lecture notes, in the dark "fancy dimmer" Metropolis style, and **publishing** them to GitHub Pages. Audience: the same professionals the notes target. Deliverable: one PDF deck per source lecture note, each a click-to-advance presentation, plus a small Pages site that serves the pre-compiled PDFs (and any interactive page) behind a mobile-first landing index.
+Conventions for building **animated, minimal-text, diagram-driven Beamer decks** from existing lecture notes, in a light, projection-first Metropolis style with the standard LaTeX fonts, and **publishing** them to GitHub Pages. Audience: the same professionals the notes target. Deliverable: one PDF deck per source lecture note, each a click-to-advance presentation, plus a small Pages site that serves the pre-compiled PDFs (and any interactive page) behind a mobile-first landing index.
 
-These rules were extracted from the session that built the **LATS teaching materials** (`agentic-research/LATS/slides/`): two decks (`mcts-slides.tex`, `lats-slides.tex`) sharing one preamble (`beamer-preamble.tex`), deployed via `.github/workflows/deploy-pages.yml` behind `site/index.html`. When you have access to that folder, those are the canonical examples; match their structure, theme, and voice. The reusable scaffolding is vendored next to this file in `templates/`.
+These rules were extracted from the session that built the **LATS teaching materials** (`agentic-research/LATS/slides/`): two decks (`mcts-slides.tex`, `lats-slides.tex`) sharing one preamble (`beamer-preamble.tex`), deployed via `.github/workflows/deploy-pages.yml` behind `site/index.html`. When you have access to that folder, those are the canonical examples for STRUCTURE, animation, and voice; do NOT match their dark colors, which predate the projection lesson below (the classic_rl RL deck is the canonical light example). The reusable scaffolding is vendored next to this file in `templates/`.
 
 This skill is the **slide-deck** counterpart to the sibling `course-viz` skill (browser-only interactive viz). A deck and an interactive page often ship together on the same Pages site (the LATS site does). The decks are derived from lecture notes; the viz is built separately. Read whichever matches the deliverable.
 
@@ -16,7 +16,7 @@ This skill is the **slide-deck** counterpart to the sibling `course-viz` skill (
 ## When to use this skill
 
 - "Make slides from the lecture notes for <topic>." / "Turn `<note>.tex` into a deck."
-- "Build a Beamer deck in the dark Metropolis style like the LATS slides."
+- "Build a Beamer deck like the LATS slides." (If the ask names the dark style explicitly, that selects the screen-only dark variant.)
 - "Put the slides / notes online." / "Deploy the teaching materials to GitHub Pages."
 - Any time the deliverable is a presentation PDF and/or a Pages site that serves it.
 
@@ -30,53 +30,59 @@ If the ask is an interactive browser visualization (not a PDF deck), use `course
 
 3. **Minimal text.** A few words per slide. No paragraphs. No bullet walls (3 to 4 short items max, each a phrase, not a sentence). If a slide needs prose to make sense, the diagram is doing too little.
 
-4. **A diagram on essentially every content slide.** TikZ, styled light-on-dark via the shared styles. A slide that is only text and a formula is the exception, not the rule.
+4. **A diagram on essentially every content slide.** TikZ, styled via the shared styles. A slide that is only text and a formula is the exception, not the rule.
 
 5. **Every piece appears on its own click.** Reveal incrementally: `[<+->]` on lists, `\pause` between blocks, `\only<n->` / `\onslide<n->` on TikZ elements and on formula terms. A slide that shows everything at once on the first click is a bug (see the animation check in Verification).
 
 6. **At most one big formula per slide, built up term by term.** Use a chain of `\only<n>` that each REPLACES the previous, with `\underbrace{...}_{\text{name}}` naming each term as it lands. Never dump a multi-line derivation onto one slide.
 
-7. **LuaLaTeX only.** See the engine rule below. `pdflatex` and `xelatex` both fail or render wrong on this theme.
+7. **Engine matches the fonts.** The standard light theme compiles with plain `pdflatex`. Only the explicit-request dark Fira variant needs LuaLaTeX (see the engine rule below).
 
 8. **Dash-free RENDERED output.** No prose `---` (em dash) or `--` (en dash) in any `.tex`; the only allowed `--` is a TikZ `(a) -- (b)` line segment. Verify the PDF, not just the source (see the dash rule).
 
 9. **Verify by rendering and eyeballing, then publish.** Compile, dash-check the PDF, run the style critic that renders ALL pages to PNG, then deploy. See Verification.
 
-## Engine: LuaLaTeX, never pdflatex or xelatex
+10. **Words before operator notation for manager audiences.** No `argmax` (and no similar operator shorthand) on a slide for a non-mathematical audience: say "keep the call with the largest value" in words. Symbols the source notes define and gloss (pi-star, Q-star, gamma) are fine.
 
-This is the single most load-bearing setup fact.
+## Engine: match the fonts
 
-- **Use LuaLaTeX.** `luaotfload` (LuaLaTeX's font loader) finds the TeX-tree-installed Fira fonts that Metropolis wants, reliably.
-- **Do NOT use `pdflatex`.** It has no `fontspec` / no Fira; Metropolis falls back or errors.
-- **Do NOT use `xelatex`.** Its `fontconfig` path may not see the `texmf`-installed Fira and the run can fail. (xelatex works in some setups, but it is the flaky one here; LuaLaTeX is the dependable choice.)
-
-Compile (twice, for the nav bar and section toc):
+- **Standard light theme (the default): plain `pdflatex`.** It uses `lmodern` / Computer Modern; no fontspec, nothing to go wrong. Compile twice, for the nav bar and section toc:
 
 ```bash
 cd /abs/path/to/slides
-lualatex <deck>.tex && lualatex <deck>.tex
+pdflatex <deck>.tex && pdflatex <deck>.tex
 ```
 
-If a build cannot find Fira at all, the fix is the engine, not the preamble. Switch to `lualatex` before touching `\setmainfont`.
+- **Dark Fira variant (only on explicit request): LuaLaTeX, never pdflatex or xelatex.** `luaotfload` (LuaLaTeX's font loader) finds the TeX-tree-installed Fira fonts reliably; `pdflatex` has no `fontspec` / no Fira (Metropolis falls back or errors) and `xelatex`'s `fontconfig` path may miss the `texmf`-installed Fira. If a Fira build cannot find the font, the fix is the engine, not the preamble.
 
-## The "fancy dimmer" dark theme
+## The light, projection-first theme
 
-Metropolis with `\metroset{background=dark}` is the look. Two fixes are mandatory, both already in `templates/beamer-preamble.tex`:
+**The load-bearing lesson, learned in front of a real projector: dark themes do not project.** Light-on-dark slides wash out in a lit lecture hall, and the lead also rejected designer fonts. The default is therefore LIGHT Metropolis with the standard LaTeX fonts:
 
-1. **Fix the default LIGHT frametitle bar.** Metropolis dark still ships a white frametitle band. Override it so the title strip is a seamless dark panel:
+```latex
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usefonttheme[onlymath]{serif}   % math in the classic Computer Modern italic
+\usetheme{metropolis}
+```
+
+Two fixes are mandatory, both already in `templates/beamer-preamble.tex`:
+
+1. **Frametitle as a pale panel.** Style the title strip as a light gray band with near-black text so the whole deck stays light:
    ```latex
-   \setbeamercolor{frametitle}{fg=white!95!black, bg=panel}
-   \setbeamercolor{frametitle right}{fg=white!95!black, bg=panel}
+   \setbeamercolor{frametitle}{fg=black!88, bg=panel}   % panel = black!8
+   \setbeamercolor{frametitle right}{fg=black!88, bg=panel}
    ```
-   Skip this and every slide has a jarring white bar across the top.
 
-2. **Keep the muted color light enough.** On the dark canvas, `muted` must stay legible:
+2. **Keep the muted color dark enough.** On the light canvas, `muted` must survive a projector:
    ```latex
-   \colorlet{muted}{white!66!black}   % the legible floor
+   \colorlet{muted}{black!55}   % the legible floor
    ```
-   `white!48!black` is TOO DARK: it made captions and a built-up formula nearly invisible against the background. Do not lower it below `white!66!black`.
+   Lighter grays wash out under projection. Do not raise it above `black!55` toward white.
 
-The accent palette (sky cyan `accent`, amber `accent2`, green `good`, rose `bad`, plus a `panel` slightly lighter than the bg) is the "style". Retune the hues per course if you like, but keep the structure: one primary accent for emphasis (`\alert`, progress bar, separators), a second for secondary highlights, green/rose for success/failure states. Style **every** TikZ element light-on-dark via the shared `fg`/`muted` colors and the `edge` / `nodebox` / `treenode` / `good fill` / `bad fill` / `acc fill` styles, never with a default (dark-on-transparent) node.
+The accent palette (deep sky blue `accent`, dark amber `accent2`, dark green `good`, dark rose `bad`, plus a `panel` slightly darker than the bg) is the "style". Retune the hues per course if you like, but keep the structure: one primary accent for emphasis (`\alert`, progress bar, separators), a second for secondary highlights, green/rose for success/failure states, box fills as soft tints (`good!14!white` and friends). Style **every** TikZ element through the shared `fg`/`muted` colors and the `edge` / `nodebox` / `treenode` / `good fill` / `bad fill` / `acc fill` styles, never with hardcoded colors in a deck.
+
+**Dark "fancy dimmer" variant: screen-only, explicit request only.** The original dark look (`\metroset{background=dark}` + Fira via LuaLaTeX) is reserved for decks that will only ever be read on a screen, and only when the lead asks for it by name. Its two mandatory fixes: override the default LIGHT frametitle band that Metropolis dark still ships (`fg=white!95!black, bg=panel` with a dark panel), and keep `muted` at `white!66!black` or LIGHTER (`white!48!black` made captions nearly invisible). Never pick dark silently; projection is the default reality of a lecture.
 
 ## Animation patterns
 
@@ -119,18 +125,18 @@ These are the five patterns the LATS decks use. `templates/deck-skeleton.tex` is
 
 Reach for the helper `\newcommand{\takeaway}[1]{...}` (in the preamble) for the one big centered line that closes many slides.
 
-## TikZ-on-dark label collisions (the recurring bug)
+## TikZ label collisions (the recurring bug)
 
-This is the bug that bit the LATS build most often, and the one the style critic exists to catch.
+This is the bug that bit the LATS build most often, and the one the style critic exists to catch. It is background-independent: it bit again, three times, when the RL deck switched fonts (changed text metrics shift every label).
 
-**Captions placed `below=Nmm of <node>` land on top of other labels, or run through other nodes.** On a dense dark diagram, a label you positioned relative to one node frequently overlaps a sibling node or another caption. It compiles clean and looks fine in the source. It is only visible when you render the page to PNG and look.
+**Captions placed `below=Nmm of <node>` land on top of other labels, or run through other nodes.** On a dense diagram, a label you positioned relative to one node frequently overlaps a sibling node or another caption. It compiles clean and looks fine in the source. It is only visible when you render the page to PNG and look.
 
 Defensive habits:
 - Prefer placing a caption where there is clearly empty canvas, not mechanically `below` of its node.
 - For per-click captions on the same node, use `\only<n>{...}` so only one shows at a time (two captions stacked under one node is a classic collision).
 - For an action arrow with a label (a rollout, a transition), aim the arrow at empty space and label the arrow tip, e.g. `... -- ++(0.9,-1.1) node[right]{...}`.
 - When two bars/labels must coexist, draw both in ONE `tikzpicture` with explicit coordinates so a label can never collide with the frame edge or the other bar (the LATS "punchline" slide does this).
-- Style every element light-on-dark; a dark default node on the dark bg is itself an invisibility bug.
+- Style every element through the shared styles; a node whose colors blend into the background is an invisibility bug.
 - A label can be wider than the slot you imagined: a header wider than its column collides with its neighbour. Rotate it over its own column or widen the slot; never assume text fits.
 - Align grouped objects on ONE shared axis; do not top-pin. Matrices of different row counts pinned at the same TOP coordinate stagger, and the operators between them float a row too high. Center every member of the group, and the operators, on a single axis.
 - Never draw an arrow between two anchors that can coincide: `\draw (a.east) -- (b.west)` where `b` is `right=0pt of a` is ZERO-LENGTH and renders a stray arrowhead on the shared border. Use spanning anchors (`a.north east -- b.north east`) or give the arrow real length.
@@ -170,7 +176,7 @@ For calibration, the real LATS decks each have **13 frames** that expand to **60
 
 The build follows a phased shape: **OWN-THE-LINCHPIN, then PARALLEL BUILD, then VERIFY-WITH-CRITIQUE.** Scout and spec inline yourself; delegate gathering and per-deck building to parallel agents; keep the canonical example, the theme/preamble, the voice, and the verification single-threaded.
 
-**Phase 0 (sequential, you): smoke-test the linchpin.** Author `beamer-preamble.tex`. Compile a tiny 2-slide test deck against it with LuaLaTeX, render both pages to PNG, and EYEBALL them before fanning out. A broken preamble fanned out in parallel wastes all the parallel work. (In the LATS session the slide theme WAS smoke-tested and it paid off; the notes preamble was NOT pre-tested and shipped a broken indicator glyph a human caught later. Smoke-test the linchpin.)
+**Phase 0 (sequential, you): smoke-test the linchpin.** Author `beamer-preamble.tex`. Compile a tiny 2-slide test deck against it with the deck engine (plain `pdflatex` for the standard light theme), render both pages to PNG, and EYEBALL them before fanning out. A broken preamble fanned out in parallel wastes all the parallel work. (In the LATS session the slide theme WAS smoke-tested and it paid off; the notes preamble was NOT pre-tested and shipped a broken indicator glyph a human caught later. Smoke-test the linchpin.)
 
 ```bash
 cd /abs/path/to/slides
@@ -186,7 +192,7 @@ cat > _smoketest.tex <<'EOF'
     \node[bad fill, nodebox, right=of b] (c) {bad};
     \draw[edge] (a) -- (b); \draw[dimedge] (b) -- (c);
   \end{tikzpicture}
-  \only<2->{\takeaway{muted text must stay legible: white!66!black}}
+  \only<2->{\takeaway{muted text must stay legible: black!55}}
 \end{frame}
 \begin{frame}{One formula, one term at a time}
   \centering
@@ -195,38 +201,39 @@ cat > _smoketest.tex <<'EOF'
 \end{frame}
 \end{document}
 EOF
-lualatex -interaction=nonstopmode _smoketest.tex >/dev/null && \
+pdflatex -interaction=nonstopmode _smoketest.tex >/dev/null && \
   pdftoppm -png -r 130 _smoketest.pdf /tmp/smoke && echo "rendered /tmp/smoke-*.png"
 ```
-Then `Read` `/tmp/smoke-*.png`. Check: dark frametitle (no white bar), legible muted text, light-on-dark nodes, the formula building in two steps. `_smoketest.*` is gitignored.
+Then `Read` `/tmp/smoke-*.png`. Check: pale panel frametitle, legible muted text, tinted nodes with dark borders, the formula building in two steps. `_smoketest.*` is gitignored.
 
 **Phase 1 (deck agents, parallel after Phase 0):** one agent per source lecture note, each building one deck that inherits the shared preamble. Bundle by source note, not by slide; a deck is a coherent voice and should not be split across agents.
 
-**Phase 2 (verify-with-critique, you):** compile all decks, run the dash check and the animation check, then dispatch ONE style-critic agent that renders ALL pages of ALL decks to PNG and reads them for collisions / invisible glyphs / off-slide clipping. Fix centrally. For a deck with dense dark diagrams, add the per-diagram high-DPI audit (`templates/slide-figure-audit.workflow.py`): 130 DPI is too coarse, so render the collision-prone terminal-overlay pages at 250 to 300 DPI and read each alone (see Verification 4b). Then publish.
+**Phase 2 (verify-with-critique, you):** compile all decks, run the dash check and the animation check, then dispatch ONE style-critic agent that renders ALL pages of ALL decks to PNG and reads them for collisions / invisible glyphs / off-slide clipping. Fix centrally. For a deck with dense diagrams, add the per-diagram high-DPI audit (`templates/slide-figure-audit.workflow.py`): 130 DPI is too coarse, so render the collision-prone terminal-overlay pages at 250 to 300 DPI and read each alone (see Verification 4b). Then publish.
 
 ### Deck-agent prompt template
 
 Copy and fill the bracketed fields:
 
-> Build the slide deck `[DECK-FILE].tex` from the lecture note `[NOTE-PATH]`, in the dark "fancy dimmer" Metropolis style. Write it to `[SLIDES-DIR]/[DECK-FILE].tex`.
+> Build the slide deck `[DECK-FILE].tex` from the lecture note `[NOTE-PATH]`, in the light, projection-first Metropolis style with the standard LaTeX fonts. Write it to `[SLIDES-DIR]/[DECK-FILE].tex`.
 >
 > **Inherit the shared theme.** First line after `\documentclass[aspectratio=169]{beamer}` is `\input{beamer-preamble}`. Do NOT redefine colors, TikZ styles, or the theme; they live in `beamer-preamble.tex` in the same directory. Available styles: `edge`, `dimedge`, `nodebox`, `accentbox`, `treenode`, `gridcell`, `good fill`, `bad fill`, `acc fill`; colors `accent`, `accent2`, `good`, `bad`, `panel`, `fg`, `muted`; helper `\takeaway{...}`.
 >
-> **Engine.** LuaLaTeX only. Compile from `[SLIDES-DIR]` so `\input` resolves: `lualatex [DECK-FILE].tex` twice.
+> **Engine.** Plain `pdflatex`, twice, from `[SLIDES-DIR]` so `\input` resolves. (Only the explicit-request dark Fira variant uses LuaLaTeX.)
 >
 > **Structure.** One `\section` per section of `[NOTE-PATH]`, in the same order. Mirror the note; do not invent a narrative.
 >
 > **Deck principles (hard rules).**
 > - Minimal text: a few words per slide, no paragraphs, at most 3 to 4 short bullet phrases.
-> - A TikZ diagram on essentially every content slide, styled light-on-dark with the shared styles.
+> - A TikZ diagram on essentially every content slide, styled with the shared styles.
 > - Every piece on its own click: `[<+->]` on lists, `\only<n->`/`\onslide<n->` on TikZ and formula terms.
 > - At most ONE big formula per slide, built term by term with a chain of `\only<n>` and `\underbrace{...}_{\text{name}}`.
-> - Place TikZ labels where there is empty canvas; never stack two captions under one node; aim labelled arrows at empty space. (Dark-background label collisions are the recurring bug.)
+> - Place TikZ labels where there is empty canvas; never stack two captions under one node; aim labelled arrows at empty space. (Label collisions are the recurring bug.)
 > - NO prose `---` or `--`; the only allowed `--` is a TikZ `(a) -- (b)` segment.
+> - Words before operator notation: no argmax on any slide; selections are said in words ("keep the call with the largest value").
 >
 > **Numbers.** Every value, every worked-example state, must come verbatim from `[SPEC-PATH]` (the source-of-truth spec the notes also cite). Do not invent or round numbers.
 >
-> **Verify before reporting done.** Compile clean with LuaLaTeX; run the animation check (overlay pages must be much greater than frame count); `pdftotext ... | grep -cP '\x{2014}'` and `'\x{2013}'` the Unicode dashes (must be 0); render 2 to 3 representative pages to PNG with `pdftoppm` and READ them to confirm dark frametitle, legible muted text, and no label collisions.
+> **Verify before reporting done.** Compile clean; run the animation check (overlay pages must be much greater than frame count); `pdftotext ... | grep -cP '\x{2014}'` and `'\x{2013}'` the Unicode dashes (must be 0); render 2 to 3 representative pages to PNG with `pdftoppm` and READ them to confirm the pale panel frametitle, legible muted text, and no label collisions.
 >
 > **Output:** the single `[DECK-FILE].tex` plus its compiled `[DECK-FILE].pdf`.
 
@@ -274,7 +281,7 @@ The patterns above were extracted from the LATS slides build. When you have acce
 
 | Pattern | Reference path (in `agentic-research/LATS/`) | Template here |
 |---|---|---|
-| Shared dark Metropolis preamble | `slides/beamer-preamble.tex` | `templates/beamer-preamble.tex` |
+| Shared Metropolis preamble (light here; the LATS one is the dark variant) | `slides/beamer-preamble.tex` | `templates/beamer-preamble.tex` |
 | Full animated deck (structure + all 5 animation patterns) | `slides/mcts-slides.tex` | `templates/deck-skeleton.tex` |
 | Second deck sharing the same preamble | `slides/lats-slides.tex` | (same skeleton) |
 | Built-up formula (UCB1 / UCT term by term) | `slides/mcts-slides.tex` (UCB1, UCT frames) | skeleton Pattern C |
@@ -282,16 +289,17 @@ The patterns above were extracted from the LATS slides build. When you have acce
 | Two-bar punchline drawn in one tikzpicture (collision-safe) | `slides/mcts-slides.tex` ("punchline" frame) | (collision rule) |
 | No-LaTeX-in-CI Pages deploy | `.github/workflows/deploy-pages.yml` | `templates/deploy-pages.yml` |
 | Mobile-first dark landing page | `site/index.html` | `templates/landing-index.html` |
-| Per-diagram awkward-graphics audit (render high-DPI, read, fix, verify, loop) | (the dark-bg collision-bug lesson) | `templates/slide-figure-audit.workflow.py` |
+| Per-diagram awkward-graphics audit (render high-DPI, read, fix, verify, loop) | (the collision-bug lesson) | `templates/slide-figure-audit.workflow.py` |
 | Build-artifact gitignore (commit the PDFs) | `slides/.gitignore` | (Things to never do) |
 
 ## Verification
 
-### 1. Compile clean (LuaLaTeX, twice)
+### 1. Compile clean (the deck engine, twice)
 ```bash
 cd /abs/path/to/slides
-lualatex -interaction=nonstopmode <deck>.tex && lualatex -interaction=nonstopmode <deck>.tex
+pdflatex -interaction=nonstopmode <deck>.tex && pdflatex -interaction=nonstopmode <deck>.tex
 ```
+(Use `lualatex` instead only for the explicit-request dark Fira variant.)
 Exit 0 is necessary, not sufficient. It does NOT catch invisible glyphs, label collisions, off-slide clipping, or an un-animated frame.
 
 ### 2. Dash check on the RENDERED PDF
@@ -308,7 +316,7 @@ echo "frames=$FRAMES overlay-pages=$PAGES"   # expect PAGES much greater than FR
 ```
 
 ### 4. Style critic: render ALL pages and READ them
-The agent has no eyes; compiling proves nothing about how a slide LOOKS. Render every overlay page and look at them. This is what catches the dark-background label collisions, invisible muted text, garbled glyphs, and off-slide clipping. Every real visual bug in the LATS session was caught by rendering, not by compiling.
+The agent has no eyes; compiling proves nothing about how a slide LOOKS. Render every overlay page and look at them. This is what catches the label collisions, invisible muted text, garbled glyphs, and off-slide clipping. Every real visual bug in the LATS session was caught by rendering, not by compiling.
 ```bash
 pdftoppm -png -r 130 <deck>.pdf /tmp/<deck>_page
 # then Read /tmp/<deck>_page-*.png  (open them; a screenshot you do not look at is not verification)
@@ -317,16 +325,16 @@ For a multi-deck build this is the dedicated style-critic agent's job (Phase 2):
 
 ### 4b. Per-diagram high-DPI audit (the collision-prone pages, rendered high)
 
-Step 4 at `-r 130` is too coarse to judge a dense dark diagram: a 16:9 slide is only ~820 x 461 px at 130 DPI, so a caption grazing a node is sub-visible. Slides are small enough that the FULL slide fits under the Read tool's 2000 px cap even at 300 DPI (a 169 slide is ~1890 x 1063 px at `-r 300`), so render the collision-prone pages HIGH and read them one at a time. The collision-prone page of a frame is its TERMINAL overlay (every piece revealed, the most ink on the canvas).
+Step 4 at `-r 130` is too coarse to judge a dense diagram: a 16:9 slide is only ~820 x 461 px at 130 DPI, so a caption grazing a node is sub-visible. Slides are small enough that the FULL slide fits under the Read tool's 2000 px cap even at 300 DPI (a 169 slide is ~1890 x 1063 px at `-r 300`), so render the collision-prone pages HIGH and read them one at a time. The collision-prone page of a frame is its TERMINAL overlay (every piece revealed, the most ink on the canvas).
 
 ```bash
 # render ONE collision-prone page (the terminal overlay of a frame) at 300 DPI:
 pdftoppm -png -singlefile -r 300 -f <PAGE> -l <PAGE> <deck>.pdf /tmp/slideN
-# then Read /tmp/slideN.png and judge it against the TikZ-on-dark traps.
+# then Read /tmp/slideN.png and judge it against the collision traps.
 # only for an unusually dense diagram, crop to it: add  -x <X> -y <Y> -W <W> -H <H>
 ```
 
-Resolution gotcha: keep BOTH dimensions under 2000 px. A full 169 slide at `-r 300` is ~1890 x 1063 (safe); a 4:3 slide is ~1510 x 1130 (safe); push DPI higher only on a crop. Loop per page: render, read, and if awkward make a POSITIONING-ONLY fix (never a number, label text, or an overlay `<n->` spec), rebuild with LuaLaTeX twice, re-render, re-read, until clean. Shipped as `templates/slide-figure-audit.workflow.py`: diagnose-per-page in parallel, then ONE serial apply+rebuild agent (the deck is edited serially so parallel edits never conflict), then verify-per-page in parallel, looping until clean. Run it whenever a deck has dense dark diagrams.
+Resolution gotcha: keep BOTH dimensions under 2000 px. A full 169 slide at `-r 300` is ~1890 x 1063 (safe); a 4:3 slide is ~1510 x 1130 (safe); push DPI higher only on a crop. Loop per page: render, read, and if awkward make a POSITIONING-ONLY fix (never a number, label text, or an overlay `<n->` spec), rebuild with the deck engine twice, re-render, re-read, until clean. Shipped as `templates/slide-figure-audit.workflow.py`: diagnose-per-page in parallel, then ONE serial apply+rebuild agent (the deck is edited serially so parallel edits never conflict), then verify-per-page in parallel, looping until clean. Run it whenever a deck has dense diagrams.
 
 ### 5. Publish, then verify LIVE
 After the deploy workflow runs (watch via `gh run list` then `gh run watch <id> --exit-status`):
@@ -339,11 +347,11 @@ curl -o /dev/null -s -w '%{http_code} %{content_type}\n' "$SITE/<deck>.pdf"   # 
 
 1. Author `beamer-preamble.tex`; smoke-test it (2-slide deck, render to PNG, READ it).
 2. Build each deck (one per note), inheriting the preamble.
-3. **Compile** each deck clean with LuaLaTeX (twice).
+3. **Compile** each deck clean with the deck engine, plain `pdflatex` (twice).
 4. **Dash-check** each rendered PDF (`pdftotext ... | grep -cP '\x{2014}'` and `'\x{2013}'`, both 0).
 5. **Animation-check** each deck (overlay pages much greater than frame count).
 6. **Style critic**: render ALL pages of ALL decks to PNG and READ them; fix collisions / invisible text / clipping centrally.
-   - **Per-diagram high-DPI audit:** render each collision-prone (terminal-overlay) page at 250 to 300 DPI and READ it alone; 130 DPI is too coarse to see a caption grazing a node on the dark canvas. Use `templates/slide-figure-audit.workflow.py` for a deck with dense dark diagrams.
+   - **Per-diagram high-DPI audit:** render each collision-prone (terminal-overlay) page at 250 to 300 DPI and READ it alone; 130 DPI is too coarse to see a caption grazing a node. Use `templates/slide-figure-audit.workflow.py` for a deck with dense diagrams.
 7. Commit the pre-compiled PDFs; gitignore LaTeX aux files.
 8. Write `site/index.html` (dash-free) and add the path-filtered `deploy-pages.yml`.
 9. Commit + push; watch the run (`gh run list`, then `gh run watch <id> --exit-status`).
@@ -353,20 +361,22 @@ Step 6, actually looking at the rendered pages, is what makes the rest work. Don
 
 ## Things to never do
 
-- **Compile with `pdflatex` or `xelatex`.** No Fira / wrong rendering / fontconfig miss. LuaLaTeX only.
+- **Build dark for a lecture.** Dark themes wash out on real projectors; dark is screen-only and explicit-request-only. Default to light.
+- **Compile the dark Fira variant with `pdflatex` or `xelatex`.** No Fira / wrong rendering / fontconfig miss; that variant is LuaLaTeX only. (The standard light theme compiles with plain `pdflatex`.)
 - **Redefine the theme inside a deck.** Colors and TikZ styles live in `beamer-preamble.tex`; `\input` it, don't fork it.
-- **Leave the default light frametitle bar.** Set `\setbeamercolor{frametitle}{bg=panel}` (and `frametitle right`).
-- **Lower `muted` below `white!66!black`.** `white!48!black` made captions and a formula nearly invisible on the dark bg.
+- **Leave the frametitle unstyled.** Set `\setbeamercolor{frametitle}{fg=black!88, bg=panel}` (and `frametitle right`); on the dark variant, override its default LIGHT bar the same way with a dark panel.
+- **Let `muted` drift toward the background.** Light theme: keep it `black!55` or darker (lighter grays wash out under a projector). Dark variant: keep it `white!66!black` or lighter (`white!48!black` made captions nearly invisible).
 - **Write a paragraph or a bullet wall on a slide.** A few words; a diagram does the work.
 - **Show everything on the first click.** Every piece gets its own overlay (`[<+->]`, `\only<n->`). An overlay-page-count near the frame count is the symptom.
 - **Put more than one big formula on a slide, or dump a multi-line derivation.** One formula, built term by term.
 - **Place a caption mechanically `below` of its node without checking the render.** It lands on another label or runs through a node. Render and look.
 - **Run the style critic at 130 DPI and call it done.** A 16:9 slide at 130 DPI is only ~820 px wide; a caption grazing a node is sub-visible. Render the collision-prone (terminal-overlay) pages at 250 to 300 DPI (a slide stays under the 2000 px Read cap even at 300) and read them one at a time. See Verification 4b; `templates/slide-figure-audit.workflow.py`.
-- **Leave the other awkward-graphics traps unchecked** (see TikZ-on-dark label collisions): a label wider than its slot, a group top-pinned instead of centered on a shared axis, an arrow between coincident `right=0pt` anchors (a stray zero-length arrowhead), or an `\only<n>` piece overlapping a piece from another overlay on the terminal page. Each compiles clean; only rendering the page high catches it.
-- **Use a default (dark-on-transparent) TikZ node on the dark bg.** Style every element light-on-dark.
+- **Leave the other awkward-graphics traps unchecked** (see TikZ label collisions): a label wider than its slot, a group top-pinned instead of centered on a shared axis, an arrow between coincident `right=0pt` anchors (a stray zero-length arrowhead), or an `\only<n>` piece overlapping a piece from another overlay on the terminal page. Each compiles clean; only rendering the page high catches it.
+- **Use hardcoded node colors instead of the shared styles.** Every element goes through `fg`/`muted` and the named styles, whichever theme is active.
 - **Use prose `---` or `--` in LaTeX, or dash entities in HTML.** The only allowed `--` is a TikZ `(a) -- (b)` segment. Verify the RENDERED output, not the bytes.
 - **Trust the byte hook as proof of a dash-free deck.** `---`/`--` are ASCII and pass the hook but render as dashes. `pdftotext | grep -P` the PDF for the codepoints.
 - **Invent or round a number on a slide.** Every value traces to the source spec the notes cite.
+- **Put `argmax` (or similar operator notation) on a manager-facing slide.** Selections are said in words: "keep the call with the largest value".
 - **Report "compiled" or "published" without rendering / curling.** Exit 0 and a green CI check do not prove the slides look right or the URL serves. Render and read; curl the live URL.
 - **Run LaTeX in CI.** PDFs are compiled locally and committed; the workflow only gathers and deploys.
 - **Commit LaTeX aux files.** Gitignore `*.aux *.log *.nav *.snm *.toc *.out *.vrb *.synctex.gz *.fls *.fdb_latexmk` and the `_smoketest.*` scratch; DO commit the `.pdf` deliverables.
@@ -378,7 +388,7 @@ Step 6, actually looking at the rendered pages, is what makes the rest work. Don
 
 0. **Read the source lecture notes and the numbers spec.** The deck is the note distilled; the section order and every number come from there. If there is a runnable reference implementation pinning the worked example, read its REAL output, not your memory of it.
 
-1. **Author the shared preamble** from `templates/beamer-preamble.tex`. Retune the accent palette per course if desired; keep the two mandatory fixes (dark frametitle, `muted` at least `white!66!black`).
+1. **Author the shared preamble** from `templates/beamer-preamble.tex` (light, standard fonts). Retune the accent palette per course if desired; keep the two mandatory fixes (pale panel frametitle, `muted` at `black!55` or darker).
 
 2. **Smoke-test the preamble** (Phase 0): compile the 2-slide `_smoketest.tex`, render to PNG, READ it. Fix the theme here, before any deck exists.
 
@@ -386,9 +396,9 @@ Step 6, actually looking at the rendered pages, is what makes the rest work. Don
 
 4. **Build one deck per source note** from `templates/deck-skeleton.tex`. Direct (1 to 2 notes) or fan out (3+ notes) using the deck-agent prompt template. Mirror the note's section order; apply the five animation patterns; pull every number from the spec.
 
-5. **Verify each deck**: compile (LuaLaTeX, twice), dash-check the PDF, animation-check (overlay pages much greater than frames).
+5. **Verify each deck**: compile (the deck engine, twice), dash-check the PDF, animation-check (overlay pages much greater than frames).
 
-6. **Style critic** (Phase 2): render ALL pages of ALL decks to PNG and READ them. Fix dark-background label collisions, invisible muted text, clipping, un-animated frames centrally. For dense dark diagrams, run the per-diagram high-DPI audit (`templates/slide-figure-audit.workflow.py`): render the collision-prone terminal-overlay pages at 250 to 300 DPI and read each alone (full-slide 130 DPI is too coarse).
+6. **Style critic** (Phase 2): render ALL pages of ALL decks to PNG and READ them. Fix label collisions, invisible muted text, clipping, un-animated frames centrally. For dense diagrams, run the per-diagram high-DPI audit (`templates/slide-figure-audit.workflow.py`): render the collision-prone terminal-overlay pages at 250 to 300 DPI and read each alone (full-slide 130 DPI is too coarse).
 
 7. **Commit** the pre-compiled PDFs; gitignore the aux files. Solo on `main`, small logical commits, end each message with the co-author trailer from the repo `CLAUDE.md`.
 

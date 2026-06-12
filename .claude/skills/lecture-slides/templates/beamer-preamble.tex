@@ -1,7 +1,10 @@
-% ===== shared Beamer preamble: "fancy dimmer" Metropolis (dark) =====
-% Engine: LuaLaTeX. luaotfload finds the TeX-tree Fira fonts reliably.
-% Do NOT compile with pdflatex (no Fira/fontspec) or xelatex (its fontconfig
-% path may miss the texmf-installed Fira and fail). LuaLaTeX only.
+% ===== shared Beamer preamble: light Metropolis, standard LaTeX fonts =====
+% Projection-friendly variant: LIGHT background, DARK text (dark-on-light
+% projects reliably; light-on-dark washes out on real projectors), and the
+% standard Latin Modern / Computer Modern fonts instead of Fira.
+%
+% Engine: pdflatex (no fontspec needed with standard fonts). lualatex also
+% works but is not required.
 %
 % Each deck does:
 %   \documentclass[aspectratio=169]{beamer}
@@ -12,44 +15,47 @@
 % no prose "--" (renders an en dash). The ONLY allowed "--" is a TikZ line
 % segment, e.g. \draw (a) -- (b). Use a comma, colon, parentheses, or "to".
 
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usefonttheme[onlymath]{serif}   % math in the classic Computer Modern italic
+
 \usetheme{metropolis}
 \metroset{
-  background=dark,            % the "fancy dimmer" look
   sectionpage=progressbar,
   numbering=fraction,
   progressbar=foot,
   block=fill
 }
 
-% --- distinctive accents on the dark canvas (the "style"); retune per course ---
-\definecolor{accent}{HTML}{38BDF8}    % sky cyan (primary accent)
-\definecolor{accent2}{HTML}{FBBF24}   % amber (secondary highlight)
-\definecolor{good}{HTML}{34D399}      % green (success / positive state)
-\definecolor{bad}{HTML}{FB7185}       % rose (failure / negative state)
-\definecolor{panel}{HTML}{2A2D3A}     % a panel slightly lighter than the bg
+% --- accents retuned for a LIGHT canvas (same names; keep the structure) ---
+\definecolor{accent}{HTML}{0369A1}    % deep sky blue (primary accent)
+\definecolor{accent2}{HTML}{B45309}   % dark amber (secondary highlight)
+\definecolor{good}{HTML}{047857}      % dark green (success / positive state)
+\definecolor{bad}{HTML}{BE123C}       % dark rose (failure / negative state)
+\colorlet{panel}{black!8}             % a panel slightly darker than the bg
 
+\setbeamercolor{normal text}{fg=black!87, bg=white}
 \setbeamercolor{alerted text}{fg=accent}
 \setbeamercolor{progress bar in head/foot}{fg=accent}
 \setbeamercolor{progress bar in section page}{fg=accent}
 \setbeamercolor{title separator}{fg=accent}
-% CRITICAL: Metropolis dark still ships a LIGHT frametitle bar by default.
-% Override it so the title strip is a seamless dark panel, not a white band.
-\setbeamercolor{frametitle}{fg=white!95!black, bg=panel}
-\setbeamercolor{frametitle right}{fg=white!95!black, bg=panel}
+% Frametitle: a light panel strip with near-black text (fully light deck).
+\setbeamercolor{frametitle}{fg=black!88, bg=panel}
+\setbeamercolor{frametitle right}{fg=black!88, bg=panel}
 
 % --- math (keep consistent with the lecture notes the deck derives from) ---
 \usepackage{amsmath, amssymb}
 \usepackage{dsfont}   % \mathds{1} indicator (amssymb has no blackboard-bold digit 1)
 
-% --- TikZ, styled for a dark background so every diagram reads light-on-dark ---
+% --- TikZ, styled dark-on-light so every diagram reads on a projector ---
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, calc, backgrounds, fit, shapes.geometric}
 \tikzset{>={Stealth[round]}}
-\colorlet{fg}{white!92!black}
-% NOTE on the muted color: keep it LIGHT enough on the dark background.
-% white!66!black is the floor that stays legible; white!48!black is TOO DARK
-% (it made captions and a built-up formula nearly invisible). Do not lower it.
-\colorlet{muted}{white!66!black}
+\colorlet{fg}{black!85}
+% NOTE on the muted color: keep it DARK enough on the light background.
+% black!55 is the legible floor; anything lighter washes out under a
+% projector. Do not raise it above black!55 toward white.
+\colorlet{muted}{black!55}
 \tikzset{
   every node/.style={text=fg, font=\footnotesize},
   edge/.style={draw=fg, thick, ->},
@@ -58,9 +64,9 @@
   accentbox/.style={draw=accent, line width=1pt, rounded corners=2pt, inner sep=5pt, text=fg},
   gridcell/.style={draw=muted, minimum size=1.05cm, anchor=center, text=fg},
   treenode/.style={circle, draw=fg, thick, minimum size=0.9cm, inner sep=1pt, text=fg},
-  good fill/.style={fill=good!22!panel, draw=good, text=fg},
-  bad fill/.style={fill=bad!22!panel, draw=bad, text=fg},
-  acc fill/.style={fill=accent!22!panel, draw=accent, text=fg},
+  good fill/.style={fill=good!14!white, draw=good, text=fg},
+  bad fill/.style={fill=bad!12!white, draw=bad, text=fg},
+  acc fill/.style={fill=accent!13!white, draw=accent, text=fg},
 }
 
 % --- minimal-text helper: one big centered takeaway line ---
