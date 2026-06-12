@@ -14,3 +14,13 @@ tests/shots/
 probe*.html
 seed.html
 *.output
+
+# LaTeX build intermediates
+*.aux
+*.fdb_latexmk
+*.fls
+lecture_notes/*.log
+lecture_notes/out.txt
+lecture_notes/fncount.txt
+lecture_notes/pagebottoms.txt
+lecture_notes/reinforcement_learning.out
