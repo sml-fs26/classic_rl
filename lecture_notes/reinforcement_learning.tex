@@ -127,11 +127,10 @@ week at \sa{failing}. Even without a breakdown, wear tends to slip by one or two
 the weeks. Under \sa{service} the van spends the week in the shop: reward $-50$, no
 deliveries, and the wear often improves; from \sa{worn}, the van returns to \sa{healthy}
 $95\%$ of the time. Under \sa{replace} the reward is $-130$, and the next week starts
-with a
-brand-new van at \sa{healthy}, whatever the old one looked like. The dynamics is random in
-the sense of Remark~\ref{rem:randomdyn}: feeding $(\sa{worn}, \sa{run})$ into $T$ may return
-$(\sa{shaky}, +72)$ one week and $(\sa{failing}, -208)$ another. There is no final week (the
-fleet runs indefinitely), and the visualization fixes $\gamma = 0.9$.
+with a brand-new van at \sa{healthy}, whatever the old one looked like. The dynamics is
+random in the sense of Remark~\ref{rem:randomdyn}: feeding $(\sa{worn}, \sa{run})$ into
+$T$ may return $(\sa{shaky}, +72)$ one week and $(\sa{failing}, -208)$ another. There
+is no final week (the fleet runs indefinitely), and the visualization fixes $\gamma = 0.9$.
 \end{example}
 
 % 3: strategies and the histories they generate.
@@ -340,43 +339,67 @@ guesses of $Q^\star(s, a)$, one cell per state-action pair, twelve for the fleet
 every cell starting at $0$, as in the visualization. Then, after every lived week, improve
 the single cell just used.
 
-The evidence for that improvement comes from the recurrence~\eqref{eq:recurrence}: what is
-accumulated from week $i$ on equals this week's reward plus $\gamma$ times what is
-accumulated from week $i+1$ on. The future itself has not happened yet, and waiting for
-it would take forever, so the table's current best guess for the next pair stands in for
-it: the same move as plugging a forecasted cash flow into an NPV calculation. One week of
-experience $(s_i,\, a_i,\, r_i,\, s_{i+1},\, a_{i+1})$, one logbook line, therefore reports: ``this
-week, the value of the pair $(s_i, a_i)$ looked like
-$r_i + \gamma\, q(s_{i+1}, a_{i+1})$,'' that is, this week's money plus $\gamma$ times the
-current estimate of the pair the van moved on to. SARSA folds that report into the one
-cell it concerns:
+For a moment, forget the future, and ask the simplest version of the question: what does
+\emph{one} week of a given pair pay on average, say $(\sa{worn}, \sa{run})$? The odds are
+unknown, but the logbook shows what those weeks actually paid: $+72$, $+72$, $+72$,
+$-208$, $+72$, \dots{} (an excerpt, mostly profits with the occasional breakdown).
+Averaging them is the manager's reflex, and there is a bookkeeping trick that needs no
+filing cabinet: keep one number per cell and, each time a new week arrives, nudge it
+toward what the week paid:
+\begin{equation}\label{eq:cashrule}
+q(s_i, a_i) \;\leftarrow\; q(s_i, a_i) \;+\; \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr].
+\end{equation}
+In words: the arrow is an instruction, not an equation; compute the right side and replace
+the left side by it, moving the estimate a fraction $\alpha$ of the way toward what the
+week actually paid. The number $\alpha$ is the \emph{learning rate}, $0.15$ in the
+visualization. ($\alpha$ is the Greek letter alpha.) If $\alpha$ shrinks like $1/n$ as
+the observations accumulate, $n$ counting the weeks of that pair seen so far, these
+nudges reproduce \emph{exactly} the average of those weeks (two lines of school algebra,
+deferred to Appendix~\ref{app:runavg}); held at a small constant such as $0.15$, they
+produce an average that gently favors recent weeks. Never overwrite, only nudge: one
+lucky or unlucky week must not erase a year of evidence.
+
+This formula is already on the manager's desk. It is \emph{exponential smoothing}, the
+standard forecast-revision update used in demand planning and spreadsheet forecasting:
+$\text{new forecast} = \text{old forecast} + \alpha\,(\text{actual} - \text{old forecast})$;
+revise the plan by a fraction of the miss, and never bet everything on the latest data
+point. SARSA forecasts the value of a decision the way a planner forecasts sales.
+
+But $Q^\star(s_i, a_i)$, the number the table is after, is not the average of one week's
+cash alone: by the recurrence~\eqref{eq:recurrence}, a week is its cash \emph{plus}
+$\gamma$ times the value accumulated from the pair where the van lands, the new state
+and the call made there. So the week's true ``actual'' is
+$r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1})$. The future has not
+happened yet, and $Q^\star$ is exactly what we do not know, so the table's current best
+guess $q(s_{i+1}, a_{i+1})$ stands in for it: the same move as plugging a forecasted
+cash flow into an NPV calculation. One logbook line
+$(s_i,\, a_i,\, r_i,\, s_{i+1},\, a_{i+1})$ therefore reports the evidence
+$r_i + \gamma\, q(s_{i+1}, a_{i+1})$, and feeding that richer actual into the smoothing
+rule~\eqref{eq:cashrule} gives SARSA's update:
 \begin{equation}\label{eq:sarsa}
 q(s_i, a_i) \;\leftarrow\; q(s_i, a_i)
 \;+\; \alpha \bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr].
 \end{equation}
-In words: the arrow is an instruction, not an equation; compute the right side and replace
-the left side by it. Three steps unpack the instruction. First, name the bracket: it is
-the \emph{surprise}, the gap between what this week's evidence says the pair is worth and
-what the table currently believes. A positive surprise means the week looked better than
-the table believed; a negative one, worse. Second, the move: shift the belief a small
-fraction $\alpha$ of the way toward the evidence. The number $\alpha$ is the
-\emph{learning rate}, $0.15$ in the visualization. ($\alpha$ is the Greek letter alpha.)
-Never overwrite, only nudge: one lucky week must not erase a year of evidence. To see one
-nudge land, feed in week one of Example~\ref{ex:trajectory} with the table still all
-zeros: the logbook line is $(\sa{healthy}, \sa{run}, +95, \sa{worn}, \sa{service})$; the
-evidence is $95 + 0.9 \cdot q(\sa{worn}, \sa{service}) = 95 + 0.9 \cdot 0 = 95$; the
-surprise is $95 - 0 = 95$; and the cell $q(\sa{healthy}, \sa{run})$ moves from $0$ to
-$0 + 0.15 \cdot 95 = 14.25$. One cell moves; the other eleven stay put. Third, the
-punchline. The Bellman
-equation~\eqref{eq:bellman} says that $Q^\star(s_i, a_i)$ is the \emph{average} of the
-evidence $r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1})$ over many weeks, and an average over
-many executions is exactly how the expectation was defined in
-Definition~\ref{def:expectation}. SARSA computes that average the only way available
-without the odds: incrementally, as the weeks arrive. The update rule is the standard
-recipe for a running average (Appendix~\ref{app:runavg} derives it). Set \eqref{eq:sarsa}
-beside~\eqref{eq:bellman}: the update rule is the Bellman equation with the expectation
-replaced by an arriving average and $Q^\star$ replaced by the current guess $q$. SARSA
-solves the Bellman equation by averaging evidence instead of computing expectations.
+In words: the same forecast revision as before, only the ``actual'' grew up; it is now
+this week's money plus the discounted value of where the week left you.
+
+Name the bracket: it is the \emph{surprise} (the planner's ``miss''), the gap between
+what this week's evidence says the pair is worth and what the table currently believes.
+A positive surprise means the week looked better than the table believed; a negative
+one, worse. To see one nudge land, feed in week one of Example~\ref{ex:trajectory} with
+the table still all zeros: the
+logbook line is $(\sa{healthy}, \sa{run}, +95, \sa{worn}, \sa{service})$; the evidence is
+$95 + 0.9 \cdot q(\sa{worn}, \sa{service}) = 95 + 0.9 \cdot 0 = 95$; the surprise is
+$95 - 0 = 95$; and the cell $q(\sa{healthy}, \sa{run})$ moves from $0$ to
+$0 + 0.15 \cdot 95 = 14.25$. One cell moves; the other eleven stay put. Now the
+punchline. The Bellman equation~\eqref{eq:bellman} says that $Q^\star(s_i, a_i)$ is the
+\emph{average} of that very evidence over many weeks, and an average over many executions
+is exactly how the expectation was defined in Definition~\ref{def:expectation}. SARSA
+computes that average the only way available without the odds: incrementally, with the
+smoothing recipe of~\eqref{eq:cashrule}. Set \eqref{eq:sarsa} beside~\eqref{eq:bellman}:
+the update rule is the Bellman equation with the expectation replaced by an arriving
+average and $Q^\star$ replaced by the current guess $q$. SARSA solves the Bellman
+equation by averaging evidence instead of computing expectations.
 
 \begin{remark}
 The name SARSA spells the five logbook entries each update consumes: State, Action,
@@ -452,7 +475,8 @@ exchange. The recipe is due to Herbert Robbins and Sutton Monro, who published i
 \section{The running average}\label{app:runavg}
 
 Appendix~\ref{app:rm} gave the general principle; here is the alternative, elementary
-explanation, needing nothing beyond school algebra. Let $A_n$ be the average of the first
+explanation, the two lines of school algebra promised in
+Section~\ref{sec:sarsa}. Let $A_n$ be the average of the first
 $n$ observations $x_1, \dots, x_n$, that is, $A_n = (x_1 + \cdots + x_n)/n$. Then
 \[
 n\,A_n \;=\; x_1 + \cdots + x_n \;=\; (n-1)\,A_{n-1} + x_n.
