@@ -131,10 +131,10 @@
     \useasboundingbox (-0.6,-3.0) rectangle (13.4,2.6);
     \only<1->{\node at (6.4,2.3) {a policy (the playbook): \ $\pi : S \to A$, \ one call per state};}%
     \only<2->{%
-      \node[nodebox, font=\scriptsize] at (1.6,1.45) {HEALTHY $\to$ RUN};
-      \node[nodebox, font=\scriptsize] at (4.8,1.45) {WORN $\to$ SERVICE};
-      \node[nodebox, font=\scriptsize] at (8.0,1.45) {SHAKY $\to$ REPLACE};
-      \node[nodebox, font=\scriptsize] at (11.2,1.45) {FAILING $\to$ REPLACE};
+      \node[nodebox, font=\scriptsize, inner sep=3pt] at (1.3,1.45) {HEALTHY $\to$ RUN};
+      \node[nodebox, font=\scriptsize, inner sep=3pt] at (4.6,1.45) {WORN $\to$ SERVICE};
+      \node[nodebox, font=\scriptsize, inner sep=3pt] at (7.95,1.45) {SHAKY $\to$ REPLACE};
+      \node[nodebox, font=\scriptsize, inner sep=3pt] at (11.5,1.45) {FAILING $\to$ REPLACE};
       \node[text=muted, font=\scriptsize] at (6.4,0.75)
         {each week: $a_i = \pi(s_i)$, then $(s_{i+1}, r_i) = T(s_i, a_i)$};}%
     \only<3->{\node[nodebox, align=center, font=\scriptsize] (c1) at (1.2,-0.6)
@@ -411,7 +411,7 @@
     \only<3->{\draw[dashed, draw=bad] (2.2,2.0) -- (5.5,2.0);
       \draw[dashed, draw=bad] (4.4,1.6) -- (5.5,1.6);
       \draw[<->, draw=bad, thick] (5.5,1.6) -- (5.5,2.0);
-      \node[text=bad, font=\scriptsize, align=center] at (5.5,1.1) {the miss\\ $80 - 100 = -20$};}%
+      \node[text=bad, font=\scriptsize, align=center] at (5.5,1.1) {the miss\\ {\tiny $80 - 100 = -20$}};}%
     \only<4->{\draw[draw=good, fill=good!22!panel] (6.6,0) rectangle (7.8,1.94);
       \node[font=\scriptsize] at (7.2,2.25) {next Monday: $97$};
       \node[text=muted, font=\scriptsize] at (7.2,-0.35) {$100 + 0.15 \times (-20) = 97$};}%
@@ -435,7 +435,7 @@
     \only<2->{\node[nodebox, font=\scriptsize] at (2.9,0.5) {SERVICE: $-50$};}%
     \only<3->{\node[text=accent2] at (9.3,2.45) {the scorecard $Q^\star$ you saw};
       \node[nodebox, good fill, font=\scriptsize] at (9.3,1.75) {REPLACE crowned at SHAKY and FAILING: $149.9$};}%
-    \only<4->{\node[nodebox, good fill, font=\scriptsize] at (9.3,1.15) {SERVICE crowned at WORN: $226.1$};}%
+    \only<4->{\node[nodebox, good fill, font=\scriptsize] at (9.3,1.0) {SERVICE crowned at WORN: $226.1$};}%
     \only<5->{\node at (6.25,-0.15) {what does the cash-only ledger miss?};}%
     \only<6->{%
       \node[nodebox] (wk) at (2.2,-1.7) {one week};
