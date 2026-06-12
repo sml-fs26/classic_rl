@@ -1,9 +1,9 @@
 /* ============================================================
    Scene 6, "Return over the van's life".
-   Part 1: the six-week tape ledger (rewards, gamma powers, weighted
-   products, raw vs discounted totals). Part 2: the gamma slider over
-   DATA.gammaSweep with the 4-cell policy band strip, the two sliding
-   frontier markers, and the SHAKY Q-row in numbers.
+   The six-week tape ledger, built up one row per click: rewards,
+   raw sum, gamma-power weights (+ decay sparkline), weighted
+   products, the gathered return G, then the formula card.
+   The patience-knob playground lives in scene13 / scene13.css.
    Shared chrome (concept-heading / concept-formula-*) lives in
    css/style.css. All colour comes from CSS tokens.
    ============================================================ */
@@ -19,7 +19,6 @@
   max-width: 92ch;
   margin: 0 0 12px;
 }
-.scene6-scene .s6-lede b { color: var(--lever-run); }
 
 /* ---- The six-week tape card ---- */
 .scene6-scene .s6-tape {
@@ -52,7 +51,6 @@
   min-width: 640px;
 }
 .scene6-scene .s6-row { display: contents; }
-.scene6-scene .s6-row.s6-hidden { display: none; }
 
 .scene6-scene .s6-rowlab {
   display: flex;
@@ -62,7 +60,6 @@
   text-transform: uppercase;
   color: var(--ink-secondary);
 }
-.scene6-scene .s6-rowlab sup { font-size: 5px; }
 .scene6-scene .s6-wk {
   font-size: 7px;
   text-align: center;
@@ -117,6 +114,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* the tiny decay sparkline (total slot of the WEIGHT row) */
+.scene6-scene .s6-sparkcell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-secondary);
+}
+.scene6-scene .s6-sparkcell svg {
+  width: 100%;
+  max-width: 90px;
+  height: 26px;
+}
+
 /* the two totals */
 .scene6-scene .s6-total {
   display: flex;
@@ -139,16 +149,36 @@
   box-shadow: 2px 2px 0 var(--rule);
 }
 .scene6-scene .s6-total.s6-g .s6-total-val { font-size: 12px; }
+
+/* ---- Step animations (forward clicks only; replay is plain) ---- */
 .scene6-scene .s6-pop { animation: s6-pop 700ms ease-out 1; }
 @keyframes s6-pop {
   0%   { box-shadow: 0 0 0 4px var(--pikachu-yellow); }
   100% { box-shadow: 2px 2px 0 var(--rule); }
 }
-@media (prefers-reduced-motion: reduce) {
-  .scene6-scene .s6-pop { animation: none; }
-}
-.scene6-scene.s6-instant .s6-pop { animation: none; }
 
+@keyframes s6-fadein {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: none; }
+}
+.scene6-scene .s6-stagger { animation: s6-fadein 320ms ease-out both; }
+
+@keyframes s6-glowk {
+  0%   { box-shadow: 0 0 0 3px var(--pikachu-yellow); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+}
+.scene6-scene .s6-glow { animation: s6-glowk 460ms ease-out 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene6-scene .s6-pop,
+  .scene6-scene .s6-stagger,
+  .scene6-scene .s6-glow { animation: none; }
+}
+.scene6-scene.s6-instant .s6-pop,
+.scene6-scene.s6-instant .s6-stagger,
+.scene6-scene.s6-instant .s6-glow { animation: none; }
+
+/* ---- Caption under the tape ---- */
 .scene6-scene .s6-caption {
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
@@ -156,163 +186,22 @@
   color: var(--ink-secondary);
   margin: 10px 2px 0;
   max-width: 86ch;
+  min-height: 15px;
 }
 
+/* ---- The formula card + the highlighted gamma chip ---- */
 .scene6-scene .s6-formula { margin-bottom: 14px; }
-
-/* ---- Part 2: the patience knob ---- */
-.scene6-scene .s6-knob {
-  border-top: 2px solid var(--rule);
-  padding-top: 12px;
-  margin-top: 2px;
-}
-.scene6-scene .s6-knob-title { margin-bottom: 6px; }
-
-.scene6-scene .s6-gamma-row { padding-left: 0; }
-.scene6-scene .s6-gamma-lab { font-size: 9px; color: var(--ink); }
-.scene6-scene .s6-gamma-row input[type="range"] {
-  width: min(300px, 50vw);
-}
-.scene6-scene .s6-gamma-row .val {
-  font-size: 12px;
-  min-width: 5ch;
-  color: var(--ink);
-}
-
-/* the policy band strip + frontier markers */
-.scene6-scene .s6-band-wrap {
-  position: relative;
-  max-width: 560px;
-  margin: 30px 0 30px;
-}
-.scene6-scene .s6-band-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border: 3px solid var(--rule);
+.scene6-scene .s6-gamma-chip {
+  display: inline-block;
+  border: 2px solid var(--pikachu-yellow);
   background: var(--bg-strong);
+  padding: 4px 10px;
+  margin-top: 6px;
+  box-shadow: 2px 2px 0 var(--rule);
 }
-.scene6-scene .s6-band-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 4px 9px;
-  border-left: 3px solid var(--rule);
-  text-align: center;
-  font-family: 'Press Start 2P', monospace;
-}
-.scene6-scene .s6-band-cell:first-child { border-left: none; }
-.scene6-scene .s6-band-state {
-  font-size: 6.5px;
-  color: var(--ink-on-box);
-  opacity: 0.85;
-}
-.scene6-scene .s6-band-act { font-size: 10px; font-weight: bold; }
-.scene6-scene .s6-band-cell.lever-run     { background: var(--lever-run-soft); }
-.scene6-scene .s6-band-cell.lever-service { background: var(--lever-service-soft); }
-.scene6-scene .s6-band-cell.lever-replace { background: var(--lever-replace-soft); }
-.scene6-scene .s6-band-cell.lever-run .s6-band-act     { color: var(--lever-run); }
-.scene6-scene .s6-band-cell.lever-service .s6-band-act { color: var(--lever-service); }
-.scene6-scene .s6-band-cell.lever-replace .s6-band-act { color: var(--lever-replace); }
+.scene6-scene .s6-gamma-chip .katex { font-size: 14px; color: var(--ink-on-box); }
 
-.scene6-scene .s6-frontier {
-  position: absolute;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Press Start 2P', monospace;
-  pointer-events: none;
-  transition: left 160ms ease-out;
-  z-index: 2;
-}
-.scene6-scene .s6-frontier.f-top { top: -26px; color: var(--lever-service); }
-.scene6-scene .s6-frontier.f-bot { bottom: -26px; color: var(--lever-replace); }
-.scene6-scene .s6-frontier-lab {
-  font-size: 6.5px;
-  border: 2px solid currentColor;
-  background: var(--bg-strong);
-  color: var(--ink-on-box);
-  padding: 2px 4px;
-  white-space: nowrap;
-}
-.scene6-scene .s6-frontier-line {
-  width: 3px;
-  height: 14px;
-  background: currentColor;
-}
-@media (prefers-reduced-motion: reduce) {
-  .scene6-scene .s6-frontier { transition: none; }
-}
-.scene6-scene.s6-instant .s6-frontier { transition: none; }
-
-/* the SHAKY row in numbers */
-.scene6-scene .s6-shaky {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 0 0 12px;
-  font-family: 'Press Start 2P', monospace;
-}
-.scene6-scene .s6-shaky-lab {
-  font-size: 8px;
-  color: var(--ink-secondary);
-  margin-right: 2px;
-}
-.scene6-scene .s6-shaky-state { color: var(--wear-2); }
-.scene6-scene .s6-shaky-chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  border: 2px solid var(--rule);
-  background: var(--bg-strong);
-  padding: 5px 8px;
-}
-.scene6-scene .s6-shaky-chip .s6-shaky-name { font-size: 7px; }
-.scene6-scene .s6-shaky-chip.lever-run .s6-shaky-name     { color: var(--lever-run); }
-.scene6-scene .s6-shaky-chip.lever-service .s6-shaky-name { color: var(--lever-service); }
-.scene6-scene .s6-shaky-chip.lever-replace .s6-shaky-name { color: var(--lever-replace); }
-.scene6-scene .s6-shaky-val {
-  font-size: 10px;
-  color: var(--ink-on-box);
-  font-variant-numeric: tabular-nums;
-}
-.scene6-scene .s6-shaky-val.neg { color: var(--lever-replace); }
-.scene6-scene .s6-shaky-star {
-  font-size: 8px;
-  color: var(--lever-service);
-  visibility: hidden;
-}
-.scene6-scene .s6-shaky-chip.s6-best .s6-shaky-star { visibility: visible; }
-.scene6-scene .s6-shaky-chip.s6-best.lever-run     { box-shadow: inset 0 0 0 2px var(--lever-run); }
-.scene6-scene .s6-shaky-chip.s6-best.lever-service { box-shadow: inset 0 0 0 2px var(--lever-service); }
-.scene6-scene .s6-shaky-chip.s6-best.lever-replace { box-shadow: inset 0 0 0 2px var(--lever-replace); }
-
-/* signpost + closer */
-.scene6-scene .s6-signpost {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8.5px;
-  line-height: 1.9;
-  color: var(--ink-secondary);
-  background: var(--bg-strong);
-  border-left: 4px solid var(--pikachu-yellow);
-  padding: 9px 11px;
-  margin: 0 0 10px;
-  max-width: 86ch;
-}
-.scene6-scene .s6-signpost b { color: var(--ink-on-box); }
-.scene6-scene .s6-closer {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8.5px;
-  line-height: 1.9;
-  color: var(--ink-secondary);
-  margin: 0;
-  max-width: 86ch;
-}
-.scene6-scene .s6-closer b { color: var(--ink); }
-
-/* step hint */
+/* ---- Step hint ---- */
 .scene6-scene .s6-hint {
   font-family: 'Press Start 2P', monospace;
   font-size: 7.5px;
@@ -321,13 +210,8 @@
   margin-top: 12px;
 }
 
-/* inline KaTeX gamma inside pixel-font labels */
-.scene6-scene .s6-gamma-lab .katex,
-.scene6-scene .s6-shaky-lab .katex { font-size: 13px; }
-
 @media (max-width: 720px) {
   .scene6-scene .s6-grid { min-width: 560px; }
-  .scene6-scene .s6-band-wrap { max-width: none; }
 }
 
 /* Utility hide, last so the doubled class beats every display-setting

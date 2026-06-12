@@ -182,6 +182,7 @@
       flipBtn.classList.toggle('sc12-hidden', k >= total);
       signoff.classList.toggle('sc12-shown', k >= total);
       replayWrap.classList.toggle('sc12-shown', k >= total);
+      foot.classList.toggle('sc12-shown', k >= total);
     }
 
     function flip() {

@@ -232,7 +232,9 @@
   max-width: 74ch;
   margin: 16px auto 0;
   text-align: center;
+  display: none;
 }
+.sc12-foot.sc12-shown { display: block; }
 
 /* the shared .poke-btn hover references a token this viz does not
    define; give scene-12 buttons a working hover */

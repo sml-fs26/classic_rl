@@ -7,7 +7,8 @@
  *     step 1  WALL 1, the rows: multiply in the state factors a real fleet
  *             sheet would track, one chip at a time (odometer buckets x age
  *             x weeks since service x route load) -> 4,160,000 states, ONE
- *             van. The running product snaps bigger with each landing chip.
+ *             van. Chips land ~250ms apart and the running product counts
+ *             up odometer-style as each factor multiplies in.
  *     step 2  x a modest fleet of 40 vans -> 166,400,000; x 3 calls ->
  *             499,200,000 Q-cells. The big number is the whole argument.
  *     step 3  WALL 2, the columns: DP also needs p(s'|s,a) per row, and
@@ -66,7 +67,7 @@
     const lede = document.createElement('p');
     lede.className = 's10-lede';
     lede.innerHTML =
-      'Scene 9 was easy because the sheet was tiny and the odds were printed. ' +
+      'That sheet was tiny and the odds were printed. ' +
       'Price what a <b>real fleet sheet</b> looks like.';
     root.appendChild(lede);
 
@@ -123,7 +124,7 @@
         '<span class="s10-wall-title">AND THE ODDS DP FEEDS ON?</span></div>' +
       '<div class="s10-wall-row">' +
         '<div class="s10-wall-formula" id="s10-pform"></div>' +
-        '<p class="s10-wall-body">every backup in scene 9 read <b>p(s&prime;|s,a)</b> straight off ' +
+        '<p class="s10-wall-body">every backup so far read <b>p(s&prime;|s,a)</b> straight off ' +
         'the sheet. nobody prints breakdown odds for <b>YOUR</b> van on <b>YOUR</b> routes.</p>' +
       '</div>';
     root.appendChild(wall);
@@ -159,11 +160,21 @@
 
     /* ---------------- step engine ---------------- */
     let step = 0;
+    let shown = 0;               /* the number currently on the big readout */
+    let rampId = null;           /* in-flight odometer rAF, if any */
     const timers = [];
     function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
-    function clearTimers() { while (timers.length) clearTimeout(timers.pop()); }
+    function clearTimers() {
+      while (timers.length) clearTimeout(timers.pop());
+      cancelRamp();
+    }
+    function cancelRamp() {
+      if (rampId != null) { cancelAnimationFrame(rampId); rampId = null; }
+    }
 
     function setBig(n, unit, pop) {
+      cancelRamp();
+      shown = n;
       bigEl.textContent = fmt(n);
       unitEl.textContent = unit;
       if (pop) {
@@ -172,6 +183,24 @@
         bigEl.classList.add('s10-pop');
         if (window.SFX) window.SFX.play('tick');
       }
+    }
+
+    /* Odometer ramp: count the big readout up from its current value to n
+       over ~ms, then snap-pop. Skipped under &run / reduced motion. */
+    function rampBig(n, unit, ms) {
+      cancelRamp();
+      if (RUN || reduceMotion || !(ms > 0)) { setBig(n, unit, true); return; }
+      const from = shown;
+      unitEl.textContent = unit;
+      const t0 = performance.now();
+      (function frame(now) {
+        const u = Math.min(1, (now - t0) / ms);
+        const eased = 1 - Math.pow(1 - u, 3);
+        shown = Math.round(from + (n - from) * eased);
+        bigEl.textContent = fmt(shown);
+        if (u < 1) rampId = requestAnimationFrame(frame);
+        else { rampId = null; setBig(n, unit, true); }
+      })(t0);
     }
 
     /* Draw the FINAL state of step i instantly (used for PREV, cold entry,
@@ -206,7 +235,7 @@
       }
 
       goBtn.textContent = BTN_LABELS[Math.min(i, BTN_LABELS.length - 1)];
-      goBtn.disabled = i >= 4;
+      goBtn.disabled = false;
     }
 
     function land(el, fn) {
@@ -223,7 +252,7 @@
       renderInstant(i - 1);          /* base state */
       step = i;
       goBtn.textContent = BTN_LABELS[Math.min(i, BTN_LABELS.length - 1)];
-      goBtn.disabled = i >= 4;
+      goBtn.disabled = false;
 
       if (i === 1) {
         tagEl.hidden = false;
@@ -234,19 +263,19 @@
           later(() => {
             prod *= f.value;
             const done = k === STATE_FACTORS.length - 1;
-            land(factorChips[k], () => setBig(prod, 'STATES. ONE REAL VAN.', true));
+            land(factorChips[k], () => rampBig(prod, 'STATES. ONE REAL VAN.', A(210)));
             if (done) noteEl.innerHTML = 'track what the workshop tracks and ONE van is already <b>' +
               fmt(oneVanStates) + ' states</b>.';
             else noteEl.innerHTML = 'multiplying in what a real sheet tracks&hellip;';
-          }, A(160 + k * 420));
+          }, A(160 + k * 250));
         });
       } else if (i === 2) {
         later(() => {
-          land(fleetChip, () => setBig(fleetStates, 'STATES. THE WHOLE FLEET.', true));
+          land(fleetChip, () => rampBig(fleetStates, 'STATES. THE WHOLE FLEET.', A(220)));
           noteEl.innerHTML = 'a modest fleet of ' + FLEET_VANS + ' vans&hellip;';
         }, A(160));
         later(() => {
-          land(callsChip, () => setBig(qCells, 'Q-CELLS TO FILL.', true));
+          land(callsChip, () => rampBig(qCells, 'Q-CELLS TO FILL.', A(220)));
           noteEl.innerHTML = fmt(fleetStates) + ' fleet states &times; ' + NUM_ACTIONS +
             ' calls = <b>' + fmt(qCells) + ' cells</b>. no whiteboard holds that. no sweep visits it.';
           if (window.SFX) window.SFX.play('hit');
@@ -266,7 +295,10 @@
       }
     }
 
-    goBtn.addEventListener('click', () => { if (step < 4) advanceTo(step + 1); });
+    goBtn.addEventListener('click', () => {
+      if (step < 4) advanceTo(step + 1);
+      else if (window.VanViz) window.VanViz.goTo(window.VanViz.getCurrentScene() + 1);
+    });
 
     renderInstant(0);
 

@@ -1,1 +1,341 @@
-/* Scene 14: SARSA, let her drive. Populated by the decomposition rebuild. */
+/* Scene 14, "SARSA: let her drive": the staged live cockpit.
+   Two-column live board (van + logbook line + update rule | QTable + bands)
+   over a bottom row (learning curve | controls). Gated panels carry the
+   `hidden` attribute until the run earns them; .s14-enter animates the
+   reveal. All colour from shared tokens; semantic reds/greens use the
+   Okabe-Ito --cb-* tokens paired with status words and signed numbers for
+   redundancy. Both themes retint automatically; no inline colours. */
+
+/* gated panels: the hidden attribute must beat the display rules below */
+.scene14-scene [hidden] { display: none !important; }
+
+.scene14-scene .s14-enter {
+  animation: s14-rise 0.42s ease-out both;
+}
+@keyframes s14-rise {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.scene14-scene .s14-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  max-width: 96ch;
+  margin: 0 0 12px;
+}
+.scene14-scene .s14-lede b { color: var(--ink); }
+
+/* shared small caption */
+.scene14-scene .s14-cap {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  color: var(--ink-secondary);
+}
+
+/* ---- main two-column row ---- */
+.scene14-scene .s14-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+.scene14-scene .s14-left,
+.scene14-scene .s14-right {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---- van panel ---- */
+.scene14-scene .s14-van-panel {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 8px 12px 10px;
+}
+.scene14-scene .s14-van-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.scene14-scene .s14-week {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+}
+.scene14-scene .s14-week b {
+  font-size: 12px;
+  color: var(--pikachu-cheek);
+  font-variant-numeric: tabular-nums;
+}
+.scene14-scene .s14-van-host { display: flex; justify-content: center; }
+/* the week counter is the only clock here; odometer kilometres are not
+   model data, so the gauge + van carry the state alone */
+.scene14-scene .s14-van-host .vc-odo { display: none; }
+
+/* ---- the logbook line (s, a, r, s', a') ---- */
+.scene14-scene .s14-strip {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 8px 12px 10px;
+}
+.scene14-scene .s14-tuple {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+.scene14-scene .s14-trow {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-on-box);
+  min-height: 18px;
+}
+.scene14-scene .s14-trow.muted { color: var(--ink-secondary); opacity: 0.65; }
+.scene14-scene .s14-tlab { color: var(--ink-secondary); font-size: 9px; }
+.scene14-scene .s14-tval {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 9px;
+}
+.scene14-scene .s14-r.pos { color: var(--profit-green); }
+.scene14-scene .s14-r.neg { color: var(--lever-replace); }
+.scene14-scene .s14-bd {
+  font-size: 7px;
+  padding: 1px 4px;
+  border: 2px solid var(--lever-replace);
+  color: var(--lever-replace);
+}
+
+/* state + action + pick chips */
+.scene14-scene .s14-wear {
+  font-size: 8px;
+  padding: 2px 6px;
+  border: 2px solid var(--rule);
+  border-left-width: 6px;
+  background: var(--bg);
+  color: var(--ink-on-box);
+}
+.scene14-scene .s14-wear.w0 { border-left-color: var(--wear-0); }
+.scene14-scene .s14-wear.w1 { border-left-color: var(--wear-1); }
+.scene14-scene .s14-wear.w2 { border-left-color: var(--wear-2); }
+.scene14-scene .s14-wear.w3 { border-left-color: var(--wear-3); }
+
+.scene14-scene .s14-lever {
+  font-size: 8px;
+  padding: 2px 6px;
+  border: 2px solid var(--rule);
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+.scene14-scene .s14-lever.lever-run     { background: var(--lever-run); }
+.scene14-scene .s14-lever.lever-service { background: var(--lever-service); }
+.scene14-scene .s14-lever.lever-replace { background: var(--lever-replace); }
+:root[data-theme="crt"] .scene14-scene .s14-lever { color: var(--bg); }
+
+.scene14-scene .s14-pick {
+  font-size: 6.5px;
+  padding: 1px 4px;
+  border: 1px solid var(--ink-secondary);
+  color: var(--ink-secondary);
+  letter-spacing: 0.05em;
+}
+.scene14-scene .s14-pick.explore { border-color: var(--cb-purple); color: var(--cb-purple); }
+.scene14-scene .s14-pick.greedy  { border-color: var(--cb-blue);   color: var(--cb-blue); }
+
+/* ---- the update rule card ---- */
+.scene14-scene .s14-upd-card {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 8px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.scene14-scene .s14-upd {
+  overflow-x: auto;
+  text-align: center;
+}
+.scene14-scene .s14-upd .katex { color: var(--ink-on-box); font-size: 13px; }
+.scene14-scene .s14-upd .katex-display { margin: 2px 0; }
+.scene14-scene .s14-upd-live {
+  border-top: 1px dashed var(--inner-highlight);
+  padding-top: 7px;
+}
+.scene14-scene .s14-upd-live .katex { font-size: 11.5px; color: var(--pikachu-cheek); }
+.scene14-scene .s14-upd-wait {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+}
+.scene14-scene .s14-upd-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.scene14-scene .s14-chip-td,
+.scene14-scene .s14-chip-q {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  padding: 3px 7px;
+  border: 2px solid var(--ink-secondary);
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.scene14-scene .s14-chip-td.pos { border-color: var(--cb-bluish-green); color: var(--cb-bluish-green); }
+.scene14-scene .s14-chip-td.neg { border-color: var(--cb-vermillion);   color: var(--cb-vermillion); }
+
+/* ---- right column: board + bands ---- */
+.scene14-scene .s14-qhost { overflow-x: auto; }
+
+.scene14-scene .s14-bands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 5px;
+}
+.scene14-scene .s14-band {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: 'Press Start 2P', monospace;
+  border: 2px solid var(--ink-secondary);
+  background: var(--bg-strong);
+  padding: 4px 7px 5px;
+  min-width: 84px;
+}
+.scene14-scene .s14-band-state  { font-size: 6.5px; color: var(--ink-secondary); }
+.scene14-scene .s14-band-act    { font-size: 8.5px; color: var(--ink-on-box); }
+.scene14-scene .s14-band-status { font-size: 6px; letter-spacing: 0.06em; color: var(--ink-secondary); }
+.scene14-scene .s14-band.is-grey { opacity: 0.55; }
+.scene14-scene .s14-band.is-good {
+  border-color: var(--cb-bluish-green);
+  box-shadow: inset 0 0 0 1px var(--cb-bluish-green);
+}
+.scene14-scene .s14-band.is-good .s14-band-act,
+.scene14-scene .s14-band.is-good .s14-band-status { color: var(--cb-bluish-green); }
+.scene14-scene .s14-band.is-bad { border-color: var(--cb-vermillion); }
+.scene14-scene .s14-band.is-bad .s14-band-act,
+.scene14-scene .s14-band.is-bad .s14-band-status { color: var(--cb-vermillion); }
+
+.scene14-scene .s14-banner {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  line-height: 1.7;
+  text-align: center;
+  padding: 9px 10px;
+  border: 3px solid var(--cb-bluish-green);
+  color: var(--cb-bluish-green);
+  background: var(--bg-strong);
+}
+.scene14-scene .s14-banner.s14-banner-flash { animation: s14-banner-flash 1.2s steps(2) 2; }
+@keyframes s14-banner-flash { 50% { filter: brightness(1.8); } }
+
+/* ---- bottom row: curve + controls ---- */
+.scene14-scene .s14-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+/* pin the slots so the controls stay put while the curve is still gated */
+.scene14-scene .s14-curve-wrap { grid-column: 1; grid-row: 1; }
+.scene14-scene .s14-ctrl-panel { grid-column: 2; grid-row: 1; }
+
+.scene14-scene .s14-curve-wrap {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 8px 12px 6px;
+}
+.scene14-scene .s14-curve-host { width: 100%; margin-top: 4px; }
+.scene14-scene .s14-curve-host .learning-curve { border: none; box-shadow: none; padding: 0; }
+/* before week 1 the chart is a placeholder note, not a degenerate axis */
+.scene14-scene .s14-curve-empty {
+  display: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: var(--ink-secondary);
+  text-align: center;
+  padding: 34px 8px;
+}
+.scene14-scene .s14-curve-blank .s14-curve-host { display: none; }
+.scene14-scene .s14-curve-blank .s14-curve-empty { display: block; }
+
+.scene14-scene .s14-ctrl-panel {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.scene14-scene .s14-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.scene14-scene .s14-primary {
+  background: var(--pikachu-yellow);
+  color: #181818;
+}
+:root[data-theme="crt"] .scene14-scene .s14-primary {
+  background: var(--pikachu-yellow);
+  color: var(--bg);
+}
+/* until the first week rolls, DRIVE quietly asks to be pressed */
+.scene14-scene .s14-primary.s14-call { animation: s14-call 1.5s steps(2) infinite; }
+@keyframes s14-call { 50% { filter: brightness(1.3); } }
+
+.scene14-scene .s14-tray {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.scene14-scene .s14-menurow { padding: 4px 2px; font-size: 9px; }
+.scene14-scene .s14-menurow .val { min-width: 44px; }
+
+/* ---- closing line (under the board, revealed with the bands) ---- */
+.scene14-scene .s14-closing {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  border-top: 2px solid var(--rule);
+  padding-top: 10px;
+  margin-top: 2px;
+}
+.scene14-scene .s14-closing b { color: var(--ink); }
+
+/* ---- responsive / reduced motion ---- */
+@media (max-width: 940px) {
+  .scene14-scene .s14-row,
+  .scene14-scene .s14-bottom { grid-template-columns: minmax(0, 1fr); }
+  .scene14-scene .s14-curve-wrap { grid-column: auto; grid-row: auto; }
+  .scene14-scene .s14-ctrl-panel { grid-column: auto; grid-row: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene14-scene .s14-banner.s14-banner-flash { animation: none; }
+  .scene14-scene .s14-enter { animation: none; }
+  .scene14-scene .s14-primary.s14-call { animation: none; }
+}

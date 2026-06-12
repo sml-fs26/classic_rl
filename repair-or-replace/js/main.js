@@ -66,6 +66,21 @@
   }
   function hasRunFlag() { return /[#&?]run\b/.test(window.location.hash || ''); }
 
+  /* Step deep-link params (&step / &autostep / &s10step / &s9fp) are one-shot
+     affordances for cold entry and headless QA. syncHash preserves foreign
+     hash params across scene changes, so without scrubbing, a &step=3 link
+     leaks into the NEXT scene's builder and pre-skips its guided steps.
+     Called only when paging AWAY from an already-shown scene, never on the
+     initial deep link. */
+  function stripStepParams() {
+    const cur = window.location.hash || '';
+    if (cur.length < 2) return;
+    const kept = cur.slice(1).split('&')
+      .filter((tok) => !/^(autostep|step|s10step|s9fp)(=|$)/.test(tok));
+    const next = kept.length ? '#' + kept.join('&') : '#';
+    if (next !== cur) history.replaceState(null, '', next);
+  }
+
   function syncHash(idx) {
     const cur = window.location.hash || '';
     const m = cur.match(/[#&?]scene=(\d+)/);
@@ -132,6 +147,8 @@
   function goTo(idx) {
     if (idx < 0 || idx >= SCENES.length) return;
     if (idx === current) { syncHash(idx); return; }
+
+    if (current >= 0) stripStepParams();
 
     if (current >= 0) {
       const old = sceneNodes[current];

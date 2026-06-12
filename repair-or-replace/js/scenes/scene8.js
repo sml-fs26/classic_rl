@@ -1,25 +1,34 @@
 /* Scene 8, "The Bellman equation": the recursion behind the table,
- * hand-checked on ONE cell.
+ * hand-checked on ONE cell, one idea per click.
  *
- *     step 0  the identity Q*(s,a) = E[R + gamma max Q*(S',a')] + one-liner.
- *     step 1  pick the cell (WORN, SERVICE) = 226.1: highlight it on a small
- *             QTable and draw the branch fan. SERV_UP[WORN] = [.05, .70, .25];
- *             up1 and up2 both land HEALTHY, so the fan is
- *             WORN --service--> { 0.05 WORN, 0.95 HEALTHY }.
- *     step 2  substitute V (= max-Q per state, from DATA.V):
- *             -50 + 0.9 x (0.05 x 226.1 + 0.95 x 311.0), each term as a
- *             source-coloured chip (cost / gamma / prob / V).
- *     step 3  evaluate: 11.31, 295.45, 306.76, x0.9 = 276.08, -50 = 226.08,
- *             which rounds to the table's 226.1. Check mark + SFX 'win'.
- *     step 4  the catch: V sits on BOTH sides; 12 equations, 12 unknowns.
- *             You do not solve it with algebra, you ITERATE it. Next: DP.
+ *   step  0  the identity Q*(s,a) = E[R + gamma max Q*(S',a')] + one-line gloss.
+ *   step  1  pick the cell: the full table, (WORN, SERVICE) ringed, rest dim.
+ *   step  2  play it forward: the table collapses to a mini strip and the
+ *            week panel opens with the WORN chip + the SVC cost chip.
+ *   step  3  branch one draws: 0.05 stay WORN (the wrench changes nothing).
+ *   step  4  branch two draws: 0.95 land HEALTHY (up 1 + up 2 both cap there).
+ *   step  5  the substitution skeleton appears; six chips fill its slots,
+ *            staggered: -50, 0.9, 0.05, 226.1, 0.95, 311.0. Caption: each V
+ *            is the best Q in its row (the mini strip marks those two cells).
+ *   steps 6..10  the arithmetic cascade, ONE line per click, earlier lines
+ *            dimming: 0.05 x 226.1 = 11.31; 0.95 x 311.0 = 295.45;
+ *            sum 306.76; x 0.9 = 276.08; minus 50 = 226.08.
+ *   step 11  the check: 226.08 rounds to 226.1, exactly the cell we picked.
+ *   step 12  the catch: 311.0 and 226.1 are answers from the same table;
+ *            12 equations, 12 unknowns; you iterate it. Next: DP.
  *
- *   Every intermediate number is computed in code from DATA.V and
- *   DATA.model (displayed at 2dp via a float-dust-proof half-up rounding),
- *   never hard-coded, so the strings cannot drift from the data.
+ *   Every number is computed from DATA.V / DATA.model (displayed via a
+ *   float-dust-proof half-up rounding), never hard-coded, so the strings
+ *   cannot drift from the data.
  *
- *   [data-run-primary] = the RUN THE CHECK button (jumps to the last step)
- *   so &run captures the full derivation. Optional &step=N for QA.
+ *   Rewind safety: render() derives everything from `step` alone (pure
+ *   show/hide), and the reveal animations are CSS display-toggle animations,
+ *   so they fire only when an element first becomes visible (a forward
+ *   click), never while rewinding.
+ *
+ *   [data-run-primary] = RUN THE CHECK, which advances ONE internal step
+ *   (same as NEXT), so &run nudges the scene off the formula card.
+ *   &step=N deep link for QA, read once at build.
  */
 (function () {
   window.scenes = window.scenes || {};
@@ -74,10 +83,17 @@
     const total = disc - cost;        /* 226.0795 -> 226.1 (1dp) */
     const checks = round1(total) === round1(qCell);
 
-    const MAX_STEP = 4;
+    /* Best action per row (for the "V = best Q in its row" mini-strip marks). */
+    function argmaxA(s) {
+      let m = -Infinity, k = 0;
+      for (let a = 0; a < A; a++) { const v = Qstar[s * A + a]; if (v > m) { m = v; k = a; } }
+      return k;
+    }
+
+    const MAX_STEP = 12;
     let step = hashStep(MAX_STEP);
 
-    /* ---- Heading + formula card ---- */
+    /* ---- Heading + formula card (step 0) ---- */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = 'The Bellman equation';
@@ -101,7 +117,34 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Step 1 panel: the picked cell | the branch fan ---- */
+    /* ---- Mini strip: the table, parked (step 2+) ---- */
+    const mini = document.createElement('div');
+    mini.className = 's8-mini s8-popin';
+    const miniLabel = document.createElement('span');
+    miniLabel.className = 's8-mini-label';
+    miniLabel.textContent = 'THE TABLE, PARKED';
+    mini.appendChild(miniLabel);
+    const mosaic = document.createElement('span');
+    mosaic.className = 's8-mosaic';
+    for (let s = 0; s < 4; s++) {
+      for (let a = 0; a < A; a++) {
+        const c = document.createElement('span');
+        c.className = 's8-mini-cell';
+        if (s === S_FROM && a === A_SVC) c.classList.add('s8-mini-pick');
+        if ((s === 0 && a === argmaxA(0)) || (s === 1 && a === argmaxA(1))) {
+          c.classList.add('s8-mini-best');
+        }
+        mosaic.appendChild(c);
+      }
+    }
+    mini.appendChild(mosaic);
+    const miniChip = document.createElement('span');
+    miniChip.className = 's8-mini-chip';
+    miniChip.textContent = 'Q*(WORN, SVC) = +' + qCell.toFixed(1);
+    mini.appendChild(miniChip);
+    root.appendChild(mini);
+
+    /* ---- Panel: full table (step 1) XOR the week tree (step 2+) ---- */
     const panel = document.createElement('div');
     panel.className = 's8-panel';
     root.appendChild(panel);
@@ -110,11 +153,15 @@
     tableCol.className = 's8-table-col';
     const pickLabel = document.createElement('div');
     pickLabel.className = 's8-col-label';
-    pickLabel.innerHTML = 'PICK ONE CELL: Q*(WORN, SVC) = <b>' + qCell.toFixed(1) + '</b>';
+    pickLabel.textContent = 'PICK ONE CELL: Q*(WORN, SVC)';
     tableCol.appendChild(pickLabel);
     const qHost = document.createElement('div');
     qHost.className = 's8-q s8-dimcells';
     tableCol.appendChild(qHost);
+    const tableCaption = document.createElement('p');
+    tableCaption.className = 's8-caption';
+    tableCaption.textContent = 'One cell, checked by hand.';
+    tableCol.appendChild(tableCaption);
     panel.appendChild(tableCol);
 
     const qt = window.QTable.mount(qHost);
@@ -126,7 +173,7 @@
     }
 
     const treeCol = document.createElement('div');
-    treeCol.className = 's8-tree-col';
+    treeCol.className = 's8-tree-col s8-popin';
     const treeLabel = document.createElement('div');
     treeLabel.className = 's8-col-label';
     treeLabel.textContent = 'ONE CALL, ONE WEEK DEEP';
@@ -142,28 +189,41 @@
         '<span>' + name + '</span></span>';
     }
 
-    tree.innerHTML =
-      '<div class="s8-tree-root">' + stateChipHtml(1, 'WORN') + '</div>' +
-      '<div class="s8-edge">' +
-        '<span class="s8-edge-chip">' + ACT.leverIconSvg('service') +
-          '<span>SVC ' + (-cost) + '</span></span>' +
-        '<span class="s8-edge-arrow">→</span>' +
-      '</div>' +
-      '<div class="s8-branches">' +
-        '<div class="s8-branch">' +
-          '<span class="s8-prob w1">' + pStay.toFixed(2) + '</span>' +
-          '<span class="s8-branch-arrow">→</span>' +
-          stateChipHtml(1, 'WORN') +
-          '<span class="s8-branch-note">the wrench changes nothing</span>' +
-        '</div>' +
-        '<div class="s8-branch">' +
-          '<span class="s8-prob w0">' + pUp.toFixed(2) + '</span>' +
-          '<span class="s8-branch-arrow">→</span>' +
-          stateChipHtml(0, 'HEALTHY') +
-          '<span class="s8-branch-note">up 1 (' + pUp1.toFixed(2) + ') + up 2 (' +
-            pUp2.toFixed(2) + '): both land HEALTHY</span>' +
-        '</div>' +
-      '</div>';
+    const rootRow = document.createElement('div');
+    rootRow.className = 's8-tree-root';
+    rootRow.innerHTML = stateChipHtml(1, 'WORN');
+    tree.appendChild(rootRow);
+
+    const edge = document.createElement('div');
+    edge.className = 's8-edge';
+    edge.innerHTML =
+      '<span class="s8-edge-chip">' + ACT.leverIconSvg('service') +
+        '<span>SVC ' + (-cost) + '</span></span>' +
+      '<span class="s8-edge-arrow">→</span>';
+    tree.appendChild(edge);
+
+    const branches = document.createElement('div');
+    branches.className = 's8-branches';
+    tree.appendChild(branches);
+
+    const branchA = document.createElement('div');
+    branchA.className = 's8-branch s8-popin';
+    branchA.innerHTML =
+      '<span class="s8-prob w1">' + pStay.toFixed(2) + '</span>' +
+      '<span class="s8-branch-arrow">→</span>' +
+      stateChipHtml(1, 'WORN') +
+      '<span class="s8-branch-note">the wrench changes nothing</span>';
+    branches.appendChild(branchA);
+
+    const branchB = document.createElement('div');
+    branchB.className = 's8-branch s8-popin';
+    branchB.innerHTML =
+      '<span class="s8-prob w0">' + pUp.toFixed(2) + '</span>' +
+      '<span class="s8-branch-arrow">→</span>' +
+      stateChipHtml(0, 'HEALTHY') +
+      '<span class="s8-branch-note">up 1 (' + pUp1.toFixed(2) + ') + up 2 (' +
+        pUp2.toFixed(2) + '): both land HEALTHY</span>';
+    branches.appendChild(branchB);
 
     /* mount the tiny gauge swatches (compact VanCards) */
     tree.querySelectorAll('.s8-st-gauge').forEach((host) => {
@@ -171,97 +231,96 @@
     });
 
     const treeCaption = document.createElement('p');
-    treeCaption.className = 's8-tree-caption';
-    treeCaption.textContent = 'SERVICE at WORN: pay ' + cost + ' now. Stay ' +
-      pStay.toFixed(2) + '; up one ' + pUp1.toFixed(2) + '; up two ' + pUp2.toFixed(2) +
-      '. Two branches land HEALTHY: ' + pUp.toFixed(2) + ' total.';
+    treeCaption.className = 's8-caption';
+    treeCaption.textContent = 'Pay the bill now. The week decides where she lands.';
     treeCol.appendChild(treeCaption);
     panel.appendChild(treeCol);
 
-    /* ---- Step 2/3: substitution + evaluation card ---- */
-    const math = document.createElement('div');
-    math.className = 's8-math';
-    root.appendChild(math);
+    /* ---- Substitution skeleton + evaluation ledger ---- */
+    const eqCard = document.createElement('div');
+    eqCard.className = 's8-math s8-popin';
+    root.appendChild(eqCard);
 
     const mathLabel = document.createElement('div');
     mathLabel.className = 's8-math-label';
     mathLabel.textContent = 'SUBSTITUTE THE NUMBERS';
-    math.appendChild(mathLabel);
+    eqCard.appendChild(mathLabel);
+
+    function slotHtml(idx, chipCls, text, tag) {
+      return '<span class="s8-slot s8-d' + idx + '">' +
+        '<span class="s8-slot-box">' +
+          '<span class="s8-slot-ph"></span>' +
+          '<span class="s8-chip ' + chipCls + '">' + text + '</span>' +
+        '</span>' +
+        '<span class="s8-slot-tag">' + tag + '</span></span>';
+    }
+    function opHtml(t) { return '<span class="s8-op">' + t + '</span>'; }
 
     const eq = document.createElement('div');
     eq.className = 's8-eq';
     eq.innerHTML =
       '<span class="s8-eq-lhs">Q*(WORN, SVC) =</span>' +
-      '<span class="s8-chip cost">' + (-cost) + '</span>' +
-      '<span class="s8-op">+</span>' +
-      '<span class="s8-chip gam">' + GAMMA + '</span>' +
-      '<span class="s8-op">×</span>' +
-      '<span class="s8-op">(</span>' +
-      '<span class="s8-chip pr w1">' + pStay.toFixed(2) + '</span>' +
-      '<span class="s8-op">×</span>' +
-      '<span class="s8-chip vv w1">' + V[1].toFixed(1) + '</span>' +
-      '<span class="s8-op">+</span>' +
-      '<span class="s8-chip pr w0">' + pUp.toFixed(2) + '</span>' +
-      '<span class="s8-op">×</span>' +
-      '<span class="s8-chip vv w0">' + V[0].toFixed(1) + '</span>' +
-      '<span class="s8-op">)</span>';
-    math.appendChild(eq);
+      slotHtml(0, 'cost', String(-cost), 'bill') +
+      opHtml('+') +
+      slotHtml(1, 'gam', String(GAMMA), 'discount') +
+      opHtml('×') +
+      opHtml('(') +
+      slotHtml(2, 'pr w1', pStay.toFixed(2), 'stay odds') +
+      opHtml('×') +
+      slotHtml(3, 'vv w1', V[1].toFixed(1), 'V(WORN)') +
+      opHtml('+') +
+      slotHtml(4, 'pr w0', pUp.toFixed(2), 'up odds') +
+      opHtml('×') +
+      slotHtml(5, 'vv w0', V[0].toFixed(1), 'V(HEALTHY)') +
+      opHtml(')');
+    eqCard.appendChild(eq);
 
-    const legend = document.createElement('p');
-    legend.className = 's8-eq-legend';
-    legend.innerHTML = '<b>' + (-cost) + '</b>: the shop bill. <b>' + GAMMA +
-      '</b>: the discount. <b>' + V[1].toFixed(1) + ' = V(WORN)</b> and <b>' +
-      V[0].toFixed(1) + ' = V(HEALTHY)</b>: each V is the best Q in its row, the ' +
-      '"then play perfectly" part.';
-    math.appendChild(legend);
+    const vCaption = document.createElement('p');
+    vCaption.className = 's8-caption s8-vcap';
+    vCaption.textContent = 'Each V is the best Q in its row.';
+    eqCard.appendChild(vCaption);
 
-    /* evaluation ledger */
-    const evalBox = document.createElement('div');
-    evalBox.className = 's8-eval';
-    math.appendChild(evalBox);
+    /* evaluation ledger, one line per click */
+    const ledger = document.createElement('div');
+    ledger.className = 's8-eval';
+    eqCard.appendChild(ledger);
 
     const LINES = [
       { e: pStay.toFixed(2) + ' × ' + V[1].toFixed(1), v: t1, n: 'the stay-WORN branch' },
       { e: pUp.toFixed(2) + ' × ' + V[0].toFixed(1), v: t2, n: 'the land-HEALTHY branch' },
-      { e: fmt2(t1) + ' + ' + fmt2(t2), v: sum, n: 'what next week is worth, on average' },
-      { e: fmt2(sum) + ' × ' + GAMMA, v: disc, n: 'discounted: next week counts at ' + GAMMA },
+      { e: fmt2(t1) + ' + ' + fmt2(t2), v: sum, n: 'next week, on average' },
+      { e: fmt2(sum) + ' × ' + GAMMA, v: disc, n: 'next week counts less' },
       { e: fmt2(disc) + ' - ' + cost, v: total, n: 'minus the shop bill' },
     ];
-    LINES.forEach((ln) => {
+    const lineEls = LINES.map((ln) => {
       const rowEl = document.createElement('div');
-      rowEl.className = 's8-eval-line';
+      rowEl.className = 's8-eval-line s8-popin';
       rowEl.innerHTML =
         '<span class="s8-expr">' + ln.e + '</span>' +
         '<span class="s8-op">=</span>' +
         '<span class="s8-val">' + fmt2(ln.v) + '</span>' +
         '<span class="s8-note">' + ln.n + '</span>';
-      evalBox.appendChild(rowEl);
+      ledger.appendChild(rowEl);
+      return rowEl;
     });
 
     const verdict = document.createElement('div');
-    verdict.className = 's8-verdict';
+    verdict.className = 's8-verdict s8-popin';
     verdict.innerHTML =
       '<span class="s8-check">' + (checks ? '✓' : '✗') + '</span>' +
       '<span>' + fmt2(total) + ' rounds to <b>' + round1(total).toFixed(1) +
       '</b>: exactly the cell we picked.</span>';
-    evalBox.appendChild(verdict);
+    ledger.appendChild(verdict);
 
-    const consistency = document.createElement('p');
-    consistency.className = 's8-consistency';
-    consistency.innerHTML = 'The table is <b>CONSISTENT</b> with itself: every cell ' +
-      'is this week plus the discounted best-next. All twelve cells pass this same check.';
-    math.appendChild(consistency);
-
-    /* ---- Step 4: the catch ---- */
+    /* ---- The catch ---- */
     const catchBox = document.createElement('div');
-    catchBox.className = 'poke-box tight s8-catch';
+    catchBox.className = 'poke-box tight s8-catch s8-popin';
     catchBox.innerHTML = '<b>THE CATCH:</b> ' + V[0].toFixed(1) + ' and ' + V[1].toFixed(1) +
-      ' are themselves best-of-row numbers from the same table. The unknowns sit on ' +
-      'BOTH sides of the equals sign: 12 equations, 12 unknowns, all tangled. ' +
-      'You do not solve this with algebra. You <b class="s8-iterate">ITERATE</b> it. Next: DP.';
+      ' are themselves answers from the same table. 12 equations, 12 unknowns: ' +
+      'you do not solve it, you <b class="s8-iterate">ITERATE</b> it. Next: DP.';
     root.appendChild(catchBox);
 
-    /* ---- Hint + fast-forward ---- */
+    /* ---- Hint + the one-step RUN button ---- */
     const hint = document.createElement('div');
     hint.className = 's8-hint';
     const hintText = document.createElement('span');
@@ -275,47 +334,67 @@
     root.appendChild(hint);
 
     const HINTS = [
-      '▶ NEXT: pick one cell and check it by hand',
+      '▶ NEXT: pick one cell',
+      '▶ NEXT: play it forward one week',
+      '▶ NEXT: the first branch',
+      '▶ NEXT: the second branch',
       '▶ NEXT: substitute the numbers',
-      '▶ NEXT: evaluate',
+      '▶ NEXT: evaluate, one line per click',
+      '▶ NEXT: the other branch',
+      '▶ NEXT: add them up',
+      '▶ NEXT: discount it',
+      '▶ NEXT: pay the bill',
+      '▶ NEXT: the check',
       '▶ NEXT: the catch',
       'The recursion holds. NEXT moves on: DP fills the table.',
     ];
 
-    function applyStep() {
+    /* Pure function of `step`: cold entry, rewind and replay all land on
+       exactly the same DOM state. */
+    function render() {
       panel.classList.toggle('s8-hidden', step < 1);
-      math.classList.toggle('s8-hidden', step < 2);
-      evalBox.classList.toggle('s8-hidden', step < 3);
-      consistency.classList.toggle('s8-hidden', step < 3);
-      catchBox.classList.toggle('s8-hidden', step < 4);
+      tableCol.classList.toggle('s8-hidden', step !== 1);
+      mini.classList.toggle('s8-hidden', step < 2);
+      mini.classList.toggle('s8-show-best', step >= 5);
+      miniChip.classList.toggle('s8-mini-glow', step >= 11);
+      treeCol.classList.toggle('s8-hidden', step < 2);
+      branchA.classList.toggle('s8-hidden', step < 3);
+      branchB.classList.toggle('s8-hidden', step < 4);
+      eqCard.classList.toggle('s8-hidden', step < 5);
+      ledger.classList.toggle('s8-hidden', step < 6);
+      lineEls.forEach((el, i) => {
+        el.classList.toggle('s8-hidden', step < 6 + i);
+        el.classList.toggle('s8-dimline', step > 6 + i);
+      });
+      verdict.classList.toggle('s8-hidden', step < 11);
+      catchBox.classList.toggle('s8-hidden', step < 12);
+      eq.querySelectorAll('.s8-chip.vv').forEach((ch) => {
+        ch.classList.toggle('s8-loop', step >= 12);
+      });
       hintText.textContent = HINTS[step];
       runBtn.classList.toggle('s8-hidden', step >= MAX_STEP);
     }
 
-    runBtn.addEventListener('click', () => {
-      step = MAX_STEP;
-      applyStep();
-      if (window.SFX) window.SFX.play('win');
-    });
+    function advance() {
+      if (step >= MAX_STEP) return false;
+      step++;
+      render();
+      if (window.SFX) window.SFX.play(step === 11 ? 'win' : 'tick');
+      return true;
+    }
 
-    applyStep();
+    runBtn.addEventListener('click', () => { advance(); });
+
+    render();
 
     return {
       onEnter() {},
       onLeave() {},
-      onNextKey() {
-        if (step < MAX_STEP) {
-          step++;
-          applyStep();
-          if (window.SFX) window.SFX.play(step === 3 ? 'win' : 'tick');
-          return true;
-        }
-        return false;
-      },
+      onNextKey() { return advance(); },
       onPrevKey() {
         if (step > 0) {
           step--;
-          applyStep();
+          render();
           return true;
         }
         return false;

@@ -63,7 +63,60 @@
   align-items: start;
 }
 .scene9-scene .s9-board { min-width: 0; }
-.scene9-scene .s9-qhost { overflow-x: auto; }
+.scene9-scene .s9-qhost { overflow-x: auto; position: relative; }
+
+/* ---- the one-cell spotlight beat (between sweep 0 and sweep 1) ---- */
+.scene9-scene .q-cell.s9-spot-cell {
+  background: var(--bg);
+  box-shadow: inset 0 0 0 3px var(--pikachu-cheek);
+}
+.scene9-scene .q-cell.s9-spot-cell .q-val { color: var(--lever-replace); }
+.scene9-scene .q-cell.s9-spot-cell.s9-spot-flash {
+  animation: s9-spot-flash 700ms steps(2) 2;
+}
+@keyframes s9-spot-flash { 50% { filter: brightness(1.7); } }
+
+/* the tiny backup bubble, anchored under the spotlit cell by JS */
+.scene9-scene .s9-spot-bubble {
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  padding: 7px 10px;
+  font-family: 'Press Start 2P', monospace;
+  white-space: nowrap;
+}
+.scene9-scene .s9-spot-bubble[hidden] { display: none; }
+.scene9-scene .s9-spot-bubble::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 2px;
+  height: 9px;
+  margin-left: -1px;
+  background: var(--rule);
+}
+.scene9-scene .s9-spot-lab {
+  font-size: 6.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+}
+.scene9-scene .s9-spot-bubble b {
+  font-size: 10px;
+  color: var(--lever-replace);
+  font-variant-numeric: tabular-nums;
+}
+.scene9-scene .s9-spot-bubble.s9-spot-pop { animation: s9-spot-pop 240ms steps(3) 1; }
+@keyframes s9-spot-pop {
+  0%   { opacity: 0; transform: translateX(-50%) scale(0.7); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
 
 /* V-chip row: one chip per state, tinted by the wear ramp */
 .scene9-scene .s9-vchips-cap {
@@ -142,4 +195,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .scene9-scene .s9-lock.s9-lock-flash { animation: none; }
+  .scene9-scene .q-cell.s9-spot-cell.s9-spot-flash,
+  .scene9-scene .s9-spot-bubble.s9-spot-pop { animation: none; }
 }

@@ -1,15 +1,107 @@
 /* ============================================================
-   Scene 8, "The Bellman equation".
-   The identity card on top; then the picked cell (WORN, SERVICE)
-   highlighted on a shrunken QTable beside the one-week branch fan;
-   then the substitution line built from source-coloured chips
-   (cost / gamma / prob / V) and the evaluation ledger that lands
-   back on the table's own 226.1; finally the 12-unknowns catch.
+   Scene 8, "The Bellman equation", decomposed: one idea per click.
+   The identity card on top; the picked cell (WORN, SERVICE) ringed
+   on the full QTable; then the table collapses to a mini strip
+   while the one-week branch fan stages in (call chip, branch one,
+   branch two); then a substitution skeleton whose slots fill with
+   source-coloured chips (cost / gamma / prob / V), an arithmetic
+   ledger that grows one line per click with earlier lines dimming,
+   the rounds-to-226.1 verdict, and the 12-unknowns catch.
    Shared chrome lives in css/style.css + css/qtable.css.
    All colour comes from CSS tokens.
    ============================================================ */
 
-/* ---- Panel: picked cell | branch fan ---- */
+/* ---- Reveal animations (display-toggle: they fire only when an
+       element first becomes visible, i.e. on a forward click) ---- */
+@keyframes s8-rise {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes s8-chip-in {
+  0%   { opacity: 0; transform: scale(0.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+/* `backwards` fill (never `both`): a finished forwards-filling animation
+   would pin opacity at 1 and silently defeat the .s8-dimline dimming. */
+.scene8-scene .s8-popin { animation: s8-rise 240ms ease-out backwards; }
+.scene8-scene .s8-edge  { animation: s8-rise 240ms ease-out 260ms backwards; }
+
+/* the six substitution chips pop in staggered once the skeleton shows */
+.scene8-scene .s8-slot .s8-chip { animation: s8-chip-in 220ms ease-out backwards; }
+.scene8-scene .s8-d0 .s8-chip { animation-delay: 120ms; }
+.scene8-scene .s8-d1 .s8-chip { animation-delay: 300ms; }
+.scene8-scene .s8-d2 .s8-chip { animation-delay: 480ms; }
+.scene8-scene .s8-d3 .s8-chip { animation-delay: 660ms; }
+.scene8-scene .s8-d4 .s8-chip { animation-delay: 840ms; }
+.scene8-scene .s8-d5 .s8-chip { animation-delay: 1020ms; }
+
+.scene8-scene.s8-instant .s8-popin,
+.scene8-scene.s8-instant .s8-edge,
+.scene8-scene.s8-instant .s8-slot .s8-chip { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .scene8-scene .s8-popin,
+  .scene8-scene .s8-edge,
+  .scene8-scene .s8-slot .s8-chip { animation: none; }
+}
+
+/* ---- Shared one-line caption under a panel ---- */
+.scene8-scene .s8-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.8;
+  color: var(--ink-secondary);
+  margin: 8px 2px 0;
+}
+
+/* ---- Mini strip: the table, parked ---- */
+.scene8-scene .s8-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 3px var(--inner-highlight);
+  padding: 7px 12px;
+  margin: 0 0 12px;
+  font-family: 'Press Start 2P', monospace;
+}
+.scene8-scene .s8-mini-label {
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  color: var(--ink-secondary);
+}
+.scene8-scene .s8-mosaic {
+  display: grid;
+  grid-template-columns: repeat(3, 11px);
+  grid-auto-rows: 8px;
+  gap: 2px;
+}
+.scene8-scene .s8-mini-cell {
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  opacity: 0.7;
+}
+.scene8-scene .s8-mini-cell.s8-mini-pick {
+  outline: 2px solid var(--pikachu-yellow);
+  opacity: 1;
+}
+.scene8-scene .s8-mini.s8-show-best .s8-mini-cell.s8-mini-best {
+  background: var(--profit-green);
+  opacity: 1;
+}
+.scene8-scene .s8-mini-chip {
+  border: 2px solid var(--pikachu-yellow);
+  background: var(--bg);
+  color: var(--ink-on-box);
+  padding: 4px 7px;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+.scene8-scene .s8-mini-chip.s8-mini-glow {
+  box-shadow: 0 0 0 2px var(--pikachu-yellow);
+}
+
+/* ---- Panel: picked cell (step 1) XOR branch fan (step 2+) ---- */
 .scene8-scene .s8-panel {
   display: flex;
   align-items: flex-start;
@@ -25,7 +117,6 @@
   color: var(--ink-secondary);
   margin-bottom: 8px;
 }
-.scene8-scene .s8-col-label b { color: var(--ink); font-size: 9px; }
 
 .scene8-scene .s8-table-col { flex: 0 1 auto; min-width: 0; }
 
@@ -50,7 +141,7 @@
 .scene8-scene .s8-q.s8-dimcells .q-row-head.s8-dim { opacity: 0.38; }
 
 /* ---- The branch fan ---- */
-.scene8-scene .s8-tree-col { flex: 1 1 360px; min-width: 300px; }
+.scene8-scene .s8-tree-col { flex: 1 1 360px; min-width: 300px; max-width: 720px; }
 .scene8-scene .s8-tree {
   display: flex;
   align-items: center;
@@ -59,7 +150,7 @@
   border: 3px solid var(--rule);
   background: var(--bg-strong);
   box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
-  padding: 14px 14px;
+  padding: 12px 14px;
   font-family: 'Press Start 2P', monospace;
 }
 .scene8-scene .s8-st {
@@ -99,6 +190,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-height: 36px;
+  justify-content: center;
 }
 .scene8-scene .s8-branch {
   display: flex;
@@ -122,15 +215,8 @@
   color: var(--ink-secondary);
   max-width: 26ch;
 }
-.scene8-scene .s8-tree-caption {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7.5px;
-  line-height: 1.8;
-  color: var(--ink-secondary);
-  margin: 8px 2px 0;
-}
 
-/* ---- Substitution + evaluation card ---- */
+/* ---- Substitution skeleton + evaluation ledger ---- */
 .scene8-scene .s8-math {
   border: 4px solid var(--rule);
   background: var(--bg-strong);
@@ -151,16 +237,40 @@
 }
 .scene8-scene .s8-eq {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 6px;
   font-family: 'Press Start 2P', monospace;
   font-size: 10px;
   color: var(--ink-on-box);
 }
-.scene8-scene .s8-eq-lhs { font-size: 9px; margin-right: 2px; }
+.scene8-scene .s8-eq-lhs { font-size: 9px; margin-right: 2px; padding-top: 8px; }
+.scene8-scene .s8-eq > .s8-op { padding-top: 7px; }
 .scene8-scene .s8-op { color: var(--ink-secondary); }
+
+/* a slot: dashed placeholder underneath, chip on top, tiny role tag below */
+.scene8-scene .s8-slot {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.scene8-scene .s8-slot-box { position: relative; display: inline-flex; }
+.scene8-scene .s8-slot-ph {
+  position: absolute;
+  inset: 0;
+  border: 2px dashed var(--ink-secondary);
+  opacity: 0.7;
+}
+.scene8-scene .s8-slot-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+}
 .scene8-scene .s8-chip {
+  position: relative;
   border: 2px solid var(--rule);
   background: var(--bg);
   padding: 4px 7px;
@@ -174,17 +284,12 @@
 .scene8-scene .s8-chip.w1   { border-color: var(--wear-1); }
 .scene8-scene .s8-chip.pr   { border-style: dashed; font-size: 9px; }
 
-.scene8-scene .s8-eq-legend {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7.5px;
-  line-height: 1.9;
-  color: var(--ink-secondary);
-  margin: 10px 0 0;
-  max-width: 88ch;
-}
-.scene8-scene .s8-eq-legend b { color: var(--ink-on-box); }
+/* the catch points back at the two V chips: they are table answers */
+.scene8-scene .s8-chip.s8-loop { box-shadow: 0 0 0 2px var(--charmander-orange); }
 
-/* the evaluation ledger */
+.scene8-scene .s8-vcap { margin: 9px 0 0; }
+
+/* the evaluation ledger: one line per click, earlier lines dim */
 .scene8-scene .s8-eval {
   display: flex;
   flex-direction: column;
@@ -199,22 +304,9 @@
   gap: 8px;
   flex-wrap: wrap;
   font-family: 'Press Start 2P', monospace;
-  animation: s8-rise 240ms ease-out both;
+  transition: opacity 200ms ease-out;
 }
-.scene8-scene .s8-eval-line:nth-child(2) { animation-delay: 120ms; }
-.scene8-scene .s8-eval-line:nth-child(3) { animation-delay: 240ms; }
-.scene8-scene .s8-eval-line:nth-child(4) { animation-delay: 360ms; }
-.scene8-scene .s8-eval-line:nth-child(5) { animation-delay: 480ms; }
-.scene8-scene .s8-verdict { animation: s8-rise 240ms ease-out 640ms both; }
-@keyframes s8-rise {
-  0%   { opacity: 0; transform: translateY(3px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .scene8-scene .s8-eval-line, .scene8-scene .s8-verdict { animation: none; }
-}
-.scene8-scene.s8-instant .s8-eval-line,
-.scene8-scene.s8-instant .s8-verdict { animation: none; }
+.scene8-scene .s8-eval-line.s8-dimline { opacity: 0.45; }
 
 .scene8-scene .s8-expr {
   font-size: 9px;
@@ -244,15 +336,6 @@
   font-size: 15px;
   color: var(--profit-green);
 }
-.scene8-scene .s8-consistency {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  line-height: 1.9;
-  color: var(--ink-secondary);
-  margin: 10px 0 0;
-  max-width: 88ch;
-}
-.scene8-scene .s8-consistency b { color: var(--ink-on-box); }
 
 /* ---- The catch ---- */
 .scene8-scene .s8-catch {

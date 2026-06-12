@@ -1,8 +1,10 @@
 /* Scene 1: Tutorial, "How it works".
    A step-driven printed fleet sheet: OLD BESSIE + the wear strip on top,
    the three call cards (RUN / SERVICE / REPLACE) below, dialog + nav.
-   Reuses the foundation tokens (--ink, --bg-strong, --rule, --lever-*,
-   --wear-*, --profit-green); no inline categorical colours. */
+   Nine steps; staged reveals: tow row (-280 -> FAILING slam), cliff
+   pulse, staggered SERVICE effect lines. Reuses the foundation tokens
+   (--ink, --bg-strong, --rule, --lever-*, --wear-*, --profit-green);
+   no inline categorical colours. */
 
 .scene1-scene { max-width: 1020px; margin: 0 auto; }
 
@@ -189,19 +191,24 @@
 
 /* the WORN -> SHAKY double cliff */
 .tut-cliff { background: var(--lever-replace-soft); }
+.tut-pulse { animation: tut-cliffpulse 460ms steps(2) 2; }
+@keyframes tut-cliffpulse {
+  0%, 100% { box-shadow: none; }
+  50%      { box-shadow: 0 0 0 3px var(--lever-replace); }
+}
 .tut-cliffchip {
   grid-column: 3 / 5;
   border: 3px solid var(--lever-replace);
   background: var(--bg);
   padding: 5px 4px;
   text-align: center;
-  font-size: 7px;
+  font-size: 8px;
   color: var(--lever-replace);
   line-height: 1.6;
 }
 .tut-cliffchip small {
   display: block;
-  font-size: 6.5px;
+  font-size: 8px;
   color: var(--ink-on-box);
 }
 
@@ -213,6 +220,50 @@
 }
 .tut-foot-warn { color: var(--lever-replace); }
 
+/* the tow row: what a breakdown costs (-280 chip -> FAILING) */
+.tut-towrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 2px solid var(--lever-replace);
+  background: var(--bg);
+}
+.tut-tow-cost {
+  font-size: 12px;
+  color: var(--lever-replace);
+  font-variant-numeric: tabular-nums;
+}
+.tut-tow-sub { font-size: 6.5px; color: var(--ink-secondary); }
+.tut-tow-arrow {
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 10px;
+  color: var(--ink-secondary);
+}
+.tut-tow-dest {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 7px;
+}
+
+/* staged tow reveal: cost chip, then the arrow, then the FAILING slam */
+.tut-tow-fresh > * { animation: tut-pop-in 260ms steps(4) backwards; }
+.tut-tow-fresh > .tut-tow-arrow { animation-delay: 240ms; }
+.tut-tow-fresh > .tut-tow-dest {
+  animation: tut-pop-in 260ms steps(4) 480ms backwards,
+             tut-slam 360ms steps(2) 740ms;
+}
+@keyframes tut-slam {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-3px); box-shadow: 0 0 0 3px var(--lever-replace); }
+  65%  { transform: translateX(3px);  box-shadow: 0 0 0 3px var(--lever-replace); }
+  100% { transform: translateX(0); }
+}
+/* the strip's FAILING chip slams in sync with the tow landing */
+.tut-slam-chip { animation: tut-slam 360ms steps(2) 740ms; }
+
 /* SERVICE / REPLACE shared bits */
 .tut-cost-row { display: flex; align-items: baseline; gap: 8px; }
 .tut-cost { font-size: 14px; }
@@ -221,9 +272,14 @@
 .tut-cost-sub { font-size: 7.5px; color: var(--ink-secondary); }
 
 .tut-sgrid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.tut-srow {
   display: grid;
   grid-template-columns: 18px 58px minmax(0, 1fr);
-  gap: 7px 8px;
+  gap: 0 8px;
   align-items: center;
 }
 .tut-srow-name { font-size: 7px; }
@@ -259,6 +315,7 @@
 
 /* forward-step pop-in (suppressed on rewind / &run / reduced motion) */
 .tut-pop { animation: tut-pop-in 320ms steps(4) backwards; }
+.tut-pop-late { animation-delay: 420ms; }
 @keyframes tut-pop-in {
   0%   { opacity: 0; transform: translateY(10px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -290,7 +347,8 @@
 
 /* ---- reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
-  .tut-pop { animation: none; }
+  .tut-pop, .tut-pulse, .tut-slam-chip,
+  .tut-tow-fresh > * { animation: none; }
 }
 
 /* ---- mobile ---- */

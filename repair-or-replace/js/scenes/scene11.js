@@ -1,544 +1,363 @@
-/* Scene 11, "SARSA: learn from the logbook": the live-learning flagship.
+/* Scene 11, "SARSA: the one-cell nudge": a guided walkthrough of ONE update.
  *
- *   The counterpart to scene 9 with the printed odds taken away. OLD BESSIE
- *   drives ONE endless stream of weeks (continuing task, gamma = 0.9, no
- *   episode resets, terminal=false in every update) and after each week the
- *   learner nudges exactly one Q-cell toward what the logbook just said:
+ *   The didactic half of the SARSA pair (scene 14 owns the free-running
+ *   cockpit). Five internal steps, one idea per click:
  *
- *       q[s,a] <- q[s,a] + alpha * ( r + 0.9 * q[s',a'] - q[s,a] )
+ *     0  one logbook line: the chips s, a, r, s', a' slide in one at a time
+ *     1  the target r + 0.9 x q[s',a'] assembles from those chips
+ *     2  the gap: target vs her current guess q[s,a], a bar with a TD chip
+ *     3  the nudge: q[s,a] slides alpha = 0.15 of the way to the target
+ *     4  the full update line, every term colour-matched to the chips above
  *
- *   True on-policy SARSA: pick a' for s' (eps-greedy), update WITH it, then
- *   actually execute that a' next week. The local pickTagged() mirrors
- *   SARSA.pickEpsGreedy draw for draw (same rng consumption) and additionally
- *   reports whether the eps coin came up EXPLORE, so the readout can tag the
- *   choice; the learning dynamics are identical to the shared primitive.
+ *   The worked example (source, deterministic):
+ *     transition   s=WORN, a=RUN, r=+72, s'=SHAKY is a legal draw from
+ *                  DATA.model: revRun[WORN] = 72, and a non-breakdown RUN
+ *                  at WORN degrades one level with chance (1-0.08) x 0.55.
+ *     a'=SVC       the call picked for SHAKY next week (on-policy).
+ *     q[WORN,RUN] = 42.2 and q[SHAKY,SVC] = 38.0: her notebook part-way
+ *                  through learning, well inside (0, Q*) for those cells
+ *                  (DATA.Qstar: 203.4 and 126.4). The pair is fixed so the
+ *                  whole displayed chain is EXACT at one decimal:
+ *                  target = 72 + 0.9 x 38.0 = 106.2, TD = +64.0,
+ *                  nudge = 0.15 x 64.0 = +9.6, new cell = 51.8.
+ *     alpha = 0.15, gamma = 0.9 match the scene 14 cockpit defaults and
+ *     DATA.model.gamma; r is read from DATA at build time, never typed.
  *
- *   Layout:
- *     left   the live board: a VanCard mirroring the state, the week count,
- *            the (s, a, r, s', a') logbook line with EXPLORE/GREEDY tags,
- *            and the update rule via KaTeX with live numbers substituted
- *            when paused / stepping / at SLOW speed, plus a signed TD chip.
- *     right  the 4x3 QTable filling live + a BANDS indicator row comparing
- *            SARSA.argmaxPolicy(Q) to DATA.policy per state (grey until the
- *            row is visited, red on mismatch, green on match). When all 4
- *            match, "THREE BANDS REDISCOVERED" flashes once per run.
- *     below  a learning curve of weekly money (raw + moving average) and
- *            the controls: DRIVE/PAUSE, STEP, RESET, SPEED, eps, alpha.
- *
- *   Speeds: the default is deliberately SLOW (~1 week / 900ms with the van
- *   fx) so one update is legible; faster levels drop the fx and batch the
- *   chart; TURBO folds ~50 weeks into each tick. The sim cadence is a
- *   teaching control, not an animation, so it is NOT collapsed under
- *   reduced motion (the van fx collapse themselves inside VanCard).
- *
- *   Headless (&run): the auto-clicked DRIVE fast-forwards RUN_WEEKS weeks
- *   synchronously on a PINNED seed (verified offline: bands match DATA's
- *   three bands at that horizon), renders everything once, and stays
- *   paused, so the capture is stable and converged. Interactive runs draw
- *   a fresh seed per RESET.
+ *   Rendering is a pure function of the step cursor (applyStep), so rewind
+ *   restores any step exactly; one-shot animations fire only on forward
+ *   clicks. `&step=K` (0..4) deep-links to a step on cold entry. No
+ *   data-run-primary: there is nothing to run here.
  *
  *   Contract: window.scenes.scene11 = function(root){ return {...}; }
- *   onLeave pauses the driver; cold-entry safe; [data-run-primary] = DRIVE.
  */
 (function () {
   window.scenes = window.scenes || {};
 
-  const STATE_DISPLAY = (window.Van && window.Van.STATE_DISPLAY) ||
-    ['HEALTHY', 'WORN', 'SHAKY', 'FAILING'];
-  const NUM_STATES = (window.Van && window.Van.NUM_STATES) || 4;
-  const GAMMA = (window.Van && window.Van.GAMMA != null) ? window.Van.GAMMA : 0.9;
+  const N_STEPS = 5;
 
-  const RUN_SEED = 12345;    /* pinned &run seed; bands verified at RUN_WEEKS */
-  const RUN_WEEKS = 4000;
-
-  /* speed levels: tick delay, weeks folded per tick, what gets narrated */
-  const SPEEDS = [
-    { name: 'SLOW',  tick: 900, weeks: 1,  fx: true,  formula: true,  flash: true,  chartEvery: 1 },
-    { name: 'BRISK', tick: 260, weeks: 1,  fx: false, formula: false, flash: false, chartEvery: 2 },
-    { name: 'FAST',  tick: 110, weeks: 6,  fx: false, formula: false, flash: false, chartEvery: 3 },
-    { name: 'TURBO', tick: 50,  weeks: 50, fx: false, formula: false, flash: false, chartEvery: 4 },
-  ];
+  function hashStep() {
+    const m = (window.location.hash || '').match(/[#&?]step=(\d+)/);
+    if (!m) return 0;
+    const n = parseInt(m[1], 10);
+    return Number.isFinite(n) ? Math.max(0, Math.min(N_STEPS - 1, n)) : 0;
+  }
+  function instantMode() {
+    return /[#&?](run|instant)\b/.test(window.location.hash || '') ||
+      !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
 
   window.scenes.scene11 = function (root) {
-    root.classList.add('scene-pad', 'scene11-scene');
+    root.classList.add('scene-pad', 'scene11-scene', 'concept-scene');
     root.innerHTML = '';
 
     const Van = window.Van;
-    const SARSA = window.SARSA;
-    const Actions = window.Actions;
-    const A_IDS = Actions.MOVE_IDS;                       /* [run, service, replace] */
-    const DATA = window.DATA || {};
-    const TARGET = DATA.policy || ['run', 'service', 'replace', 'replace'];
-    const Curve = window.LearningCurve || window.Chart;   /* js/chart.js export */
+    const ACT = window.Actions;
+    const D = window.DATA || {};
+    const M = D.model || {};
+    const SD = (Van && Van.STATE_DISPLAY) || D.stateDisplay ||
+      ['HEALTHY', 'WORN', 'SHAKY', 'FAILING'];
+    const GAMMA = (M.gamma != null) ? M.gamma : ((Van && Van.GAMMA) || 0.9);
+    const REV = M.revRun || (Van && Van.REV_RUN) || [95, 72, 40, 16];
 
-    const RUN = /[#&?]run\b/.test(window.location.hash || '');
+    /* ---- the worked example (provenance in the header comment) ---- */
+    const EX = {
+      sFrom: 1, a: 'run', sTo: 2, aNext: 'service',
+      r: REV[1],          /* +72: RUN at WORN, no breakdown */
+      qB: 42.2,           /* her current q[WORN, RUN]  */
+      qN: 38.0,           /* her current q[SHAKY, SVC] */
+      alpha: 0.15,
+    };
+    EX.boot = GAMMA * EX.qN;       /* 34.2  */
+    EX.target = EX.r + EX.boot;    /* 106.2 */
+    EX.td = EX.target - EX.qB;     /* +64.0 */
+    EX.delta = EX.alpha * EX.td;   /* +9.6  */
+    EX.qAfter = EX.qB + EX.delta;  /* 51.8  */
+    const BAR_MAX = 120;           /* gap-bar scale, comfortably > target */
 
-    /* eps-greedy with an EXPLORE/GREEDY tag. Mirrors SARSA.pickEpsGreedy
-       exactly (same branches, same rng draws), so the trajectory is the one
-       the shared primitive would produce. */
-    function pickTagged(Q, sIdx, eps, rng) {
-      if (rng() < eps) {
-        return { a: A_IDS[Math.floor(rng() * A_IDS.length)], explored: true };
-      }
-      return { a: SARSA.argmaxQ(Q, sIdx, rng), explored: false };
-    }
-    const aIdx = (id) => A_IDS.indexOf(id);
+    const f1 = (v) => v.toFixed(1);
+    const pos = (v) => (v >= 0 ? '+' : '') + v.toFixed(1);
+    const pct = (v) => (v / BAR_MAX * 100).toFixed(3) + '%';
 
-    /* ---------------- DOM ---------------- */
-    const h = document.createElement('h2');
-    h.className = 'concept-heading';
-    h.textContent = 'SARSA: LEARN FROM THE LOGBOOK';
-    root.appendChild(h);
-
-    const lede = document.createElement('p');
-    lede.className = 's11-lede';
-    lede.innerHTML =
-      'No printed odds this time. Drive, one endless stream of weeks. ' +
-      'After every week the logbook gains one line, and that line nudges <b>one cell</b>.';
-    root.appendChild(lede);
-
-    /* ---- main two-column row ---- */
-    const main = document.createElement('div');
-    main.className = 's11-row';
-    root.appendChild(main);
-
-    const left = document.createElement('div');
-    left.className = 's11-left';
-    main.appendChild(left);
-
-    /* van panel */
-    const vanPanel = document.createElement('div');
-    vanPanel.className = 's11-van-panel';
-    vanPanel.innerHTML =
-      '<div class="s11-van-head"><span class="s11-cap">THE VAN, LIVE</span>' +
-      '<span class="s11-week">WEEK <b id="s11-week">0</b></span></div>' +
-      '<div class="s11-van-host" id="s11-van"></div>';
-    left.appendChild(vanPanel);
-    const van = window.VanCard.mount(vanPanel.querySelector('#s11-van'), { wear: 0, size: 'md' });
-    const weekEl = vanPanel.querySelector('#s11-week');
-
-    /* this-week logbook line */
-    const strip = document.createElement('div');
-    strip.className = 's11-strip';
-    strip.innerHTML =
-      '<div class="s11-cap">THIS WEEK IN THE LOGBOOK</div>' +
-      '<div class="s11-tuple" id="s11-tuple"></div>';
-    left.appendChild(strip);
-    const tupleEl = strip.querySelector('#s11-tuple');
-
-    /* the update rule */
-    const updCard = document.createElement('div');
-    updCard.className = 's11-upd-card';
-    updCard.innerHTML =
-      '<div class="s11-cap">THE ONE-CELL NUDGE</div>' +
-      '<div class="s11-upd" id="s11-rule"></div>' +
-      '<div class="s11-upd s11-upd-live" id="s11-live"></div>' +
-      '<div class="s11-upd-chips">' +
-        '<span class="s11-chip-td" id="s11-td">TD &mdash;</span>' +
-        '<span class="s11-chip-q" id="s11-qmove">q[s,a] &mdash;</span>' +
-      '</div>';
-    left.appendChild(updCard);
-    window.Katex.render(
-      String.raw`q[s,a] \;\leftarrow\; q[s,a] + \alpha\,\bigl(\, r + 0.9\, q[s',a'] - q[s,a] \,\bigr)`,
-      updCard.querySelector('#s11-rule'), true
-    );
-    const liveEl = updCard.querySelector('#s11-live');
-    const tdEl = updCard.querySelector('#s11-td');
-    const qmoveEl = updCard.querySelector('#s11-qmove');
-
-    /* right column: QTable + bands */
-    const right = document.createElement('div');
-    right.className = 's11-right';
-    main.appendChild(right);
-
-    const rcap = document.createElement('div');
-    rcap.className = 's11-cap';
-    rcap.textContent = 'THE SCORECARD, FILLING ITSELF';
-    right.appendChild(rcap);
-
-    const qHost = document.createElement('div');
-    qHost.className = 's11-qhost';
-    right.appendChild(qHost);
-    const qt = window.QTable.mount(qHost);
-
-    const bandsWrap = document.createElement('div');
-    bandsWrap.className = 's11-bands-wrap';
-    bandsWrap.innerHTML = '<div class="s11-cap">BANDS VS THE DP ANSWER (SCENE 9)</div>' +
-      '<div class="s11-bands" id="s11-bands"></div>';
-    right.appendChild(bandsWrap);
-    const bandsRow = bandsWrap.querySelector('#s11-bands');
-    const bandEls = [];
-    for (let s = 0; s < NUM_STATES; s++) {
-      const b = document.createElement('span');
-      b.className = 's11-band is-grey';
-      b.innerHTML = '<span class="s11-band-state">' + STATE_DISPLAY[s] + '</span>' +
-                    '<span class="s11-band-act">?</span>' +
-                    '<span class="s11-band-status">UNSEEN</span>';
-      bandsRow.appendChild(b);
-      bandEls[s] = b;
-    }
-
-    const banner = document.createElement('div');
-    banner.className = 's11-banner';
-    banner.hidden = true;
-    banner.textContent = 'THREE BANDS REDISCOVERED: NO ODDS WERE GIVEN.';
-    right.appendChild(banner);
-
-    /* the closing caption sits under the board, revealed with the bands */
-    const closing = document.createElement('div');
-    closing.className = 's11-closing';
-    closing.hidden = true;
-    closing.innerHTML =
-      'DP needed the odds. SARSA needed the logbook. ' +
-      '<b>Same twelve numbers, same three bands.</b>';
-    right.appendChild(closing);
-
-    /* ---- bottom: learning curve + controls ---- */
-    const bottom = document.createElement('div');
-    bottom.className = 's11-bottom';
-    root.appendChild(bottom);
-
-    const curveWrap = document.createElement('div');
-    curveWrap.className = 's11-curve-wrap';
-    curveWrap.innerHTML = '<div class="s11-cap">WEEKLY MONEY: RAW + 50-WEEK AVERAGE</div>' +
-      '<div class="s11-curve-host" id="s11-curve"></div>' +
-      '<div class="s11-curve-empty">the curve starts with the first week.</div>';
-    bottom.appendChild(curveWrap);
-    const curve = Curve.mount(curveWrap.querySelector('#s11-curve'), {
-      W: 540, H: 170, window: 50,
-      pad: { top: 10, right: 16, bottom: 30, left: 42 },
-    });
-    /* the shared chart labels its axes for episodic siblings; this task is
-       continuing, so relabel the same nodes to weeks */
-    (function relabel() {
-      const labs = curveWrap.querySelectorAll('.lc-axis-label');
-      if (labs[0]) labs[0].textContent = 'week';
-      if (labs[1]) labs[1].textContent = 'money';
-    })();
-
-    const panel = document.createElement('div');
-    panel.className = 's11-ctrl-panel';
-    panel.innerHTML =
-      '<div class="s11-btns">' +
-        '<button class="poke-btn s11-primary" id="s11-drive" data-run-primary>&#9654; DRIVE</button>' +
-        '<button class="poke-btn" id="s11-step">STEP</button>' +
-        '<button class="poke-btn" id="s11-reset">RESET</button>' +
-      '</div>' +
-      '<div class="poke-menu-row s11-menurow">SPEED' +
-        '<input type="range" id="s11-speed" min="0" max="3" step="1" value="0">' +
-        '<span class="val" id="s11-speed-val">SLOW</span></div>' +
-      '<div class="poke-menu-row s11-menurow">EPSILON' +
-        '<input type="range" id="s11-eps" min="0" max="50" step="1" value="15">' +
-        '<span class="val" id="s11-eps-val">0.15</span></div>' +
-      '<div class="poke-menu-row s11-menurow">ALPHA' +
-        '<input type="range" id="s11-alpha" min="1" max="50" step="1" value="15">' +
-        '<span class="val" id="s11-alpha-val">0.15</span></div>';
-    bottom.appendChild(panel);
-
-    /* ---------------- training state ---------------- */
-    let Q, rng, baseSeed, week, sCur, aCur, aCurExp, lastObs, rewards;
-    let eps = 0.15, alpha = 0.15, speed = 0;
-    let playing = false, timer = null, tickCount = 0;
-    let bandsFlashShown = false, everMatched = false;
-
-    function freshSeed() {
-      return RUN ? RUN_SEED : (((Date.now() ^ (Math.random() * 1e9)) >>> 0) || 1);
-    }
-
-    function hardReset() {
-      pausePlay();
-      Q = SARSA.makeQ();
-      baseSeed = freshSeed();
-      rng = Van.makeRng(baseSeed);
-      week = 0;
-      sCur = Van.initialState();
-      aCur = null;
-      aCurExp = false;
-      lastObs = null;
-      rewards = [];
-      tickCount = 0;
-      bandsFlashShown = false;
-      everMatched = false;
-      banner.hidden = true;
-      closing.hidden = true;
-      van.setName('OLD BESSIE');
-      van.set(0);
-      qt.reset();
-      refreshCurve();
-      renderWeek();
-      renderTuple(null);
-      renderFormula(null);
-      renderBands(false);
-    }
-
-    /* ---- one SARSA week (the continuing task: always bootstraps) ---- */
-    function stepWeek() {
-      if (aCur === null) {
-        const p0 = pickTagged(Q, sCur.wear, eps, rng);
-        aCur = p0.a; aCurExp = p0.explored;
-      }
-      const sFrom = sCur.wear;
-      const out = Van.sample(sCur, aCur, rng);
-      const pN = pickTagged(Q, out.sNext.wear, eps, rng);
-      const qBefore = Q[sFrom * 3 + aIdx(aCur)];
-      const qNext = Q[out.sNext.wear * 3 + aIdx(pN.a)];
-      const td = SARSA.update(Q, sFrom, aCur, out.reward, out.sNext.wear, pN.a,
-                              alpha, GAMMA, false /* continuing: never terminal */);
-      week++;
-      rewards.push(out.reward);
-      lastObs = {
-        week, sFrom, a: aCur, aExp: aCurExp, r: out.reward,
-        sTo: out.sNext.wear, aNext: pN.a, aNextExp: pN.explored,
-        qBefore, qNext, qAfter: Q[sFrom * 3 + aIdx(aCur)], td,
-        log: out.log,
-      };
-      sCur = out.sNext;
-      aCur = pN.a; aCurExp = pN.explored;     /* execute the picked a' next week */
-      return lastObs;
-    }
-
-    /* ---------------- rendering ---------------- */
-    const fmt1 = (v) => (Math.round(v * 10) / 10).toFixed(1);
-    const fmtSigned = (v) => (v >= 0 ? '+' : '') + v;
+    const CELL_B = 'q[' + SD[EX.sFrom] + ',' + ACT.shortLabel(EX.a) + ']';
+    const CELL_N = 'q[' + SD[EX.sTo] + ',' + ACT.shortLabel(EX.aNext) + ']';
 
     function wearChip(w) {
-      return '<span class="s11-wear w' + w + '">' + STATE_DISPLAY[w] + '</span>';
+      return '<span class="s11-wear w' + w + '">' + SD[w] + '</span>';
     }
     function leverChip(id) {
-      return '<span class="s11-lever ' + Actions.toneClass(id) + '">' +
-             Actions.shortLabel(id) + '</span>';
-    }
-    function pickTag(explored) {
-      return '<span class="s11-pick ' + (explored ? 'explore' : 'greedy') + '">' +
-             (explored ? 'EXPLORE' : 'GREEDY') + '</span>';
+      return '<span class="s11-lever ' + ACT.toneClass(id) + '">' +
+             ACT.shortLabel(id) + '</span>';
     }
 
-    function renderWeek() {
-      weekEl.textContent = week.toLocaleString('en-US');
+    /* ---------------- DOM ---------------- */
+    const heading = document.createElement('h2');
+    heading.className = 'concept-heading';
+    heading.textContent = 'SARSA: the one-cell nudge';
+    root.appendChild(heading);
+
+    const stage = document.createElement('div');
+    stage.className = 's11-stage';
+    root.appendChild(stage);
+
+    function mkPanel(cls, capText) {
+      const p = document.createElement('div');
+      p.className = 's11-panel ' + cls;
+      p.hidden = true;
+      const row = document.createElement('div');
+      row.className = 's11-caprow';
+      row.innerHTML = '<span class="s11-cap">' + capText + '</span>';
+      p.appendChild(row);
+      stage.appendChild(p);
+      return p;
     }
 
-    function renderTuple(obs) {
-      if (!obs) {
-        tupleEl.innerHTML =
-          '<div class="s11-trow"><span class="s11-tlab">s</span><span class="s11-tval">' +
-            wearChip(sCur.wear) + '</span></div>' +
-          '<div class="s11-trow muted"><span class="s11-tlab">a</span><span class="s11-tval">? press DRIVE or STEP</span></div>' +
-          '<div class="s11-trow muted"><span class="s11-tlab">r</span><span class="s11-tval">?</span></div>' +
-          '<div class="s11-trow muted"><span class="s11-tlab">s&prime;</span><span class="s11-tval">?</span></div>' +
-          '<div class="s11-trow muted"><span class="s11-tlab">a&prime;</span><span class="s11-tval">?</span></div>';
-        return;
-      }
-      const bd = obs.log && obs.log.breakdown
-        ? ' <span class="s11-bd">BREAKDOWN</span>' : '';
-      tupleEl.innerHTML =
-        '<div class="s11-trow"><span class="s11-tlab">s</span><span class="s11-tval">' +
-          wearChip(obs.sFrom) + '</span></div>' +
-        '<div class="s11-trow"><span class="s11-tlab">a</span><span class="s11-tval">' +
-          leverChip(obs.a) + ' ' + pickTag(obs.aExp) + '</span></div>' +
-        '<div class="s11-trow"><span class="s11-tlab">r</span><span class="s11-tval s11-r ' +
-          (obs.r >= 0 ? 'pos' : 'neg') + '">' + fmtSigned(obs.r) + bd + '</span></div>' +
-        '<div class="s11-trow"><span class="s11-tlab">s&prime;</span><span class="s11-tval">' +
-          wearChip(obs.sTo) + '</span></div>' +
-        '<div class="s11-trow"><span class="s11-tlab">a&prime;</span><span class="s11-tval">' +
-          leverChip(obs.aNext) + ' ' + pickTag(obs.aNextExp) + '</span></div>';
+    /* ---- panel 0: the logbook line ---- */
+    const logPanel = mkPanel('s11-logpanel', 'ONE WEEK, ONE LOGBOOK LINE');
+    const logRow = document.createElement('div');
+    logRow.className = 's11-lrow';
+    logPanel.appendChild(logRow);
+    const LGRPS = [
+      { lab: 's',        chip: wearChip(EX.sFrom) },
+      { lab: 'a',        chip: leverChip(EX.a) },
+      { lab: 'r',        chip: '<span class="s11-money is-r">' + (EX.r >= 0 ? '+' : '') + EX.r + '</span>' },
+      { lab: 's&prime;', chip: wearChip(EX.sTo) },
+      { lab: 'a&prime;', chip: leverChip(EX.aNext) },
+    ];
+    const logGrps = LGRPS.map((g) => {
+      const el = document.createElement('span');
+      el.className = 's11-lgrp';
+      el.innerHTML = '<span class="s11-llab">' + g.lab + '</span>' + g.chip;
+      logRow.appendChild(el);
+      return el;
+    });
+
+    /* ---- panel 1: the target assembles ---- */
+    const targetPanel = mkPanel('s11-targetpanel', 'THE TARGET');
+    const tRow = document.createElement('div');
+    tRow.className = 's11-trow';
+    targetPanel.appendChild(tRow);
+    function vchip(cls, lab, val, sub) {
+      const c = document.createElement('span');
+      c.className = 's11-vchip ' + cls;
+      c.innerHTML = '<span class="s11-vlab">' + lab + '</span>' +
+        '<span class="s11-vval">' + val + '</span>' +
+        (sub ? '<span class="s11-vsub">' + sub + '</span>' : '');
+      return c;
+    }
+    function opTok(html) {
+      const o = document.createElement('span');
+      o.className = 's11-op';
+      o.innerHTML = html;
+      return o;
+    }
+    const targetToks = [
+      vchip('is-r', 'r', (EX.r >= 0 ? '+' : '') + EX.r, 'the week\'s money'),
+      opTok('+'),
+      opTok(f1(GAMMA) + ' &times;'),
+      vchip('is-qn', CELL_N, f1(EX.qN), 'her guess, next cell'),
+      opTok('='),
+      vchip('is-target', 'TARGET', f1(EX.target)),
+    ];
+    targetToks.forEach((t) => tRow.appendChild(t));
+
+    /* ---- panel 2 + 3: the gap bar and the nudge ---- */
+    const gapPanel = mkPanel('s11-gappanel', 'THE GAP: TARGET VS HER GUESS');
+    const alphaChip = vchip('is-alpha', '', '0.15', 'step size');
+    alphaChip.hidden = true;
+    window.Katex.render('\\alpha =', alphaChip.querySelector('.s11-vlab'), false);
+    gapPanel.querySelector('.s11-caprow').appendChild(alphaChip);
+
+    const trackBox = document.createElement('div');
+    trackBox.className = 's11-trackbox';
+    trackBox.innerHTML =
+      '<div class="s11-track">' +
+        '<span class="s11-fill s11-hatch"></span>' +
+        '<span class="s11-fill s11-bite"></span>' +
+        '<span class="s11-mark is-ghost" hidden></span>' +
+        '<span class="s11-mark is-now"><i class="s11-mlab s11-mlab-below"></i></span>' +
+        '<span class="s11-mark is-target"><i class="s11-mlab s11-mlab-above">TARGET ' + f1(EX.target) + '</i></span>' +
+        '<span class="s11-tdchip">TD ' + pos(EX.td) + '</span>' +
+        '<span class="s11-dlab">' + pos(EX.delta) + '</span>' +
+        '<span class="s11-tick s11-tick-0">0</span>' +
+        '<span class="s11-tick s11-tick-1">' + BAR_MAX + '</span>' +
+      '</div>';
+    gapPanel.appendChild(trackBox);
+    const track = trackBox.querySelector('.s11-track');
+    const hatch = track.querySelector('.s11-hatch');
+    const bite = track.querySelector('.s11-bite');
+    const ghost = track.querySelector('.is-ghost');
+    const markNow = track.querySelector('.is-now');
+    const nowLab = markNow.querySelector('.s11-mlab');
+    const markTarget = track.querySelector('.is-target');
+    const tdChip = track.querySelector('.s11-tdchip');
+    const dLab = track.querySelector('.s11-dlab');
+    /* static geometry */
+    markTarget.style.left = pct(EX.target);
+    ghost.style.left = pct(EX.qB);
+    bite.style.left = pct(EX.qB);
+    tdChip.style.left = pct((EX.qB + EX.target) / 2);
+    dLab.style.left = pct(EX.qB + EX.delta / 2);
+
+    /* ---- panel 4: the update rule, colour-matched ---- */
+    const rulePanel = mkPanel('s11-rulepanel', 'THE UPDATE RULE');
+    const symRow = document.createElement('div');
+    symRow.className = 's11-eq s11-eq-sym';
+    rulePanel.appendChild(symRow);
+    const numRow = document.createElement('div');
+    numRow.className = 's11-eq s11-eq-num';
+    rulePanel.appendChild(numRow);
+    function tok(row, cls, html) {
+      const t = document.createElement('span');
+      t.className = 's11-tok ' + cls;
+      if (html != null) t.innerHTML = html;
+      row.appendChild(t);
+      return t;
+    }
+    /* Press Start 2P has no left-arrow or minus-sign glyphs: the arrow is
+       KaTeX (like the alpha), the minus is the ASCII hyphen. */
+    function arrowTok(row) {
+      const t = tok(row, 'tk-op tk-arrow', '');
+      t.appendChild(window.Katex.inline('\\leftarrow'));
+      return t;
+    }
+    const symToks = [
+      tok(symRow, 'tk-qb', 'q[s,a]'),
+      arrowTok(symRow),
+      tok(symRow, 'tk-qb', 'q[s,a]'),
+      tok(symRow, 'tk-op', '+'),
+      tok(symRow, 'tk-alpha', ''),
+      tok(symRow, 'tk-op', '('),
+      tok(symRow, 'tk-r', 'r'),
+      tok(symRow, 'tk-op', '+'),
+      tok(symRow, 'tk-op', f1(GAMMA) + ' &times;'),
+      tok(symRow, 'tk-qn', 'q[s&prime;,a&prime;]'),
+      tok(symRow, 'tk-op', '-'),
+      tok(symRow, 'tk-qb', 'q[s,a]'),
+      tok(symRow, 'tk-op', ')'),
+    ];
+    symToks[4].appendChild(window.Katex.inline('\\alpha'));
+    tok(numRow, 'tk-qb tk-new', f1(EX.qAfter));
+    arrowTok(numRow);
+    tok(numRow, 'tk-qb', f1(EX.qB));
+    tok(numRow, 'tk-op', '+');
+    tok(numRow, 'tk-alpha', EX.alpha.toFixed(2));
+    tok(numRow, 'tk-op', '(');
+    tok(numRow, 'tk-r', (EX.r >= 0 ? '+' : '') + EX.r);
+    tok(numRow, 'tk-op', '+');
+    tok(numRow, 'tk-op', f1(GAMMA) + ' &times;');
+    tok(numRow, 'tk-qn', f1(EX.qN));
+    tok(numRow, 'tk-op', '-');
+    tok(numRow, 'tk-qb', f1(EX.qB));
+    tok(numRow, 'tk-op', ')');
+
+    /* ---- caption + hint ---- */
+    const caption = document.createElement('p');
+    caption.className = 's11-caption';
+    root.appendChild(caption);
+
+    const hintRow = document.createElement('div');
+    hintRow.className = 's11-hintrow';
+    hintRow.innerHTML =
+      '<span class="s11-counter"></span><span class="s11-hint"></span>';
+    root.appendChild(hintRow);
+    const counterEl = hintRow.querySelector('.s11-counter');
+    const hintEl = hintRow.querySelector('.s11-hint');
+
+    const CAPTIONS = [
+      'After every week, the logbook gains one line. That line is all SARSA sees.',
+      'What the week said the cell is worth.',
+      'The surprise.',
+      'Move a little, not all the way.',
+      'One line, one cell, no printed odds.',
+    ];
+    const HINTS = [
+      '&#9654; NEXT: price this line',
+      '&#9654; NEXT: her current guess',
+      '&#9654; NEXT: the nudge',
+      '&#9654; NEXT: the whole rule',
+      '&#9654; NEXT: let her drive',
+    ];
+
+    /* ---------------- step engine ---------------- */
+    const panels = [logPanel, targetPanel, gapPanel, rulePanel];
+    const SHOW_FROM = [0, 1, 2, 4];    /* panel i visible when cursor >= this */
+    const PANEL_STEP = [0, 1, 2, 2, 3]; /* the active panel per step */
+
+    let cursor = hashStep();
+
+    function stag(els, ms, base) {
+      els.forEach((el, j) => {
+        el.style.animationDelay = ((base || 0) + j * ms) + 'ms';
+        el.classList.add('s11-in');
+      });
     }
 
-    /* live numbers in the rule; negatives get parentheses */
-    function texNum(v, dp) {
-      const s = dp ? fmt1(v) : String(v);
-      return v < 0 ? '(' + s + ')' : s;
-    }
-    function renderFormula(obs) {
-      if (!obs) {
-        liveEl.innerHTML = '<span class="s11-upd-wait">numbers appear as the weeks roll&hellip;</span>';
-        tdEl.innerHTML = 'TD &mdash;';
-        tdEl.className = 's11-chip-td';
-        qmoveEl.innerHTML = 'q[s,a] &mdash;';
-        return;
-      }
-      const sName = '\\text{' + STATE_DISPLAY[obs.sFrom] + '}';
-      const aName = '\\text{' + Actions.shortLabel(obs.a) + '}';
-      const tex =
-        'q[' + sName + ',' + aName + '] \\leftarrow ' + fmt1(obs.qBefore) +
-        ' + ' + alpha.toFixed(2) + '\\,\\bigl(' + texNum(obs.r, false) +
-        ' + 0.9 \\cdot ' + texNum(obs.qNext, true) +
-        ' - ' + texNum(obs.qBefore, true) + '\\bigr) = ' + fmt1(obs.qAfter);
-      window.Katex.render(tex, liveEl, false);
-      tdEl.textContent = 'TD ' + (obs.td >= 0 ? '+' : '') + fmt1(obs.td);
-      tdEl.className = 's11-chip-td ' + (obs.td >= 0 ? 'pos' : 'neg');
-      qmoveEl.innerHTML = 'q[s,a] ' + fmt1(obs.qBefore) + ' -&gt; ' + fmt1(obs.qAfter);
-    }
+    function applyStep(opts) {
+      const o = opts || {};
+      const flash = !!o.flash && !instantMode();
 
-    function renderBands(allowFx) {
-      const pol = SARSA.argmaxPolicy(Q);
-      let all = true;
-      for (let s = 0; s < NUM_STATES; s++) {
-        const got = pol[s];
-        const el = bandEls[s];
-        const act = el.querySelector('.s11-band-act');
-        const status = el.querySelector('.s11-band-status');
-        if (!got) {                       /* row never visited yet */
-          el.className = 's11-band is-grey';
-          act.textContent = '?';
-          status.textContent = 'UNSEEN';
-          all = false;
-        } else if (got === TARGET[s]) {
-          el.className = 's11-band is-good';
-          act.textContent = Actions.shortLabel(got);
-          status.textContent = 'MATCH';
-        } else {
-          el.className = 's11-band is-bad';
-          act.textContent = Actions.shortLabel(got);
-          status.textContent = 'WRONG';
-          all = false;
+      panels.forEach((p, i) => {
+        const vis = cursor >= SHOW_FROM[i];
+        p.hidden = !vis;
+        p.classList.toggle('s11-past', vis && PANEL_STEP[cursor] !== i);
+      });
+
+      /* settle every one-shot animation; forward clicks re-arm below */
+      root.querySelectorAll('.s11-in').forEach((el) => {
+        el.classList.remove('s11-in');
+        el.style.animationDelay = '';
+      });
+
+      /* gap-bar geometry is a pure function of the step */
+      const nudged = cursor >= 3;
+      const now = nudged ? EX.qAfter : EX.qB;
+      track.classList.toggle('s11-noanim', !flash);
+      markNow.style.left = pct(now);
+      nowLab.textContent = CELL_B + ' ' + f1(now);
+      ghost.hidden = !nudged;
+      hatch.style.left = pct(now);
+      hatch.style.width = pct(EX.target - now);
+      bite.style.width = pct(nudged ? EX.delta : 0);
+      dLab.hidden = !nudged;
+      alphaChip.hidden = !nudged;
+
+      caption.textContent = CAPTIONS[cursor];
+      counterEl.textContent = 'STEP ' + (cursor + 1) + '/' + N_STEPS;
+      hintEl.innerHTML = HINTS[cursor];
+
+      if (flash) {
+        if (cursor === 0) stag(logGrps, 300);
+        else if (cursor === 1) stag(targetToks, 200);
+        else if (cursor === 2) { stag([trackBox], 0); stag([tdChip], 0, 550); }
+        else if (cursor === 3) { stag([alphaChip], 0); stag([dLab], 0, 650); }
+        else if (cursor === 4) {
+          stag(symToks, 80);
+          stag([numRow], 0, symToks.length * 80 + 250);
         }
       }
-      if (all) {
-        everMatched = true;
-        closing.hidden = false;
-        if (!bandsFlashShown) {
-          bandsFlashShown = true;        /* once per run */
-          banner.hidden = false;
-          if (allowFx) {
-            banner.classList.remove('s11-banner-flash');
-            void banner.offsetWidth;
-            banner.classList.add('s11-banner-flash');
-          }
-          if (window.SFX) window.SFX.play('win');
-        }
-      }
     }
 
-    function mirrorVan(obs, withFx) {
-      if (!obs) { van.set(sCur.wear); return; }
-      if (!withFx) { van.set(obs.sTo); return; }
-      const face = obs.log.face;
-      if (face === 'breakdown') van.playBreakdown(() => van.set(obs.sTo));
-      else if (face && face.indexOf('fix') === 0) van.playService(() => van.set(obs.sTo));
-      else if (face === 'new') van.playReplace();      /* resets itself to HEALTHY */
-      else van.set(obs.sTo);
-    }
-
-    function refreshCurve() {
-      curveWrap.classList.toggle('s11-curve-blank', !rewards.length);
-      if (!rewards.length) { curve.setData([0]); return; }   /* wipes the old path */
-      curve.setData(rewards);
-      curve.setCursor(rewards.length - 1);
-    }
-    /* redraws get rarer as the logbook grows (the path is O(n)) */
-    function chartDue(cfg) {
-      const n = rewards.length;
-      const every = n < 2500 ? cfg.chartEvery : (n < 10000 ? cfg.chartEvery * 8 : cfg.chartEvery * 24);
-      return tickCount % every === 0;
-    }
-
-    /* one render pass after a batch of weeks */
-    function renderBatch(cfg, narrated) {
-      qt.update(Q, { suppressFlash: !cfg.flash });
-      renderWeek();
-      renderBands(true);
-      renderTuple(lastObs);
-      mirrorVan(lastObs, narrated && cfg.fx);
-      if (narrated && cfg.formula) renderFormula(lastObs);
-      if (chartDue(cfg) || narrated) refreshCurve();
-    }
-
-    /* ---------------- the driver ---------------- */
-    function driveBtn() { return document.getElementById('s11-drive'); }
-    function setDriveLabel() {
-      driveBtn().innerHTML = playing ? '&#9632; PAUSE' : '&#9654; DRIVE';
-    }
-    function pausePlay() {
-      if (timer) { clearTimeout(timer); timer = null; }
-      if (playing) {
-        playing = false;
-        setDriveLabel();
-        /* paused: make the last update legible whatever the speed was */
-        if (lastObs) { renderFormula(lastObs); renderTuple(lastObs); refreshCurve(); }
-      }
-    }
-    function tick() {
-      timer = setTimeout(() => {
-        timer = null;
-        if (!playing) return;
-        const cfg = SPEEDS[speed];
-        for (let i = 0; i < cfg.weeks; i++) stepWeek();
-        tickCount++;
-        renderBatch(cfg, cfg.weeks === 1);
-        tick();
-      }, SPEEDS[speed].tick);
-    }
-    function startPlay() {
-      if (playing) return;
-      if (RUN && week === 0) { fastForward(); return; }
-      playing = true;
-      setDriveLabel();
-      tick();
-    }
-    function togglePlay() { if (playing) pausePlay(); else startPlay(); }
-
-    /* &run: deterministic synchronous fast-forward on the pinned seed */
-    function fastForward() {
-      for (let i = 0; i < RUN_WEEKS; i++) stepWeek();
-      qt.update(Q, { suppressFlash: true });
-      renderWeek();
-      renderBands(false);
-      renderTuple(lastObs);
-      van.set(sCur.wear);
-      renderFormula(lastObs);
-      refreshCurve();
-    }
-
-    function stepOnce() {
-      pausePlay();
-      stepWeek();
-      tickCount++;
-      renderBatch({ fx: true, formula: true, flash: true, chartEvery: 1 }, true);
-      refreshCurve();
-    }
-
-    /* ---------------- wiring ---------------- */
-    document.getElementById('s11-step').addEventListener('click', stepOnce);
-    document.getElementById('s11-reset').addEventListener('click', hardReset);
-    driveBtn().addEventListener('click', togglePlay);
-
-    function wireSlider(id, valId, apply) {
-      const el = document.getElementById(id);
-      const val = document.getElementById(valId);
-      el.addEventListener('input', () => apply(parseInt(el.value, 10) || 0, val));
-      /* the pager ignores arrows while a slider has focus; release it after
-         pointer use so presenters can keep stepping with the keys */
-      el.addEventListener('pointerup', () => el.blur());
-      el.addEventListener('change', () => el.blur());
-    }
-    wireSlider('s11-speed', 's11-speed-val', (v, val) => {
-      speed = Math.max(0, Math.min(3, v));
-      val.textContent = SPEEDS[speed].name;
-    });
-    wireSlider('s11-eps', 's11-eps-val', (v, val) => {
-      eps = v / 100;
-      val.textContent = eps.toFixed(2);
-    });
-    wireSlider('s11-alpha', 's11-alpha-val', (v, val) => {
-      alpha = v / 100;
-      val.textContent = alpha.toFixed(2);
-    });
-
-    hardReset();
+    applyStep({ flash: cursor === 0 });
 
     return {
-      onEnter() {
-        /* re-entry: repaint the cached board without touching the run */
-        qt.update(Q, { suppressFlash: true });
-        renderWeek();
-        renderBands(false);
-        renderTuple(lastObs);
-        mirrorVan(lastObs, false);
-        setDriveLabel();
+      onEnter() { applyStep({}); },
+      onNextKey() {
+        if (cursor < N_STEPS - 1) {
+          cursor++;
+          applyStep({ flash: true });
+          if (window.SFX) window.SFX.play('tick');
+          return true;
+        }
+        return false;   /* on to scene 14: let her drive */
       },
-      onLeave() { pausePlay(); },
-      onNextKey() { return false; },   /* free-running scene: keys page on */
-      onPrevKey() { return false; },
+      onPrevKey() {
+        if (cursor > 0) {
+          cursor--;
+          applyStep({});
+          return true;
+        }
+        return false;
+      },
     };
   };
 })();

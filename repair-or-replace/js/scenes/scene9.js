@@ -4,16 +4,24 @@
  *   so Q* can be computed without driving a single week. Each press of
  *   1 SWEEP runs one synchronous Bellman backup over all 4 wear states:
  *       V <- bellmanSweep(V, 0.9).Vnew
- *   and repaints the 4x3 QTable from qFromV(V, 0.9). The V-chip row under
- *   the board echoes the per-row maximum, the HUD tracks the sweep count
- *   and max |dV|, and a banner narrates the teaching beats:
+ *   and repaints the 4x3 QTable from qFromV(Vb, 0.9) where Vb is the V
+ *   BEFORE that sweep: after k sweeps the board shows Q after exactly k
+ *   backups (qFromV of the current V would silently show k+1 reward
+ *   layers, and the chips would stop matching the starred cells). The
+ *   V-chip row under the board therefore EQUALS the per-row maximum, the
+ *   HUD tracks the sweep count and max |dV|, and a banner narrates:
  *
  *     sweep 0   every cell starts ignorant: zero (board blank via reset()).
+ *     spotlight (NEXT-key beat between sweeps 0 and 1) ONE cell, SVC at
+ *               WORN, recomputes alone: the cell flashes and a tiny bubble
+ *               shows "this week + 0.9 x next-week zeros". The next NEXT
+ *               runs the full sweep ("the other 11 do the same, at once"),
+ *               and the spotlit cell keeps the value the bubble computed.
  *     sweep 1   one backup: this week's money plus 0.9 x next week's zeros.
- *     sweep 2   the BANDS are already final. Verified live: the greedy
- *               policy (QTable.policyFromQ) first equals DATA.policy here
- *               (DATA.convergence.policyStableAt), and a POLICY LOCKED chip
- *               flashes at that moment.
+ *     LOCK_SHOW the BANDS are final. Derived live at build: the first sweep
+ *               whose displayed board (QTable.policyFromQ) equals
+ *               DATA.policy (policyStableAt + 1 on this data, because the
+ *               board lags V by one backup); a POLICY LOCKED chip flashes.
  *     large k   decimals keep polishing to sweep 228 (tol 1e-9,
  *               DATA.convergence.itersTo1e9); decisions stopped long ago.
  *
@@ -26,8 +34,9 @@
  *   shows, is compared against DATA.Qstar at build (console.warn on drift).
  *
  *   Contract: window.scenes.scene9 = function(root){ return {...}; }
- *   NEXT/PREV keys step the beats (0 -> 1 -> 2 -> fixed point) before the
- *   pager moves on; PREV undoes one control action. Cold-entry safe; no
+ *   NEXT/PREV keys step the beats (0 -> spotlight -> 1 -> 2 -> fixed point)
+ *   before the pager moves on; PREV undoes one control action. Cold-entry
+ *   safe (&autostep=K reaches every beat headlessly); no
  *   timers beyond a tracked one-shot chip flash. [data-run-primary] is the
  *   1 SWEEP button, so &run captures a live mid-computation board.
  */
@@ -64,6 +73,26 @@
         drift = Math.max(drift, Math.abs(Math.round(Qfp[i] * 10) / 10 - QSTAR[i]));
       }
       if (drift > 1e-9) console.warn('scene9: live fixed point (1dp) drifts from DATA.Qstar by', drift);
+    })();
+
+    /* The spotlight cell for the first beat: SVC at WORN, backed up alone
+       from the all-zero table. Value computed live, never typed. */
+    const MOVE_IDS = (window.Actions && window.Actions.MOVE_IDS) || ['run', 'service', 'replace'];
+    const SPOT_S = 1; /* WORN */
+    const SPOT_A = Math.max(0, MOVE_IDS.indexOf('service'));
+    const SPOT_CELL = SPOT_S * MOVE_IDS.length + SPOT_A;
+    const spotVal = B.qFromV(new Float64Array(NUM_STATES), GAMMA)[SPOT_CELL];
+
+    /* The sweep at which the DISPLAYED board (Q after k backups) first
+       goes greedy-equal to DATA.policy. Derived live, never assumed. */
+    const LOCK_SHOW = (function () {
+      let Vp = new Float64Array(NUM_STATES);
+      for (let k = 1; k <= 24; k++) {
+        const pol = window.QTable.policyFromQ(B.qFromV(Vp, GAMMA));
+        if (pol.length === OPT.length && pol.every((p, i) => p === OPT[i])) return k;
+        Vp = B.bellmanSweep(Vp, GAMMA).Vnew;
+      }
+      return LOCK_AT + 1;
     })();
 
     /* ---------------- DOM ---------------- */
@@ -106,6 +135,43 @@
     qHost.className = 's9-qhost';
     boardCol.appendChild(qHost);
     const qt = window.QTable.mount(qHost);
+
+    /* the spotlight bubble, parked inside the (positioned) table host so it
+       can anchor under the SVC-at-WORN cell during the one-cell beat */
+    const bubble = document.createElement('div');
+    bubble.className = 's9-spot-bubble';
+    bubble.hidden = true;
+    bubble.innerHTML =
+      '<span class="s9-spot-lab">THIS WEEK + ' + GAMMA + ' &times; NEXT-WEEK ZEROS</span>' +
+      '<b>' + Math.round(spotVal) + ' + ' + GAMMA + ' &times; 0 = ' + spotVal.toFixed(1) + '</b>';
+    qHost.appendChild(bubble);
+
+    function paintSpot(suppress) {
+      const cell = qt.cells[SPOT_CELL];
+      if (!cell) return;
+      cell.classList.add('s9-spot-cell');
+      cell.querySelector('.q-val').textContent =
+        (spotVal >= 0 ? '+' : '') + spotVal.toFixed(1);
+      bubble.hidden = false;
+      bubble.style.left = (cell.offsetLeft + cell.offsetWidth / 2) + 'px';
+      bubble.style.top = (cell.offsetTop + cell.offsetHeight + 9) + 'px';
+      if (suppress) {
+        cell.classList.remove('s9-spot-flash');
+        bubble.classList.remove('s9-spot-pop');
+      } else {
+        cell.classList.remove('s9-spot-flash');
+        void cell.offsetWidth;
+        cell.classList.add('s9-spot-flash');
+        bubble.classList.remove('s9-spot-pop');
+        void bubble.offsetWidth;
+        bubble.classList.add('s9-spot-pop');
+      }
+    }
+    function clearSpot() {
+      const cell = qt.cells[SPOT_CELL];
+      if (cell) cell.classList.remove('s9-spot-cell', 's9-spot-flash');
+      bubble.hidden = true;
+    }
 
     const chipsCap = document.createElement('div');
     chipsCap.className = 's9-vchips-cap';
@@ -156,16 +222,20 @@
 
     /* ---------------- state ---------------- */
     let V = new Float64Array(NUM_STATES);
+    let Vb = new Float64Array(NUM_STATES);  /* V one sweep behind: board = qFromV(Vb) */
     let sweep = 0;
     let delta = null;            /* max |dV| of the last sweep; null at sweep 0 */
     let converged = false;
+    let spot = false;            /* the one-cell spotlight beat is showing */
+    let spotSeen = false;        /* the beat was shown this run (sweep-1 wording) */
     let wasLocked = false;       /* greedy policy == DATA.policy on last render */
     let lockFlashed = false;     /* the chip flashes once per run */
     const history = [];          /* one snapshot per control action, for PREV */
     let flashTimer = null;
 
     function snap() {
-      history.push({ V: Float64Array.from(V), sweep, delta, converged });
+      history.push({ V: Float64Array.from(V), Vb: Float64Array.from(Vb),
+                     sweep, delta, converged, spot, spotSeen });
     }
 
     function settle() {
@@ -175,6 +245,7 @@
       sweep = FP_AT;
       delta = 0;
       V = Float64Array.from(VFP);
+      Vb = Float64Array.from(VFP);
     }
 
     function fmtDelta() {
@@ -190,21 +261,33 @@
         t: 'SWEEP ' + FP_AT + ': THE FIXED POINT.',
         b: 'nothing moves: the board <b>is Q*</b>. the printed decimals froze at sweep ' +
            TOL_AT + ' (tol 1e-9); the doubles stop entirely at sweep ' + FP_AT +
-           '. the decisions locked at sweep ' + LOCK_AT + '.',
+           '. the decisions locked at sweep ' + LOCK_SHOW + '.',
+      };
+      if (sweep === 0 && spot) return {
+        t: 'ONE CELL FIRST.',
+        b: 'one backup lands on <b>one cell</b>: SVC at WORN. the bubble is the whole sum.',
       };
       if (sweep === 0) return {
         t: 'SWEEP 0: A BLANK SHEET.',
         b: 'every cell starts ignorant: zero. press <b>1 SWEEP</b> to back the whole table up once.',
+      };
+      if (sweep === 1 && spotSeen) return {
+        t: 'SWEEP 1: THE FULL SWEEP.',
+        b: 'and the other 11 cells do the same, <b>all at once</b>.',
       };
       if (sweep === 1) return {
         t: 'SWEEP 1: ONE BACKUP.',
         b: "one backup: this week's money plus 0.9 times next week's zeros. " +
            'the stars only rank immediate money so far.',
       };
-      if (sweep === LOCK_AT) return {
-        t: 'SWEEP ' + LOCK_AT + ': THE BANDS LOCK.',
+      if (sweep === LOCK_SHOW) return {
+        t: 'SWEEP ' + LOCK_SHOW + ': THE BANDS LOCK.',
         b: 'look at the stars: the <b>BANDS are already final</b> (policy locks at sweep ' +
-           LOCK_AT + '). every later sweep only polishes decimals.',
+           LOCK_SHOW + '). every later sweep only polishes decimals.',
+      };
+      if (sweep < LOCK_SHOW) return {
+        t: 'SWEEP ' + sweep + ': AGAIN.',
+        b: 'each backup folds in one more week. watch the <b>stars</b>: still shuffling.',
       };
       return {
         t: 'SWEEP ' + sweep + ': POLISHING.',
@@ -220,12 +303,16 @@
       let Q;
       if (converged) {
         Q = QSTAR;
+        clearSpot();
         qt.update(Q, { suppressFlash: !!o.suppress });
       } else if (sweep === 0) {
         Q = null;
         qt.reset();
+        if (spot) paintSpot(!o.allowFx);
+        else clearSpot();
       } else {
-        Q = B.qFromV(V, GAMMA);
+        Q = B.qFromV(Vb, GAMMA);
+        clearSpot();
         qt.update(Q, { suppressFlash: !!o.suppress });
       }
 
@@ -267,10 +354,21 @@
     }
 
     /* ---------------- actions ---------------- */
+    function showSpot() {
+      if (converged || sweep !== 0 || spot) return;
+      snap();
+      spot = true;
+      spotSeen = true;
+      render({ allowFx: true });
+      if (window.SFX) window.SFX.play('tick');
+    }
+
     function doSweeps(n) {
       if (converged) return;
       snap();
+      spot = false;
       for (let i = 0; i < n; i++) {
+        Vb = V;
         const r = B.bellmanSweep(V, GAMMA);
         V = r.Vnew;
         sweep++;
@@ -284,6 +382,7 @@
     function jumpFP() {
       if (converged) return;
       snap();
+      spot = false;
       settle();
       render({ allowFx: true });
       if (window.SFX) window.SFX.play('hit');
@@ -292,9 +391,12 @@
     function reset() {
       snapClear();
       V = new Float64Array(NUM_STATES);
+      Vb = new Float64Array(NUM_STATES);
       sweep = 0;
       delta = null;
       converged = false;
+      spot = false;
+      spotSeen = false;
       wasLocked = false;
       lockFlashed = false;
       render({ suppress: true });
@@ -305,9 +407,12 @@
       const prev = history.pop();
       if (!prev) return false;
       V = prev.V;
+      Vb = prev.Vb;
       sweep = prev.sweep;
       delta = prev.delta;
       converged = prev.converged;
+      spot = prev.spot;
+      spotSeen = prev.spotSeen;
       render({ suppress: true });
       return true;
     }
@@ -329,7 +434,8 @@
       },
       onNextKey() {
         if (converged) return false;
-        if (sweep < LOCK_AT) doSweeps(1);
+        if (sweep === 0 && !spot) showSpot();
+        else if (sweep < LOCK_SHOW) doSweeps(1);
         else jumpFP();
         return true;
       },

@@ -1,40 +1,41 @@
 /* Scene 4 ("Policy: your maintenance playbook") styles.
+   8-step engine, the playbook card as centerpiece.
    Left: the editable playbook card (state chip -> call slot per wear
-   level), the "this Monday" lookup line and the two preset buttons.
-   Right: blurb + completeness note + the 3^4 = 81 count + closing hook.
+   level), the Monday lookup line, the two seed tabs.
+   Right rail: pi : S -> A, the 3x3x3x3 = 81 counter, the teaser banner.
    All colour from tokens (--wear-*, --lever-*, chrome tokens). */
 
-.scene4-scene { max-width: 1040px; margin: 0 auto; }
+.scene4-scene { max-width: 1060px; margin: 0 auto; }
 
-.s4-head { margin: 0 2px 8px; }
-.s4-title { margin: 0 0 6px; }
-.s4-lede { margin: 0; max-width: 104ch; }
-.s4-lede b { color: var(--cb-vermillion); }
+/* Panels are revealed step by step via [hidden]; some of them carry
+   display: flex/grid below, which would beat the UA hidden rule. */
+.scene4-scene [hidden] { display: none !important; }
 
-/* ---- Formula strip ---- */
-.s4-formula-card {
+/* Step-staged bits parked invisibly until their beat. */
+.scene4-scene .s4-pending { visibility: hidden; }
+
+/* ---- Head: one-line headline + step counter ---- */
+.s4-head {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin: 6px 2px 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 2px 10px;
 }
-.s4-formula.poke-formula { margin: 0; display: inline-block; }
-.s4-formula .katex { font-size: 17px; }
-.s4-formula .katex-display { margin: 2px 0; }
-.s4-formula-foot {
+.s4-title { margin: 0; white-space: nowrap; }
+.s4-step-counter {
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
-  line-height: 1.7;
+  letter-spacing: 0.06em;
   color: var(--ink-secondary);
-  max-width: 52ch;
+  white-space: nowrap;
 }
 
 /* ---- Two-column body ---- */
 .s4-body {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(330px, 0.9fr);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.85fr);
+  gap: 22px;
   align-items: start;
 }
 
@@ -45,6 +46,12 @@
   gap: 8px;
   min-width: 0;
 }
+.s4-board-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
 .s4-board-title {
   font-family: 'Press Start 2P', monospace;
   font-size: 10px;
@@ -52,11 +59,21 @@
   color: var(--ink);
   text-transform: uppercase;
 }
+/* The card earns its nameplate once every row holds a call. */
+.s4-card-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border: 2px solid var(--rule);
+  background: var(--pikachu-yellow);
+  color: #181818;
+}
 .s4-col-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
+  padding: 0 10px 0 24px;
   font-family: 'Press Start 2P', monospace;
   font-size: 7px;
   letter-spacing: 0.06em;
@@ -71,12 +88,28 @@
 }
 .s4-row {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) 20px minmax(132px, auto);
+  grid-template-columns: 14px minmax(118px, 1fr) 20px minmax(138px, auto);
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 8px 4px;
 }
 .s4-row + .s4-row { border-top: 2px solid var(--inner-highlight); }
+
+/* The Monday lookup cursor, parked on the row being read. */
+.s4-row-cursor {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--pikachu-cheek);
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+.s4-row-target .s4-row-cursor { opacity: 1; }
+.s4-row-target { background: var(--bg-strong); }
+@keyframes s4-rowhit {
+  0%, 100% { box-shadow: none; }
+  25%, 70% { box-shadow: inset 0 0 0 3px var(--pikachu-yellow); }
+}
+.s4-row-hit { animation: s4-rowhit 0.9s ease-out 1; }
 
 .s4-state { display: inline-flex; align-items: center; gap: 8px; }
 .s4-state-gauge { display: inline-flex; }
@@ -103,6 +136,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  min-height: 33px;
   padding: 7px 9px 7px 12px;
   border: 3px solid var(--rule);
   background: var(--card-bg);
@@ -133,15 +167,46 @@
 .s4-slot-name { min-width: 4ch; letter-spacing: 0.04em; text-align: left; }
 .s4-slot-cycle { margin-left: auto; color: var(--ink-secondary); font-size: 11px; }
 
+/* Blank slot: the call is not written yet. */
+.s4-slot.s4-empty {
+  border-style: dashed;
+  border-color: var(--inner-highlight);
+  background: transparent;
+  box-shadow: none;
+  justify-content: center;
+}
+.s4-slot.s4-empty::before { background: transparent; }
+.s4-slot-q {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-secondary);
+  opacity: 0.8;
+}
+
 @keyframes s4-flip {
   0%   { transform: scale(1);    filter: brightness(1); }
   40%  { transform: scale(1.08); filter: brightness(1.3); }
   100% { transform: scale(1);    filter: brightness(1); }
 }
 .s4-slot.s4-flip { animation: s4-flip 0.42s ease-out; }
-@media (prefers-reduced-motion: reduce) { .s4-slot.s4-flip { animation: none; } }
 
-/* ---- "This playbook, this Monday" lookup ---- */
+/* A freshly written call lands on its row. */
+@keyframes s4-land {
+  0%   { transform: scale(0.4); opacity: 0; }
+  55%  { transform: scale(1.12); opacity: 1; filter: brightness(1.35); }
+  100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
+.s4-slot.s4-land { animation: s4-land 0.38s ease-out; }
+
+/* Generic entrance pop for panels / chips / tags. */
+@keyframes s4-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.s4-pop { animation: s4-pop 0.32s ease-out; }
+
+/* ---- The Monday lookup ---- */
 .s4-monday {
   display: flex;
   flex-direction: column;
@@ -158,38 +223,47 @@
   letter-spacing: 0.08em;
   color: var(--ink-secondary);
 }
-.s4-monday-pick { display: flex; gap: 6px; flex-wrap: wrap; }
-.s4-pick {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 7px;
-  letter-spacing: 0.03em;
-  padding: 4px 7px;
-  border: 2px solid var(--rule);
-  background: var(--card-bg);
-  cursor: pointer;
-  opacity: 0.65;
-  transition: opacity 140ms ease, box-shadow 140ms ease;
-}
-.s4-pick:hover { opacity: 1; }
-.s4-pick.active {
-  opacity: 1;
-  box-shadow: 0 0 0 2px var(--pikachu-yellow);
-  border-color: var(--pikachu-yellow);
-}
 .s4-monday-line {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   flex-wrap: wrap;
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
   color: var(--ink-on-box);
-  min-height: 24px;
+  min-height: 26px;
+}
+.s4-monday-gauge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 6px;
+  border: 2px solid var(--rule);
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+.s4-monday-gauge:hover { filter: brightness(1.1); }
+.s4-monday-gauge:focus-visible { outline: 3px solid var(--pikachu-yellow); outline-offset: 2px; }
+.s4-monday-gauge-chip { display: inline-flex; }
+.s4-monday-gauge-cycle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--ink-secondary);
+}
+.s4-monday-state {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 0.03em;
+}
+.s4-monday-arrow {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--pikachu-cheek);
 }
 .s4-monday-pi .katex { font-size: 12px; color: var(--ink-on-box); }
-.s4-monday-tail { color: var(--ink-secondary); font-size: 7px; }
 
-/* Small lever chiplet used in the lookup line. */
+/* Small lever chiplet: the call the lookup hands back. */
 .s4-chiplet {
   display: inline-flex;
   align-items: center;
@@ -205,9 +279,9 @@
 .s4-chiplet.lever-service { color: var(--lever-service); }
 .s4-chiplet.lever-replace { color: var(--lever-replace); }
 
-/* ---- Preset buttons ---- */
+/* ---- Seed tabs ---- */
+.s4-seed { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
 .s4-seed-label {
-  margin-top: 8px;
   font-family: 'Press Start 2P', monospace;
   font-size: 8px;
   letter-spacing: 0.08em;
@@ -241,98 +315,139 @@
   color: #181818;
 }
 
-/* ===== RIGHT: the reading panel ===== */
-.s4-panel {
+/* ===== RIGHT: the step rail ===== */
+.s4-rail {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
-.s4-blurb { display: flex; flex-direction: column; gap: 8px; }
-.s4-blurb-name {
-  align-self: flex-start;
+.s4-rail-title {
   font-family: 'Press Start 2P', monospace;
   font-size: 9px;
-  letter-spacing: 0.04em;
-  padding: 4px 8px;
-  border: 2px solid var(--rule);
-  background: var(--pikachu-yellow);
-  color: #181818;
-}
-.s4-blurb-text {
-  margin: 0;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  line-height: 1.85;
+  letter-spacing: 0.05em;
   color: var(--ink-on-box);
 }
 
-.s4-complete-note {
-  margin: 0;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  line-height: 1.8;
-  color: var(--ink-secondary);
-  padding-left: 10px;
-  border-left: 3px solid var(--cb-vermillion);
+/* pi : S -> A */
+.s4-formula-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 14px 12px;
 }
-.s4-complete-note b { color: var(--cb-vermillion); }
+.s4-formula.poke-formula { margin: 6px 0 0; display: inline-block; }
+.s4-formula .katex { font-size: 18px; }
+.s4-formula .katex-display { margin: 2px 0; }
 
-/* The 81-playbooks count card. */
+/* The 81-playbooks counter. */
 .s4-count {
   background: var(--bg-strong);
   border: 4px solid var(--rule);
   box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
   padding: 10px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.s4-count-title {
+.s4-count-grid {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 7px;
+}
+.s4-cc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 58px;
+}
+.s4-cc-state {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  letter-spacing: 0.04em;
+}
+.s4-cc-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+.s4-cc-chip {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  text-align: center;
+  padding: 3px 0;
+  border: 2px solid var(--inner-highlight);
+  background: var(--card-bg);
+  opacity: 0.35;
+  transition: opacity 160ms ease, border-color 160ms ease;
+}
+.s4-cc-chip.lever-run     { color: var(--lever-run); }
+.s4-cc-chip.lever-service { color: var(--lever-service); }
+.s4-cc-chip.lever-replace { color: var(--lever-replace); }
+.s4-cc-chip.lit { opacity: 1; border-color: currentColor; }
+.s4-cc-n {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--ink-on-box);
+}
+.s4-cc-x {
+  align-self: flex-end;
+  padding-bottom: 1px;
   font-family: 'Press Start 2P', monospace;
   font-size: 9px;
-  letter-spacing: 0.05em;
-  color: var(--ink-on-box);
-  margin-bottom: 4px;
-}
-.s4-count-formula { text-align: center; overflow-x: auto; }
-.s4-count-formula .katex { font-size: 16px; color: var(--ink-on-box); }
-.s4-count-formula .katex-display { margin: 6px 0; }
-.s4-count-body {
-  margin: 2px 0 0;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 8px;
-  line-height: 1.8;
   color: var(--ink-secondary);
 }
+.s4-count-result {
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--ink-on-box);
+}
+.s4-count-num {
+  display: inline-block;
+  min-width: 3ch;
+  text-align: left;
+  font-size: 18px;
+  color: var(--pikachu-cheek);
+}
 
-/* Closing hook. */
+/* The teaser banner. */
 .s4-hook {
   background: var(--bg-strong);
   border: 4px solid var(--rule);
   box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
-  padding: 10px 14px 12px;
+  padding: 14px 14px;
+  text-align: center;
 }
 .s4-hook-title {
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
+  font-size: 10px;
+  line-height: 1.8;
   letter-spacing: 0.05em;
   color: var(--pikachu-cheek);
-  margin-bottom: 7px;
 }
-.s4-hook-body {
-  margin: 0;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  line-height: 1.85;
-  color: var(--ink-on-box);
-}
-.s4-hook-body b { color: var(--profit-green); }
 
-.s4-hint { margin-top: 12px; }
+/* ---- Caption dialog + hint ---- */
+.s4-dialog { margin-top: 14px; }
+.s4-hint { margin-top: 10px; }
+
+/* Reduced motion: no entrance choreography. */
+@media (prefers-reduced-motion: reduce) {
+  .s4-slot.s4-flip, .s4-slot.s4-land, .s4-pop, .s4-row-hit { animation: none; }
+}
 
 /* Responsive: stack the columns. */
 @media (max-width: 940px) {
   .s4-body { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
-  .s4-row { grid-template-columns: 1fr; row-gap: 5px; }
+  .s4-row { grid-template-columns: 14px 1fr; row-gap: 5px; }
   .s4-row-arrow { display: none; }
 }

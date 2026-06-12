@@ -1,33 +1,36 @@
 /* Scene 7, "Q*: the action scorecard": earns the Q* badge.
  *
- *   The 12-cell reveal, one internal step per beat, on the shared QTable
- *   widget fed from DATA.Qstar (indexed state*3 + actionIdx):
+ *   Concrete first, formula LAST. Seven internal steps, one idea each,
+ *   on the shared QTable widget fed from DATA.Qstar (state*3 + actionIdx):
  *
- *     step 0  empty grid + the definition of Q*.
- *     step 1  HEALTHY row: RUN +311.0 starred.
- *     step 2  WORN row: SERVICE beats RUN by +22.7. The first frontier.
- *     step 3  SHAKY row: THE HEADLINE. REPLACE beats SERVICE by +23.5
- *             although the van still runs; a md VanCard at wear 2 sits
- *             beside the table with the callout. FAILING is one row LOWER
- *             and still hidden: the map says replace BEFORE dead.
- *     step 4  FAILING row: REPLACE again, and RUN is NEGATIVE (-3.1).
- *     step 5  the three bands painted beside the table + the closer.
+ *     step 0  empty 4x3 scorecard + the question line + a gamma chip.
+ *             No formal definition anywhere on screen.
+ *     step 1  HEALTHY row staggers in. "Young van: drive her."
+ *     step 2  WORN row. "Worn van: the shop wins."
+ *     step 3  SHAKY row; then, as its own delayed beat, the surprise
+ *             badge "+23.5 OVER THE SHOP" pops under the van.
+ *             No text previews FAILING here.
+ *     step 4  FAILING row. "Replace BEFORE dead is the headline."
+ *     step 5  the bands column paints, one band at a time.
+ *     step 6  ONLY NOW the formal line: Q*(s,a) = E[G | start at s,
+ *             make call a, play perfectly after]. G is the return the
+ *             student built two scenes back.
  *
  *   Row-by-row reveal = qt.update with a masked array (unrevealed rows 0,
- *   which the widget renders as blank dashes) + suppressFlash. Margins
- *   (+22.7, +23.5) are computed from DATA.Qstar, never hand-typed; an
+ *   which the widget renders as blank dashes) + suppressFlash. The margin
+ *   badge (+23.5) is computed from DATA.Qstar, never hand-typed; an
  *   in-code warning ties DATA.Qstar to live value iteration at gamma 0.9.
+ *   render(step) is a pure function of step, so rewind re-renders exactly.
  *
  *   [data-run-primary] = the FILL ALL button, so &run captures the full
- *   board. Optional &step=N hash flag for headless QA. Cold-entry safe.
+ *   board. &step=N hash flag for headless QA. Cold-entry safe.
  */
 (function () {
   window.scenes = window.scenes || {};
 
   const A = 3;
   const NUM_STATES = 4;
-
-  function fmt1(v) { return (v >= 0 ? '+' : '') + v.toFixed(1); }
+  const MAX_STEP = 6;
 
   function hashStep(maxStep) {
     const m = (window.location.hash || '').match(/[#&?]step=(\d+)/);
@@ -36,7 +39,7 @@
     return Number.isFinite(n) ? Math.max(0, Math.min(maxStep, n)) : 0;
   }
   function instantMode() {
-    return /[#&?]run\b/.test(window.location.hash || '') ||
+    return /[#&?](run|instant)\b/.test(window.location.hash || '') ||
       !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
@@ -47,8 +50,6 @@
 
     const D = window.DATA || {};
     const ACT = window.Actions;
-    const STATE_DISPLAY = (window.Van && window.Van.STATE_DISPLAY) ||
-      ['HEALTHY', 'WORN', 'SHAKY', 'FAILING'];
     const GAMMA = (D.model && D.model.gamma) || (window.Van && window.Van.GAMMA) || 0.9;
 
     /* Q* from DATA (authoritative), with a live fallback for a cold link. */
@@ -75,11 +76,10 @@
       if (maxDiff > 1e-6) console.warn('scene7: DATA.Qstar drift vs Bellman (1dp) =', maxDiff);
     } catch (e) { /* cold entry: skip */ }
 
-    const mWorn = q(1, 1) - q(1, 0);     /* SERVICE over RUN at WORN  = 22.7 */
-    const mShaky = q(2, 2) - q(2, 1);    /* REPLACE over SERVICE at SHAKY = 23.5 */
+    /* REPLACE over SERVICE at SHAKY = the +23.5 surprise. */
+    const mShaky = q(2, 2) - q(2, 1);
     const fmtM = (m) => '+' + (Math.round(m * 10 + 1e-6) / 10).toFixed(1);
 
-    const MAX_STEP = 5;
     let step = hashStep(MAX_STEP);
 
     /* ---- Heading ---- */
@@ -87,22 +87,6 @@
     heading.className = 'concept-heading';
     heading.textContent = 'Q*: the action scorecard';
     root.appendChild(heading);
-
-    /* ---- Q* formula card ---- */
-    const fcard = document.createElement('div');
-    fcard.className = 'concept-formula-card';
-    fcard.innerHTML = '<div class="concept-formula-label">THE SCORE OF ONE CALL</div>';
-    const fhost = document.createElement('div');
-    fcard.appendChild(fhost);
-    window.Katex.render(
-      String.raw`Q^{\star}(s, a) \;=\; \max_{\pi}\; \mathbb{E}\!\left[\, G \mid s_1 = s,\; a_1 = a \,\right]`,
-      fhost, true);
-    const ffoot = document.createElement('div');
-    ffoot.className = 'concept-formula-foot';
-    ffoot.textContent = 'Q*(s, a): the long-run discounted money of making call a ' +
-      'in state s, then playing perfectly. G is the return from the last scene.';
-    fcard.appendChild(ffoot);
-    root.appendChild(fcard);
 
     /* ---- Panel: van icon | scorecard + bands ---- */
     const panel = document.createElement('div');
@@ -114,12 +98,9 @@
     iconCol.innerHTML = '<div class="s7-icon-label">THE VAN IN PLAY</div>';
     const vanHost = document.createElement('div');
     iconCol.appendChild(vanHost);
-    const iconCaption = document.createElement('div');
-    iconCaption.className = 's7-icon-caption';
-    iconCol.appendChild(iconCaption);
     const callout = document.createElement('div');
-    callout.className = 's7-callout';
-    callout.innerHTML = 'SCRAP HER ANYWAY:<br><b>' + fmtM(mShaky) + '</b> OVER THE SHOP';
+    callout.className = 's7-callout s7-hidden';
+    callout.innerHTML = '<b>' + fmtM(mShaky) + '</b> OVER THE SHOP';
     iconCol.appendChild(callout);
     panel.appendChild(iconCol);
     const van = window.VanCard.mount(vanHost, { wear: 0, size: 'md' });
@@ -128,8 +109,13 @@
     tableCol.className = 's7-table-col';
     const tableLabel = document.createElement('div');
     tableLabel.className = 's7-table-label';
-    tableLabel.appendChild(document.createTextNode('Q*(STATE, ACTION) AT '));
-    tableLabel.appendChild(window.Katex.inline('\\gamma = ' + GAMMA));
+    const labelText = document.createElement('span');
+    labelText.textContent = 'THE SCORECARD';
+    tableLabel.appendChild(labelText);
+    const gammaChip = document.createElement('span');
+    gammaChip.className = 's7-gamma-chip';
+    gammaChip.appendChild(window.Katex.inline('\\gamma = ' + GAMMA));
+    tableLabel.appendChild(gammaChip);
     tableCol.appendChild(tableLabel);
     const tableRow = document.createElement('div');
     tableRow.className = 's7-table-row';
@@ -143,7 +129,7 @@
 
     /* the vertical band strip (step 5) */
     const bands = document.createElement('div');
-    bands.className = 's7-bands';
+    bands.className = 's7-bands s7-hidden';
     const bandSpacer = document.createElement('div');
     bandSpacer.className = 's7-bands-spacer';
     bandSpacer.textContent = 'BANDS';
@@ -160,7 +146,22 @@
     }
     tableRow.appendChild(bands);
 
-    /* ---- Read-out + hint + closer ---- */
+    /* ---- The formal line, hidden until the last step ---- */
+    const fcard = document.createElement('div');
+    fcard.className = 'concept-formula-card s7-formula s7-hidden';
+    fcard.innerHTML = '<div class="concept-formula-label">THE SCORE OF ONE CALL</div>';
+    const fhost = document.createElement('div');
+    fcard.appendChild(fhost);
+    window.Katex.render(
+      String.raw`Q^{\star}(s, a) \;=\; \mathbb{E}\left[\, G \;\middle|\; \text{start at } s,\ \text{make call } a,\ \text{play perfectly after} \,\right]`,
+      fhost, true);
+    const ffoot = document.createElement('div');
+    ffoot.className = 'concept-formula-foot';
+    ffoot.textContent = 'G: the return you built.';
+    fcard.appendChild(ffoot);
+    root.appendChild(fcard);
+
+    /* ---- Caption + hint + FILL ALL ---- */
     const readEl = document.createElement('p');
     readEl.className = 's7-read';
     root.appendChild(readEl);
@@ -177,43 +178,17 @@
     hint.appendChild(fillBtn);
     root.appendChild(hint);
 
-    const note = document.createElement('p');
-    note.className = 's7-note';
-    note.innerHTML = 'The scrap zone is <b>two rows wide</b>. The surprise is not that a ' +
-      'dead van gets replaced; it is that a running one does. Next: where do these ' +
-      'twelve numbers come from?';
-    root.appendChild(note);
-
-    /* ---- Copy per step (numbers interpolated from DATA.Qstar) ---- */
-    const READOUTS = [
-      'The empty scorecard. Each cell gets one number: the long-run discounted money ' +
-        'of that call in that state, played perfectly afterwards. ' +
-        '<b>Twelve numbers decide everything.</b>',
-      '<b>HEALTHY:</b> RUN ' + fmt1(q(0, 0)) + ' takes the star, ahead of SERVICE ' +
-        fmt1(q(0, 1)) + ' and REPLACE ' + fmt1(q(0, 2)) + '. Young van: drive her.',
-      '<b>WORN:</b> SERVICE ' + fmt1(q(1, 1)) + ' beats RUN ' + fmt1(q(1, 0)) +
-        '. The first frontier: one level of wear and the shop already beats the road, ' +
-        'by <b>' + fmtM(mWorn) + '</b>.',
-      '<b>SHAKY: the headline.</b> REPLACE ' + fmt1(q(2, 2)) + ' beats SERVICE ' +
-        fmt1(q(2, 1)) + ' beats RUN ' + fmt1(q(2, 0)) + '. She still starts every ' +
-        'morning; the map says scrap her anyway, <b>' + fmtM(mShaky) + '</b> over the ' +
-        'shop. And FAILING sits one row lower, still face down: replace BEFORE dead.',
-      '<b>FAILING:</b> REPLACE ' + fmt1(q(3, 2)) + ' again, and RUN goes negative: ' +
-        '<b class="s7-neg">' + fmt1(q(3, 0)) + '</b>, the only red cell on the board. ' +
-        'Driving a dead van loses money on average.',
-      'Three bands, painted: RUN, then SVC, then NEW NEW. The policy reads straight ' +
-        'off the stars: <b>run it young, shop it worn, scrap it from shaky down.</b> ' +
-        'The asymmetry is the lesson: the scrap zone is wide.',
+    /* ---- One short caption per step, no numbers in prose ---- */
+    const CAPTIONS = [
+      'One number per cell: what is this call worth here, long run?',
+      'Young van: drive her.',
+      'Worn van: the shop wins.',
+      'She still starts every morning. <b>Scrap her anyway.</b>',
+      'Replace <b>BEFORE</b> dead is the headline.',
+      'The policy reads straight off the stars.',
+      '<b>Twelve numbers decide everything.</b> Next: where they come from.',
     ];
-    const ICON_CAPTIONS = [
-      'OLD BESSIE waits on the verdict.',
-      '<b>HEALTHY:</b> drive her.',
-      '<b>WORN:</b> into the shop.',
-      '<b>SHAKY:</b> she still starts every morning.',
-      '<b>FAILING:</b> driving her loses money.',
-      '<b>SHAKY</b> is the line: replace BEFORE dead.',
-    ];
-    const WEAR_BY_STEP = [0, 0, 1, 2, 3, 2];
+    const WEAR_BY_STEP = [0, 0, 1, 2, 3, 2, 2];
 
     /* ---- Reveal machinery ---- */
     function maskedQ(rows) {
@@ -235,15 +210,57 @@
       }
     }
 
-    function flashRow(s) {
-      if (instantMode()) return;
-      for (let a = 0; a < A; a++) {
-        const cellEl = qt.cells[s * A + a];
-        cellEl.classList.remove('s7-just-filled');
-        void cellEl.offsetWidth;
-        cellEl.classList.add('s7-just-filled');
-        setTimeout(() => cellEl.classList.remove('s7-just-filled'), 760);
+    function clearFx() {
+      for (let i = 0; i < qt.cells.length; i++) {
+        qt.cells[i].classList.remove('s7-reveal');
+        qt.cells[i].style.animationDelay = '';
       }
+      for (let s = 0; s < NUM_STATES; s++) {
+        const lab = qt.getCellNode(s);
+        if (lab) { lab.classList.remove('s7-reveal'); lab.style.animationDelay = ''; }
+        bandCells[s].classList.remove('s7-band-pop');
+        bandCells[s].style.animationDelay = '';
+      }
+      callout.classList.remove('s7-callout-pop');
+      fcard.classList.remove('s7-pop-in');
+    }
+
+    /* The new row's cells land left to right, ~190 ms apart. */
+    function revealRow(s) {
+      const lab = qt.getCellNode(s);
+      if (lab) { lab.style.animationDelay = '0ms'; lab.classList.add('s7-reveal'); }
+      for (let a = 0; a < A; a++) {
+        const c = qt.cells[s * A + a];
+        c.style.animationDelay = (120 + a * 190) + 'ms';
+        c.classList.add('s7-reveal');
+      }
+      setTimeout(() => {
+        if (lab) { lab.classList.remove('s7-reveal'); lab.style.animationDelay = ''; }
+        for (let a = 0; a < A; a++) {
+          const c = qt.cells[s * A + a];
+          c.classList.remove('s7-reveal');
+          c.style.animationDelay = '';
+        }
+      }, 120 + (A - 1) * 190 + 340 + 120);
+    }
+
+    /* The badge waits for the SHAKY row, then pops: its own beat. */
+    function popCallout() {
+      callout.classList.add('s7-callout-pop');
+      setTimeout(() => callout.classList.remove('s7-callout-pop'), 850 + 380 + 120);
+    }
+
+    function revealBands() {
+      for (let s = 0; s < NUM_STATES; s++) {
+        bandCells[s].style.animationDelay = (s * 150) + 'ms';
+        bandCells[s].classList.add('s7-band-pop');
+      }
+      setTimeout(() => {
+        for (let s = 0; s < NUM_STATES; s++) {
+          bandCells[s].classList.remove('s7-band-pop');
+          bandCells[s].style.animationDelay = '';
+        }
+      }, (NUM_STATES - 1) * 150 + 360 + 120);
     }
 
     function alignBands() {
@@ -263,29 +280,30 @@
     function render(o) {
       const opts = o || {};
       const rows = Math.min(step, 4);
+      clearFx();
       qt.update(maskedQ(rows), { suppressFlash: true });
       paintPending(rows);
 
       van.set(WEAR_BY_STEP[step]);
-      iconCaption.innerHTML = ICON_CAPTIONS[step];
       callout.classList.toggle('s7-hidden', step !== 3);
-
       bands.classList.toggle('s7-hidden', step < 5);
       if (step >= 5) requestAnimationFrame(alignBands);
+      fcard.classList.toggle('s7-hidden', step < 6);
+      labelText.textContent = step >= 6 ? 'Q*(STATE, ACTION)' : 'THE SCORECARD';
 
-      readEl.innerHTML = READOUTS[step];
-      note.classList.toggle('s7-hidden', step < 5);
+      readEl.innerHTML = CAPTIONS[step];
+      hintText.textContent = 'STEP ' + (step + 1) + ' / ' + (MAX_STEP + 1);
+      fillBtn.disabled = step >= MAX_STEP;
 
-      if (step < 4) {
-        hintText.textContent = 'ROWS ' + rows + '/4 ON THE BOARD. NEXT reveals ' +
-          STATE_DISPLAY[rows] + '.';
-      } else if (step === 4) {
-        hintText.textContent = 'ROWS 4/4 ON THE BOARD. NEXT paints the three bands.';
-      } else {
-        hintText.textContent = 'Scorecard complete. NEXT moves on.';
+      if (opts.flash && !instantMode()) {
+        if (step >= 1 && step <= 4) revealRow(step - 1);
+        if (step === 3) popCallout();
+        if (step === 5) revealBands();
+        if (step === 6) {
+          fcard.classList.add('s7-pop-in');
+          setTimeout(() => fcard.classList.remove('s7-pop-in'), 460);
+        }
       }
-
-      if (opts.flash && step >= 1 && step <= 4) flashRow(step - 1);
     }
 
     function fillAll() {

@@ -1,1 +1,206 @@
-/* Scene 13: Turn the patience knob. Populated by the decomposition rebuild. */
+/* ============================================================
+   Scene 13, "Turn the patience knob".
+   The gamma playground: dial + best-call-per-state strip with two
+   sliding frontier markers + the SHAKY Q-row in numbers, guided in
+   three steps before the dial unlocks for free play.
+   Shared chrome (concept-heading / poke-menu-row) lives in
+   css/style.css. All colour comes from CSS tokens.
+   ============================================================ */
+
+/* ---- The knob panel ---- */
+.scene13-scene .s13-knob {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  padding: 14px 18px 12px;
+  margin: 0 0 14px;
+}
+
+.scene13-scene .s13-gamma-row { padding-left: 0; }
+.scene13-scene .s13-gamma-lab { font-size: 9px; color: var(--ink-on-box); }
+.scene13-scene .s13-gamma-row input[type="range"] {
+  width: min(340px, 52vw);
+}
+.scene13-scene .s13-gamma-row .val {
+  font-size: 13px;
+  min-width: 5ch;
+  color: var(--ink-on-box);
+}
+
+/* locked dial during the guided steps */
+.scene13-scene .s13-knob.s13-locked input[type="range"] {
+  opacity: 0.5;
+  cursor: default;
+}
+.scene13-scene .s13-knob.s13-locked .s13-gamma-row::before { opacity: 0.4; }
+
+/* ---- The best-call strip + frontier markers ---- */
+.scene13-scene .s13-strip-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  margin: 12px 0 0;
+}
+.scene13-scene .s13-band-wrap {
+  position: relative;
+  max-width: 620px;
+  margin: 32px 0 34px;
+}
+.scene13-scene .s13-band-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+}
+.scene13-scene .s13-band-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px 11px;
+  border-left: 3px solid var(--rule);
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+}
+.scene13-scene .s13-band-cell:first-child { border-left: none; }
+.scene13-scene .s13-band-state {
+  font-size: 7px;
+  color: var(--ink-on-box);
+  opacity: 0.85;
+}
+.scene13-scene .s13-band-act { font-size: 11px; font-weight: bold; }
+.scene13-scene .s13-band-cell.lever-run     { background: var(--lever-run-soft); }
+.scene13-scene .s13-band-cell.lever-service { background: var(--lever-service-soft); }
+.scene13-scene .s13-band-cell.lever-replace { background: var(--lever-replace-soft); }
+.scene13-scene .s13-band-cell.lever-run .s13-band-act     { color: var(--lever-run); }
+.scene13-scene .s13-band-cell.lever-service .s13-band-act { color: var(--lever-service); }
+.scene13-scene .s13-band-cell.lever-replace .s13-band-act { color: var(--lever-replace); }
+
+.scene13-scene .s13-frontier {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Press Start 2P', monospace;
+  pointer-events: none;
+  transition: left 160ms ease-out;
+  z-index: 2;
+}
+.scene13-scene .s13-frontier.f-top { top: -28px; color: var(--lever-service); }
+.scene13-scene .s13-frontier.f-bot { bottom: -28px; color: var(--lever-replace); }
+.scene13-scene .s13-frontier-lab {
+  font-size: 7px;
+  border: 2px solid currentColor;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  padding: 2px 4px;
+  white-space: nowrap;
+}
+.scene13-scene .s13-frontier-line {
+  width: 3px;
+  height: 15px;
+  background: currentColor;
+}
+
+/* ---- The SHAKY row in numbers ---- */
+.scene13-scene .s13-shaky {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 4px;
+  font-family: 'Press Start 2P', monospace;
+}
+.scene13-scene .s13-shaky-lab {
+  font-size: 8px;
+  color: var(--ink-secondary);
+  margin-right: 2px;
+}
+.scene13-scene .s13-shaky-state { color: var(--wear-2); }
+.scene13-scene .s13-shaky-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  border: 2px solid var(--rule);
+  background: var(--bg-strong);
+  padding: 6px 9px;
+}
+.scene13-scene .s13-shaky-chip .s13-shaky-name { font-size: 7px; }
+.scene13-scene .s13-shaky-chip.lever-run .s13-shaky-name     { color: var(--lever-run); }
+.scene13-scene .s13-shaky-chip.lever-service .s13-shaky-name { color: var(--lever-service); }
+.scene13-scene .s13-shaky-chip.lever-replace .s13-shaky-name { color: var(--lever-replace); }
+.scene13-scene .s13-shaky-val {
+  font-size: 10px;
+  color: var(--ink-on-box);
+  font-variant-numeric: tabular-nums;
+}
+.scene13-scene .s13-shaky-val.neg { color: var(--lever-replace); }
+.scene13-scene .s13-shaky-star {
+  font-size: 8px;
+  color: var(--lever-service);
+  visibility: hidden;
+}
+.scene13-scene .s13-shaky-chip.s13-best .s13-shaky-star { visibility: visible; }
+.scene13-scene .s13-shaky-chip.s13-best.lever-run     { box-shadow: inset 0 0 0 2px var(--lever-run); }
+.scene13-scene .s13-shaky-chip.s13-best.lever-service { box-shadow: inset 0 0 0 2px var(--lever-service); }
+.scene13-scene .s13-shaky-chip.s13-best.lever-replace { box-shadow: inset 0 0 0 2px var(--lever-replace); }
+
+/* ---- Caption + step hint ---- */
+.scene13-scene .s13-caption {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8.5px;
+  line-height: 1.9;
+  color: var(--ink-secondary);
+  background: var(--bg-strong);
+  border-left: 4px solid var(--pikachu-yellow);
+  padding: 9px 11px;
+  margin: 0 0 10px;
+  max-width: 86ch;
+}
+.scene13-scene .s13-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  margin-top: 12px;
+}
+
+/* ---- Step animations (forward clicks only; replay is plain) ---- */
+@keyframes s13-fadein {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: none; }
+}
+.scene13-scene .s13-stagger { animation: s13-fadein 320ms ease-out both; }
+
+@keyframes s13-popk {
+  0%   { box-shadow: 0 0 0 4px var(--pikachu-yellow); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+}
+.scene13-scene .s13-pop { animation: s13-popk 700ms ease-out 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene13-scene .s13-frontier { transition: none; }
+  .scene13-scene .s13-stagger,
+  .scene13-scene .s13-pop { animation: none; }
+}
+.scene13-scene.s13-instant .s13-frontier { transition: none; }
+.scene13-scene.s13-instant .s13-stagger,
+.scene13-scene.s13-instant .s13-pop { animation: none; }
+
+/* inline KaTeX gamma inside pixel-font labels */
+.scene13-scene .s13-gamma-lab .katex,
+.scene13-scene .s13-shaky-lab .katex { font-size: 13px; }
+
+@media (max-width: 720px) {
+  .scene13-scene .s13-band-wrap { max-width: none; }
+}
+
+/* Utility hide, last so the doubled class beats every display-setting
+   rule above regardless of source order. */
+.scene13-scene .s13-hidden.s13-hidden { display: none; }

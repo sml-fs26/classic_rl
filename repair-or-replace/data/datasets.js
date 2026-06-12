@@ -3607,7 +3607,7 @@
         "hue": "mdp",
         "title": "The MDP frame",
         "symbol": "\\langle S,\\, A,\\, P,\\, R,\\, \\gamma \\rangle",
-        "caption": "The fleet sheet has been an MDP all along: the state (how worn the van is), the action you pick each week, the odds of wear and breakdown, and the money. Four states, three actions.",
+        "caption": "States, calls, printed odds, weekly money. An MDP all along.",
         "anchor": "Scene 3: the formalization"
       },
       {
@@ -3615,7 +3615,7 @@
         "hue": "policy",
         "title": "Policy = your maintenance playbook",
         "symbol": "\\pi : S \\rightarrow A",
-        "caption": "A policy is one chosen action per wear state, your standing order. A good one changes its mind as the van ages: run it young, shop it worn, scrap it shaky.",
+        "caption": "One call per wear level, in advance. Run young, shop worn, scrap shaky.",
         "anchor": "Scene 4: the 4-cell playbook"
       },
       {
@@ -3623,7 +3623,7 @@
         "hue": "return",
         "title": "Return over the van’s life",
         "symbol": "G_i = \\sum_{j \\ge i} \\gamma^{\\,j-i}\\, r_j",
-        "caption": "The money summed over every week ahead, future weeks discounted by gamma. Patience is a dial: short-sighted owners patch forever; patient owners replace while it still starts.",
+        "caption": "Money summed over every week ahead, discounted. Patience is a dial.",
         "anchor": "Scenes 6 and 7: return, then the patience knob"
       },
       {
@@ -3631,7 +3631,7 @@
         "hue": "qstar",
         "title": "Q* = the action scorecard",
         "symbol": "Q^*(s, a) = \\max_\\pi \\mathbb{E}\\,[\\,G \\mid s, a\\,]",
-        "caption": "The true long-run value of each call in each state, if you play smart afterwards. Twelve cells, three bands, and the stars say: scrap the van at SHAKY, while it still runs.",
+        "caption": "What each call is worth, long run. The stars say: scrap her at SHAKY.",
         "anchor": "Scene 8: the 12-cell scorecard"
       },
       {
@@ -3639,7 +3639,7 @@
         "hue": "dp",
         "title": "DP: compute it if you know the odds",
         "symbol": "Q^*(s, a) = \\mathbb{E}\\,[\\,R + \\gamma \\max_{a'} Q^*(S', a')\\,]",
-        "caption": "With the wear and breakdown odds printed, repeated Bellman backups fill the whole scorecard; the bands lock in within a handful of sweeps. You usually do not have the odds.",
+        "caption": "Printed odds, no driving: sweep the backups until the sheet freezes.",
         "anchor": "Scene 10: filling Q* with DP"
       },
       {
@@ -3647,7 +3647,7 @@
         "hue": "sarsa",
         "title": "SARSA: learn it from the logbook",
         "symbol": "q[s,a] \\leftarrow q[s,a] + \\alpha\\,(\\,r + \\gamma\\, q[s',a'] - q[s,a]\\,)",
-        "caption": "No odds needed: nudge each cell toward what last week actually paid, exploring a little. The same three bands emerge from nothing but driving, billing, and breakdowns.",
+        "caption": "No odds, just the logbook. Nudge each cell toward what the week paid.",
         "anchor": "Scenes 12 and 13: the SARSA nudge, then the live drive"
       }
     ]
