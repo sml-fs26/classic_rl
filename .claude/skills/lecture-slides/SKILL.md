@@ -1,11 +1,11 @@
 ---
 name: lecture-slides
-description: Build animated, minimal-text, diagram-driven Beamer slide decks from existing lecture notes in a light, projection-first Metropolis style with the standard LaTeX fonts, then publish them to GitHub Pages. Use when the user asks for "slides", a "deck", a "Beamer presentation", "lecture slides", or to "turn the notes into slides" and/or to "put the slides online" / "deploy to Pages" for a course topic. Defines the pdflatex light theme (dark is a screen-only variant on explicit request: it washes out on projectors), the overlay-animation patterns (one click per piece, one formula built term by term, a diagram on every slide), the render-and-eyeball style critic that catches TikZ label collisions, the words-not-argmax rule for manager audiences, and the no-LaTeX-in-CI Pages deploy of pre-compiled PDFs.
+description: Build animated, minimal-text, diagram-driven Beamer slide decks from existing lecture notes in a light, projection-first Metropolis style with the Libertinus serif font, then publish them to GitHub Pages. Use when the user asks for "slides", a "deck", a "Beamer presentation", "lecture slides", or to "turn the notes into slides" and/or to "put the slides online" / "deploy to Pages" for a course topic. Defines the pdflatex light theme (dark is a screen-only variant on explicit request: it washes out on projectors), the overlay-animation patterns (one click per piece, one formula built term by term, a diagram on every slide), the render-and-eyeball style critic that catches TikZ label collisions, the words-not-argmax rule for manager audiences, and the no-LaTeX-in-CI Pages deploy of pre-compiled PDFs.
 ---
 
 # lecture-slides
 
-Conventions for building **animated, minimal-text, diagram-driven Beamer decks** from existing lecture notes, in a light, projection-first Metropolis style with the standard LaTeX fonts, and **publishing** them to GitHub Pages. Audience: the same professionals the notes target. Deliverable: one PDF deck per source lecture note, each a click-to-advance presentation, plus a small Pages site that serves the pre-compiled PDFs (and any interactive page) behind a mobile-first landing index.
+Conventions for building **animated, minimal-text, diagram-driven Beamer decks** from existing lecture notes, in a light, projection-first Metropolis style with the Libertinus serif font, and **publishing** them to GitHub Pages. Audience: the same professionals the notes target. Deliverable: one PDF deck per source lecture note, each a click-to-advance presentation, plus a small Pages site that serves the pre-compiled PDFs (and any interactive page) behind a mobile-first landing index.
 
 These rules were extracted from the session that built the **LATS teaching materials** (`agentic-research/LATS/slides/`): two decks (`mcts-slides.tex`, `lats-slides.tex`) sharing one preamble (`beamer-preamble.tex`), deployed via `.github/workflows/deploy-pages.yml` behind `site/index.html`. When you have access to that folder, those are the canonical examples for STRUCTURE, animation, and voice; do NOT match their dark colors, which predate the projection lesson below (the classic_rl RL deck is the canonical light example). The reusable scaffolding is vendored next to this file in `templates/`.
 
@@ -46,7 +46,7 @@ If the ask is an interactive browser visualization (not a PDF deck), use `course
 
 ## Engine: match the fonts
 
-- **Standard light theme (the default): plain `pdflatex`.** It uses `lmodern` / Computer Modern; no fontspec, nothing to go wrong. Compile twice, for the nav bar and section toc:
+- **Light theme (the default): plain `pdflatex`.** It uses Libertinus (or `lmodern` if a course wants sans); no fontspec, nothing to go wrong. Compile twice, for the nav bar and section toc:
 
 ```bash
 cd /abs/path/to/slides
@@ -57,16 +57,18 @@ pdflatex <deck>.tex && pdflatex <deck>.tex
 
 ## The light, projection-first theme
 
-**The load-bearing lesson, learned in front of a real projector: dark themes do not project.** Light-on-dark slides wash out in a lit lecture hall, and the lead also rejected designer fonts. The default is therefore LIGHT Metropolis with the standard LaTeX fonts:
+**The load-bearing lesson, learned in front of a real projector: dark themes do not project.** Light-on-dark slides wash out in a lit lecture hall, so the default is LIGHT Metropolis: a white background with near-black text. The default font is **Libertinus**, an elegant old-style book serif whose matching Libertinus Math puts text and formulas in one voice (chosen by the lead over Fira, CM Bright, and a field of sans alternatives):
 
 ```latex
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usefonttheme[onlymath]{serif}   % math in the classic Computer Modern italic
+\usepackage{libertinus}   % Libertinus Serif + Biolinum + matching Libertinus Math
+\usefonttheme{serif}      % body, headings, and math all in the serif
 \usetheme{metropolis}
 ```
 
-Two fixes are mandatory, both already in `templates/beamer-preamble.tex`:
+A sans course can instead use `\usepackage{lmodern}` with `\usefonttheme[onlymath]{serif}` (Computer Modern math), but Libertinus is the default; do not pick a designer webfont (Fira and the like were rejected). Three fixes are mandatory, all already in `templates/beamer-preamble.tex`:
+
+0. **White background, dark text.** `\setbeamercolor{normal text}{fg=black!87, bg=white}` (dark-on-light is what survives a projector).
 
 1. **Frametitle as a pale panel.** Style the title strip as a light gray band with near-black text so the whole deck stays light:
    ```latex
@@ -214,7 +216,7 @@ Then `Read` `/tmp/smoke-*.png`. Check: pale panel frametitle, legible muted text
 
 Copy and fill the bracketed fields:
 
-> Build the slide deck `[DECK-FILE].tex` from the lecture note `[NOTE-PATH]`, in the light, projection-first Metropolis style with the standard LaTeX fonts. Write it to `[SLIDES-DIR]/[DECK-FILE].tex`.
+> Build the slide deck `[DECK-FILE].tex` from the lecture note `[NOTE-PATH]`, in the light, projection-first Metropolis style with the Libertinus serif font. Write it to `[SLIDES-DIR]/[DECK-FILE].tex`.
 >
 > **Inherit the shared theme.** First line after `\documentclass[aspectratio=169]{beamer}` is `\input{beamer-preamble}`. Do NOT redefine colors, TikZ styles, or the theme; they live in `beamer-preamble.tex` in the same directory. Available styles: `edge`, `dimedge`, `nodebox`, `accentbox`, `treenode`, `gridcell`, `good fill`, `bad fill`, `acc fill`; colors `accent`, `accent2`, `good`, `bad`, `panel`, `fg`, `muted`; helper `\takeaway{...}`.
 >
@@ -388,7 +390,7 @@ Step 6, actually looking at the rendered pages, is what makes the rest work. Don
 
 0. **Read the source lecture notes and the numbers spec.** The deck is the note distilled; the section order and every number come from there. If there is a runnable reference implementation pinning the worked example, read its REAL output, not your memory of it.
 
-1. **Author the shared preamble** from `templates/beamer-preamble.tex` (light, standard fonts). Retune the accent palette per course if desired; keep the two mandatory fixes (pale panel frametitle, `muted` at `black!55` or darker).
+1. **Author the shared preamble** from `templates/beamer-preamble.tex` (light, Libertinus serif). Retune the accent palette per course if desired; keep the mandatory fixes (white bg with dark text, pale panel frametitle, `muted` at `black!55` or darker).
 
 2. **Smoke-test the preamble** (Phase 0): compile the 2-slide `_smoketest.tex`, render to PNG, READ it. Fix the theme here, before any deck exists.
 
