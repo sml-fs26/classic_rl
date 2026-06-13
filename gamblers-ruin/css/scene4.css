@@ -1,0 +1,12 @@
+/* scene4.css -- policy. */
+.sc4-formula { text-align: center; }
+.sc4-row { align-items: flex-start; gap: 36px; }
+.sc4-panel { max-width: 540px; display: flex; flex-direction: column; gap: 12px; }
+.sc4-preset-label { font-size: 13px; }
+.sc4-presets { gap: 8px; }
+.sc4-blurb { min-height: 84px; font-size: 15px; }
+.sc4-note { font-size: 14px; }
+.sc4-framing { margin-top: 16px; }
+/* In policy mode the value column just reads "play" on the chosen row. */
+.sc4 .ql-val { font-size: 11px; color: var(--ink-secondary); }
+.sc4 .ql-row.argmax .ql-val { color: var(--ink); font-weight: 700; }

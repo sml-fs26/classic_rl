@@ -241,7 +241,7 @@ body.attract .demo-tag{display:inline;color:var(--hot);}
   <header>
     <div class="subA" id="subA">SML · REINFORCEMENT LEARNING</div>
     <h1><span class="star">★</span> CLASSIC RL <span class="star">★</span></h1>
-    <span class="badge" id="badge">12 - IN - 1</span>
+    <span class="badge" id="badge">13 - IN - 1</span>
   </header>
 
   <div class="list" id="list" role="listbox" aria-label="Select a visualization"></div>
@@ -297,12 +297,13 @@ const GAMES = [
   {name:"PIPELINE CLIMB",     href:"pipeline-climb/",    acc:"#7ce040", tag:"BIZ", blurb:"A lead climbs cold to hot. Nurture, demo, or close: the same lever is +29 when READY and destructive when COLD."},
   {name:"CHURN RESCUE",       href:"churn-rescue/",      acc:"#ff5470", tag:"BIZ", blurb:"A cooling account, a ticking renewal clock. Wait, send a cheap touch, or spend a deep discount. Retention ROI as an MDP."},
   {name:"REPAIR OR REPLACE",  href:"repair-or-replace/", acc:"#9aa7ff", tag:"BIZ", blurb:"One van, four states of wear. Run it, shop it, or buy new: scrap it while it still starts, timing set by γ."},
+  {name:"GAMBLER'S RUIN",     href:"gamblers-ruin/",     acc:"#d9a521", tag:"BIZ", blurb:"Double your stake to $10 against a rigged coin. The best bet zig-zags: bold in the dangerous middle, timid at the edges (DP, then SARSA vs Q-learning)."},
 ];
 
 /* ---- pixel sprites: one inline-SVG cartridge icon per game ---- *
  *  Each sprite is a grid of single-char rows; PX maps char to colour *
  *  ('.' = transparent). spriteSVG() rasterises it to <rect> pixels.  */
-const SPR=['robot','reel7','ghost','target','trophy','ladder','pokeball','tag','die5','bars','heart','van'];
+const SPR=['robot','reel7','ghost','target','trophy','ladder','pokeball','tag','die5','bars','heart','van','coin'];
 const PX={'.':null,K:'#0b0b16',W:'#f4f6ff',R:'#ff4d5e',r:'#c0202e',G:'#6be24a',g:'#1f9a52',
   B:'#41a6ff',b:'#9aa7ff',Y:'#ffd23f',O:'#ff9a3c',P:'#b06bff',C:'#5ad0ff',S:'#c9cee6',s:'#6c7194',N:'#9a6a3c'};
 const SPRITES={
@@ -332,6 +333,8 @@ const SPRITES={
        ".KbbbbbbbbK",".KKKKKKKKK.","..KK...KK..","..KK...KK..","..........."],
   qblock:["KKKKKKKKKKK","KYYYYYYYYYK","KYsYYYYYsYK","KYYYKKKYYYK","KYYKYYYKYYK",
           "KYYYYYKYYYK","KYYYYKYYYYK","KYYYYYYYYYK","KYYYYKYYYYK","KYsYYYYYsYK","KKKKKKKKKKK"],
+  coin:["...KKKKK...",".KKYYYYYKK.",".KYYYYYYYK.",".KYKKKKKYK.",".KYKYYYYYK.",
+        ".KYYKKKYYK.",".KYYYYYKYK.",".KYKKKKKYK.",".KYYYYYYYK.",".KKYYYYYKK.","...KKKKK..."],
   dog:["............KK",".KK........KSK",".KKKKKKKKKKSCK","KSSSSSSSSSSSSK",
        "KSSSSSSSSSSSK.","KSSSSSSSSSSSK.",".K.KK..KK.K...",".K.KK..KK.K..."]
 };
@@ -345,11 +348,11 @@ function spriteSVG(id){
 
 /* ---- attach sprites, then split into the main menu (5 headliners + EXTRA) and the EXTRA bundle ---- */
 GAMES.forEach((g,i)=>{ g.spr = SPR[i]; });
-const EXTRA = {name:"EXTRA ...", isBundle:true, acc:"#ffd23f", tag:"+7", spr:"qblock",
-  blurb:"7 bonus cartridges: the component drills (bandits, Bellman, Robbins-Monro, SARSA) plus extra boardroom games. Press START to open."};
+const EXTRA = {name:"EXTRA ...", isBundle:true, acc:"#ffd23f", tag:"+8", spr:"qblock",
+  blurb:"8 bonus cartridges: the component drills (bandits, Bellman, Robbins-Monro, SARSA), Gambler's Ruin, plus extra boardroom games. Press START to open."};
 const VIEWS = {
   main:[GAMES[0],GAMES[5],GAMES[6],GAMES[7],GAMES[11],EXTRA],
-  extra:[GAMES[1],GAMES[2],GAMES[3],GAMES[4],GAMES[8],GAMES[9],GAMES[10]]
+  extra:[GAMES[1],GAMES[2],GAMES[3],GAMES[4],GAMES[8],GAMES[9],GAMES[10],GAMES[12]]
 };
 let view='main';
 function curList(){ return VIEWS[view]; }
@@ -398,7 +401,7 @@ function paint(){
   [...listEl.children].forEach((r,i)=>r.classList.toggle('sel', i===sel));
   const g = list[sel]; if(!g) return;
   document.documentElement.style.setProperty('--acc', g.acc);
-  infoL.textContent = g.isBundle ? 'EXTRA · 7 BONUS CARTRIDGES'
+  infoL.textContent = g.isBundle ? 'EXTRA · 8 BONUS CARTRIDGES'
                                  : `NO. ${String(sel+1).padStart(2,'0')} · ${g.name}`;
   infoB.textContent = g.blurb;
   const r = listEl.children[sel];
@@ -422,7 +425,7 @@ function boot(){
 
 /* ---- EXTRA bundle: an in-page sub-screen with the other 7 cartridges ---- */
 function setExtraChrome(on){
-  $('#badge').textContent = on ? 'EXTRA · 7' : '12 - IN - 1';
+  $('#badge').textContent = on ? 'EXTRA · 8' : '13 - IN - 1';
   $('#subA').textContent  = on ? '▸ EXTRA GAMES' : 'SML · REINFORCEMENT LEARNING';
   document.body.classList.toggle('in-extra', on);
 }

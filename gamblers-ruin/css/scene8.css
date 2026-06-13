@@ -1,0 +1,13 @@
+/* scene8.css -- Bellman. */
+.sc8-formula { text-align: center; }
+.sc8-row { align-items: flex-start; gap: 36px; }
+.sc8-right { max-width: 620px; display: flex; flex-direction: column; gap: 14px; flex: 1 1 440px; }
+.sc8-read { font-size: 15px; }
+.sc8-worked-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.sc8-pick-lead { font-size: 14px; margin: 0 0 8px; }
+.sc8-calc { min-height: 130px; }
+.sc8-calc-expr { font-size: 14.5px; margin: 0 0 8px; }
+.sc8-calc-tex { text-align: center; }
+.sc8-calc-match { margin-top: 8px; font-weight: 700; color: var(--pos); font-variant-numeric: tabular-nums; }
+.sc8-check { color: var(--pos); margin-right: 4px; }
+.sc8-framing { margin-top: 16px; }

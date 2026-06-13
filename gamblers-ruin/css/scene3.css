@@ -1,0 +1,20 @@
+/* scene3.css -- formalization. */
+.sc3-row { align-items: flex-start; gap: 32px; }
+.sc3-panel { max-width: 600px; display: flex; flex-direction: column; gap: 8px; }
+.sc3-rail { display: flex; gap: 8px; margin-bottom: 4px; }
+.sc3-chip {
+  width: 34px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--rule-soft); border-radius: 5px; font-weight: 700; font-size: 15px;
+  color: var(--ink-faint); background: var(--bg-strong);
+  transition: all 160ms;
+}
+.sc3-chip.active { color: var(--bet-ink); background: var(--accent); border-color: var(--bet3-rule); transform: translateY(-2px); }
+.sc3-tag { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.sc3-h { font-size: 22px; margin: 0; }
+.sc3-formula { margin: 6px 0; }
+.sc3-body { font-size: 16px; line-height: 1.55; margin: 0; min-height: 4.4em; }
+.sc3-body b { color: var(--accent); }
+.sc3-nav { align-items: center; margin-top: 4px; }
+.sc3-stepcount { margin-right: auto; font-size: 13px; }
+.qladder.sc3-emph-state .ql-ladder { box-shadow: 0 0 0 3px var(--bet1), 3px 3px 0 var(--shadow); }
+.sc3-framing { margin-top: 16px; }

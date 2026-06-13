@@ -1,0 +1,56 @@
+/* scene11.css -- SARSA vs Q-learning, side by side (pixel skin). */
+.sc11-tag { font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.sc11-h { font-family: 'Press Start 2P', monospace; font-size: 13px; line-height: 1.5; margin: 6px 0 10px; }
+.sc11-eps { font-size: 10px; }
+.sc11-note { font-size: 8px; line-height: 1.8; border-left: 3px solid var(--rule-soft); padding-left: 10px; }
+.sc11-nav { align-items: center; margin-top: 14px; }
+.sc11-stepcount { margin-right: auto; font-size: 9px; }
+
+/* step 1: the two update-rule cards, side by side */
+.sc11-split-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sc11-split-cards .formula-card { margin: 0; }
+.sc11-card-sarsa  { border-left: 6px solid var(--bet1) !important; }
+.sc11-card-qlearn { border-left: 6px solid var(--bet3) !important; }
+.sc11-split-cards .formula-note { font-size: 8px; line-height: 1.8; text-align: left; }
+
+/* step 2 */
+.sc11-ctrls { gap: 10px; margin-bottom: 12px; align-items: center; }
+.sc11-ep-wrap { font-size: 9px; }
+.sc11-ep { font-size: 13px; color: var(--ink-on-box); }
+
+.sc11-boards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; align-items: start; }
+.sc11-board { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sc11-board-title { font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.04em; text-align: center; }
+.sc11-board-sub { font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.5; color: var(--ink-secondary); text-align: center; min-height: 2.4em; }
+.sc11-board-sarsa  .sc11-board-title { color: var(--bet1); }
+.sc11-board-qlearn .sc11-board-title { color: var(--bet3); }
+.sc11-board-oracle .sc11-board-title { color: var(--goal-rule); }
+.sc11-learner-host { display: flex; justify-content: center; }
+.sc11-learner-host .qladder { width: 100%; }
+.sc11-learner-host .qladder-qtable .ql-ladder { min-width: 0; width: 100%; }
+
+/* per-board readout (agreement bar + win-rate) */
+.sc11-readout {
+  display: flex; flex-direction: column; gap: 5px;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 7px 8px;
+  font-family: 'Press Start 2P', monospace;
+}
+.sc11-ro-row { display: grid; grid-template-columns: auto 1fr auto; gap: 6px; align-items: center; }
+.sc11-ro-row:only-child, .sc11-board-oracle .sc11-ro-row { grid-template-columns: auto 1fr; }
+.sc11-ro-lab { font-size: 7px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-secondary); }
+.sc11-ro-val { font-size: 8px; font-variant-numeric: tabular-nums; color: var(--ink-on-box); text-align: right; justify-self: end; }
+.sc11-bar { height: 10px; background: var(--bg-sunk); border: 2px solid var(--rule); overflow: hidden; }
+.sc11-bar-fill { display: block; height: 100%; width: 0; transition: width 360ms ease-out; }
+.sc11-bar-fill.conv { background: var(--pos); }
+.sc11-board-sarsa  .sc11-bar-fill.conv { background: var(--bet1); }
+.sc11-board-qlearn .sc11-bar-fill.conv { background: var(--bet3); }
+
+.sc11-framing { margin-top: 16px; font-size: 10px; }
+
+@media (max-width: 980px) {
+  .sc11-boards { grid-template-columns: 1fr; gap: 18px; }
+  .sc11-board-sub { min-height: 0; }
+  .sc11-split-cards { grid-template-columns: 1fr; }
+}

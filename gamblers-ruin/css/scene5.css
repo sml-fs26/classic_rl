@@ -1,0 +1,33 @@
+/* scene5.css -- trajectory. */
+.sc5-row { align-items: flex-start; gap: 32px; }
+.sc5-right { display: flex; flex-direction: column; gap: 12px; max-width: 640px; flex: 1 1 440px; }
+.sc5-rollout { display: flex; flex-direction: column; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.sc5-step {
+  display: grid;
+  grid-template-columns: 56px 64px 1fr 96px 56px 72px;
+  gap: 8px; align-items: center;
+  padding: 6px 8px; border: 1px solid var(--rule-soft); border-radius: 5px; background: var(--bg-strong);
+  font-size: 13.5px;
+}
+.sc5-step.sc5-head {
+  background: transparent; border: none; color: var(--ink-secondary);
+  font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; padding-bottom: 0;
+}
+.sc5-step.sc5-head .sc5-cell { line-height: 1.2; }
+.sc5-cell { display: flex; align-items: center; }
+.sc5-s, .sc5-next { font-weight: 700; font-variant-numeric: tabular-nums; }
+.sc5-flip.up { color: var(--pos); font-weight: 700; }
+.sc5-flip.down { color: var(--neg); font-weight: 700; }
+.sc5-r { font-variant-numeric: tabular-nums; }
+.sc5-r.pos { color: var(--pos); font-weight: 700; }
+.sc5-next.goal { color: var(--goal-rule); font-weight: 700; }
+.sc5-next.ruin { color: var(--neg); font-weight: 700; }
+.sc5-step.sc5-in { animation: sc5-pop 0.35s ease-out; }
+@keyframes sc5-pop { 0% { transform: translateX(-8px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sc5-step.sc5-in { animation: none; } }
+.sc5-note { font-size: 14px; }
+.sc5-framing { margin-top: 16px; }
+@media (max-width: 760px) {
+  .sc5-step { grid-template-columns: 38px 48px 88px 74px 40px 56px; font-size: 11px; gap: 5px; min-width: 360px; }
+  .sc5-rollout { padding-bottom: 4px; }
+}

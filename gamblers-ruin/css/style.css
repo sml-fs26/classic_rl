@@ -1,0 +1,555 @@
+/* Gambler's Ruin -- global styles.
+ *
+ * House style: the SML reinforcement-learning gallery's LIGHT PIXEL theme
+ * (warm grey-cream NES "shell", hard black borders, Press Start 2P
+ * everywhere), matching the sibling cartridges press-your-luck/ and
+ * last-minute-pricing/ EXACTLY. A screen-only high-contrast CRT variant
+ * (amber phosphor) is the dark option (toggle / #theme=crt). Math lives in
+ * bordered .formula-block / .formula-card cards; KaTeX is vendored under
+ * vendor/katex.
+ *
+ * Stake colour identity (kept consistent everywhere so the optimal-policy
+ * overlay reads as a column of colours that zig-zags):
+ *   BET $1  calm blue    (timid)
+ *   BET $2  amber        (medium)
+ *   BET $3  burnt orange (bold)
+ */
+
+/* ---------- Press Start 2P (bundled, offline) ---------- */
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('../assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+  font-display: block;  /* pixel font: do NOT flash a fallback serif first */
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ---------- Tokens: light (default) ---------- */
+:root,
+:root[data-theme="light"] {
+  --bg:             #E8E0CC;     /* warm grey-cream, NES "shell" */
+  --bg-strong:      #F8F4E4;     /* lighter card paper */
+  --bg-sunk:        #DCD3BA;     /* recessed wells */
+  --ink:            #181818;
+  --ink-secondary:  #585858;
+  --ink-faint:      #8A8268;
+  --rule:           #181818;     /* hard black borders */
+  --rule-soft:      #BBB6A2;     /* hairlines / inner-highlight light */
+  --card-bg:        #FFFFFF;
+  --inner-highlight:#404040;     /* the secondary inner border line */
+  --accent:         #C2541E;     /* burnt-orange highlight (matches bold) */
+  --accent-soft:    #F2C9A8;
+  --highlight:      #F8D028;     /* pixel "select" yellow */
+  --highlight-cheek:#E84828;
+  --shadow:         rgba(24, 20, 12, 0.20);
+  --ink-on-box:     #181818;
+
+  /* Stake (action) colours */
+  --bet1:      #2f6cb1;   --bet1-rule: #1c4b82;   --bet1-tint: #C9DBEE;
+  --bet2:      #C08A3E;   --bet2-rule: #8c6224;   --bet2-tint: #EDDCB8;
+  --bet3:      #C2541E;   --bet3-rule: #743d18;   --bet3-tint: #EFCFB6;
+  --bet-ink:   #ffffff;   /* text on a saturated chip */
+
+  /* Terminals */
+  --goal:      #E8A030;   --goal-rule: #8a6010;   --goal-glow: rgba(232,160,48,0.55);
+  --ruin:      #2E2A22;   --ruin-rule: #181818;
+  --token:     #D6432A;   --token-rule: #8a2412;  /* the bright cash token */
+
+  /* Coin */
+  --coin-face:  #F1EAD7;
+  --coin-win:   #2E9E6B;   /* heads / win green */
+  --coin-loss:  #D6432A;   /* tails / loss red */
+
+  /* Win/loss + heat (Okabe-Ito-ish, colour-blind aware) */
+  --pos:       #2E9E6B;   --pos-tint: #C7E7D5;
+  --neg:       #D6432A;   --neg-tint: #F2CFC9;
+  --heat0:     #DCD3BA;   --heat1: #E7DCBF;  --heat2: #E9C98F;  --heat3: #DFA85C;  --heat4: #C8902C;
+
+  /* Cross-viz hue identities (kept for the recap chips) */
+  --hue-mdp:     #B8323A;     /* red */
+  --hue-policy:  #2F6CB1;     /* blue */
+  --hue-return:  #2E9E6B;     /* green */
+  --hue-qstar:   #C8902C;     /* gold */
+  --hue-dp:      #7A5C8C;     /* purple */
+  --hue-sarsa:   #C2541E;     /* orange */
+}
+
+/* ---------- Tokens: CRT (screen-only dark option) ----------
+   Amber-phosphor terminal: dark background, warm-amber text. Pairs with the
+   scanline + vignette + phosphor-glow overlays below. */
+:root[data-theme="crt"] {
+  --bg:             #0a0500;
+  --bg-strong:      #1a0d05;
+  --bg-sunk:        #050200;
+  --ink:            #FFB350;
+  --ink-secondary:  #8B6030;
+  --ink-faint:      #6A4820;
+  --rule:           #FF9020;
+  --rule-soft:      #5A3010;
+  --card-bg:        #1a0d05;
+  --inner-highlight:#5A3010;
+  --accent:         #FF6A1E;
+  --accent-soft:    #5A3010;
+  --highlight:      #FFC060;
+  --highlight-cheek:#FF6020;
+  --shadow:         rgba(0, 0, 0, 0.5);
+  --ink-on-box:     #FFB350;
+
+  --bet1: #6FB0F0; --bet1-rule: #3f78b3; --bet1-tint: #102030;
+  --bet2: #FFC76E; --bet2-rule: #a87f33; --bet2-tint: #2A1808;
+  --bet3: #FF8A52; --bet3-rule: #a85b28; --bet3-tint: #2A1408;
+  --bet-ink: #1a0d05;
+
+  --goal: #FFC060; --goal-rule: #b07020; --goal-glow: rgba(255,192,96,0.5);
+  --ruin: #1a0d05; --ruin-rule: #050200;
+  --token: #FF6A1E; --token-rule: #8a2412;
+
+  --coin-face: #2A1808;
+  --coin-win:  #FFC76E;
+  --coin-loss: #FF6020;
+
+  --pos: #FFC76E; --pos-tint: #2A1808;
+  --neg: #FF6020; --neg-tint: #2A1004;
+  --heat0: #1a0d05; --heat1: #2A1808; --heat2: #4A3010; --heat3: #7A5020; --heat4: #b07020;
+
+  --hue-mdp:    #FF6020;
+  --hue-policy: #FFB350;
+  --hue-return: #FFC76E;
+  --hue-qstar:  #FFC060;
+  --hue-dp:     #FF9050;
+  --hue-sarsa:  #FF8A52;
+}
+
+/* CRT scanlines + vignette overlays (pointer-events:none so clicks pass). */
+:root[data-theme="crt"] body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 9991;
+  background: repeating-linear-gradient(to bottom,
+    rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+    rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px);
+  mix-blend-mode: multiply;
+}
+:root[data-theme="crt"] body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 9992;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+}
+:root[data-theme="crt"] body,
+:root[data-theme="crt"] .scene-title,
+:root[data-theme="crt"] .topbar,
+:root[data-theme="crt"] .scene-heading,
+:root[data-theme="crt"] .concept-heading {
+  text-shadow: 0 0 6px rgba(255, 180, 80, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Press Start 2P', "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  -webkit-font-smoothing: none;   /* keep the pixel font crisp */
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;             /* never let a wide child scroll the page + clip the topbar */
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg);
+  border-bottom: 4px solid var(--rule);
+  gap: 10px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.topbar .brand {
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.topbar .scene-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 0 16px;
+}
+.topbar .right-cluster { display: flex; gap: 6px; align-items: center; }
+
+.theme-toggle, .pager-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  padding: 5px 8px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--rule-soft);
+}
+.theme-toggle:hover, .pager-btn:hover { background: var(--highlight); }
+.pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.pager-btn:disabled:hover { background: var(--bg-strong); }
+
+/* SOUND + MUSIC toggles: same chrome as THEME but with an "on" state. */
+.sound-toggle.active, .music-toggle.active {
+  background: var(--highlight);
+  color: var(--ink);
+  box-shadow: inset 2px 2px 0 0 #B89020;
+}
+
+.dot-pager { display: flex; gap: 4px; align-items: center; }
+.dot-pager .dot {
+  width: 10px; height: 10px;
+  background: var(--ink-secondary);
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  padding: 0; cursor: pointer;
+}
+.dot-pager .dot.active { background: var(--highlight); }
+.dot-pager .dot:hover { background: var(--highlight-cheek); }
+
+/* ---------- Concept badges ---------- */
+.concept-badges { display: flex; gap: 4px; margin: 0 6px; align-items: center; }
+.concept-badge {
+  min-width: 30px; height: 22px; padding: 0 5px;
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  background: var(--bg);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px; letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  opacity: 0.4;
+  transition: opacity 200ms, background 200ms, color 200ms;
+}
+.concept-badge.earned {
+  opacity: 1; color: var(--bet-ink);
+  box-shadow: inset 0 0 0 1px var(--inner-highlight);
+}
+.concept-badge.mdp.earned    { background: var(--hue-mdp);    color: #fff; }
+.concept-badge.policy.earned { background: var(--hue-policy); color: #fff; }
+.concept-badge.return.earned { background: var(--hue-return); color: #fff; }
+.concept-badge.qstar.earned  { background: var(--hue-qstar);  color: #181818; }
+.concept-badge.dp.earned     { background: var(--hue-dp);     color: #fff; }
+.concept-badge.sarsa.earned  { background: var(--hue-sarsa);  color: #fff; }
+@keyframes badge-flash {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 var(--highlight); }
+  40% { transform: scale(1.3); box-shadow: 0 0 0 8px var(--highlight); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 transparent; }
+}
+.concept-badge.flashing { animation: badge-flash 1s ease-out; position: relative; z-index: 4; }
+@media (prefers-reduced-motion: reduce) { .concept-badge.flashing { animation: none; } }
+
+/* ---------- Stage / scene engine ---------- */
+.stage {
+  position: relative;
+  max-width: 1100px;
+  margin: 16px auto 32px;
+  padding: 0 20px;
+  min-height: calc(100vh - 130px);
+}
+.scene {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0; left: 20px; right: 20px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active { opacity: 1; pointer-events: auto; position: relative; left: 0; right: 0; }
+.scene-pad { padding: 12px 4px 24px; }
+
+/* ---------- Headings + prose ---------- */
+h1, h2, h3 { font-family: 'Press Start 2P', monospace; font-weight: 400; }
+.scene-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px; line-height: 1.4; margin: 6px 0 12px; color: var(--ink);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.scene-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; line-height: 1.8; color: var(--ink); max-width: 92ch; margin: 0 0 14px;
+}
+.scene-lede b { color: var(--accent); }
+.scene-lede em { font-style: normal; color: var(--bet1); }
+.scene-sub { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; color: var(--ink-secondary); max-width: 92ch; }
+.muted { color: var(--ink-secondary); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* ---------- Generic card / panel ---------- */
+.card {
+  background: var(--card-bg);
+  border: 3px solid var(--rule);
+  border-radius: 0;
+  padding: 14px 16px;
+  box-shadow: inset 0 0 0 2px var(--card-bg), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow);
+}
+.poke-box, .dlg-box {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  border-radius: 0;
+  padding: 14px 16px;
+  position: relative;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.8;
+}
+.poke-box b, .dlg-box b { color: var(--accent); }
+.poke-box em, .dlg-box em { font-style: normal; color: var(--bet1); }
+.dlg-box .triangle {
+  position: absolute; right: 14px; bottom: 10px;
+  width: 0; height: 0;
+  border-left: 6px solid transparent; border-right: 6px solid transparent;
+  border-top: 8px solid var(--ink);
+  animation: blink 0.9s steps(2, end) infinite;
+}
+@keyframes blink { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+@media (prefers-reduced-motion: reduce) { .dlg-box .triangle { animation: none; } }
+
+/* ---------- Formula cards (KaTeX) ---------- */
+.formula-block, .formula-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  border-radius: 0;
+  padding: 14px 18px;
+  margin: 12px 0;
+  max-width: 100%;
+  overflow-x: auto;        /* long formulas scroll inside the card, not the page */
+  -webkit-overflow-scrolling: touch;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+}
+.formula-card .formula-label, .formula-block .formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-secondary); margin-bottom: 10px;
+}
+.formula-block .katex, .formula-card .katex {
+  font-family: "KaTeX_Main", "Iowan Old Style", Georgia, serif;
+  font-size: 1.2em; color: var(--ink-on-box);
+}
+.formula-block .katex-display, .formula-card .katex-display { margin: 0; }
+.formula-note {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; line-height: 1.8; color: var(--ink-secondary); margin-top: 10px;
+}
+.katex { color: var(--ink-on-box); }
+
+/* ---------- Buttons (the chunky pixel action button) ---------- */
+.gr-btn, .poke-btn, .pyl-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 3px solid var(--rule);
+  border-radius: 0;
+  padding: 9px 14px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight), 2px 2px 0 0 var(--shadow);
+}
+.gr-btn:hover, .poke-btn:hover, .pyl-btn:hover { background: var(--highlight); color: var(--rule); }
+.gr-btn:active, .poke-btn:active, .pyl-btn:active { box-shadow: inset 2px 2px 0 0 var(--inner-highlight); transform: translate(1px, 1px); }
+.gr-btn:disabled, .poke-btn:disabled, .pyl-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.gr-btn:disabled:hover { background: var(--bg-strong); color: var(--ink-on-box); }
+.gr-btn.primary { background: var(--accent); color: var(--bet-ink); border-color: var(--rule); }
+.gr-btn.primary:hover { background: var(--highlight); color: var(--rule); }
+.gr-btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* ---------- Stake chips (the three levers) ---------- */
+.stake-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: 'Press Start 2P', monospace; font-size: 10px;
+  color: var(--bet-ink);
+  border: 3px solid var(--rule);
+  border-radius: 0;
+  padding: 9px 12px;
+  cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.25), 2px 2px 0 0 var(--shadow);
+}
+.stake-chip:hover { filter: brightness(1.07); }
+.stake-chip:active { transform: translate(1px,1px); box-shadow: inset 2px 2px 0 0 rgba(0,0,0,0.25); }
+.stake-chip[data-stake="bet1"], .stake-fill-bet1 { background: var(--bet1); border-color: var(--bet1-rule); }
+.stake-chip[data-stake="bet2"], .stake-fill-bet2 { background: var(--bet2); border-color: var(--bet2-rule); }
+.stake-chip[data-stake="bet3"], .stake-fill-bet3 { background: var(--bet3); border-color: var(--bet3-rule); }
+.stake-chip .chip-role { font-size: 7px; opacity: 0.92; text-transform: uppercase; letter-spacing: 0.05em; }
+.stake-chip:disabled, .stake-chip.clamped {
+  background: var(--bg-sunk); color: var(--ink-faint); border-color: var(--rule-soft);
+  cursor: not-allowed; box-shadow: none; filter: none;
+  text-decoration: line-through;
+}
+.stake-tag {
+  display: inline-block; font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--bet-ink);
+  border: 2px solid var(--rule); border-radius: 0; padding: 3px 7px;
+}
+.stake-tag[data-stake="bet1"] { background: var(--bet1); border-color: var(--bet1-rule); }
+.stake-tag[data-stake="bet2"] { background: var(--bet2); border-color: var(--bet2-rule); }
+.stake-tag[data-stake="bet3"] { background: var(--bet3); border-color: var(--bet3-rule); }
+
+/* ---------- HUD strip ---------- */
+.hud-strip {
+  display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.hud-item { display: flex; flex-direction: column; gap: 3px; }
+.hud-label { font-size: 7px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary); }
+.hud-val { font-size: 14px; font-variant-numeric: tabular-nums; color: var(--ink-on-box); }
+.hud-val.pos { color: var(--pos); }
+.hud-val.neg { color: var(--neg); }
+
+/* ---------- Layout helpers ---------- */
+.scene-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; margin-bottom: 14px; }
+.scene-row.center { justify-content: center; }
+.scene-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.grow { flex: 1 1 320px; min-width: 0; }
+
+/* ---------- Concept-scene chrome (KaTeX-heavy formula scenes) ---------- */
+.concept-scene { display: flex; flex-direction: column; gap: 14px; }
+.concept-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px; letter-spacing: 0.08em; margin: 6px 0 2px; color: var(--ink); text-transform: uppercase;
+}
+.concept-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.8; color: var(--ink-secondary); margin: 0 2px 4px; max-width: 92ch;
+}
+.concept-lede b { color: var(--ink-on-box); }
+
+/* ---------- Footnote ---------- */
+.footnote {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px; line-height: 1.7; color: var(--ink-secondary);
+  border-top: 2px solid var(--rule-soft);
+  padding-top: 8px; margin-top: 16px;
+}
+.footnote kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px; border: 1px solid var(--rule); border-radius: 0;
+  padding: 0 4px; background: var(--bg-strong); color: var(--ink);
+}
+
+/* ---------- Cross-viz hue chip (recap) ---------- */
+.hue-chip {
+  display: inline-block; padding: 3px 8px;
+  border: 2px solid var(--rule); background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--ink); letter-spacing: 0.5px; text-transform: uppercase;
+}
+
+/* ============================================================
+   Japanese "flavor mode" -- body.lang-jp swaps the primary font to
+   DotGothic16 (a bitmap-style Japanese font from Google Fonts) so the kana
+   glyphs match the chiptune pixel-art feel of the English Press-Start-2P
+   text. Press Start 2P stays a fallback for Latin glyphs nested inside
+   Japanese strings (e.g. "Q*", "SML"). DotGothic16 is also a tail fallback
+   in EN mode so the 日本語 toggle label renders cleanly.
+   ============================================================ */
+body.lang-jp,
+body.lang-jp button,
+body.lang-jp input,
+body.lang-jp .scene,
+body.lang-jp .topbar {
+  font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace;
+}
+body.lang-jp .scene { letter-spacing: 0.02em; }
+.theme-toggle, .pager-btn, .topbar .brand, .scene-title {
+  font-family: 'Press Start 2P', 'DotGothic16', 'Courier New', monospace;
+}
+
+/* ---------- Speaker-notes overlay (press `n`) ---------- */
+.speaker-notes-overlay[hidden] { display: none; }
+.speaker-notes-overlay {
+  position: fixed; right: 18px; bottom: 18px; z-index: 9990;
+  width: 480px; max-width: calc(100vw - 36px); pointer-events: none;
+}
+.speaker-notes-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  padding: 14px 18px 16px;
+  max-height: 75vh; overflow-y: auto;
+  pointer-events: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.7; color: var(--ink-on-box);
+}
+.speaker-notes-title {
+  font-size: 9px; letter-spacing: 0.06em;
+  color: var(--highlight-cheek); margin-bottom: 10px;
+  border-bottom: 2px solid var(--rule); padding-bottom: 6px;
+}
+.speaker-notes-title kbd {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  border: 2px solid var(--rule); border-radius: 0; padding: 1px 5px; background: var(--bg); color: var(--ink-on-box);
+}
+.speaker-notes-content h3 { font-size: 11px; letter-spacing: 0.04em; color: var(--highlight-cheek); margin: 0 0 8px; }
+.speaker-notes-content p { margin: 4px 0 8px; }
+.speaker-notes-content b { color: var(--highlight-cheek); }
+.speaker-notes-content em { color: var(--bet1); font-style: normal; }
+
+/* ---------- Responsive (<= 720px) ----------
+   The pixel-font chrome packs brand + title + ~7 buttons into one flex row at
+   desktop; on a phone the row overflows. Below 720px the topbar collapses to
+   wrapping rows: brand / PREV+dots+NEXT / badges (full-width) / toggles. The
+   scene-title hides (every scene opens with its own H2). Per-scene responsive
+   rules live alongside their desktop rules in the scene CSS files. */
+@media (max-width: 720px) {
+  .topbar { flex-wrap: wrap; padding: 10px 12px; gap: 8px; row-gap: 10px; }
+  .topbar .scene-title { display: none; }
+  .topbar .brand { flex: 1 1 auto; font-size: 10px; }
+  .topbar .right-cluster { flex: 0 0 100%; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .topbar .right-cluster #prev-btn,
+  .topbar .right-cluster #next-btn { min-height: 36px; padding: 8px 12px; font-size: 10px; }
+  .topbar .right-cluster .dot-pager { flex: 1 1 auto; justify-content: center; }
+  .dot-pager .dot { width: 12px; height: 12px; }
+  .topbar .right-cluster .concept-badges { flex: 1 1 100%; margin: 0; justify-content: center; gap: 5px; }
+  .topbar .right-cluster #theme-toggle,
+  .topbar .right-cluster #sound-toggle,
+  .topbar .right-cluster #music-toggle,
+  .topbar .right-cluster #lang-toggle { min-height: 30px; padding: 6px 10px; font-size: 8px; }
+
+  .stage { padding: 0 12px; margin: 12px auto 24px; min-height: calc(100dvh - 220px); }
+  .scene { left: 12px; right: 12px; }
+  .scene.active { left: 0; right: 0; }
+  .scene-heading { font-size: 15px; }
+  .scene-lede { font-size: 9px; }
+  .scene-row { gap: 12px; }
+  .scene-pad { padding: 8px 0 18px; }
+  .speaker-notes-overlay { right: 8px; bottom: 8px; left: 8px; width: auto; }
+}

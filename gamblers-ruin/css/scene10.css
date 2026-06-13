@@ -1,0 +1,18 @@
+/* scene10.css -- why DP does not scale. */
+.sc10-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 10px 0; }
+.sc10-card { flex: 1 1 380px; display: flex; flex-direction: column; gap: 10px; }
+.sc10-tag { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.sc10-h { font-size: 20px; margin: 0; }
+.sc10-body { font-size: 15px; line-height: 1.55; margin: 0; }
+.sc10-glyph { height: 96px; display: flex; align-items: center; justify-content: center; background: var(--bg-sunk); border-radius: 6px; border: 1px solid var(--rule-soft); }
+.sc10-glyph-coin .sc10-coin-q {
+  width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--ink-secondary);
+  display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 700; color: var(--ink-secondary);
+  background: var(--coin-face);
+}
+.sc10-glyph-grid { padding: 8px; }
+.sc10-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px; width: 100%; height: 100%; }
+.sc10-cell { background: var(--bet1-tint); border: 1px solid var(--bet1); border-radius: 1px; }
+.sc10-framing { margin-top: 16px; }
+.sc10-bridge { margin-top: 8px; font-style: italic; }
+@media (max-width: 760px) { .sc10-cards { gap: 16px; } }

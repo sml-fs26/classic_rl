@@ -1,0 +1,40 @@
+/* scene12.css -- recap. */
+.sc12-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 12px 0; }
+.sc12-card { display: flex; flex-direction: column; gap: 10px; }
+.sc12-card-head { display: flex; align-items: center; gap: 10px; }
+.sc12-badge {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--bet-ink);
+  border: 1.5px solid var(--rule); border-radius: 4px; padding: 2px 8px;
+}
+.sc12-badge.mdp { background: #b8323a; }
+.sc12-badge.policy { background: #2f6cb1; }
+.sc12-badge.return { background: #1f7a4d; }
+.sc12-badge.qstar { background: #c8902c; color: #1a1a1a; }
+.sc12-badge.dp { background: #7a5c8c; }
+.sc12-badge.sarsa { background: #a05a2c; }
+.sc12-card-title { font-size: 14px; font-weight: 700; letter-spacing: 0.02em; }
+.sc12-glyph { height: 54px; display: flex; align-items: center; justify-content: center; }
+.sc12-blurb { font-size: 13.5px; line-height: 1.5; margin: 0; flex: 1 1 auto; }
+.sc12-f { margin: 0; font-size: 0.9em; }
+.sc12-close { font-size: 18px; font-weight: 700; text-align: center; margin: 18px 0 4px; }
+.sc12-bridge { text-align: center; font-style: italic; margin: 0 0 14px; }
+.sc12-replay-row { justify-content: center; }
+
+/* glyphs */
+.sc12-zig { display: flex; flex-direction: column-reverse; gap: 2px; }
+.sc12-zig-cell { width: 64px; height: 5px; border-radius: 1px; border: 1px solid var(--rule); }
+.sc12-policy { display: flex; align-items: center; gap: 8px; }
+.sc12-policy .sc12-sw { width: 22px; height: 22px; border-radius: 3px; border: 1.5px solid var(--rule); }
+.sc12-arrow { font-size: 18px; color: var(--ink-secondary); }
+.sc12-tape { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.sc12-tape .sc12-r0 { color: var(--neg); font-size: 22px; }
+.sc12-tape .sc12-r1 { color: var(--pos); font-size: 22px; }
+.sc12-tape .sc12-or { font-size: 12px; color: var(--ink-secondary); font-weight: 400; }
+.sc12-mini { display: grid; grid-template-columns: repeat(3, 12px); gap: 2px; }
+.sc12-mini-cell { width: 12px; height: 12px; background: var(--bet3-tint); border: 1px solid var(--bet3); border-radius: 1px; }
+.sc12-coin-mini { width: 40px; height: 40px; border-radius: 50%; border: 2.5px solid var(--ink-secondary); background: var(--coin-face); position: relative; }
+.sc12-coin-badge { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); font-size: 9px; font-weight: 700; background: var(--ink); color: var(--bg); padding: 1px 5px; border-radius: 7px; white-space: nowrap; }
+.sc12-tuple { display: flex; gap: 4px; }
+.sc12-tuple span { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--rule); border-radius: 3px; font-weight: 700; background: var(--bg-strong); }
+@media (max-width: 860px) { .sc12-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .sc12-grid { grid-template-columns: 1fr; } }

@@ -1,0 +1,14 @@
+/* scene1.css -- tutorial. */
+.sc1-row { align-items: flex-start; gap: 32px; }
+.sc1-right { display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
+.sc1-chips { display: flex; gap: 10px; flex-wrap: wrap; transition: opacity 180ms; }
+.sc1-chips.sc1-dim { opacity: 0.4; }
+.sc1-coin-host { align-self: flex-start; transition: opacity 180ms; }
+.sc1-coin-host.sc1-dim { opacity: 0.35; }
+.sc1-dialog { min-height: 92px; }
+.sc1-nav { align-items: center; }
+.sc1-stepcount { margin-right: auto; font-size: 13px; }
+.stake-chip.chip-hl { box-shadow: 0 0 0 3px var(--accent), 2px 2px 0 var(--shadow); }
+.ql-ladder, .qladder.sc1-emph .ql-ladder { transition: box-shadow 200ms; }
+.qladder.sc1-emph .ql-ladder { box-shadow: 0 0 0 3px var(--accent), 3px 3px 0 var(--shadow); }
+.sc1-demo { align-self: flex-start; }

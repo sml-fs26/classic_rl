@@ -1,0 +1,28 @@
+/* scene7.css -- optimal action-value Q*. */
+.sc7-formula { text-align: center; }
+.sc7-pick { display: flex; align-items: center; gap: 12px; margin: 8px 0 14px; flex-wrap: wrap; }
+.sc7-pick-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.sc7-row { align-items: flex-start; gap: 36px; }
+.sc7-table-col { max-width: 560px; display: flex; flex-direction: column; gap: 12px; }
+.sc7-at { font-size: 17px; font-weight: 700; }
+.sc7-table { border-collapse: separate; border-spacing: 0; border: 1.5px solid var(--rule); border-radius: 6px; overflow: hidden; box-shadow: 3px 3px 0 var(--shadow); }
+.sc7-table th {
+  background: var(--bg-sunk); text-align: left; padding: 10px 14px;
+  font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-secondary);
+  border-bottom: 1.5px solid var(--rule);
+}
+.sc7-table td { padding: 12px 14px; border-bottom: 1px solid var(--rule-soft); }
+.sc7-tr:last-child td { border-bottom: none; }
+.sc7-tr.is-best td { background: var(--bet2-tint); }
+.sc7-tr.clamped td { opacity: 0.55; }
+.sc7-q { font-variant-numeric: tabular-nums; }
+.sc7-qval { font-size: 18px; font-weight: 700; }
+.sc7-star { color: var(--accent); font-size: 18px; margin-left: 8px; }
+.sc7-besttag {
+  display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+  color: var(--bet-ink); background: var(--accent); border: 1.5px solid var(--bet3-rule);
+  border-radius: 4px; padding: 1px 7px;
+}
+.sc7-read { min-height: 76px; font-size: 15px; }
+.sc7-note { font-size: 14px; }
+.sc7-framing { margin-top: 16px; }

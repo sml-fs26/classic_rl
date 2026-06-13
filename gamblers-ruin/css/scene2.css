@@ -1,0 +1,29 @@
+/* scene2.css -- playtest. */
+.sc2-row { align-items: flex-start; gap: 32px; }
+.sc2-right { display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
+.sc2-hud { align-items: center; }
+.sc2-hud .sc2-coin-host { margin-left: auto; transform: scale(0.92); }
+.sc2-prompt { font-size: 14px; }
+.sc2-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.sc2-dialog { min-height: 70px; font-size: 15px; }
+.sc2-tape-wrap { margin-top: 16px; }
+.sc2-tape-title { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.sc2-tape {
+  display: flex; gap: 8px; overflow-x: auto; padding: 8px 4px;
+  background: var(--bg-sunk); border: 1px solid var(--rule-soft); border-radius: 6px;
+  min-height: 56px; align-items: center;
+}
+.sc2-tape-step {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  font-size: 12px; font-variant-numeric: tabular-nums;
+  border: 1.5px solid var(--rule-soft); border-radius: 5px; padding: 5px 9px; background: var(--bg-strong);
+}
+.sc2-tape-step .tape-arrow { font-weight: 700; }
+.sc2-tape-step.up   { border-color: var(--pos); }
+.sc2-tape-step.up   .tape-arrow { color: var(--pos); }
+.sc2-tape-step.down { border-color: var(--neg); }
+.sc2-tape-step.down .tape-arrow { color: var(--neg); }
+.sc2-tape-step.goal { background: var(--bet2-tint); border-color: var(--goal-rule); }
+.sc2-tape-step.ruin { background: var(--neg-tint); border-color: var(--ruin-rule); }
+.sc2-tape-step .tape-after { font-weight: 700; }
+.sc2-framing { margin-top: 16px; }

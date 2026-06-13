@@ -1,0 +1,9 @@
+/* scene9.css -- dynamic programming fill. */
+.sc9-formula { text-align: center; }
+.sc9-ctrls { align-items: center; gap: 10px; margin-bottom: 6px; }
+.sc9-status { font-size: 13px; margin-left: auto; }
+.sc9-row { align-items: flex-start; gap: 32px; }
+.sc9-panel { max-width: 460px; min-height: 150px; flex: 1 1 360px; }
+.sc9-panel-title { font-weight: 700; font-size: 16px; margin-bottom: 6px; color: var(--accent); }
+.sc9-panel-body { font-size: 15px; line-height: 1.55; }
+.sc9-framing { margin-top: 16px; }
