@@ -105,14 +105,18 @@ h1 .star{color:var(--glow);}
   display:flex;flex-direction:column;justify-content:safe center;
   border-top:2px solid var(--frame);border-bottom:2px solid var(--frame);
   padding:6px 0;scrollbar-width:thin;}
-.row{display:grid;grid-template-columns:30px 18px 1fr auto;gap:10px;align-items:center;
-  padding:6px 10px;font-size:12px;color:var(--dim);cursor:pointer;
+.row{display:grid;grid-template-columns:28px 14px 24px 1fr auto;gap:9px;align-items:center;
+  padding:5px 10px;font-size:12px;color:var(--dim);cursor:pointer;
   border-left:4px solid transparent;}
 .row .no{font-size:10px;color:var(--dim);}
 .row .cur{color:var(--glow);visibility:hidden;}
+.row .chip{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;
+  background:#05050f;border:1px solid rgba(255,255,255,.14);border-radius:3px;padding:2px;}
+.row .chip svg{display:block;}
+:root[data-pal="green"] .row .chip svg{filter:grayscale(1) sepia(1) hue-rotate(58deg) saturate(2.4) brightness(1.05);}
+:root[data-pal="amber"] .row .chip svg{filter:grayscale(1) sepia(1) saturate(2.6) brightness(1.02);}
 .row .nm{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.row .tag{font-size:8px;color:var(--dim);letter-spacing:.12em;}
-.row .chk{font-size:11px;color:var(--phos);width:12px;text-align:center;}
+.row .tag{font-size:8px;color:var(--dim);letter-spacing:.12em;white-space:nowrap;}
 .row:hover{color:var(--ink);background:color-mix(in srgb,var(--frame) 40%,transparent);}
 .row.sel{
   background:var(--acc);border-left-color:#000;
@@ -121,7 +125,8 @@ h1 .star{color:var(--glow);}
 :root[data-pal="green"] .row.sel,:root[data-pal="amber"] .row.sel{
   background:var(--phos);                 /* monochrome CRT modes */
 }
-.row.sel .no,.row.sel .nm,.row.sel .tag,.row.sel .chk{color:#06061a;}
+.row.sel .no,.row.sel .nm,.row.sel .tag{color:#06061a;}
+.row.sel .chip{border-color:rgba(0,0,0,.45);}
 .row.sel .cur{visibility:visible;color:#06061a;animation:blink 1s steps(2) infinite;}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
@@ -177,6 +182,19 @@ h1 .star{color:var(--glow);}
   animation:fall linear forwards;}
 @keyframes fall{to{transform:translateY(112vh) rotate(360deg);opacity:.2}}
 
+/* attract-mode mascot: ANYmal trots across the screen when idle */
+#mascot{position:fixed;left:0;bottom:54px;z-index:6;width:58px;display:none;pointer-events:none;
+  filter:drop-shadow(0 0 6px color-mix(in srgb,var(--glow) 70%,transparent));}
+#mascot .mi{display:block;width:58px;height:34px;image-rendering:pixelated;}
+body.attract #mascot{display:block;animation:trot 9s linear infinite;}
+body.attract #mascot .mi{animation:bob .34s steps(2) infinite;}
+@keyframes trot{from{transform:translateX(-90px)}to{transform:translateX(calc(100vw + 90px))}}
+@keyframes bob{50%{transform:translateY(-3px)}}
+body.attract h1{animation:apulse 1.1s ease-in-out infinite;}
+@keyframes apulse{50%{text-shadow:0 2px 0 var(--frame),0 0 28px var(--glow);}}
+.demo-tag{display:none;}
+body.attract .demo-tag{display:inline;color:var(--hot);}
+
 /* responsive */
 @media (max-width:560px){
   #screen{padding-left:12px;padding-right:12px;}
@@ -185,7 +203,8 @@ h1 .star{color:var(--glow);}
   .subA{letter-spacing:.14em;font-size:8px;}
   .topbar{font-size:8px;}
   .topbar a{padding:4px 6px;}
-  .row{grid-template-columns:24px 14px 1fr auto;gap:7px;font-size:11px;padding:6px 6px;}
+  .row{grid-template-columns:22px 12px 22px 1fr;gap:7px;font-size:11px;padding:5px 6px;}
+  .row .chip{width:20px;height:20px;}
   .row .tag{display:none;}
   .info{min-height:46px;}
   .info .ib{font-size:12px;}
@@ -197,6 +216,7 @@ h1 .star{color:var(--glow);}
   .crt::after,.start button,#boot .flash,#boot h2,#boot .pb{animation:none!important;}
   .row.sel .cur{animation:none;visibility:visible;}
   #load .bar i{animation:none;width:100%;}
+  #mascot{display:none!important;}
 }
 </style>
 </head>
@@ -205,7 +225,7 @@ h1 .star{color:var(--glow);}
 
 <div id="screen">
   <div class="topbar">
-    <span id="credit">CREDIT&nbsp;01</span>
+    <span id="credit">CREDIT&nbsp;01<span class="demo-tag">&nbsp;&middot;&nbsp;DEMO</span></span>
     <a href="list.html" title="Plain editorial list">▤ PLAIN&nbsp;LIST</a>
   </div>
 
@@ -246,6 +266,8 @@ h1 .star{color:var(--glow);}
   <div class="bar"><i></i></div>
 </div>
 
+<div id="mascot"><div class="mi"></div></div>
+
 <div id="fx"></div>
 
 <script>
@@ -267,6 +289,48 @@ const GAMES = [
   {name:"REPAIR OR REPLACE",  href:"repair-or-replace/", acc:"#9aa7ff", tag:"BIZ", blurb:"One van, four states of wear. Run it, shop it, or buy new: scrap it while it still starts, timing set by γ."},
 ];
 
+/* ---- pixel sprites: one inline-SVG cartridge icon per game ---- *
+ *  Each sprite is a grid of single-char rows; PX maps char to colour *
+ *  ('.' = transparent). spriteSVG() rasterises it to <rect> pixels.  */
+const SPR=['robot','reel7','ghost','target','trophy','ladder','pokeball','tag','die5','bars','heart','van'];
+const PX={'.':null,K:'#0b0b16',W:'#f4f6ff',R:'#ff4d5e',r:'#c0202e',G:'#6be24a',g:'#1f9a52',
+  B:'#41a6ff',b:'#9aa7ff',Y:'#ffd23f',O:'#ff9a3c',P:'#b06bff',C:'#5ad0ff',S:'#c9cee6',s:'#6c7194',N:'#9a6a3c'};
+const SPRITES={
+  robot:[".....R.....",".....K.....","..KKKKKKK..","..KSSSSSK..","..KSSSSSK..",
+         "..KCCSCCK..","..KSSSSSK..","..KSKKKSK..","..KKKKKKK..","...K...K..."],
+  reel7:["..KKKKKKK..","..KYYYYYK..","..KRRRRRK..","..KYYYRYK..","..KYYYRYK..",
+         "..KYYRYYK..","..KYYRYYK..","..KYRYYYK..","..KYYYYYK..","..KKKKKKK.."],
+  ghost:["...KKKKK...","..KPPPPPK..",".KPPPPPPPK.",".KPWWPWWPK.",".KPWWPWWPK.",
+         ".KPPPPPPPK.",".KPPPPPPPK.",".KPPPPPPPK.",".KPPPPPPPK.",".KP..P..PK."],
+  target:["...........","...RRRRR...","..RWWWWWR..",".RWRRRRRWR.",".RWRWWWRWR.",
+          ".RWRWRWRWR.",".RWRWWWRWR.",".RWRRRRRWR.","..RWWWWWR..","...RRRRR...","..........."],
+  trophy:["...........","..KYYYYYK..",".KYYYYYYYK.","KKYYYYYYYKK","K.KYYYYYK.K",
+          "..KYYYYYK..","...KYYYK...","....KYK....","...KKKKK...","..KKKKKKK..","..........."],
+  ladder:["...N...N...","...N...N...","...NNNNN...","...N...N...","...N...N...",
+          "...NNNNN...","...N...N...","...N...N...","...NNNNN...","...N...N...","...N...N..."],
+  pokeball:["...KKKKK...",".KKRRRRRKK.",".KRRRRRRRK.","KRRRRRRRRRK","KRRRWWWRRRK",
+            "KKKKWKWKKKK","KWWWWWWWWWK","KWWWWWWWWWK",".KWWWWWWWK.",".KKWWWWWKK.","...KKKKK..."],
+  tag:["..KKKKKKK..",".KOOOKOOOK.",".KOOOOOOOK.",".KOYYYOOOK.",".KOYOOOOOK.",
+       ".KOYYYOOOK.",".KOOOYOOOK.",".KOYYYOOOK.",".KOOOOOOOK.","..KKKKKKK.."],
+  die5:["..KKKKKKK..",".KWWWWWWWK.",".KWKWWWKWK.",".KWWWWWWWK.",".KWWWKWWWK.",
+        ".KWWWWWWWK.",".KWKWWWKWK.",".KWWWWWWWK.","..KKKKKKK.."],
+  bars:["...........","...........","...........",".......GG..",".......GG..",
+        "....GG.GG..","....GG.GG..",".GG.GG.GG..",".GG.GG.GG..",".GG.GG.GG..","..........."],
+  heart:["...........",".KK...KK...","KRRK.KRRK..","KRRRKRRRK..","KRRRRRRRRK.",
+         "KRRRRRRRRK.",".KRRRRRRK..","..KRRRRK...","...KRRK....","....KK.....","..........."],
+  van:["...........","...KKKKKKK.","..KKWWKbbbK",".KbbbbbbbbK",".KbbbbbbbbK",
+       ".KbbbbbbbbK",".KKKKKKKKK.","..KK...KK..","..KK...KK..","..........."],
+  dog:["............KK",".KK........KSK",".KKKKKKKKKKSCK","KSSSSSSSSSSSSK",
+       "KSSSSSSSSSSSK.","KSSSSSSSSSSSK.",".K.KK..KK.K...",".K.KK..KK.K..."]
+};
+function spriteSVG(id){
+  const g=SPRITES[id]; if(!g) return '';
+  const w=g[0].length, h=g.length; let p='';
+  for(let y=0;y<h;y++){ const row=g[y]; for(let x=0;x<row.length;x++){ const c=PX[row[x]];
+    if(c) p+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+c+'"/>'; } }
+  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="100%" shape-rendering="crispEdges" aria-hidden="true">'+p+'</svg>';
+}
+
 const $ = s => document.querySelector(s);
 const listEl = $('#list'), infoL = $('#info-l'), infoB = $('#info-b');
 let sel = 0, booted = false;
@@ -279,6 +343,7 @@ const startSel = parseInt(qs.get('i'),10);
 if(!isNaN(startSel)) sel = Math.max(0, Math.min(GAMES.length-1, startSel));
 const palQ = qs.get('pal');
 if(['nes','green','amber'].includes(palQ)) document.documentElement.setAttribute('data-pal', palQ);
+const demo = qs.get('demo')==='1';
 
 /* ---- save file: which carts have been opened ---- */
 let visited = {};
@@ -292,9 +357,9 @@ GAMES.forEach((g,i)=>{
   r.innerHTML =
     `<span class="no">${String(i+1).padStart(2,'0')}</span>`+
     `<span class="cur">▶</span>`+
+    `<span class="chip">${spriteSVG(SPR[i])}</span>`+
     `<span class="nm">${g.name}</span>`+
-    `<span class="tag">${visited[g.href]?'★ ':''}${g.tag}</span>`+
-    `<span class="chk">${visited[g.href]?'✓':''}</span>`;
+    `<span class="tag">${visited[g.href]?'✓ ':''}${g.tag}</span>`;
   r.addEventListener('click', ()=>{ if(i===sel) boot(); else { sel=i; paint(); blip(); } });
   listEl.appendChild(r);
 });
@@ -318,7 +383,9 @@ function boot(){
   coin();
   $('#load-n').textContent = g.name;
   $('#load').classList.add('on');
-  setTimeout(()=>{ location.href = g.href; }, reduce ? 250 : 950);
+  // file:// shows a dir listing for "casino/"; target index.html so it works locally and on Pages
+  const dest = g.href + (g.href.endsWith('/') ? 'index.html' : '');
+  setTimeout(()=>{ location.href = dest; }, reduce ? 250 : 950);
 }
 
 /* ------------------------------ audio ----------------------------- *
@@ -349,10 +416,21 @@ function cyclePal(){
   paint(); blip();
 }
 
-/* ---- idle attract ---- */
-let idleT=null;
-function resetIdle(){ clearTimeout(idleT); document.body.classList.remove('attract');
-  idleT=setTimeout(()=>document.body.classList.add('attract'), 22000); }
+/* ---- idle attract / demo mode ---- */
+let idleT=null, attractTimer=null;
+function enterAttract(){
+  if(reduce || !booted) return;
+  document.body.classList.add('attract');
+  attractTimer=setInterval(()=>{ sel=(sel+1)%GAMES.length; paint(); }, 1500);
+}
+function exitAttract(){
+  document.body.classList.remove('attract');
+  if(attractTimer){ clearInterval(attractTimer); attractTimer=null; }
+}
+function resetIdle(){
+  exitAttract(); clearTimeout(idleT);
+  if(!reduce) idleT=setTimeout(enterAttract, 18000);
+}
 
 /* ---- dismiss boot ---- */
 function dismissBoot(){
@@ -437,9 +515,11 @@ function secret(){
 }
 
 /* ---- go ---- */
-['keydown','pointerdown','touchstart'].forEach(ev=>addEventListener(ev, resetIdle, {passive:true}));
+$('#mascot .mi').innerHTML = spriteSVG('dog');
+['keydown','pointerdown','touchstart','mousemove'].forEach(ev=>addEventListener(ev, resetIdle, {passive:true}));
 paint();
 if(booted) resetIdle();
+if(demo){ booted=true; $('#boot').style.display='none'; enterAttract(); }
 </script>
 </body>
 </html>
