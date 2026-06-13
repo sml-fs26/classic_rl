@@ -1,7 +1,9 @@
 % ===== shared Beamer preamble: light Metropolis, standard LaTeX fonts =====
 % Projection-friendly variant: LIGHT background, DARK text (dark-on-light
-% projects reliably; light-on-dark washes out on real projectors), and the
-% standard Latin Modern / Computer Modern fonts instead of Fira.
+% projects reliably; light-on-dark washes out on real projectors), and
+% Computer Modern Bright, a light sans from the Computer Modern family whose
+% MATH is also sans, so formulas and text share one voice. (Chosen over
+% Latin Modern Sans, LM Roman, Helvetica, and Source Sans in a font audition.)
 %
 % Engine: pdflatex (no fontspec needed with standard fonts). lualatex also
 % works but is not required.
@@ -16,8 +18,8 @@
 % segment, e.g. \draw (a) -- (b). Use a comma, colon, parentheses, or "to".
 
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usefonttheme[onlymath]{serif}   % math in the classic Computer Modern italic
+\usepackage{cmbright}              % Computer Modern Bright: light sans, with matching sans math
+\usefonttheme{professionalfonts}  % let cmbright own the math, do not let beamer override it
 
 \usetheme{metropolis}
 \metroset{

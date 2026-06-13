@@ -483,7 +483,7 @@
     \uncover<3->{{\color{muted}\footnotesize priced from your own card wall: $q(s_{i+1}, a_{i+1})$ stands in for the unknown $Q^\star$ (the NPV move)}}%
   }
   \formulaslot{0.6cm}{%
-    \uncover<7->{\footnotesize $\alpha = 0.15$, constant
+    \uncover<7->{\scriptsize $\alpha = 0.15$, constant
       \ {\color{muted}$\cdot$} \ $\varepsilon = 0.15$: a random call in $15\%$ of weeks
       \ {\color{muted}$\cdot$} \ $a_{i+1}$: actually executed, never a max}%
   }
@@ -517,15 +517,15 @@
         \node[gridcell, minimum width=1.5cm, minimum height=0.66cm] at (8.6,\y) {$0$};
         \node[gridcell, minimum width=1.5cm, minimum height=0.66cm] at (10.2,\y) {$0$};
       }
-      \node[text=muted] at (2.6,-1.16) {twelve guesses, all start at $0$};}%
-    \only<5->{\node[text=muted] at (2.6,-1.9) {one cell moves, eleven stay put};}%
+      \node[text=muted, font=\scriptsize] at (2.5,-1.16) {twelve guesses, all start at $0$};}%
+    \only<5->{\node[text=muted, font=\scriptsize] at (2.5,-1.9) {one cell moves, eleven stay put};}%
     \only<6->{%
       \draw[draw=good, line width=1.4pt, rounded corners=3pt] (6.22,-1.52) rectangle (7.78,-0.80);
       \draw[draw=good, line width=1.4pt, rounded corners=3pt] (7.82,-2.18) rectangle (9.38,-1.46);
-      \draw[draw=good, line width=1.4pt, rounded corners=3pt] (9.42,-2.84) rectangle (10.98,-2.12);
-      \draw[draw=good, line width=1.4pt, rounded corners=3pt] (9.42,-3.50) rectangle (10.98,-2.78);
-      \node[text=good] at (2.6,-2.64) {a few hundred weeks later:};
-      \node[text=good] at (2.6,-3.14) {the three bands emerge};}%
+      \draw[draw=good, line width=1.4pt, rounded corners=3pt] (9.42,-2.75) rectangle (10.98,-2.12);
+      \draw[draw=good, line width=1.4pt, rounded corners=3pt] (9.42,-3.50) rectangle (10.98,-2.87);
+      \node[text=good, font=\scriptsize] at (2.5,-2.64) {a few hundred weeks later:};
+      \node[text=good, font=\scriptsize] at (2.5,-3.14) {the three bands emerge};}%
     \only<7->{\node[text=accent] at (5.5,-3.85)
       {the cells settle below $Q^\star$ and keep jittering, but each row keeps the right call};}%
   \end{tikzpicture}
