@@ -1,9 +1,9 @@
 % ===== shared Beamer preamble: light Metropolis, standard LaTeX fonts =====
 % Projection-friendly variant: LIGHT background, DARK text (dark-on-light
 % projects reliably; light-on-dark washes out on real projectors), and
-% Computer Modern Bright, a light sans from the Computer Modern family whose
-% MATH is also sans, so formulas and text share one voice. (Chosen over
-% Latin Modern Sans, LM Roman, Helvetica, and Source Sans in a font audition.)
+% Libertinus, an elegant old-style book serif whose matching Libertinus Math
+% gives text and formulas one consistent voice. (Chosen from a font audition
+% over Lato, Open Sans, Noto Sans, Carlito, Roboto, XCharter, and Palatino.)
 %
 % Engine: pdflatex (no fontspec needed with standard fonts). lualatex also
 % works but is not required.
@@ -18,8 +18,8 @@
 % segment, e.g. \draw (a) -- (b). Use a comma, colon, parentheses, or "to".
 
 \usepackage[T1]{fontenc}
-\usepackage{cmbright}              % Computer Modern Bright: light sans, with matching sans math
-\usefonttheme{professionalfonts}  % let cmbright own the math, do not let beamer override it
+\usepackage{libertinus}   % Libertinus Serif + Biolinum + matching Libertinus Math
+\usefonttheme{serif}      % body and headings in the serif (math already follows libertinus)
 
 \usetheme{metropolis}
 \metroset{
