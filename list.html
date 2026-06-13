@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Classic RL · seven visualizations</title>
+  <style>
+    :root {
+      --bg: #f9f7f1;
+      --ink: #1a1a1a;
+      --ink-secondary: #6b6b6b;
+      --rule: #d8d4ca;
+      --card-bg: #ffffff;
+      --accent: #b8323a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #181612;
+        --ink: #ece7d9;
+        --ink-secondary: #8a8579;
+        --rule: #383530;
+        --card-bg: #211e19;
+        --accent: #d77078;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 48px 24px 64px;
+    }
+    header {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 18px;
+      margin-bottom: 30px;
+    }
+    .brand {
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ink-secondary);
+      margin-bottom: 6px;
+    }
+    h1 {
+      font-family: "Iowan Old Style", Palatino, Georgia, serif;
+      font-weight: 500;
+      font-size: 32px;
+      margin: 0 0 6px;
+      letter-spacing: -0.01em;
+    }
+    .lede {
+      font-family: "Iowan Old Style", Palatino, Georgia, serif;
+      font-style: italic;
+      color: var(--ink-secondary);
+      font-size: 16.5px;
+      margin: 0 0 4px;
+      max-width: 64ch;
+    }
+    ol.viz-list {
+      list-style: none;
+      padding: 0;
+      margin: 24px 0 0;
+      counter-reset: viz;
+    }
+    li.viz {
+      counter-increment: viz;
+      padding: 18px 4px;
+      border-bottom: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 16px;
+      align-items: baseline;
+    }
+    li.viz::before {
+      content: counter(viz);
+      font-family: "SF Mono", Menlo, monospace;
+      font-size: 13px;
+      color: var(--ink-secondary);
+    }
+    .viz-body h2 {
+      font-family: "Iowan Old Style", Palatino, Georgia, serif;
+      font-weight: 500;
+      font-size: 19px;
+      margin: 0 0 4px;
+    }
+    .viz-body h2 a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+    .viz-body h2 a:hover {
+      border-bottom-color: var(--accent);
+    }
+    .viz-body p {
+      margin: 0;
+      color: var(--ink-secondary);
+      font-size: 15px;
+    }
+    .viz-cta {
+      font-family: "SF Mono", Menlo, monospace;
+      font-size: 12px;
+      color: var(--ink-secondary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .viz-cta a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .viz-cta a:hover { text-decoration: underline; }
+    footer {
+      margin-top: 36px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      font-size: 12px;
+      color: var(--ink-secondary);
+      font-style: italic;
+      font-family: "Iowan Old Style", Palatino, Georgia, serif;
+    }
+    @media (max-width: 720px) {
+      .wrap { padding: 24px 16px 48px; }
+      h1 { font-size: 24px; line-height: 1.2; }
+      .lede { font-size: 15px; }
+      li.viz {
+        grid-template-columns: 22px 1fr;
+        gap: 10px;
+        padding: 14px 0;
+      }
+      .viz-cta { grid-column: 2; padding-top: 4px; }
+      .viz-body h2 { font-size: 17px; }
+      .viz-body p { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">SML &middot; Reinforcement Learning &middot; <a href="index.html" style="color:inherit;">&#8617; arcade start screen</a></div>
+      <h1>Classic RL visualizations</h1>
+      <p class="lede">A short curriculum: from the MDP framework, through the explore-exploit dilemma and the Bellman recursion, to a SARSA agent learning a small cliff-walk by itself, and finally a pair of integrative reviews — Snakes &amp; Ladders for the abstract board, a classic Pokemon battle for the cultural one. Below the curriculum, a <strong>manager-facing gallery</strong> reframes the same RL bones (MDP, policy, return, Q*, Bellman, DP, SARSA) as everyday business decisions, for an audience with little programming background. Each viz is a single click-step page; press <kbd>t</kbd> for theme, <kbd>←</kbd>/<kbd>→</kbd> to navigate scenes.</p>
+    </header>
+
+    <ol class="viz-list">
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="anymal-mdp/">ANYmal MDP — first contact</a></h2>
+          <p>Manually drive ANYmal on a 4×7 grid. State, action, transition, reward — the four operational pieces of an MDP, named on screen.</p>
+        </div>
+        <div class="viz-cta"><a href="anymal-mdp/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="casino/">Casino — explore / exploit</a></h2>
+          <p>Five slot machines, hidden win probabilities. Pull manually, then watch ε-greedy and decaying ε learn to balance trying things against using what's been learned.</p>
+        </div>
+        <div class="viz-cta"><a href="casino/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="spooky-house/">Spooky House — Bellman</a></h2>
+          <p>A 5×5 grid with per-cell rewards. Compute the optimal value function with one backward sweep, read the policy off V, then add γ and watch the path bend.</p>
+        </div>
+        <div class="viz-cta"><a href="spooky-house/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="darts/">Darts in the dark — Robbins-Monro</a></h2>
+          <p>Throw darts at a target you can't see. Track an estimate that updates online, and feel the trade-off between learning rate and stability.</p>
+        </div>
+        <div class="viz-cta"><a href="darts/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="sarsa-anymal/">SARSA — the capstone</a></h2>
+          <p>The four prior pieces fuse into one update rule. Watch a 21-state Q-table fill in across episodes on a small column-patrol cliff-walk.</p>
+        </div>
+        <div class="viz-cta"><a href="sarsa-anymal/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="snakes-ladders/">Snakes &amp; Ladders — integrative review</a></h2>
+          <p>A children’s game is an MDP. The whole curriculum, replayed on one board: roll dice manually, watch value iteration converge on cycles, slide γ, then let SARSA learn it from scratch.</p>
+        </div>
+        <div class="viz-cta"><a href="snakes-ladders/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="pokemon-battle/">Pokemon battle — a wild CHARMANDER appeared!</a></h2>
+          <p>A wild CHARMANDER appeared! Same RL lesson, classic Pokemon palette. Pikachu battles Charmander; Bellman, γ, ε-greedy and SARSA each play their role under a Gen-1 Red/Blue battle screen.</p>
+        </div>
+        <div class="viz-cta"><a href="pokemon-battle/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="last-minute-pricing/">Manager gallery: Last-Minute Pricing</a></h2>
+          <p>Perishable stock, a midnight deadline. Each day you set a price (premium, standard, or fire-sale), the demand draw decides how many sell, and unsold units expire worthless. The best price flips across a board of inventory by days-left: the whole revenue-management surface as an MDP, learned by DP and then by SARSA.</p>
+        </div>
+        <div class="viz-cta"><a href="last-minute-pricing/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="press-your-luck/">Manager gallery: Press Your Luck</a></h2>
+          <p>Roll to grow a pot or bank it before a 1 wipes it out, racing a rival to the finish. The optimal call flips on the scoreboard: push your luck when behind, protect the lead when ahead. The Pig dice game as an MDP, with the same DP-then-SARSA arc.</p>
+        </div>
+        <div class="viz-cta"><a href="press-your-luck/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="pipeline-climb/">Manager gallery: Pipeline Climb</a></h2>
+          <p>A lead climbs from cold to hot across five rungs; you nurture, demo, or hard-close. Push too hard too early and the deal slides back down. The same close lever is worth +29 when the lead is READY and actively destructive when it is COLD: the optimal play depends on the stage, learned by DP and then by SARSA.</p>
+        </div>
+        <div class="viz-cta"><a href="pipeline-climb/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="churn-rescue/">Manager gallery: Churn Rescue</a></h2>
+          <p>An account is cooling and the renewal clock is ticking; do nothing, send a cheap check-in, or spend a deep discount. The right lever shifts with both engagement and months-left, including a notch where an at-risk account with runway prefers the cheap touch over the discount. Retention ROI as an MDP.</p>
+        </div>
+        <div class="viz-cta"><a href="churn-rescue/">open →</a></div>
+      </li>
+
+      <li class="viz">
+        <div class="viz-body">
+          <h2><a href="repair-or-replace/">Manager gallery: Repair or Replace</a></h2>
+          <p>One van, four states of wear; run it, shop it, or buy new. The optimal call splits into three bands and scraps the van <em>while it still starts</em>, and how early depends on your patience (gamma). Asset replacement as an MDP, solved by DP then SARSA.</p>
+        </div>
+        <div class="viz-cta"><a href="repair-or-replace/">open →</a></div>
+      </li>
+    </ol>
+
+    <footer>
+      Source: <a href="https://github.com/sml-fs26/classic_rl" style="color: inherit;">github.com/sml-fs26/classic_rl</a>. Each viz is browser-only, no build step. KaTeX vendored per folder.
+    </footer>
+  </div>
+</body>
+</html>

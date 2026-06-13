@@ -1,256 +1,445 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-pal="nes">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Classic RL · seven visualizations</title>
-  <style>
-    :root {
-      --bg: #f9f7f1;
-      --ink: #1a1a1a;
-      --ink-secondary: #6b6b6b;
-      --rule: #d8d4ca;
-      --card-bg: #ffffff;
-      --accent: #b8323a;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #181612;
-        --ink: #ece7d9;
-        --ink-secondary: #8a8579;
-        --rule: #383530;
-        --card-bg: #211e19;
-        --accent: #d77078;
-      }
-    }
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.55;
-    }
-    .wrap {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 48px 24px 64px;
-    }
-    header {
-      border-bottom: 1px solid var(--rule);
-      padding-bottom: 18px;
-      margin-bottom: 30px;
-    }
-    .brand {
-      font-size: 12px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--ink-secondary);
-      margin-bottom: 6px;
-    }
-    h1 {
-      font-family: "Iowan Old Style", Palatino, Georgia, serif;
-      font-weight: 500;
-      font-size: 32px;
-      margin: 0 0 6px;
-      letter-spacing: -0.01em;
-    }
-    .lede {
-      font-family: "Iowan Old Style", Palatino, Georgia, serif;
-      font-style: italic;
-      color: var(--ink-secondary);
-      font-size: 16.5px;
-      margin: 0 0 4px;
-      max-width: 64ch;
-    }
-    ol.viz-list {
-      list-style: none;
-      padding: 0;
-      margin: 24px 0 0;
-      counter-reset: viz;
-    }
-    li.viz {
-      counter-increment: viz;
-      padding: 18px 4px;
-      border-bottom: 1px solid var(--rule);
-      display: grid;
-      grid-template-columns: 28px 1fr auto;
-      gap: 16px;
-      align-items: baseline;
-    }
-    li.viz::before {
-      content: counter(viz);
-      font-family: "SF Mono", Menlo, monospace;
-      font-size: 13px;
-      color: var(--ink-secondary);
-    }
-    .viz-body h2 {
-      font-family: "Iowan Old Style", Palatino, Georgia, serif;
-      font-weight: 500;
-      font-size: 19px;
-      margin: 0 0 4px;
-    }
-    .viz-body h2 a {
-      color: var(--ink);
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-    }
-    .viz-body h2 a:hover {
-      border-bottom-color: var(--accent);
-    }
-    .viz-body p {
-      margin: 0;
-      color: var(--ink-secondary);
-      font-size: 15px;
-    }
-    .viz-cta {
-      font-family: "SF Mono", Menlo, monospace;
-      font-size: 12px;
-      color: var(--ink-secondary);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .viz-cta a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    .viz-cta a:hover { text-decoration: underline; }
-    footer {
-      margin-top: 36px;
-      padding-top: 16px;
-      border-top: 1px solid var(--rule);
-      font-size: 12px;
-      color: var(--ink-secondary);
-      font-style: italic;
-      font-family: "Iowan Old Style", Palatino, Georgia, serif;
-    }
-    @media (max-width: 720px) {
-      .wrap { padding: 24px 16px 48px; }
-      h1 { font-size: 24px; line-height: 1.2; }
-      .lede { font-size: 15px; }
-      li.viz {
-        grid-template-columns: 22px 1fr;
-        gap: 10px;
-        padding: 14px 0;
-      }
-      .viz-cta { grid-column: 2; padding-top: 4px; }
-      .viz-body h2 { font-size: 17px; }
-      .viz-body p { font-size: 14px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0b2a">
+<title>CLASSIC RL · 12-IN-1 · SML reinforcement learning</title>
+
+<!--
+  Arcade front door for the SML reinforcement-learning visualizations.
+  A retro Nintendo "multicart" game-select screen: all 12 viz as one
+  cartridge, navigate with the d-pad, press START to boot.  This page is the
+  attract layer that sits IN FRONT of the editorial pages; each viz keeps its
+  own styling inside.  The plain editorial list is preserved at list.html.
+
+  Self-contained, browser-only, no build step.  Only external asset is the
+  pixel font, vendored at assets/fonts/ (copied from the per-viz folders).
+  Cross-viz hue identities (anymal-red, casino-blue, ghost-purple, star-amber,
+  door-green …) are reused as per-cartridge accents for continuity.
+-->
+
+<style>
+@font-face{
+  font-family:'Press Start 2P';
+  src:url('assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+  font-display:block;            /* pixel font: never flash a fallback serif */
+  font-weight:400; font-style:normal;
+}
+
+/* ---------- palettes (T cycles: NES colour / Game-Boy green / amber) ------- */
+:root{
+  --px:'Press Start 2P', monospace;
+  --mono:'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+  --bg0:#070718; --bg1:#0b0b2a; --frame:#1b1b54;
+  --ink:#eef0ff; --dim:#8a93d8; --glow:#5ad0ff; --hot:#ff4d6d;
+  --row:#11113a; --phos:#5ad0ff; --acc:#5ad0ff;
+}
+:root[data-pal="green"]{
+  --bg0:#04140a; --bg1:#0a2010; --frame:#13361c;
+  --ink:#c6ffbf; --dim:#4f9a49; --glow:#9bff7a; --hot:#e8ff7a;
+  --row:#0c2613; --phos:#9bff7a;
+}
+:root[data-pal="amber"]{
+  --bg0:#170d02; --bg1:#221405; --frame:#3a260a;
+  --ink:#ffd789; --dim:#a9803a; --glow:#ffb84d; --hot:#ff7a3c;
+  --row:#241606; --phos:#ffb84d;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+body{
+  background:radial-gradient(120% 120% at 50% 8%,var(--bg1),var(--bg0) 70%);
+  color:var(--ink);
+  font-family:var(--px);
+  -webkit-font-smoothing:none;
+  image-rendering:pixelated;
+  overflow:hidden;
+  user-select:none;
+  text-shadow:0 0 6px color-mix(in srgb,var(--glow) 35%,transparent);
+}
+
+/* CRT overlays (scanlines + vignette + flicker), above content, no clicks */
+.crt::before,.crt::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;}
+.crt::before{
+  background:repeating-linear-gradient(0deg,
+    rgba(0,0,0,.32) 0, rgba(0,0,0,.32) 1px, transparent 2px, transparent 3px);
+  mix-blend-mode:multiply;
+}
+.crt::after{
+  background:radial-gradient(130% 130% at 50% 50%,transparent 60%,rgba(0,0,0,.45) 100%);
+  animation:flick 5.5s infinite steps(60);
+}
+@keyframes flick{0%,97%{opacity:1}98%{opacity:.85}99%{opacity:.97}100%{opacity:1}}
+
+/* ---------- layout ---------- */
+#screen{
+  position:relative;z-index:5;height:100%;
+  display:flex;flex-direction:column;
+  max-width:760px;margin:0 auto;
+  padding:max(18px,env(safe-area-inset-top)) 20px max(14px,env(safe-area-inset-bottom));
+}
+
+/* top bar */
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  font-size:9px;color:var(--dim);letter-spacing:.06em;}
+.topbar a{color:var(--glow);text-decoration:none;
+  border:1px solid color-mix(in srgb,var(--glow) 45%,transparent);
+  padding:5px 7px;border-radius:2px;}
+.topbar a:hover{color:var(--ink);border-color:var(--glow);}
+
+/* marquee / title */
+header{text-align:center;margin:8px 0 6px;}
+.subA{font-size:9px;color:var(--dim);letter-spacing:.34em;margin-bottom:8px;}
+h1{margin:0;font-size:clamp(20px,7vw,40px);line-height:1.18;
+  color:var(--ink);letter-spacing:.02em;overflow-wrap:anywhere;
+  text-shadow:0 2px 0 var(--frame),0 0 16px color-mix(in srgb,var(--glow) 60%,transparent);}
+h1 .star{color:var(--glow);}
+.badge{display:inline-block;margin-top:8px;font-size:11px;color:var(--bg0);
+  background:var(--glow);padding:6px 12px;border-radius:2px;letter-spacing:.18em;
+  box-shadow:0 0 14px color-mix(in srgb,var(--glow) 70%,transparent);}
+
+/* the cartridge list */
+.list{flex:1;min-height:0;overflow:auto;margin:10px 0 8px;
+  display:flex;flex-direction:column;justify-content:safe center;
+  border-top:2px solid var(--frame);border-bottom:2px solid var(--frame);
+  padding:6px 0;scrollbar-width:thin;}
+.row{display:grid;grid-template-columns:30px 18px 1fr auto;gap:10px;align-items:center;
+  padding:6px 10px;font-size:12px;color:var(--dim);cursor:pointer;
+  border-left:4px solid transparent;}
+.row .no{font-size:10px;color:var(--dim);}
+.row .cur{color:var(--glow);visibility:hidden;}
+.row .nm{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.row .tag{font-size:8px;color:var(--dim);letter-spacing:.12em;}
+.row .chk{font-size:11px;color:var(--phos);width:12px;text-align:center;}
+.row:hover{color:var(--ink);background:color-mix(in srgb,var(--frame) 40%,transparent);}
+.row.sel{
+  background:var(--acc);border-left-color:#000;
+  color:#06061a;text-shadow:none;
+}
+:root[data-pal="green"] .row.sel,:root[data-pal="amber"] .row.sel{
+  background:var(--phos);                 /* monochrome CRT modes */
+}
+.row.sel .no,.row.sel .nm,.row.sel .tag,.row.sel .chk{color:#06061a;}
+.row.sel .cur{visibility:visible;color:#06061a;animation:blink 1s steps(2) infinite;}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+/* info strip: describes the highlighted cartridge */
+.info{min-height:52px;padding:10px 12px;border-left:5px solid var(--acc);
+  background:color-mix(in srgb,var(--frame) 34%,transparent);}
+:root[data-pal="green"] .info,:root[data-pal="amber"] .info{border-left-color:var(--phos);}
+.info .il{font-size:10px;color:var(--acc);letter-spacing:.1em;margin-bottom:6px;}
+:root[data-pal="green"] .info .il,:root[data-pal="amber"] .info .il{color:var(--phos);}
+.info .ib{font-family:var(--mono);font-size:13px;line-height:1.5;color:var(--ink);
+  text-shadow:none;letter-spacing:0;}
+
+/* footer hint bar */
+.hints{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;
+  font-size:9px;color:var(--dim);letter-spacing:.06em;}
+.hints b{color:var(--glow);}
+.start{margin-top:12px;text-align:center;}
+.start button{font-family:var(--px);font-size:12px;letter-spacing:.16em;
+  color:var(--bg0);background:var(--hot);border:0;padding:11px 22px;border-radius:3px;
+  cursor:pointer;box-shadow:0 0 16px color-mix(in srgb,var(--hot) 65%,transparent);
+  animation:pyl 1.4s ease-in-out infinite;}
+@keyframes pyl{50%{transform:scale(1.05)}}
+
+/* ---------- boot overlay ---------- */
+#boot{position:fixed;inset:0;z-index:80;background:#000;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;}
+#boot .flash{position:absolute;inset:0;background:#fff;animation:poweron 1s ease-out forwards;}
+@keyframes poweron{0%{opacity:0}6%{opacity:.9}9%{transform:scaleY(.004);opacity:1}
+  16%{transform:scaleY(.004)}40%{transform:scaleY(1);opacity:.25}100%{opacity:0}}
+#boot h2{font-size:clamp(22px,8vw,48px);color:var(--ink);margin:0;opacity:0;
+  animation:rise .7s .85s ease-out forwards;
+  text-shadow:0 0 18px var(--glow);}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.9)}to{opacity:1;transform:none}}
+#boot .pb{margin-top:26px;font-size:11px;color:var(--glow);opacity:0;
+  animation:fadein .4s 1.9s forwards,blink 1s 2.2s steps(2) infinite;letter-spacing:.2em;}
+#boot .cp{position:absolute;bottom:26px;font-size:8px;color:var(--dim);letter-spacing:.1em;}
+@keyframes fadein{to{opacity:1}}
+
+/* ---------- loading overlay ---------- */
+#load{position:fixed;inset:0;z-index:85;background:#000;display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+#load.on{display:flex;}
+#load .lt{font-size:13px;color:var(--glow);letter-spacing:.18em;}
+#load .ln{font-size:11px;color:var(--ink);}
+#load .bar{width:min(70vw,320px);height:16px;border:2px solid var(--glow);padding:2px;}
+#load .bar i{display:block;height:100%;width:0;background:var(--glow);
+  box-shadow:0 0 12px var(--glow);animation:fill .9s linear forwards;}
+@keyframes fill{to{width:100%}}
+
+/* falling-sprite easter egg layer */
+#fx{position:fixed;inset:0;z-index:70;pointer-events:none;overflow:hidden;}
+.spr{position:absolute;top:-30px;font-size:16px;color:var(--glow);
+  animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(112vh) rotate(360deg);opacity:.2}}
+
+/* responsive */
+@media (max-width:560px){
+  #screen{padding-left:12px;padding-right:12px;}
+  h1{font-size:clamp(16px,5.4vw,26px);letter-spacing:0;max-width:100%;}
+  h1 .star{display:none;}              /* stars push the line past the viewport */
+  .subA{letter-spacing:.14em;font-size:8px;}
+  .topbar{font-size:8px;}
+  .topbar a{padding:4px 6px;}
+  .row{grid-template-columns:24px 14px 1fr auto;gap:7px;font-size:11px;padding:6px 6px;}
+  .row .tag{display:none;}
+  .info{min-height:46px;}
+  .info .ib{font-size:12px;}
+}
+@media (max-height:620px){ header{margin:8px 0 4px;} .badge{margin-top:8px;} }
+
+/* respect reduced motion */
+@media (prefers-reduced-motion:reduce){
+  .crt::after,.start button,#boot .flash,#boot h2,#boot .pb{animation:none!important;}
+  .row.sel .cur{animation:none;visibility:visible;}
+  #load .bar i{animation:none;width:100%;}
+}
+</style>
 </head>
-<body>
-  <div class="wrap">
-    <header>
-      <div class="brand">SML &middot; Reinforcement Learning</div>
-      <h1>Classic RL visualizations</h1>
-      <p class="lede">A short curriculum: from the MDP framework, through the explore-exploit dilemma and the Bellman recursion, to a SARSA agent learning a small cliff-walk by itself, and finally a pair of integrative reviews — Snakes &amp; Ladders for the abstract board, a classic Pokemon battle for the cultural one. Below the curriculum, a <strong>manager-facing gallery</strong> reframes the same RL bones (MDP, policy, return, Q*, Bellman, DP, SARSA) as everyday business decisions, for an audience with little programming background. Each viz is a single click-step page; press <kbd>t</kbd> for theme, <kbd>←</kbd>/<kbd>→</kbd> to navigate scenes.</p>
-    </header>
 
-    <ol class="viz-list">
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="anymal-mdp/">ANYmal MDP — first contact</a></h2>
-          <p>Manually drive ANYmal on a 4×7 grid. State, action, transition, reward — the four operational pieces of an MDP, named on screen.</p>
-        </div>
-        <div class="viz-cta"><a href="anymal-mdp/">open →</a></div>
-      </li>
+<body class="crt">
 
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="casino/">Casino — explore / exploit</a></h2>
-          <p>Five slot machines, hidden win probabilities. Pull manually, then watch ε-greedy and decaying ε learn to balance trying things against using what's been learned.</p>
-        </div>
-        <div class="viz-cta"><a href="casino/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="spooky-house/">Spooky House — Bellman</a></h2>
-          <p>A 5×5 grid with per-cell rewards. Compute the optimal value function with one backward sweep, read the policy off V, then add γ and watch the path bend.</p>
-        </div>
-        <div class="viz-cta"><a href="spooky-house/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="darts/">Darts in the dark — Robbins-Monro</a></h2>
-          <p>Throw darts at a target you can't see. Track an estimate that updates online, and feel the trade-off between learning rate and stability.</p>
-        </div>
-        <div class="viz-cta"><a href="darts/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="sarsa-anymal/">SARSA — the capstone</a></h2>
-          <p>The four prior pieces fuse into one update rule. Watch a 21-state Q-table fill in across episodes on a small column-patrol cliff-walk.</p>
-        </div>
-        <div class="viz-cta"><a href="sarsa-anymal/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="snakes-ladders/">Snakes &amp; Ladders — integrative review</a></h2>
-          <p>A children’s game is an MDP. The whole curriculum, replayed on one board: roll dice manually, watch value iteration converge on cycles, slide γ, then let SARSA learn it from scratch.</p>
-        </div>
-        <div class="viz-cta"><a href="snakes-ladders/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="pokemon-battle/">Pokemon battle — a wild CHARMANDER appeared!</a></h2>
-          <p>A wild CHARMANDER appeared! Same RL lesson, classic Pokemon palette. Pikachu battles Charmander; Bellman, γ, ε-greedy and SARSA each play their role under a Gen-1 Red/Blue battle screen.</p>
-        </div>
-        <div class="viz-cta"><a href="pokemon-battle/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="last-minute-pricing/">Manager gallery: Last-Minute Pricing</a></h2>
-          <p>Perishable stock, a midnight deadline. Each day you set a price (premium, standard, or fire-sale), the demand draw decides how many sell, and unsold units expire worthless. The best price flips across a board of inventory by days-left: the whole revenue-management surface as an MDP, learned by DP and then by SARSA.</p>
-        </div>
-        <div class="viz-cta"><a href="last-minute-pricing/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="press-your-luck/">Manager gallery: Press Your Luck</a></h2>
-          <p>Roll to grow a pot or bank it before a 1 wipes it out, racing a rival to the finish. The optimal call flips on the scoreboard: push your luck when behind, protect the lead when ahead. The Pig dice game as an MDP, with the same DP-then-SARSA arc.</p>
-        </div>
-        <div class="viz-cta"><a href="press-your-luck/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="pipeline-climb/">Manager gallery: Pipeline Climb</a></h2>
-          <p>A lead climbs from cold to hot across five rungs; you nurture, demo, or hard-close. Push too hard too early and the deal slides back down. The same close lever is worth +29 when the lead is READY and actively destructive when it is COLD: the optimal play depends on the stage, learned by DP and then by SARSA.</p>
-        </div>
-        <div class="viz-cta"><a href="pipeline-climb/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="churn-rescue/">Manager gallery: Churn Rescue</a></h2>
-          <p>An account is cooling and the renewal clock is ticking; do nothing, send a cheap check-in, or spend a deep discount. The right lever shifts with both engagement and months-left, including a notch where an at-risk account with runway prefers the cheap touch over the discount. Retention ROI as an MDP.</p>
-        </div>
-        <div class="viz-cta"><a href="churn-rescue/">open →</a></div>
-      </li>
-
-      <li class="viz">
-        <div class="viz-body">
-          <h2><a href="repair-or-replace/">Manager gallery: Repair or Replace</a></h2>
-          <p>One van, four states of wear; run it, shop it, or buy new. The optimal call splits into three bands and scraps the van <em>while it still starts</em>, and how early depends on your patience (gamma). Asset replacement as an MDP, solved by DP then SARSA.</p>
-        </div>
-        <div class="viz-cta"><a href="repair-or-replace/">open →</a></div>
-      </li>
-    </ol>
-
-    <footer>
-      Source: <a href="https://github.com/sml-fs26/classic_rl" style="color: inherit;">github.com/sml-fs26/classic_rl</a>. Each viz is browser-only, no build step. KaTeX vendored per folder.
-    </footer>
+<div id="screen">
+  <div class="topbar">
+    <span id="credit">CREDIT&nbsp;01</span>
+    <a href="list.html" title="Plain editorial list">▤ PLAIN&nbsp;LIST</a>
   </div>
+
+  <header>
+    <div class="subA">SML · REINFORCEMENT LEARNING</div>
+    <h1><span class="star">★</span> CLASSIC RL <span class="star">★</span></h1>
+    <span class="badge">12 - IN - 1</span>
+  </header>
+
+  <div class="list" id="list" role="listbox" aria-label="Select a visualization"></div>
+
+  <div class="info" id="info">
+    <div class="il" id="info-l">NO. 01 · ANYMAL MDP</div>
+    <div class="ib" id="info-b">Drive the robot dog by hand. Meet state, action, transition, reward.</div>
+  </div>
+
+  <div class="hints">
+    <span><b>↑↓</b> SELECT</span>
+    <span><b>⏎ / A</b> START</span>
+    <span><b>T</b> SCREEN</span>
+    <span><b>↑↑↓↓←→←→BA</b> ?</span>
+  </div>
+  <div class="start"><button id="startbtn">▶ PUSH START</button></div>
+</div>
+
+<!-- boot intro -->
+<div id="boot">
+  <div class="flash"></div>
+  <h2><span style="color:var(--glow)">★</span> CLASSIC&nbsp;RL</h2>
+  <div class="pb">PRESS ⏎ / TAP TO START</div>
+  <div class="cp">© 2026 NINTEN... ER, ETH ZÜRICH · SML</div>
+</div>
+
+<!-- boot-into-game loading -->
+<div id="load">
+  <div class="lt">NOW LOADING</div>
+  <div class="ln" id="load-n">...</div>
+  <div class="bar"><i></i></div>
+</div>
+
+<div id="fx"></div>
+
+<script>
+/* ------------------------------------------------------------------ *
+ *  cartridge registry: order = the curriculum, kept as one flat list *
+ * ------------------------------------------------------------------ */
+const GAMES = [
+  {name:"ANYMAL MDP",         href:"anymal-mdp/",        acc:"#e0404a", tag:"RL",  blurb:"Drive the robot dog by hand. Meet state, action, transition, reward: the four pieces of an MDP."},
+  {name:"CASINO",             href:"casino/",            acc:"#3aa0ff", tag:"RL",  blurb:"Five slot machines, hidden odds. Pull by hand, then watch ε-greedy balance explore vs. exploit."},
+  {name:"SPOOKY HOUSE",       href:"spooky-house/",      acc:"#a060ff", tag:"RL",  blurb:"A 5×5 grid of rewards. One backward sweep yields the optimal value; read the policy off V, then bend it with γ."},
+  {name:"DARTS IN THE DARK",  href:"darts/",             acc:"#ffb020", tag:"RL",  blurb:"Throw at a target you can't see. An online estimate converges: feel learning-rate vs. stability."},
+  {name:"SARSA",              href:"sarsa-anymal/",      acc:"#45d27a", tag:"RL",  blurb:"The capstone: four pieces fuse into one update rule. Watch a 21-state Q-table fill across episodes."},
+  {name:"SNAKES & LADDERS",   href:"snakes-ladders/",    acc:"#ff7ad9", tag:"RL",  blurb:"A children's game is an MDP. Roll by hand, watch value iteration converge, slide γ, then let SARSA learn it."},
+  {name:"POKEMON BATTLE",     href:"pokemon-battle/",    acc:"#ffe000", tag:"RL",  blurb:"A wild CHARMANDER appeared! The same RL lesson under a Gen-1 Red/Blue battle screen."},
+  {name:"LAST-MINUTE PRICING",href:"last-minute-pricing/",acc:"#ff8a3c",tag:"BIZ", blurb:"Perishable stock, a midnight deadline. Set a price each day; the revenue-management surface, learned by DP then SARSA."},
+  {name:"PRESS YOUR LUCK",    href:"press-your-luck/",   acc:"#00d0c0", tag:"BIZ", blurb:"Grow the pot or bank it before a 1 wipes it out. Push when behind, protect when ahead; the Pig dice game as an MDP."},
+  {name:"PIPELINE CLIMB",     href:"pipeline-climb/",    acc:"#7ce040", tag:"BIZ", blurb:"A lead climbs cold to hot. Nurture, demo, or close: the same lever is +29 when READY and destructive when COLD."},
+  {name:"CHURN RESCUE",       href:"churn-rescue/",      acc:"#ff5470", tag:"BIZ", blurb:"A cooling account, a ticking renewal clock. Wait, send a cheap touch, or spend a deep discount. Retention ROI as an MDP."},
+  {name:"REPAIR OR REPLACE",  href:"repair-or-replace/", acc:"#9aa7ff", tag:"BIZ", blurb:"One van, four states of wear. Run it, shop it, or buy new: scrap it while it still starts, timing set by γ."},
+];
+
+const $ = s => document.querySelector(s);
+const listEl = $('#list'), infoL = $('#info-l'), infoB = $('#info-b');
+let sel = 0, booted = false;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---- query params: ?boot=0 skips intro (used for screenshots) ---- */
+const qs = new URLSearchParams(location.search);
+if(qs.get('boot') === '0'){ booted = true; $('#boot').style.display='none'; }
+const startSel = parseInt(qs.get('i'),10);
+if(!isNaN(startSel)) sel = Math.max(0, Math.min(GAMES.length-1, startSel));
+const palQ = qs.get('pal');
+if(['nes','green','amber'].includes(palQ)) document.documentElement.setAttribute('data-pal', palQ);
+
+/* ---- save file: which carts have been opened ---- */
+let visited = {};
+try{ visited = JSON.parse(localStorage.getItem('classicrl_visited') || '{}'); }catch(e){}
+
+/* ---- build the list ---- */
+GAMES.forEach((g,i)=>{
+  const r = document.createElement('div');
+  r.className = 'row'; r.dataset.i = i; r.style.setProperty('--acc', g.acc);
+  r.setAttribute('role','option');
+  r.innerHTML =
+    `<span class="no">${String(i+1).padStart(2,'0')}</span>`+
+    `<span class="cur">▶</span>`+
+    `<span class="nm">${g.name}</span>`+
+    `<span class="tag">${visited[g.href]?'★ ':''}${g.tag}</span>`+
+    `<span class="chk">${visited[g.href]?'✓':''}</span>`;
+  r.addEventListener('click', ()=>{ if(i===sel) boot(); else { sel=i; paint(); blip(); } });
+  listEl.appendChild(r);
+});
+
+function paint(){
+  [...listEl.children].forEach((r,i)=>r.classList.toggle('sel', i===sel));
+  const g = GAMES[sel];
+  document.documentElement.style.setProperty('--acc', g.acc);
+  infoL.textContent = `NO. ${String(sel+1).padStart(2,'0')} · ${g.name}`;
+  infoB.textContent = g.blurb;
+  const r = listEl.children[sel];
+  if(r) r.scrollIntoView({block:'nearest'});
+}
+function move(d){ sel = (sel + d + GAMES.length) % GAMES.length; paint(); blip(); resetIdle(); }
+
+/* ---- boot a cartridge ---- */
+function boot(){
+  const g = GAMES[sel];
+  visited[g.href] = 1;
+  try{ localStorage.setItem('classicrl_visited', JSON.stringify(visited)); }catch(e){}
+  coin();
+  $('#load-n').textContent = g.name;
+  $('#load').classList.add('on');
+  setTimeout(()=>{ location.href = g.href; }, reduce ? 250 : 950);
+}
+
+/* ------------------------------ audio ----------------------------- *
+ *  chiptune via Web Audio, no asset files. Unlocked on first gesture *
+ * ------------------------------------------------------------------ */
+let actx=null, muted=false;
+function ac(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ muted=true; } } return actx; }
+function tone(f,d,t='square',when=0,g=0.05){
+  const c=ac(); if(!c||muted) return;
+  const o=c.createOscillator(), v=c.createGain(), now=c.currentTime+when;
+  o.type=t; o.frequency.setValueAtTime(f,now);
+  v.gain.setValueAtTime(0.0001,now);
+  v.gain.exponentialRampToValueAtTime(g,now+0.01);
+  v.gain.exponentialRampToValueAtTime(0.0001,now+d);
+  o.connect(v).connect(c.destination); o.start(now); o.stop(now+d+0.02);
+}
+const blip  =()=>tone(620,0.05,'square',0,0.04);
+const chime =()=>{tone(880,0.06);tone(1320,0.12,'square',0.05);};
+const coin  =()=>{tone(988,0.07,'square',0,0.05);tone(1319,0.32,'square',0.07,0.05);};
+const jingle=()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,0.14,'square',i*0.11,0.045));
+
+/* ---- palette cycle (T) ---- */
+const PALS=['nes','green','amber'];
+function cyclePal(){
+  const cur=document.documentElement.getAttribute('data-pal');
+  const next=PALS[(PALS.indexOf(cur)+1)%PALS.length];
+  document.documentElement.setAttribute('data-pal',next);
+  paint(); blip();
+}
+
+/* ---- idle attract ---- */
+let idleT=null;
+function resetIdle(){ clearTimeout(idleT); document.body.classList.remove('attract');
+  idleT=setTimeout(()=>document.body.classList.add('attract'), 22000); }
+
+/* ---- dismiss boot ---- */
+function dismissBoot(){
+  if(booted) return; booted=true;
+  ac(); jingle();
+  const b=$('#boot'); b.style.transition='opacity .35s'; b.style.opacity='0';
+  setTimeout(()=>b.style.display='none', 360);
+  resetIdle();
+}
+
+/* ---- keyboard ---- */
+const KO=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let kbuf=[];
+addEventListener('keydown', e=>{
+  ac();
+  // konami tracking
+  kbuf.push(e.key.length===1?e.key.toLowerCase():e.key); kbuf=kbuf.slice(-KO.length);
+  if(KO.every((k,i)=>k===kbuf[i])){ secret(); kbuf=[]; }
+
+  if(!booted){
+    if(['Enter',' ','ArrowUp','ArrowDown'].includes(e.key)){ e.preventDefault(); dismissBoot(); }
+    return;
+  }
+  switch(e.key){
+    case 'ArrowUp': case 'k': case 'w': e.preventDefault(); move(-1); break;
+    case 'ArrowDown': case 'j': case 's': e.preventDefault(); move(1); break;
+    case 'Enter': case ' ': case 'x': e.preventDefault(); chime(); boot(); break;
+    case 't': case 'T': cyclePal(); break;
+    case 'Home': sel=0; paint(); blip(); break;
+    case 'End': sel=GAMES.length-1; paint(); blip(); break;
+  }
+});
+
+/* ---- touch / mouse start button + boot overlay ---- */
+$('#startbtn').addEventListener('click', ()=>{ ac(); chime(); boot(); });
+$('#boot').addEventListener('click', dismissBoot);
+$('#boot').addEventListener('touchstart', e=>{ e.preventDefault(); dismissBoot(); }, {passive:false});
+// swipe to move
+let ty=null;
+listEl.addEventListener('touchstart', e=>{ ty=e.touches[0].clientY; }, {passive:true});
+listEl.addEventListener('touchend', e=>{
+  if(ty===null) return; const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dy)>40) move(dy<0?1:-1); ty=null;
+}, {passive:true});
+
+/* ---- gamepad (real controller drives the menu) ---- */
+let gpPrev={}, gpAxis=0;
+addEventListener('gamepadconnected', ()=>{ requestAnimationFrame(pollGP); });
+function pollGP(){
+  const gp=(navigator.getGamepads&&navigator.getGamepads()[0]);
+  if(gp){
+    const up=gp.buttons[12]&&gp.buttons[12].pressed, dn=gp.buttons[13]&&gp.buttons[13].pressed;
+    const a=gp.buttons[0]&&gp.buttons[0].pressed, st=gp.buttons[9]&&gp.buttons[9].pressed;
+    const ay=gp.axes[1]||0;
+    if(!booted){ if(a||st||up||dn) dismissBoot(); }
+    else{
+      if((up||ay<-0.6) && !gpAxis){ move(-1); gpAxis=1; }
+      else if((dn||ay>0.6) && !gpAxis){ move(1); gpAxis=1; }
+      else if(!up&&!dn&&Math.abs(ay)<0.4){ gpAxis=0; }
+      if(a && !gpPrev.a){ chime(); boot(); }
+    }
+    gpPrev={a};
+  }
+  requestAnimationFrame(pollGP);
+}
+
+/* ---- konami easter egg: gamma=1, epsilon=0 "cheat", sprite rain ---- */
+function secret(){
+  jingle();
+  infoL.textContent='⚡ CHEAT ENABLED ⚡';
+  infoB.textContent='γ = 1.00 · ε = 0.00 · the agent now believes it is immortal and greedy. (You found the Konami code.)';
+  const fx=$('#fx'); const chars=['γ','ε','★','Q','π','▲','♥','$'];
+  for(let i=0;i<48;i++){
+    const s=document.createElement('div'); s.className='spr';
+    s.textContent=chars[i%chars.length];
+    s.style.left=(i/48*100)+'%';
+    s.style.color=GAMES[i%GAMES.length].acc;
+    s.style.animationDuration=(2+ (i%5)*0.6)+'s';
+    s.style.animationDelay=((i%9)*0.12)+'s';
+    fx.appendChild(s); setTimeout(()=>s.remove(), 7000);
+  }
+}
+
+/* ---- go ---- */
+['keydown','pointerdown','touchstart'].forEach(ev=>addEventListener(ev, resetIdle, {passive:true}));
+paint();
+if(booted) resetIdle();
+</script>
 </body>
 </html>
