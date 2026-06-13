@@ -87,6 +87,11 @@ body{
 .topbar a{color:var(--glow);text-decoration:none;
   border:1px solid color-mix(in srgb,var(--glow) 45%,transparent);
   padding:5px 7px;border-radius:2px;}
+#backbtn{display:none;}
+body.in-extra #backbtn{display:inline-block;}
+body.in-extra #credit{display:none;}
+.extra-hint{display:none;}
+body.in-extra .extra-hint{display:inline;color:var(--hot);}
 .topbar a:hover{color:var(--ink);border-color:var(--glow);}
 
 /* marquee / title */
@@ -128,6 +133,9 @@ h1 .star{color:var(--glow);}
 .row.sel .no,.row.sel .nm,.row.sel .tag{color:#06061a;}
 .row.sel .chip{border-color:rgba(0,0,0,.45);}
 .row.sel .cur{visibility:visible;color:#06061a;animation:blink 1s steps(2) infinite;}
+.row.bundle{border-left-color:color-mix(in srgb,var(--glow) 38%,transparent);}
+.row.bundle .nm{color:var(--glow);letter-spacing:.04em;}
+.row.bundle.sel .nm{color:#06061a;}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
 /* info strip: describes the highlighted cartridge */
@@ -226,13 +234,14 @@ body.attract .demo-tag{display:inline;color:var(--hot);}
 <div id="screen">
   <div class="topbar">
     <span id="credit">CREDIT&nbsp;01<span class="demo-tag">&nbsp;&middot;&nbsp;DEMO</span></span>
+    <a id="backbtn" href="#" title="Back to main menu">&#8617;&nbsp;BACK</a>
     <a href="list.html" title="Plain editorial list">▤ PLAIN&nbsp;LIST</a>
   </div>
 
   <header>
-    <div class="subA">SML · REINFORCEMENT LEARNING</div>
+    <div class="subA" id="subA">SML · REINFORCEMENT LEARNING</div>
     <h1><span class="star">★</span> CLASSIC RL <span class="star">★</span></h1>
-    <span class="badge">12 - IN - 1</span>
+    <span class="badge" id="badge">12 - IN - 1</span>
   </header>
 
   <div class="list" id="list" role="listbox" aria-label="Select a visualization"></div>
@@ -246,6 +255,7 @@ body.attract .demo-tag{display:inline;color:var(--hot);}
     <span><b>↑↓</b> SELECT</span>
     <span><b>⏎ / A</b> START</span>
     <span><b>T</b> SCREEN</span>
+    <span class="extra-hint"><b>ESC</b> BACK</span>
     <span><b>↑↑↓↓←→←→BA</b> ?</span>
   </div>
   <div class="start"><button id="startbtn">▶ PUSH START</button></div>
@@ -320,6 +330,8 @@ const SPRITES={
          "KRRRRRRRRK.",".KRRRRRRK..","..KRRRRK...","...KRRK....","....KK.....","..........."],
   van:["...........","...KKKKKKK.","..KKWWKbbbK",".KbbbbbbbbK",".KbbbbbbbbK",
        ".KbbbbbbbbK",".KKKKKKKKK.","..KK...KK..","..KK...KK..","..........."],
+  qblock:["KKKKKKKKKKK","KYYYYYYYYYK","KYsYYYYYsYK","KYYYKKKYYYK","KYYKYYYKYYK",
+          "KYYYYYKYYYK","KYYYYKYYYYK","KYYYYYYYYYK","KYYYYKYYYYK","KYsYYYYYsYK","KKKKKKKKKKK"],
   dog:["............KK",".KK........KSK",".KKKKKKKKKKSCK","KSSSSSSSSSSSSK",
        "KSSSSSSSSSSSK.","KSSSSSSSSSSSK.",".K.KK..KK.K...",".K.KK..KK.K..."]
 };
@@ -331,6 +343,17 @@ function spriteSVG(id){
   return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="100%" shape-rendering="crispEdges" aria-hidden="true">'+p+'</svg>';
 }
 
+/* ---- attach sprites, then split into the main menu (5 headliners + EXTRA) and the EXTRA bundle ---- */
+GAMES.forEach((g,i)=>{ g.spr = SPR[i]; });
+const EXTRA = {name:"EXTRA ...", isBundle:true, acc:"#ffd23f", tag:"+7", spr:"qblock",
+  blurb:"7 bonus cartridges: the component drills (bandits, Bellman, Robbins-Monro, SARSA) plus extra boardroom games. Press START to open."};
+const VIEWS = {
+  main:[GAMES[0],GAMES[5],GAMES[6],GAMES[7],GAMES[11],EXTRA],
+  extra:[GAMES[1],GAMES[2],GAMES[3],GAMES[4],GAMES[8],GAMES[9],GAMES[10]]
+};
+let view='main';
+function curList(){ return VIEWS[view]; }
+
 const $ = s => document.querySelector(s);
 const listEl = $('#list'), infoL = $('#info-l'), infoB = $('#info-b');
 let sel = 0, booted = false;
@@ -340,44 +363,53 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const qs = new URLSearchParams(location.search);
 if(qs.get('boot') === '0'){ booted = true; $('#boot').style.display='none'; }
 const startSel = parseInt(qs.get('i'),10);
-if(!isNaN(startSel)) sel = Math.max(0, Math.min(GAMES.length-1, startSel));
+if(!isNaN(startSel)) sel = Math.max(0, Math.min(VIEWS.main.length-1, startSel));
 const palQ = qs.get('pal');
 if(['nes','green','amber'].includes(palQ)) document.documentElement.setAttribute('data-pal', palQ);
 const demo = qs.get('demo')==='1';
+if(qs.get('view')==='extra'){ view='extra'; sel=0; setExtraChrome(true); }
 
 /* ---- save file: which carts have been opened ---- */
 let visited = {};
 try{ visited = JSON.parse(localStorage.getItem('classicrl_visited') || '{}'); }catch(e){}
 
-/* ---- build the list ---- */
-GAMES.forEach((g,i)=>{
-  const r = document.createElement('div');
-  r.className = 'row'; r.dataset.i = i; r.style.setProperty('--acc', g.acc);
-  r.setAttribute('role','option');
-  r.innerHTML =
-    `<span class="no">${String(i+1).padStart(2,'0')}</span>`+
-    `<span class="cur">▶</span>`+
-    `<span class="chip">${spriteSVG(SPR[i])}</span>`+
-    `<span class="nm">${g.name}</span>`+
-    `<span class="tag">${visited[g.href]?'✓ ':''}${g.tag}</span>`;
-  r.addEventListener('click', ()=>{ if(i===sel) boot(); else { sel=i; paint(); blip(); } });
-  listEl.appendChild(r);
-});
+/* ---- build the current list (main menu or the EXTRA bundle) ---- */
+function renderList(){
+  listEl.innerHTML='';
+  curList().forEach((g,i)=>{
+    const r = document.createElement('div');
+    r.className = 'row' + (g.isBundle?' bundle':''); r.dataset.i = i; r.style.setProperty('--acc', g.acc);
+    r.setAttribute('role','option');
+    const done = g.href && visited[g.href];
+    r.innerHTML =
+      `<span class="no">${g.isBundle?'EX':String(i+1).padStart(2,'0')}</span>`+
+      `<span class="cur">▶</span>`+
+      `<span class="chip">${spriteSVG(g.spr)}</span>`+
+      `<span class="nm">${g.name}</span>`+
+      `<span class="tag">${done?'✓ ':''}${g.tag}</span>`;
+    r.addEventListener('click', ()=>{ if(i===sel) boot(); else { sel=i; paint(); blip(); } });
+    listEl.appendChild(r);
+  });
+  paint();
+}
 
 function paint(){
+  const list = curList();
   [...listEl.children].forEach((r,i)=>r.classList.toggle('sel', i===sel));
-  const g = GAMES[sel];
+  const g = list[sel]; if(!g) return;
   document.documentElement.style.setProperty('--acc', g.acc);
-  infoL.textContent = `NO. ${String(sel+1).padStart(2,'0')} · ${g.name}`;
+  infoL.textContent = g.isBundle ? 'EXTRA · 7 BONUS CARTRIDGES'
+                                 : `NO. ${String(sel+1).padStart(2,'0')} · ${g.name}`;
   infoB.textContent = g.blurb;
   const r = listEl.children[sel];
   if(r) r.scrollIntoView({block:'nearest'});
 }
-function move(d){ sel = (sel + d + GAMES.length) % GAMES.length; paint(); blip(); resetIdle(); }
+function move(d){ const n=curList().length; sel = (sel + d + n) % n; paint(); blip(); resetIdle(); }
 
-/* ---- boot a cartridge ---- */
+/* ---- boot a cartridge (or open the EXTRA bundle) ---- */
 function boot(){
-  const g = GAMES[sel];
+  const g = curList()[sel];
+  if(g.isBundle){ openExtra(); return; }
   visited[g.href] = 1;
   try{ localStorage.setItem('classicrl_visited', JSON.stringify(visited)); }catch(e){}
   coin();
@@ -386,6 +418,25 @@ function boot(){
   // file:// shows a dir listing for "casino/"; target index.html so it works locally and on Pages
   const dest = g.href + (g.href.endsWith('/') ? 'index.html' : '');
   setTimeout(()=>{ location.href = dest; }, reduce ? 250 : 950);
+}
+
+/* ---- EXTRA bundle: an in-page sub-screen with the other 7 cartridges ---- */
+function setExtraChrome(on){
+  $('#badge').textContent = on ? 'EXTRA · 7' : '12 - IN - 1';
+  $('#subA').textContent  = on ? '▸ EXTRA GAMES' : 'SML · REINFORCEMENT LEARNING';
+  document.body.classList.toggle('in-extra', on);
+}
+function openExtra(){
+  exitAttract(); coin();
+  $('#load-n').textContent = 'EXTRA GAMES';
+  $('#load').classList.add('on');
+  setTimeout(()=>{ view='extra'; sel=0; setExtraChrome(true); renderList();
+    $('#load').classList.remove('on'); resetIdle(); }, reduce ? 150 : 650);
+}
+function backToMain(){
+  blip(); view='main'; setExtraChrome(false);
+  sel = VIEWS.main.findIndex(x=>x.isBundle); if(sel<0) sel=0;
+  renderList(); resetIdle();
 }
 
 /* ------------------------------ audio ----------------------------- *
@@ -419,9 +470,9 @@ function cyclePal(){
 /* ---- idle attract / demo mode ---- */
 let idleT=null, attractTimer=null;
 function enterAttract(){
-  if(reduce || !booted) return;
+  if(reduce || !booted || view!=='main') return;
   document.body.classList.add('attract');
-  attractTimer=setInterval(()=>{ sel=(sel+1)%GAMES.length; paint(); }, 1500);
+  attractTimer=setInterval(()=>{ const n=curList().length; sel=(sel+1)%n; paint(); }, 1500);
 }
 function exitAttract(){
   document.body.classList.remove('attract');
@@ -458,9 +509,10 @@ addEventListener('keydown', e=>{
     case 'ArrowUp': case 'k': case 'w': e.preventDefault(); move(-1); break;
     case 'ArrowDown': case 'j': case 's': e.preventDefault(); move(1); break;
     case 'Enter': case ' ': case 'x': e.preventDefault(); chime(); boot(); break;
+    case 'Escape': case 'Backspace': if(view==='extra'){ e.preventDefault(); backToMain(); } break;
     case 't': case 'T': cyclePal(); break;
     case 'Home': sel=0; paint(); blip(); break;
-    case 'End': sel=GAMES.length-1; paint(); blip(); break;
+    case 'End': sel=curList().length-1; paint(); blip(); break;
   }
 });
 
@@ -484,6 +536,7 @@ function pollGP(){
   if(gp){
     const up=gp.buttons[12]&&gp.buttons[12].pressed, dn=gp.buttons[13]&&gp.buttons[13].pressed;
     const a=gp.buttons[0]&&gp.buttons[0].pressed, st=gp.buttons[9]&&gp.buttons[9].pressed;
+    const bb=gp.buttons[1]&&gp.buttons[1].pressed;
     const ay=gp.axes[1]||0;
     if(!booted){ if(a||st||up||dn) dismissBoot(); }
     else{
@@ -491,8 +544,9 @@ function pollGP(){
       else if((dn||ay>0.6) && !gpAxis){ move(1); gpAxis=1; }
       else if(!up&&!dn&&Math.abs(ay)<0.4){ gpAxis=0; }
       if(a && !gpPrev.a){ chime(); boot(); }
+      if(bb && !gpPrev.b && view==='extra'){ backToMain(); }
     }
-    gpPrev={a};
+    gpPrev={a,b:bb};
   }
   requestAnimationFrame(pollGP);
 }
@@ -516,8 +570,9 @@ function secret(){
 
 /* ---- go ---- */
 $('#mascot .mi').innerHTML = spriteSVG('dog');
+$('#backbtn').addEventListener('click', e=>{ e.preventDefault(); ac(); backToMain(); });
 ['keydown','pointerdown','touchstart','mousemove'].forEach(ev=>addEventListener(ev, resetIdle, {passive:true}));
-paint();
+renderList();
 if(booted) resetIdle();
 if(demo){ booted=true; $('#boot').style.display='none'; enterAttract(); }
 </script>
