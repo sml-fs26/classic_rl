@@ -447,7 +447,7 @@
       \draw[edge] (wk.east) -- (vB.west)
         node[midway, below=2pt, draw=fg, rounded corners=2pt, inner sep=2.5pt, font=\scriptsize, fill=panel] {the same cash};}%
   \end{tikzpicture}
-  \takeaway{\uncover<8->{the week leaves you a van: same cash, different futures}}
+  \takeaway{\uncover<8->{same cash, different futures: so what is the leftover van worth?}}
 \end{frame}
 
 \begin{frame}{Grade the week like a trade-in}
@@ -473,21 +473,79 @@
       \node[accentbox, font=\scriptsize] (tag) at (8.0,-1.55) {trade-in price: $\gamma \times q(s_{i+1}, a_{i+1})$};
       \draw[dimedge] (8.0,-0.95) -- (tag.north);}%
   \end{tikzpicture}
-  \formulaslot{1.6cm}{%
-    \only<3>{\Large $\text{the week's worth} = \underbrace{r_i}_{\text{cash}} + \ \gamma\, \underbrace{q(s_{i+1}, a_{i+1})}_{\text{trade-in, at your own price}}$}%
-    \only<4>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr]$ \quad {\normalsize\color{muted}(cash only)}}%
-    \only<5>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, \underbrace{r_i + \gamma\, q(s_{i+1}, a_{i+1})}_{\text{the actual, grown up}} - \ q(s_i, a_i) \,\bigr]$}%
-    \only<6->{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \underbrace{\bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr]}_{\text{the surprise}}$}%
+  \formulaslot{1.7cm}{%
+    \only<3>{\Large the week's worth $= \underbrace{r_i}_{\text{cash}} + \underbrace{\gamma\, q(s_{i+1}, a_{i+1})}_{\text{trade-in, at your own price}}$}%
+    \only<4->{\Large the better target $= \underbrace{r_i + \gamma\, q(s_{i+1}, a_{i+1})}_{\text{cash, plus the van you keep}}$}%
   }
-  \formulaslot{0.5cm}{%
-    \uncover<3->{{\color{muted}\footnotesize priced from your own card wall: $q(s_{i+1}, a_{i+1})$ stands in for the unknown $Q^\star$ (the NPV move)}}%
+  \formulaslot{0.7cm}{%
+    \uncover<4->{{\color{muted}the surprise was your guess against cash: now aim it at this}}%
   }
-  \formulaslot{0.6cm}{%
-    \uncover<7->{\scriptsize $\alpha = 0.15$, constant
+  \takeaway{\uncover<5->{upgrade the target: from cash alone to cash $+$ trade-in}}
+\end{frame}
+
+\begin{frame}{Price it from your own book}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.5,-2.6) rectangle (12.5,2.45);
+    \only<1->{\node[text=bad] at (6.0,2.05)
+      {{\itshape wait:} you price the leftover van with $q$, the very book you are still learning};}%
+    \only<2->{%
+      \node[nodebox, align=center, font=\scriptsize, minimum width=3.6cm] (book) at (3.0,0.8)
+        {a dealer's price book\\ {\color{muted}this month, still being revised}};
+      \node[nodebox, good fill, align=center, font=\scriptsize, minimum width=3.6cm] (car) at (9.0,0.8)
+        {prices today's trade-in\\ {\color{muted}from that book, anyway}};
+      \draw[edge] (book.east) -- (car.west);}%
+    \only<3->{\node[text=accent2] at (6.0,-0.5)
+      {nobody refuses to price a car because the book is not final};}%
+    \only<4->{%
+      \node[text=muted, font=\scriptsize] at (3.0,-1.4) {week 0};
+      \node[gridcell, minimum size=0.92cm] at (3.0,-2.0) {$0$};
+      \node[text=muted, font=\scriptsize] at (8.0,-1.4) {many weeks};
+      \node[gridcell, good fill, minimum size=0.92cm] at (8.0,-2.0) {$\approx Q^\star$};
+      \draw[dimedge] (3.7,-2.0) -- (7.3,-2.0);
+      \node[text=good, font=\scriptsize] at (5.5,-1.66) {each nudge: less wrong};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{the book is wrong today, and that is fine: every nudge makes it less wrong}}
+\end{frame}
+
+\begin{frame}{Write the line yourself}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.3,-0.7) rectangle (12.3,0.7);
+    \only<1->{%
+      \node[nodebox, good fill, align=center, font=\scriptsize] at (2.2,0) {cash\\ $r_i$};
+      \node[nodebox, acc fill, align=center, font=\scriptsize] at (6.1,0) {value where you land\\ $\gamma\, q(s_{i+1}, a_{i+1})$};
+      \node[nodebox, align=center, font=\scriptsize] at (10.0,0) {what you believed\\ $q(s_i, a_i)$};}%
+  \end{tikzpicture}
+  \formulaslot{2.3cm}{%
+    \only<2>{\Large new guess $=$ old guess $+\ \alpha \bigl[\, \underline{\hspace{1.6em}} + \gamma\,\underline{\phantom{q(s_{i+1}, a_{i+1})}} - \underline{\phantom{q(s_i, a_i)}} \,\bigr]$}%
+    \only<3>{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr]$}%
+    \only<4->{\Large $q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha \underbrace{\bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr]}_{\text{the surprise: upgraded target minus your guess}}$}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<5->{\scriptsize $\alpha = 0.15$, constant
       \ {\color{muted}$\cdot$} \ $\varepsilon = 0.15$: a random call in $15\%$ of weeks
-      \ {\color{muted}$\cdot$} \ $a_{i+1}$: actually executed, never a max}%
+      \ {\color{muted}$\cdot$} \ $a_{i+1}$: the call you actually make, never a max}%
   }
-  \takeaway{\uncover<8->{Bellman, with the expectation replaced by an arriving average}}
+  \takeaway{\uncover<6->{you did not memorize SARSA: you wrote it}}
+\end{frame}
+
+\begin{frame}{Bellman becomes SARSA}
+  \centering
+  \formulaslot{2.9cm}{%
+    \only<1>{\Large $Q^\star(s_i, a_i) = \E\bigl[\, r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1}) \,\bigr]$}%
+    \only<2>{\Large $Q^\star(s_i, a_i) \approx \underbrace{r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1})}_{\text{the one week that arrived, not the average}}$}%
+    \only<3>{\Large $q(s_i, a_i) \approx r_i + \gamma\, q(s_{i+1}, a_{i+1})$ \quad {\normalsize\color{muted}(your book, not $Q^\star$)}}%
+    \only<4->{\Large $\boxed{\; q(s_i, a_i) \leftarrow q(s_i, a_i) + \alpha\bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr] \;}$}%
+  }
+  \begin{tikzpicture}
+    \useasboundingbox (-0.3,-0.55) rectangle (12.3,0.55);
+    \only<1>{\node[text=muted] at (6.0,0) {start from Bellman: an average over all the weeks that could happen};}%
+    \only<2>{\node[text=accent2] at (6.0,0) {erase the average: keep the single week that actually arrived};}%
+    \only<3>{\node[text=accent2] at (6.0,0) {erase the unknown truth $Q^\star$: look the value up in your own book $q$};}%
+    \only<4->{\node[text=accent2] at (6.0,0) {wrap it in the nudge: step toward the target, never jump to it};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{Bellman, with the expectation replaced by an arriving average}}
 \end{frame}
 
 \begin{frame}{One week, one nudge}
