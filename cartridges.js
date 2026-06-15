@@ -95,8 +95,8 @@ window.EXTRA = {name:"EXTRA ...", isBundle:true, acc:"#ffd23f", spr:"qblock",
 
 /* which cartridges are headliners (main menu) vs in the EXTRA bundle */
 window.VIEWS = {
-  main:[GAMES[0],GAMES[5],GAMES[6],GAMES[7],GAMES[11],GAMES[14],GAMES[15],EXTRA],
-  extra:[GAMES[1],GAMES[2],GAMES[3],GAMES[4],GAMES[8],GAMES[9],GAMES[10],GAMES[12],GAMES[13],GAMES[16],GAMES[17],GAMES[18]]
+  main:[GAMES[0],GAMES[5],GAMES[6],GAMES[7],GAMES[11],GAMES[14],GAMES[15],GAMES[16],EXTRA],
+  extra:[GAMES[1],GAMES[2],GAMES[3],GAMES[4],GAMES[8],GAMES[9],GAMES[10],GAMES[12],GAMES[13],GAMES[17],GAMES[18]]
 };
 
 /* counts auto-derive from the registry above */
