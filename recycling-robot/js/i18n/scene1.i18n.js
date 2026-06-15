@@ -1,4 +1,4 @@
-/* scene1 i18n -- tutorial. */
+/* scene1 i18n, tutorial. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

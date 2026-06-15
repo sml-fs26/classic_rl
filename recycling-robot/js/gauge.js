@@ -1,4 +1,4 @@
-/* gauge.js -- the ROBOT + 5-SEGMENT BATTERY GAUGE widget for the Recycling Robot.
+/* gauge.js, the ROBOT + 5-SEGMENT BATTERY GAUGE widget for the Recycling Robot.
  *
  *   The recurring state-icon AND the whole Q-table, one object. A little robot
  *   sits beside a vertical 5-segment gauge lit from the bottom; the same
@@ -178,7 +178,7 @@
     return s;
   }
 
-  /* ---- icon-variant handle (just the lit gauge + robot pose) ---- */
+  /*, icon-variant handle (just the lit gauge + robot pose), */
   function makeIconHandle(host, icon) {
     const robot = icon.querySelector('.rr-robot');
     const pips = icon.querySelectorAll('.rr-pip');
@@ -238,7 +238,7 @@
     return { setLevel, pulse, spark, drainTo, strand, dockRefill, setLabel, host, icon, level: () => curLevel };
   }
 
-  /* ---- qtable-variant handle (the Q-table + the header gauge) ---- */
+  /*, qtable-variant handle (the Q-table + the header gauge), */
   function makeTableHandle(host, panel, rungNodes, showValues) {
     const ALL_TINTS = LEVER_IDS.map(id => 'tint-' + id);
     const STAR = '★';

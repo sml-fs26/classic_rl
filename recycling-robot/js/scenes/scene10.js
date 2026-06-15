@@ -1,4 +1,4 @@
-/* Scene 10 -- Why DP does not scale.
+/* Scene 10, Why DP does not scale.
  *   Two reasons on a two-panel card. (a) You rarely know P: the neat printed
  *   drain probabilities are a fiction; real wear depends on terrain, load,
  *   temperature, battery age. (b) The state space explodes: this toy has 5

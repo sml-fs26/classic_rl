@@ -1,4 +1,4 @@
-/* Scene 0 -- Title / hook.
+/* Scene 0, Title / hook.
  *   The little robot beside its 5-segment battery gauge (full), the drain die
  *   with its 70/30 badge, the tagline + START. START reveals the manager
  *   framing + a BEGIN prompt that yields to the engine (-> scene 1). A soft

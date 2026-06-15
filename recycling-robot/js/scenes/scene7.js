@@ -1,4 +1,4 @@
-/* Scene 7 -- Optimal action-value Q*(s,a).
+/* Scene 7, Optimal action-value Q*(s,a).
  *   Q*(s,a) = the true long-run value of pulling lever a at battery s, assuming
  *   you operate smart afterward. The robot-and-gauge icon for one rung beside a
  *   two-column table (lever | Q*), the best row starred. Flip the rung selector

@@ -1,4 +1,4 @@
-/* Scene 5 -- Trajectory.
+/* Scene 5, Trajectory.
  *   One full shift replayed as a tape of random variables tau = (S1,A1,R1, ...,
  *   S_T). The robot-and-gauge marches left along a rollout tape: battery, lever,
  *   trash, next battery. STEP advances one entry; RESHUFFLE rolls a different

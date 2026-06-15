@@ -1,4 +1,4 @@
-/* die.js -- the BATTERY-DRAIN DIE widget (the signature animation).
+/* die.js, the BATTERY-DRAIN DIE widget (the signature animation).
  *
  *   Tap SEARCH and a chunky die tumbles into a small popup, lands on -1 (most
  *   of the time) or -2 (a bad roll), and the gauge pips drain to match with a

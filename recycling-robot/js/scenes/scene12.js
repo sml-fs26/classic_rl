@@ -1,4 +1,4 @@
-/* Scene 12 -- Recap.
+/* Scene 12, Recap.
  *   Six cards, one concept each, in the robot-and-gauge visual language: MDP,
  *   Policy, Return, Q*, DP, TD. Each card carries its badge, a KaTeX line, and
  *   the manager gloss. A click on a card jumps to its scene. Closing line. */

@@ -61,7 +61,7 @@
      mid/low (the riskier low reach hauls less). */
   function searchReward(lv) { return lv >= HIGH ? 3 : 2; }
 
-  /* ---------- Board geometry (one column of 4 rungs) ---------- */
+  /*, Board geometry (one column of 4 rungs), */
   /* full sits at the TOP (row 0), low at the BOTTOM (row 3), so the rendered
      gauge climbs upward. */
   function levelOf(s) { return (s && !s.terminal) ? s.lv : 0; }
@@ -93,14 +93,14 @@
   function availableLeverIds(_lv) { return LEVER_IDS.slice(); }
   function isLegal(_lv, leverId) { return !!LEVER_BY_ID[leverId]; }
 
-  /* ---------- Build the next state from a drain outcome ---------- */
+  /*, Build the next state from a drain outcome, */
   function drainTo(lv, delta) {
     const lv2 = lv + delta;
     if (lv2 <= EMPTY) return { terminal: true, stranded: true };
     return { lv: lv2, terminal: false };
   }
 
-  /* ---------- One die roll (one sample) ---------- */
+  /*, One die roll (one sample), */
   function sample(state, leverId, rng) {
     if (state.terminal) {
       return { sNext: state, reward: 0, terminal: true,
@@ -132,7 +132,7 @@
     return { sNext, reward, terminal: !!sNext.terminal, log };
   }
 
-  /* ---------- Successor enumeration (value iteration) ---------- */
+  /*, Successor enumeration (value iteration), */
   function successors(state, leverId) {
     if (state.terminal) return [{ sNext: state, p: 1, reward: 0 }];
     const lv = state.lv;
@@ -154,7 +154,7 @@
   }
   function successorsFromBuckets(s, leverId) { return successors(s, leverId); }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -166,7 +166,7 @@
     };
   }
 
-  /* ---------- Display helpers ---------- */
+  /*, Display helpers, */
   function level(s) { return s && !s.terminal ? s.lv : 0; }
   function stateLabel(s) {
     if (!s) return '';

@@ -1,4 +1,4 @@
-/* Scene 6 -- Return G_t.
+/* Scene 6, Return G_t.
  *   The return is the payoff summed from a point onward. Fix one situation and
  *   one chosen lever (start MID, force SEARCH), run many times, and stack the
  *   returns into a histogram. The shape is the lesson: a cluster near +14/+15

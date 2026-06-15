@@ -1,4 +1,4 @@
-/* Scene 2 -- Playtest / you run it.
+/* Scene 2, Playtest / you run it.
  *   The learner IS the robot's operator. Start full, 8-step shift; pick a lever
  *   each step, roll the drain die on SEARCH, feel the outcome. A greedy SEARCH
  *   on a low battery strands the robot for -10. Play to the end of the shift and

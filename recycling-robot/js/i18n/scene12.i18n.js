@@ -1,4 +1,4 @@
-/* scene12 i18n -- recap. The six card title/text keys mirror DATA.recap (EN)
+/* scene12 i18n, recap. The six card title/text keys mirror DATA.recap (EN)
    so the card copy is translatable; the EN strings here are the source of truth
    the page reads (DATA.recap also carries them for non-i18n fallback). */
 (function () {

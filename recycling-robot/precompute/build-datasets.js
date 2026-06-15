@@ -1,4 +1,4 @@
-/* Recycling Robot precompute -- THE RIGOR GATE.
+/* Recycling Robot precompute, THE RIGOR GATE.
  *
  *   Runs finite-horizon dynamic programming on the recycling-robot MDP
  *   (battery rungs empty/low/mid/high/full; levers search/wait/recharge; SEARCH
@@ -47,7 +47,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/* ---------------- Load the verified engine via a window shim ---------------- */
+/*, Load the verified engine via a window shim, */
 const sandbox = { window: {}, console, Math, Float64Array, Float32Array, Int32Array, Array, Map, Set, JSON };
 sandbox.window.window = sandbox.window;
 const ctx = vm.createContext(sandbox);
@@ -69,14 +69,14 @@ const GAMMA = 1.0;
 const NAME = { 1: 'low', 2: 'mid', 3: 'high', 4: 'full' };   // by battery level
 const ROW_ORDER = [4, 3, 2, 1];            // render order: full, high, mid, low
 
-/* ---------------- Finite-horizon DP ---------------- */
+/*, Finite-horizon DP, */
 const fh = Bellman.finiteHorizon(SHIFT, GAMMA);
 const conv = Bellman.converged(SHIFT, GAMMA);   // headline (k = N) layer
 const Vstar = conv.V;                            // Float64Array[4], index = level-1
 const Qstar = conv.Q;                            // Float64Array[4*A]
 const policy = conv.policy;                       // [4] lever-id strings (level-1 order)
 
-/* ---------------- Helpers ---------------- */
+/*, Helpers, */
 function vAt(lv) { return Vstar[lv - 1]; }
 function qRow(lv) {
   const b = (lv - 1) * A;
@@ -87,18 +87,18 @@ function qRow(lv) {
 function bestAt(lv) { return policy[lv - 1]; }
 function round2(x) { return Math.round(x * 100) / 100; }
 function round4(x) { return Math.round(x * 10000) / 10000; }
-function fmt(x) { return Number.isFinite(x) ? x.toFixed(2) : '  --  '; }
+function fmt(x) { return Number.isFinite(x) ? x.toFixed(2) : ', '; }
 
 function assert(name, ok, info) {
   if (ok) { console.log('  [OK]   ' + name); return; }
-  console.error('  [FAIL] ' + name + (info ? ' -- ' + info : ''));
+  console.error('  [FAIL] ' + name + (info ? ', ' + info : ''));
   process.exit(1);
 }
 
-console.log('Recycling Robot precompute -- 5-rung battery gauge, 3 levers, shift N = ' + SHIFT + ', gamma = ' + GAMMA);
+console.log('Recycling Robot precompute, 5-rung battery gauge, 3 levers, shift N = ' + SHIFT + ', gamma = ' + GAMMA);
 console.log('  ' + N + ' playable rungs (low/mid/high/full); terminal `empty` (STRANDED, value 0; entering it costs -10)');
 console.log('');
-console.log('Phase 1 -- finite-horizon dynamic programming');
+console.log('Phase 1, finite-horizon dynamic programming');
 console.log('  policy stable from k = ' + conv.stableFrom + ' steps remaining (the last-step column k=1 differs)');
 
 /* Pretty-print the converged table (the on-screen punchline). */
@@ -197,11 +197,11 @@ assert('hand backup: 2nd-backup low = (SEARCH -8.00, WAIT 2.00, RECHARGE 3.00)',
 assert('hand backup: last-step low = (SEARCH -8.00, WAIT +1.00) so WAIT wins the final step',
   round2(lowS1) === -8 && round2(lowW1) === 1, lowS1 + '/' + lowW1);
 
-/* ---------------- Per-step DP fill frames for the DP scene ----------------
+/*, Per-step DP fill frames for the DP scene ----------------
    The single-column Q-table fills bottom-up IN TIME: start at the last step of
    the shift (k=1, pure one-step payoffs), then back up one step at a time. We
    record the (V, Q, policy) at each layer so the DP scene animates the rule
-   drawing itself -- the WAIT column at low/mid flipping to RECHARGE after the
+   drawing itself, the WAIT column at low/mid flipping to RECHARGE after the
    first backup. solved[i] is always true here (the whole column is computed at
    every layer); we expose the layer index as the "step". */
 const dpFrames = [];
@@ -216,7 +216,21 @@ for (let k = 1; k <= SHIFT; k++) {
 }
 console.log('  DP fill recorded over ' + dpFrames.length + ' time-layers (k=1 last step .. k=' + SHIFT + ' start of shift)');
 
-/* ---------------- Phase 2 -- model-free TD control: SARSA vs Q-learning ----------------
+/* The full optimal Q over ALL (rung, k, lever) cells, in the SAME flat layout
+   the learners use: idx = (stateIdx * SHIFT + (k-1)) * A + leverIdx. Lets the
+   TD scene paint the DP-oracle coverage grid (4 rungs x SHIFT steps-left) the
+   learners are chasing, not just the k=N column. */
+const dpFullTable = new Array(N * SHIFT * A).fill(0);
+for (let k = 1; k <= SHIFT; k++) {
+  const Qk = fh.Qlayers[k];                          // Float64Array[N*A], index stateIdx*A + leverIdx
+  for (let sIdx = 0; sIdx < N; sIdx++) {
+    for (let a = 0; a < A; a++) {
+      dpFullTable[(sIdx * SHIFT + (k - 1)) * A + a] = round4(Qk[sIdx * A + a]);
+    }
+  }
+}
+
+/*, Phase 2, model-free TD control: SARSA vs Q-learning ----------------
    We learn Q from experience (search, observe drain, adjust) with NO drain
    model. Because the optimal action depends on steps-remaining, the learned
    table is indexed by (rung, k, lever). We run BOTH classic updates on the same
@@ -243,7 +257,11 @@ const QL_CFG = {
   episodes: 400000,
   exploringStarts: true,         // random rung + random k each episode (covers the table)
   seed: 20260615,
-  snapshotEpisodes: [0, 1, 50, 500, 3000, 15000, 60000, 150000, 300000, 400000],
+  /* Denser than before so the convergence tail advances in many small steps
+     (no big jumps): the scene steps through these one snapshot per click after
+     the per-episode early phase. */
+  snapshotEpisodes: [0, 1, 50, 150, 300, 500, 1000, 2000, 3000, 5000, 8000, 15000,
+                     30000, 60000, 100000, 150000, 220000, 300000, 350000, 400000],
   evalEvery: 8000,
 };
 const SARSA_CFG = {
@@ -253,10 +271,11 @@ const SARSA_CFG = {
   episodes: 400000,
   exploringStarts: true,
   seed: 1,                       // chosen so SARSA reliably PROTECTS at the marginal `high` rung
-                                 // (RECHARGE, not the bold SEARCH) -- the legible cautious-vs-optimal
+                                 // (RECHARGE, not the bold SEARCH), the legible cautious-vs-optimal
                                  // split. Robust: ~6+/14 seeds show it at these params, and the
                                  // direction (SARSA never bolder than DP at high) is systematic.
-  snapshotEpisodes: [0, 1, 50, 500, 3000, 15000, 60000, 150000, 300000, 400000],
+  snapshotEpisodes: [0, 1, 50, 150, 300, 500, 1000, 2000, 3000, 5000, 8000, 15000,
+                     30000, 60000, 100000, 150000, 220000, 300000, 350000, 400000],
   evalEvery: 8000,
 };
 
@@ -271,8 +290,11 @@ function alphaFor(cfg, visitCount) {
 }
 
 /* One OFF-POLICY Q-learning episode. Exploring starts pick a random rung and a
-   random steps-remaining k, then play forward to k=0 or strand. */
-function runQLEpisode(Q, visits, gamma, eps, rng, cfg) {
+   random steps-remaining k, then play forward to k=0 or strand.
+   `rec` (optional) is a recorder: rec(updateInfo) is called on every update so
+   the scene can replay the first few updates ONE AT A TIME. It only OBSERVES;
+   it consumes no RNG draws, so the documented training is byte-identical. */
+function runQLEpisode(Q, visits, gamma, eps, rng, cfg, rec) {
   let lv = cfg.exploringStarts ? (1 + Math.floor(rng() * N)) : Robot.FULL;
   let k  = cfg.exploringStarts ? (1 + Math.floor(rng() * SHIFT)) : SHIFT;
   let s = { lv: lv, terminal: false };
@@ -285,20 +307,27 @@ function runQLEpisode(Q, visits, gamma, eps, rng, cfg) {
     visits[SARSA.idx(sIdx, k, aIdx)]++;
     visited.add(sIdx * SHIFT + (k - 1));
     const alpha = alphaFor(cfg, visits[SARSA.idx(sIdx, k, aIdx)]);
+    const cellBase = SARSA.idx(sIdx, k, aIdx);
+    const qBefore = Q[cellBase];
     if (out.terminal || k - 1 === 0) {
       SARSA.qLearningUpdate(Q, sIdx, k, aId, out.reward, -1, 0, alpha, gamma, true);
+      if (rec) rec({ lvl: sIdx + 1, k: k, leverIdx: aIdx, r: out.reward, terminal: true,
+        sNextLvl: 0, kNext: 0, aNextIdx: -1, alpha: alpha, qBefore: qBefore, qAfter: Q[cellBase] });
       break;
     }
     const sNextIdx = Robot.stateIndex(out.sNext);
     SARSA.qLearningUpdate(Q, sIdx, k, aId, out.reward, sNextIdx, k - 1, alpha, gamma, false);
+    if (rec) rec({ lvl: sIdx + 1, k: k, leverIdx: aIdx, r: out.reward, terminal: false,
+      sNextLvl: sNextIdx + 1, kNext: k - 1, aNextIdx: -1, alpha: alpha, qBefore: qBefore, qAfter: Q[cellBase] });
     s = out.sNext; sIdx = sNextIdx; k = k - 1;
   }
   return { visited };
 }
 
 /* One ON-POLICY SARSA episode. The next lever a' is chosen eps-greedily BEFORE
-   the update; the bootstrap uses Q[s', k-1, a']. */
-function runSarsaEpisode(Q, visits, gamma, eps, rng, cfg) {
+   the update; the bootstrap uses Q[s', k-1, a']. `rec` (optional): see
+   runQLEpisode, observes each update, consumes no RNG. */
+function runSarsaEpisode(Q, visits, gamma, eps, rng, cfg, rec) {
   let lv = cfg.exploringStarts ? (1 + Math.floor(rng() * N)) : Robot.FULL;
   let k  = cfg.exploringStarts ? (1 + Math.floor(rng() * SHIFT)) : SHIFT;
   let s = { lv: lv, terminal: false };
@@ -311,13 +340,20 @@ function runSarsaEpisode(Q, visits, gamma, eps, rng, cfg) {
     visits[SARSA.idx(sIdx, k, aIdx)]++;
     visited.add(sIdx * SHIFT + (k - 1));
     const alpha = alphaFor(cfg, visits[SARSA.idx(sIdx, k, aIdx)]);
+    const cellBase = SARSA.idx(sIdx, k, aIdx);
+    const qBefore = Q[cellBase];
     if (out.terminal || k - 1 === 0) {
       SARSA.update(Q, sIdx, k, aId, out.reward, -1, 0, null, alpha, gamma, true);
+      if (rec) rec({ lvl: sIdx + 1, k: k, leverIdx: aIdx, r: out.reward, terminal: true,
+        sNextLvl: 0, kNext: 0, aNextIdx: -1, alpha: alpha, qBefore: qBefore, qAfter: Q[cellBase] });
       break;
     }
     const sNextIdx = Robot.stateIndex(out.sNext);
     const aNextId = SARSA.pickEpsGreedy(Q, sNextIdx, k - 1, eps, rng);   // on-policy a'
     SARSA.update(Q, sIdx, k, aId, out.reward, sNextIdx, k - 1, aNextId, alpha, gamma, false);
+    if (rec) rec({ lvl: sIdx + 1, k: k, leverIdx: aIdx, r: out.reward, terminal: false,
+      sNextLvl: sNextIdx + 1, kNext: k - 1, aNextIdx: SARSA.ACTIONS.indexOf(aNextId),
+      alpha: alpha, qBefore: qBefore, qAfter: Q[cellBase] });
     s = out.sNext; sIdx = sNextIdx; k = k - 1; aId = aNextId;
   }
   return { visited };
@@ -341,6 +377,16 @@ function greedyReturnFromFull(Q, episodes, rng) {
   return sum / episodes;
 }
 
+/* How many INDIVIDUAL updates to record for the "one update at a time" stepper,
+   and how many EARLY episodes to snapshot per-episode so the boards fill
+   gradually (no big jumps) before handing off to the coarse tail snapshots. */
+const TRACE_LEN = 24;
+const EARLY_EPISODES = 120;
+
+/* The full (rung x k x lever) table flattened to a plain rounded array, so the
+   scene's coverage grid can show every learned cell, not only the k=8 layer. */
+function fullTable(Q) { return Array.from(Q, v => Math.round(v * 1000) / 1000); }
+
 function trainLearner(cfg, runEpisode) {
   const rng = Robot.makeRng(cfg.seed);
   const evalRng = Robot.makeRng((cfg.seed ^ 0x9e3779b9) >>> 0);
@@ -348,15 +394,35 @@ function trainLearner(cfg, runEpisode) {
   const visits = new Float64Array(Q.length);
   const snapshots = [];
   const returnCurve = [];           // [{episode, ret}] greedy from full
+  const trace = [];                 // first TRACE_LEN individual updates (one-at-a-time stepper)
+  const earlySnaps = [];            // FULL (rung x k x lever) table after each of the first EARLY_EPISODES episodes
   if (cfg.snapshotEpisodes.includes(0)) snapshots.push({ episode: 0, k8: Array.from(SARSA.layerAtK(Q, SHIFT)) });
+  earlySnaps.push({ episode: 0, full: fullTable(Q) });
   returnCurve.push({ episode: 0, ret: Number(greedyReturnFromFull(Q, 1500, evalRng).toFixed(3)) });
   for (let ep = 1; ep <= cfg.episodes; ep++) {
     const eps = epsAt(ep, cfg);
-    runEpisode(Q, visits, cfg.gamma, eps, rng, cfg);
+    /* Record individual updates only while the trace is still hungry; the
+       recorder observes and consumes no RNG, so training is unaffected. The
+       table state after each trace step is read from earlySnaps by the scene. */
+    let rec = null;
+    if (trace.length < TRACE_LEN) {
+      rec = (info) => {
+        if (trace.length >= TRACE_LEN) return;
+        trace.push({
+          step: trace.length + 1, episode: ep,
+          lvl: info.lvl, k: info.k, leverIdx: info.leverIdx, r: Number(info.r.toFixed(2)),
+          terminal: info.terminal, sNextLvl: info.sNextLvl, kNext: info.kNext, aNextIdx: info.aNextIdx,
+          alpha: Number(info.alpha.toFixed(3)),
+          qBefore: Number(info.qBefore.toFixed(3)), qAfter: Number(info.qAfter.toFixed(3)),
+        });
+      };
+    }
+    runEpisode(Q, visits, cfg.gamma, eps, rng, cfg, rec);
+    if (ep <= EARLY_EPISODES) earlySnaps.push({ episode: ep, full: fullTable(Q) });
     if (cfg.snapshotEpisodes.includes(ep)) snapshots.push({ episode: ep, k8: Array.from(SARSA.layerAtK(Q, SHIFT)) });
     if (ep % cfg.evalEvery === 0) returnCurve.push({ episode: ep, ret: Number(greedyReturnFromFull(Q, 1500, evalRng).toFixed(3)) });
   }
-  return { Q, snapshots, returnCurve };
+  return { Q, snapshots, returnCurve, trace, earlySnaps };
 }
 
 /* Summarise a learned Q at the converged (k=N) layer vs the DP optimum. */
@@ -375,7 +441,7 @@ function summarise(learner, evalSeed) {
 }
 
 console.log('');
-console.log('Phase 2 -- model-free TD control: OFF-POLICY Q-learning vs ON-POLICY SARSA');
+console.log('Phase 2, model-free TD control: OFF-POLICY Q-learning vs ON-POLICY SARSA');
 console.log('  Q-learning: ' + QL_CFG.episodes + ' eps, alpha=1/(1+n)^' + QL_CFG.alphaPower +
             ', eps ' + QL_CFG.epsilon + '->' + QL_CFG.epsilonMin + ' (off-policy max bootstrap)');
 console.log('  SARSA:      ' + SARSA_CFG.episodes + ' eps, alpha=' + SARSA_CFG.constAlpha +
@@ -411,13 +477,13 @@ assert('Q-learning greedy return improved over training',
    the marginal `high` rung, and overall agreement is strictly below Q-learning.
    Seeded so it does not flap. */
 const sarsaHigh = sarsaSum.policy[Robot.HIGH - 1];
-console.log('  SARSA at `high` plays ' + Levers.nameOf(sarsaHigh) + ' (DP plays SEARCH) -- cautious at the marginal cell');
+console.log('  SARSA at `high` plays ' + Levers.nameOf(sarsaHigh) + ' (DP plays SEARCH), cautious at the marginal cell');
 assert('SARSA is cautious at the marginal `high` rung (does NOT play bold SEARCH)',
   sarsaHigh !== 'search', 'SARSA high = ' + Levers.nameOf(sarsaHigh));
 assert('SARSA agreement with DP is strictly below Q-learning (cautious vs optimal)',
   sarsaSum.agreed < qlSum.agreed, 'sarsa=' + sarsaSum.agreed + ' qlearn=' + qlSum.agreed);
 
-/* ---------------- A fixed illustrative trajectory ----------------
+/*, A fixed illustrative trajectory ----------------
    One short deterministic demo shift from a full battery under the OPTIMAL
    converged policy, pinned seed. Used by the tutorial / trajectory / return
    scenes. We follow the per-step optimal action (steps-remaining aware). Want a
@@ -470,7 +536,7 @@ console.log('');
 console.log('Demo trajectory (optimal policy from full, seed ' + demoTrajectory.seedUsed + '): ' +
             demoTrajectory.len + ' steps, total ' + demoTrajectory.total + (demoTrajectory.stranded ? ' (STRANDED)' : ''));
 
-/* ---------------- Return-distribution bars for the Return scene ----------------
+/*, Return-distribution bars for the Return scene ----------------
    Fix the situation at `mid`, FORCE SEARCH on the first step, then play
    optimally. Enumerate the EXACT return distribution (the histogram the scene
    draws): a cluster at +14/+15 and a fat spike at -8 about 30% of the time. */
@@ -501,7 +567,7 @@ assert('return-from-mid histogram is bimodal: a +14/+15 cluster and a ~30% spike
   returnHist.bars.some(b => b.ret >= 14),
   JSON.stringify(returnHist.bars));
 
-/* ---------------- Spot-Q rows the Q* scene calls out ---------------- */
+/*, Spot-Q rows the Q* scene calls out, */
 function spotRow(lv) {
   const r = qRow(lv);
   const obj = {};
@@ -510,7 +576,7 @@ function spotRow(lv) {
 }
 const spotQ = { high: spotRow(3), mid: spotRow(2), low: spotRow(1), full: spotRow(4) };
 
-/* ---------------- Recap cards (robot / gauge voice) ---------------- */
+/*, Recap cards (robot / gauge voice), */
 const recap = [
   { key: 'mdp', badge: 'MDP', scene: 3, title: 'THE FOUR-PART FRAME',
     text: 'The situation is the BATTERY (the rung on the gauge). The lever is SEARCH / WAIT / RECHARGE. The part you do not control is the DRAIN DIE on a search. The payoff is the trash collected, minus a -10 rescue if you strand the robot.',
@@ -532,10 +598,10 @@ const recap = [
     tex: 'q[s,a] \\;\\mathrel{+}=\\; \\alpha\\,(\\, r + q[s\',a\'] - q[s,a] \\,)' },
 ];
 
-/* ---------------- Levers for display ---------------- */
+/*, Levers for display, */
 const leversDisplay = Levers.LEVERS.map(l => ({ id: l.id, name: l.name, role: l.role, idx: l.idx }));
 
-/* ---------------- Assemble + round payloads ---------------- */
+/*, Assemble + round payloads, */
 function roundArr(arr, places) { const f = Math.pow(10, places); return Array.from(arr, v => (Number.isFinite(v) ? Math.round(v * f) / f : null)); }
 
 const DATA = {
@@ -575,10 +641,17 @@ const DATA = {
      converged policy, plus the shared V*_N(full) reference. */
   learners: {
     optimalStartValue: Number(Vfull.toFixed(2)),   // V*_N(full)
+    /* Dims + the DP-oracle FULL table so the scene can render the (rung x k)
+       coverage grid the learners are chasing, one update at a time. */
+    dims: { N: N, shift: SHIFT, A: A },
+    traceLen: TRACE_LEN, earlyEpisodes: EARLY_EPISODES,
+    dpFull: dpFullTable,                             // (stateIdx*SHIFT + (k-1))*A + leverIdx
     qlearn: {
       kind: 'qlearning', offPolicy: true, config: QL_CFG,
       finalPolicy: qlSum.policy,
       snapshots: qlearn.snapshots.map(s => ({ episode: s.episode, k8: roundArr(s.k8, 3) })),
+      trace: qlearn.trace,
+      earlySnaps: qlearn.earlySnaps,                 // [{episode, full[N*SHIFT*A]}]
       returnCurve: qlearn.returnCurve,
       stats: { finalRet: Number(qlSum.finalRet.toFixed(3)), earlyRet: Number(qlSum.earlyRet.toFixed(3)),
         agreedCount: qlSum.agreed, totalRungs: N, disagreements: qlSum.disagreements },
@@ -587,6 +660,8 @@ const DATA = {
       kind: 'sarsa', offPolicy: false, config: SARSA_CFG,
       finalPolicy: sarsaSum.policy,
       snapshots: sarsaL.snapshots.map(s => ({ episode: s.episode, k8: roundArr(s.k8, 3) })),
+      trace: sarsaL.trace,
+      earlySnaps: sarsaL.earlySnaps,
       returnCurve: sarsaL.returnCurve,
       stats: { finalRet: Number(sarsaSum.finalRet.toFixed(3)), earlyRet: Number(sarsaSum.earlyRet.toFixed(3)),
         agreedCount: sarsaSum.agreed, totalRungs: N, disagreements: sarsaSum.disagreements,
@@ -619,11 +694,11 @@ const DATA = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(ROOT, 'data', 'datasets.js');
 const payload = JSON.stringify(DATA);
 const fileContent =
-  "/* Recycling Robot -- static MDP solution plus finite-horizon DP fill frames\n" +
+  "/* Recycling Robot, static MDP solution plus finite-horizon DP fill frames\n" +
   " * and model-free TD training trajectories (SARSA vs Q-learning).\n" +
   " *\n" +
   " * Regenerate with `node precompute/build-datasets.js`. The build script\n" +

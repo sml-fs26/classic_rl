@@ -1,4 +1,4 @@
-/* Scene 4 -- Policy / a rule from states to actions.
+/* Scene 4, Policy / a rule from states to actions.
  *   A policy pi: S -> A is a complete playbook, one lever pre-assigned to every
  *   rung. Two hand-policies painted down the single-column gauge so a policy
  *   reads as a coloured stripe: (a) "always SEARCH" (all green, greedy) and

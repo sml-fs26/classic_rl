@@ -1,4 +1,4 @@
-/* Scene 1 -- Tutorial / how to play.
+/* Scene 1, Tutorial / how to play.
  *   Walk the controls with zero math: the robot + battery gauge (the
  *   situation), the three levers, the drain die. A guided demo: SEARCH ->
  *   die lands -1 -> one pip drains -> +3 trash; then RECHARGE snaps the gauge

@@ -1,4 +1,4 @@
-/* Scene 8 -- Bellman optimality equation.
+/* Scene 8, Bellman optimality equation.
  *   Q*(s,a) = E[ R + max_a' Q*(S', a') ]: the value of a lever now = what it
  *   pays this step, plus the value of whatever rung it leaves you in next,
  *   assuming you again pull the best lever there. A worked one-step backup on

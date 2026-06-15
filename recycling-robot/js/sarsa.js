@@ -16,7 +16,7 @@
  *     - On-policy SARSA (update): bootstrap with the ACTUAL next lever a'. On
  *       this MDP it learns the value of the eps-soft policy it follows and, at
  *       the marginal `high` rung (SEARCH 15.44 vs WAIT 14.89, gap 0.55), it
- *       turns CAUTIOUS -- an exploratory misstep from high can cascade toward
+ *       turns CAUTIOUS, an exploratory misstep from high can cascade toward
  *       stranding, so the on-policy value of SEARCH-at-high is pulled below the
  *       safe levers. SARSA therefore does NOT recover the DP-optimal policy.
  *
@@ -65,7 +65,7 @@
     return argmaxQ(Q, stateIdx, k, rng);
   }
 
-  /* Max Q over levers at (stateIdx, k) -- the off-policy bootstrap. */
+  /* Max Q over levers at (stateIdx, k), the off-policy bootstrap. */
   function maxQ(Q, stateIdx, k) {
     const b = base(stateIdx, k);
     let m = -Infinity;

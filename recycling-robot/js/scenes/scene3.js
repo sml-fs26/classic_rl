@@ -1,4 +1,4 @@
-/* Scene 3 -- Formalization / what makes this an MDP.
+/* Scene 3, Formalization / what makes this an MDP.
  *   The four parts reveal one at a time over the gauge the learner just played:
  *   State (battery), Action (lever), Transition (the drain die, 70/30), Reward
  *   (+3/+2 search, +1 wait, 0 recharge, -10 strand). NEXT advances the reveal,

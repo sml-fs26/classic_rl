@@ -1,18 +1,24 @@
-/* scene9.css -- dynamic programming. */
-.sc9-grid { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin: 8px 0 12px; }
+/* scene9.css -- dynamic programming (progressive, one rung per click). */
+.sc9-formula-card {
+  display: flex; flex-direction: column; gap: 6px;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+  padding: 8px 12px; margin: 8px 0 10px;
+}
+.sc9-formula-label { font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-secondary); }
+.sc9-formula-tex .katex { font-size: 1.0em; }
+
+.sc9-ctrls-row {
+  display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center;
+  margin: 0 0 10px;
+}
+.sc9-ctrls { gap: 8px; flex-wrap: wrap; }
+.sc9-status { font-size: 9px; color: var(--ink-on-box); font-variant-numeric: tabular-nums; }
+.sc9-status b { color: var(--accent); }
+
+.sc9-grid { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin: 4px 0 12px; }
 .sc9-board-host { flex: 0 1 auto; min-width: 0; }
 .sc9-side { display: flex; flex-direction: column; gap: 14px; flex: 1 1 280px; min-width: 0; }
-.sc9-narr { min-height: 92px; font-size: 9px; line-height: 1.8; }
-.sc9-scrub {
-  display: flex; flex-direction: column; gap: 10px;
-  padding: 10px 12px; border: 3px solid var(--rule); background: var(--bg-strong);
-  box-shadow: inset 0 0 0 2px var(--inner-highlight);
-}
-.sc9-scrub-label { font-size: 9px; color: var(--ink-on-box); }
-.sc9-range {
-  appearance: none; -webkit-appearance: none; width: 100%; height: 8px;
-  background: var(--bg); border: 2px solid var(--rule); margin: 0;
-}
-.sc9-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 18px; background: var(--highlight); border: 2px solid var(--rule); cursor: pointer; }
-.sc9-range::-moz-range-thumb { width: 14px; height: 18px; background: var(--highlight); border: 2px solid var(--rule); cursor: pointer; }
+.sc9-narr { min-height: 96px; font-size: 9px; line-height: 1.8; }
+
 @media (max-width: 720px) { .sc9-grid { gap: 16px; } .sc9-side { flex-basis: 100%; } }

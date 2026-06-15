@@ -1,4 +1,4 @@
-/* i18n CORE for the Recycling Robot -- English (authoritative) + Japanese mirror.
+/* i18n CORE for the Recycling Robot, English (authoritative) + Japanese mirror.
  *
  *   This file is the THIN core only. It seeds the shared chrome strings
  *   (topbar, concept-badge labels, prev/next, theme/lang/music labels, the
@@ -25,7 +25,7 @@
 
   const STORE = {
     en: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · RECYCLING ROBOT',
       'topbar.prev':  'PREV',
       'topbar.next':  'NEXT',
@@ -34,7 +34,7 @@
       'music.off':    '♪ MUSIC OFF',
       'lang.toggle':  '日本語',            /* what to switch TO */
 
-      /* ---- concept-badge labels (lit on reaching the relevant scene) ---- */
+      /*, concept-badge labels (lit on reaching the relevant scene), */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -42,7 +42,7 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'TD',
 
-      /* ---- common gauge vocabulary, reused across scenes ---- */
+      /*, common gauge vocabulary, reused across scenes, */
       'vocab.battery':  'battery',
       'vocab.lever':    'lever',
       'vocab.die':      'the drain die',
@@ -51,7 +51,7 @@
       'vocab.trash':    'trash',
       'vocab.return':   'return',
 
-      /* ---- the three levers (canonical labels) ---- */
+      /*, the three levers (canonical labels), */
       'lever.search':       'SEARCH',
       'lever.wait':         'WAIT',
       'lever.recharge':     'RECHARGE',
@@ -62,30 +62,30 @@
       'lever.wait.sub':     'idle, a crumb, no risk',
       'lever.recharge.sub': 'dock, refill to full',
 
-      /* ---- battery-level names ---- */
+      /*, battery-level names, */
       'level.empty':  'empty',
       'level.low':    'low',
       'level.mid':    'mid',
       'level.high':   'high',
       'level.full':   'full',
 
-      /* ---- shared gauge widget labels ---- */
+      /*, shared gauge widget labels, */
       'gauge.full':       'FULL',
       'gauge.stranded':   'EMPTY · STRANDED',
       'gauge.bestLever':  'BEST LEVER HERE',
       'gauge.title':      'BEST LEVER ON EVERY RUNG',
 
-      /* ---- drain die widget ---- */
+      /*, drain die widget, */
       'die.minus1': '−1 rung',
       'die.minus2': '−2 rungs',
       'die.badge':  '70 / 30',
       'die.roll':   'ROLL',
 
-      /* ---- shared overlay chrome ---- */
+      /*, shared overlay chrome, */
       'speakerNotes.title': 'SPEAKER NOTES · press <kbd>n</kbd> to close',
       'speakerNotes.empty': '(No notes for this scene yet.)',
 
-      /* ---- lecturer speaker notes, keyed by scene ---- */
+      /*, lecturer speaker notes, keyed by scene, */
       'notes.scene0': '<h3>Hook</h3><p>A resource that earns while it runs, but runs down. The whole lesson: <b>the right call is not fixed, it flips as the battery empties</b>. Push while you have headroom, protect the asset before you strand it.</p>',
       'notes.scene1': '<h3>Tutorial</h3><p>Vocabulary only, no theory. <b>Battery</b> = the situation (the gauge). <b>Lever</b> = SEARCH / WAIT / RECHARGE. <b>The drain die</b> = the part you do not control. <b>The shift</b> = how many steps remain.</p>',
       'notes.scene2': '<h3>Playtest</h3><p>Let them feel the swing. A greedy SEARCH on a low battery strands the robot for a brutal minus 10. "You were already following <em>some</em> rule, push while full, recharge when it gets scary?"</p>',
@@ -102,7 +102,7 @@
     },
 
     jp: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · リサイクルロボット',
       'topbar.prev':  'まえ',
       'topbar.next':  'つぎ',
@@ -111,7 +111,7 @@
       'music.off':    '♪ おんがく オフ',
       'lang.toggle':  'ENGLISH',
 
-      /* ---- concept-badge labels ---- */
+      /*, concept-badge labels, */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -119,7 +119,7 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'TD',
 
-      /* ---- common gauge vocabulary ---- */
+      /*, common gauge vocabulary, */
       'vocab.battery':  'バッテリー',
       'vocab.lever':    'レバー',
       'vocab.die':      'ドレインダイス',
@@ -128,7 +128,7 @@
       'vocab.trash':    'ゴミ',
       'vocab.return':   'リターン',
 
-      /* ---- the three levers ---- */
+      /*, the three levers, */
       'lever.search':       'サーチ',
       'lever.wait':         'まつ',
       'lever.recharge':     'じゅうでん',
@@ -139,30 +139,30 @@
       'lever.wait.sub':     'たいき、わずか、リスクなし',
       'lever.recharge.sub': 'ドック、フルまでかいふく',
 
-      /* ---- battery-level names ---- */
+      /*, battery-level names, */
       'level.empty':  'カラ',
       'level.low':    'ひくい',
       'level.mid':    'ちゅう',
       'level.high':   'たかい',
       'level.full':   'フル',
 
-      /* ---- gauge widget labels ---- */
+      /*, gauge widget labels, */
       'gauge.full':       'フル',
       'gauge.stranded':   'カラ · こしょう',
       'gauge.bestLever':  'ここでの さいぜんの レバー',
       'gauge.title':      'すべての だんの さいぜんの レバー',
 
-      /* ---- drain die widget ---- */
+      /*, drain die widget, */
       'die.minus1': '−1 だん',
       'die.minus2': '−2 だん',
       'die.badge':  '70 / 30',
       'die.roll':   'ふる',
 
-      /* ---- overlay chrome ---- */
+      /*, overlay chrome, */
       'speakerNotes.title': 'スピーカー ノート · <kbd>n</kbd> で とじる',
       'speakerNotes.empty': '（この シーンの ノートは まだ ありません）',
 
-      /* ---- lecturer speaker notes ---- */
+      /*, lecturer speaker notes, */
       'notes.scene0': '<h3>つかみ</h3><p>うごくと かせぐが、へっていく しげん。 きょうの じゅぎょう： <b>せいかいは こていでは なく、 バッテリーが へると ぎゃくてんする</b>。 よゆうが あるうちは おし、 こしょうの まえに しさんを まもる。</p>',
       'notes.scene1': '<h3>チュートリアル</h3><p>ことばだけ。 りろんは なし。 <b>バッテリー</b> = じょうきょう（ゲージ）。 <b>レバー</b> = サーチ / まつ / じゅうでん。 <b>ドレインダイス</b> = じぶんで きめられない ぶぶん。 <b>シフト</b> = のこり ステップすう。</p>',
       'notes.scene2': '<h3>プレイテスト</h3><p>ゆれを かんじて もらう。 ひくい バッテリーで よくばって サーチ すると、 ロボットは こしょうして マイナス 10 の だいだげき。</p>',
@@ -179,7 +179,7 @@
     },
   };
 
-  /* ---- current language (persisted) ---- */
+  /*, current language (persisted), */
   let lang = 'en';
   try {
     const saved = localStorage.getItem(STORAGE_KEY);

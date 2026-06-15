@@ -8,12 +8,12 @@
  *   recharge   RECHARGE   protect    blue    (#0072B2)  pays nothing now, refills to full
  *
  * Unlike the gambler's stake, a lever is NOT a number you scale: it is a
- * categorical choice. The single stochastic element -- the battery-drain die
- * on a SEARCH -- lives in robot.js, not here. SEARCH is the only lever with a
+ * categorical choice. The single stochastic element, the battery-drain die
+ * on a SEARCH, lives in robot.js, not here. SEARCH is the only lever with a
  * die; WAIT and RECHARGE are deterministic.
  *
  * Every lever is legal at every PLAYABLE rung (low/mid/high/full), so unlike
- * the gambler there are no clamped actions -- the Q-table is a clean 4x3.
+ * the gambler there are no clamped actions, the Q-table is a clean 4x3.
  *
  * Mirrors the shape of the reused engine's window.Moves (MOVE_IDS /
  * MOVE_BY_ID) so bellman.js / sarsa.js consume it unchanged; aliased to

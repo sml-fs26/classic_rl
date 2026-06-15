@@ -1,4 +1,4 @@
-/* scene10 i18n -- why DP fails. */
+/* scene10 i18n, why DP fails. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

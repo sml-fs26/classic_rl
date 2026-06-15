@@ -1,4 +1,4 @@
-/* scene8 i18n -- Bellman. */
+/* scene8 i18n, Bellman. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
