@@ -1,9 +1,9 @@
-/* Scene 5 — All five pieces in one game.
+/* Scene 5, All five pieces in one game.
  *
  *   Five recap cards in a row, each tinted with the corresponding viz's hue.
  *   Cards reference where each piece lives in this viz.
  *
- *   Static — no step engine. Cold-entry safe.
+ *   Static, no step engine. Cold-entry safe.
  */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -66,7 +66,7 @@
     const closer = document.createElement('p');
     closer.className = 'caption scene5-closer';
     closer.innerHTML =
-      'Other RL methods — Q-learning, policy gradient, function approximation, deep RL — extend these five ideas. ' +
+      'Other RL methods, Q-learning, policy gradient, function approximation, deep RL, extend these five ideas. ' +
       'Larger state spaces, function approximators for Q, off-policy targets. The grammar is the same.';
     wrap.appendChild(closer);
 

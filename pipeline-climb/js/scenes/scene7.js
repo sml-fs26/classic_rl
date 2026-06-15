@@ -3,8 +3,8 @@
  *   Average the return distribution (scene 6) away and you get ONE honest
  *   number per lever in each situation: Q*(s, a), the long-run value of
  *   pulling lever a at rung s, then playing the optimal lever forever after.
- *   The best lever in a row is the one with the highest Q* -- the per-row
- *   argmax star -- and that is the greedy playbook.
+ *   The best lever in a row is the one with the highest Q*, the per-row
+ *   argmax star, and that is the greedy playbook.
  *
  *   The core reveal: the STAR WALKS UP THE LADDER. We reveal the 5 rungs x 3
  *   levers Q-table (window.QTable) one rung at a time, COLD -> READY, with a
@@ -65,7 +65,7 @@
 
     const Qstar = getQstar();
 
-    /* ---- Heading + lede ---- */
+    /*, Heading + lede, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = T('qstar.heading');
@@ -76,7 +76,7 @@
     lede.innerHTML = T('qstar.lede');
     root.appendChild(lede);
 
-    /* ---- Q* formula card ---- */
+    /*, Q* formula card, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('qstar.formula.label') + '</div>';
@@ -92,7 +92,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Reveal panel: ladder icon | the scorecard ---- */
+    /*, Reveal panel: ladder icon | the scorecard, */
     const panel = document.createElement('div');
     panel.className = 'pc-qstar-panel';
 
@@ -122,12 +122,12 @@
 
     const qtbl = window.QTable.mount(qHost);
 
-    /* ---- Read-out (names the winner of the rung just filled) ---- */
+    /*, Read-out (names the winner of the rung just filled), */
     const readEl = document.createElement('p');
     readEl.className = 'pc-qstar-read';
     root.appendChild(readEl);
 
-    /* ---- Step hint ---- */
+    /*, Step hint, */
     const hint = document.createElement('div');
     hint.className = 'pc-qstar-hint';
     const hintText = document.createElement('span');
@@ -135,7 +135,7 @@
     hint.appendChild(hintText);
     root.appendChild(hint);
 
-    /* ---- The "star walks up" punchline (revealed at the end) ---- */
+    /*, The "star walks up" punchline (revealed at the end), */
     const note = document.createElement('p');
     note.className = 'pc-qstar-note';
     note.innerHTML = T('qstar.note');

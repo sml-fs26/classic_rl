@@ -1,4 +1,4 @@
-/* Scene 3 -- Formalization. Freeze the dock and label the four MDP parts over a
+/* Scene 3, Formalization. Freeze the dock and label the four MDP parts over a
    live dock tile, each with its KaTeX symbol. Cold-entry safe. */
 (function () {
   window.scenes = window.scenes || {};

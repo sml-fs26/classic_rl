@@ -1,4 +1,4 @@
-/* Scene 3 -- Formalization. The four MDP parts slide in over the trial the
+/* Scene 3, Formalization. The four MDP parts slide in over the trial the
    learner just played: the tuple, then State, Action, Transition, Reward, each
    with a KaTeX formula card and a manager gloss. Internal 5-step reveal.
    Cold-entry safe. */

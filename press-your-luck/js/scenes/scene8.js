@@ -119,7 +119,7 @@
 
     const bk = computeBackup();
 
-    /* ---- Heading + manager framing ---- */
+    /*, Heading + manager framing, */
     const h = document.createElement('h2');
     h.className = 's8-heading';
     h.textContent = T('s8.heading');
@@ -130,7 +130,7 @@
     mgr.textContent = T('s8.manager');
     root.appendChild(mgr);
 
-    /* ---- Bellman optimality formula card ---- */
+    /*, Bellman optimality formula card, */
     const fcard = document.createElement('div');
     fcard.className = 's8-formula-card';
     fcard.innerHTML = '<div class="s8-card-label">' + T('s8.formula.label') + '</div>';
@@ -156,7 +156,7 @@
     fcard.appendChild(read);
     root.appendChild(fcard);
 
-    /* ---- The backup IS the depth-1 trajectory tree ----
+    /*, The backup IS the depth-1 trajectory tree ----
        A collapsible card holding a depth-1 TrajTree of ROLL from (20,20,pot20)
        with each frontier child bootstrapped by its win prob V: G_t = r + V(s').
        Its weighted leaf sum equals Q*(s, ROLL) - exactly the branch arithmetic
@@ -212,7 +212,7 @@
       if (tie) tie.innerHTML = T('s8.tt.tie', { eg: window.TrajTree._fmt.fmtSigned2(tt.getEG()) });
     })();
 
-    /* ---- The worked one-step backup ---- */
+    /*, The worked one-step backup, */
     const backup = document.createElement('div');
     backup.className = 's8-backup';
     root.appendChild(backup);
@@ -243,7 +243,7 @@
     branches.className = 's8-branches';
     backup.appendChild(branches);
 
-    /* -- BUST branch -- */
+    /*, BUST branch, */
     const bust = document.createElement('div');
     bust.className = 's8-branch s8-branch-bust';
     bust.innerHTML =
@@ -258,7 +258,7 @@
       '</div>';
     branches.appendChild(bust);
 
-    /* -- GROW branch -- */
+    /*, GROW branch, */
     const grow = document.createElement('div');
     grow.className = 's8-branch s8-branch-grow';
     let growRows = '';
@@ -283,7 +283,7 @@
       '</div>';
     branches.appendChild(grow);
 
-    /* -- Put it together -- */
+    /*, Put it together, */
     const sum = document.createElement('div');
     sum.className = 's8-sum';
     const g = bk.grow;
@@ -307,7 +307,7 @@
       '<div class="s8-sum-verdict">' + T('s8.backup.sum.verdict') + '</div>';
     backup.appendChild(sum);
 
-    /* ---- The knife-edge identity ---- */
+    /*, The knife-edge identity, */
     const knife = document.createElement('div');
     knife.className = 's8-knife';
     knife.innerHTML = '<div class="s8-card-label">' + T('s8.knife.title') + '</div>';
@@ -350,7 +350,7 @@
     knife.appendChild(kident);
     root.appendChild(knife);
 
-    /* ---- Bridge to the DP scene ---- */
+    /*, Bridge to the DP scene, */
     const bridge = document.createElement('div');
     bridge.className = 's8-bridge';
     bridge.textContent = T('s8.bridge');

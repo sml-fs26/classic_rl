@@ -1,4 +1,4 @@
-/* scene10 i18n fragment -- "Why DP does not scale".
+/* scene10 i18n fragment, "Why DP does not scale".
    Two reasons DP is the ideal, not the method: (a) you rarely know P (real
    demand depends on competitors, weather, virality), and (b) the real board
    explodes (fare classes x dates x seatmaps x competitor prices).
@@ -13,7 +13,7 @@
         'a <b>perfect demand model</b> and a <b>board small enough to enumerate</b>. ' +
         'Perfect-model pricing is a fantasy.',
 
-      /* ---- Reason A: you rarely know P ---- */
+      /*, Reason A: you rarely know P, */
       'scene10.a.tag':   'REASON 1',
       'scene10.a.title': 'YOU RARELY KNOW P',
       'scene10.a.formula.label': 'THE DEMAND ODDS ARE NOT PRINTED ANYWHERE',
@@ -27,7 +27,7 @@
       'scene10.a.foot':
         'You only get to set a price and watch what actually sold, one draw at a time.',
 
-      /* ---- Reason B: the board explodes ---- */
+      /*, Reason B: the board explodes, */
       'scene10.b.tag':   'REASON 2',
       'scene10.b.title': 'THE BOARD EXPLODES',
       'scene10.b.body':
@@ -44,7 +44,7 @@
         'Even if you somehow knew P, you could not enumerate, store, or sweep a board this ' +
         'big, cell by cell.',
 
-      /* ---- verdict + bridge ---- */
+      /*, verdict + bridge, */
       'scene10.verdict': 'DP IS THE IDEAL, NOT THE METHOD',
       'scene10.bridge':
         'You never truly know demand, and the real problem is far too big to compute ' +

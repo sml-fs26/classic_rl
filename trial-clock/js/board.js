@@ -1,4 +1,4 @@
-/* board.js -- the Trial Clock state widgets.
+/* board.js, the Trial Clock state widgets.
  *
  *   TWO objects share the visual language of the MDP:
  *
@@ -47,7 +47,7 @@
   function leverName(id)  { return T('lever.' + id); }              // ONBOARD NUDGE ...
 
   /* ============================================================
-     (A) TRIAL CARD -- the recurring state icon
+     (A) TRIAL CARD, the recurring state icon
      ============================================================ */
   function mountCard(host, opts) {
     const o = opts || {};
@@ -141,7 +141,7 @@
   }
 
   /* ============================================================
-     (B) BOARD -- the whole 5x5 grid / Q-table
+     (B) BOARD, the whole 5x5 grid / Q-table
      ============================================================ */
   function mountBoard(host, opts) {
     const o = opts || {};

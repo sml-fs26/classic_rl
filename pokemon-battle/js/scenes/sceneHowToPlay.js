@@ -1,4 +1,4 @@
-/* Tutorial — "How to play".
+/* Tutorial, "How to play".
  *
  * Optional refresher scene for students who've never picked up a Gen-1
  * Pokemon game. Slotted between the title (scene 0) and the battle
@@ -10,12 +10,12 @@
  *   • A typewriter dialog box in Prof.-Oak voice
  *   • A "Step N / 6" indicator
  * The Pokemon-flavoured visuals reuse the existing battle CSS so the
- * tutorial *looks* identical to the real battle — students see the
+ * tutorial *looks* identical to the real battle, students see the
  * exact elements they'll interact with in scene 1. */
 (function () {
   window.scenes = window.scenes || {};
 
-  /* Module-level i18n helper — used by both the scene builder and
+  /* Module-level i18n helper, used by both the scene builder and
      the per-step render functions below. */
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
@@ -44,7 +44,7 @@
       return T(key, { name: trainerName });
     }
 
-    /* ---------- Top bar: step counter + SKIP button ---------- */
+    /*, Top bar: step counter + SKIP button, */
     const topbar = document.createElement('div');
     topbar.className = 'tutorial-topbar';
     root.appendChild(topbar);
@@ -64,35 +64,35 @@
       window.location.hash = '#scene=2';
     });
 
-    /* ---------- Section title ---------- */
+    /*, Section title, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title tutorial-section-title';
     root.appendChild(header);
 
-    /* ---------- Demo area (changes per step) ---------- */
+    /*, Demo area (changes per step), */
     const demoHost = document.createElement('div');
     demoHost.className = 'tutorial-demo';
     root.appendChild(demoHost);
 
-    /* ---------- Dialog at the bottom ---------- */
+    /*, Dialog at the bottom, */
     const dialogHost = document.createElement('div');
     dialogHost.className = 'tutorial-dialog';
     root.appendChild(dialogHost);
     const dialog = window.Dialog.mount(dialogHost);
 
-    /* ---------- Nav hint ---------- */
+    /*, Nav hint, */
     const navHint = document.createElement('div');
     navHint.className = 'tutorial-nav-hint';
     navHint.innerHTML = T('tut.nav.hint');
     root.appendChild(navHint);
 
-    /* ---------- Step engine ---------- */
+    /*, Step engine, */
     let cursor = 0;
 
     function renderStep(c) {
       cursor = c;
       /* Any prior step's animation loop must be stopped before its DOM is
-         torn down — both the HP-bucket demo and the turn-flow demo
+         torn down, both the HP-bucket demo and the turn-flow demo
          register setTimeouts that would keep firing into an empty
          demoHost otherwise. */
       stopHpAnimation();
@@ -109,7 +109,7 @@
         c === STEPS_DATA.length - 1 ? T('tut.go_to_battle') : T('tut.skip');
     }
 
-    /* Optional `#…&tut=N` hash flag jumps straight to internal step N — used
+    /* Optional `#…&tut=N` hash flag jumps straight to internal step N, used
        for headless screenshots and deep-linking. */
     function readInitialStep() {
       const m = (window.location.hash || '').match(/[#&?]tut=(\d+)/);
@@ -140,7 +140,7 @@
   };
 
   /* =========================================================================
-     Per-step render functions — each receives the demo host and fills it.
+     Per-step render functions, each receives the demo host and fills it.
      ========================================================================= */
 
   function renderStepWelcome(host) {
@@ -194,7 +194,7 @@
     /* HPBar.mount overwrites host.className, so add the stagger class here. */
     oppHpHost.classList.add('tut-stage-stage2');
 
-    /* Callout overlay layer.  Pure CSS-positioned labels (no SVG arrows —
+    /* Callout overlay layer.  Pure CSS-positioned labels (no SVG arrows, 
        the dotted-border + text strip is enough at this scale).  Opponent
        callouts ride the same .tut-stage-stage2 delay as the sprite/HP. */
     const callouts = document.createElement('div');
@@ -207,14 +207,14 @@
     stage.appendChild(callouts);
   }
 
-  /* Step 3 — HP has five buckets.
+  /* Step 3, HP has five buckets.
      Two layers: (1) a live demo at the top with Charmander taking damage in a
      loop (the bar drains, a "−1 HP" damage flash floats up, the sprite
      faints, the demo resets); (2) below it, a comic-strip reference showing
-     all six stages — FULL → HIGH → MID → LOW → CRITICAL → FAINTED — with
+     all six stages, FULL → HIGH → MID → LOW → CRITICAL → FAINTED, with
      "−1 HP" arrows between panels, so the student sees the whole ladder at
      once. */
-  /* Bucket order matches Battle.BUCKETS — label is looked up live so a
+  /* Bucket order matches Battle.BUCKETS, label is looked up live so a
      language toggle re-paints the demo without reseting the animation. */
   const HP_STAGES = [
     { key: 'full',     pct: 100, cls: '' },
@@ -331,7 +331,7 @@
   }
 
   function renderStepMoves(host) {
-    /* Step 4 — two layers only:
+    /* Step 4, two layers only:
          1. The move buttons (replica of scene 1, disabled).
          2. An axis strip under them that makes the left-right gradient
             (more damage / less reliable) explicit.
@@ -340,7 +340,7 @@
     const wrap = document.createElement('div');
     wrap.className = 'tut-move-demo';
 
-    /* 1. Move menu (no PWR/ACC strip — moveSubHtml now returns just the type pill). */
+    /* 1. Move menu (no PWR/ACC strip, moveSubHtml now returns just the type pill). */
     const menu = document.createElement('div');
     menu.className = 'move-menu tut-move-menu';
     for (const m of window.Moves.MOVES) {
@@ -353,7 +353,7 @@
     }
     wrap.appendChild(menu);
 
-    /* 2. Gradient axis — three labels aligned to the three buttons. */
+    /* 2. Gradient axis, three labels aligned to the three buttons. */
     const axis = document.createElement('div');
     axis.className = 'tut-move-axis';
     axis.innerHTML =
@@ -422,7 +422,7 @@
       rowNodes.forEach((n, i) => n.classList.toggle('active', i === cur.row));
       cur.enter(stage);
       /* Per-phase HP updates, capped at CRITICAL (NB-1) so the tutorial
-         loop never goes to FAINTED — that concept arrives in scene 1. */
+         loop never goes to FAINTED, that concept arrives in scene 1. */
       if (ctx) {
         if (phase === 0) {
           ctx.charmBucket = Math.min(NB - 1, ctx.charmBucket + 1);
@@ -463,7 +463,7 @@
       '<div class="sprite-host opponent"><img class="poke-sprite" src="assets/charmander-front.png" alt="' + T('pokemon.charmander') + '"/></div>' +
       '<div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="' + T('pokemon.pikachu') + '"/></div>';
 
-    /* HP boxes — append to stage so the existing absolute positioning
+    /* HP boxes, append to stage so the existing absolute positioning
        on .hp-box.opponent / .hp-box.player puts them in the right
        corners. They animate dropping a bucket per attack inside
        runTurnAnimation below. */
@@ -506,7 +506,7 @@
     wrap.appendChild(seq);
     host.appendChild(wrap);
 
-    /* Kick off the loop with an HP context — bars drop a bucket per
+    /* Kick off the loop with an HP context, bars drop a bucket per
        attack and reset when both hit CRITICAL. */
     runTurnAnimation(stage, rowNodes, {
       pikaHp, charmHp,

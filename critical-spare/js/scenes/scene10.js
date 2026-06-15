@@ -1,4 +1,4 @@
-/* Scene 10 -- Why DP does not scale. Two blunt reason cards: (a) you rarely
+/* Scene 10, Why DP does not scale. Two blunt reason cards: (a) you rarely
    know the failure odds P; (b) real plants explode far past a 3x3 grid (dozens
    of machines, part types, lead times, shared spares). Static, cold-entry safe. */
 (function () {

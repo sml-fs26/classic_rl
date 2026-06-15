@@ -1,4 +1,4 @@
-/* i18n CORE for Windy Treasure Cave -- English (authoritative) + Japanese mirror.
+/* i18n CORE for Windy Treasure Cave, English (authoritative) + Japanese mirror.
  *
  *   This file is the THIN core only. It seeds the shared chrome strings
  *   (topbar, concept-badge labels, prev/next, theme/lang/music labels, the
@@ -26,7 +26,7 @@
 
   const STORE = {
     en: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · WINDY TREASURE CAVE',
       'topbar.prev':  'PREV',
       'topbar.next':  'NEXT',
@@ -35,7 +35,7 @@
       'music.off':    '♪ MUSIC OFF',
       'lang.toggle':  '日本語',
 
-      /* ---- concept-badge labels ---- */
+      /*, concept-badge labels, */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -43,7 +43,7 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'TD',
 
-      /* ---- common cave vocabulary ---- */
+      /*, common cave vocabulary, */
       'vocab.tile':     'tile',
       'vocab.heading':  'heading',
       'vocab.wind':     'the wind die',
@@ -53,13 +53,13 @@
       'vocab.torch':    'torch',
       'vocab.gust':     'GUST',
 
-      /* ---- the four headings ---- */
+      /*, the four headings, */
       'act.UP':    'UP',
       'act.DOWN':  'DOWN',
       'act.LEFT':  'LEFT',
       'act.RIGHT': 'RIGHT',
 
-      /* ---- board widget labels ---- */
+      /*, board widget labels, */
       'board.gold':  'GOLD  +10',
       'board.pit':   'PIT  -10',
       'board.start': 'START',
@@ -67,19 +67,19 @@
       'board.best':  'BEST HEADING',
       'board.tie':   '= a tie (both best)',
 
-      /* ---- wind-die widget ---- */
+      /*, wind-die widget, */
       'die.aim':   'YOU WALK ↑',
       'die.left':  'GUST ← LEFT',
       'die.right': 'GUST → RIGHT',
       'die.badge': '70 / 15 / 15',
       'die.roll':  'ROLL',
 
-      /* ---- shared overlay chrome ---- */
+      /*, shared overlay chrome, */
       'speakerNotes.title': 'SPEAKER NOTES · press <kbd>n</kbd> to close',
       'speakerNotes.empty': '(No notes for this scene yet.)',
 
-      /* ---- lecturer speaker notes, keyed by scene ---- */
-      'notes.scene0': '<h3>Hook</h3><p>One prize (the gold, +10), one hazard (the pit, -10), a wind that gets a vote. The whole lesson: <b>the right heading depends on where you stand</b> -- steer around your hazards, sprint only where the ground is safe.</p>',
+      /*, lecturer speaker notes, keyed by scene, */
+      'notes.scene0': '<h3>Hook</h3><p>One prize (the gold, +10), one hazard (the pit, -10), a wind that gets a vote. The whole lesson: <b>the right heading depends on where you stand</b>, steer around your hazards, sprint only where the ground is safe.</p>',
       'notes.scene1': '<h3>Tutorial</h3><p>Vocabulary only, no theory. <b>Tile</b> = the situation (where you stand). <b>Heading</b> = the lever (the way you aim). <b>The wind die</b> = the part you do not control. Wall-bump = stay put, still -1.</p>',
       'notes.scene2': '<h3>Playtest</h3><p>Let them feel the shove. Almost everyone gets gusted into a wall or toward the pit at least once. "You were already following <em>some</em> rule for which way to go."</p>',
       'notes.scene3': '<h3>Formalization</h3><p>Name the four parts over the cave they just walked: state s (the tile), action a (the heading), transition P (the wind, 0.7/0.15/0.15), reward r (-1 a step, +10 gold, -10 pit).</p>',
@@ -91,11 +91,11 @@
       'notes.scene9': '<h3>DP</h3><p>The wind odds are printed, so P is known and Q* is exact. Value floods OUT from the gold; the danger crater sets around the pit; the arrow field bends into place, never pointing inward.</p>',
       'notes.scene10': '<h3>Why DP fails</h3><p>(a) You rarely know the true wind odds. (b) A 5x5 cave is tiny; a real one (fog, items, a moving hazard) explodes. DP is the ideal, not the method.</p>',
       'notes.scene11': '<h3>SARSA vs Q-learning</h3><p>Same steps, two update rules. On-policy <b>SARSA</b> learns the value of the cautious route it walks and keeps its distance from the pit (below the pit it aims AWAY); off-policy <b>Q-learning</b> bootstraps on the best next heading and recovers the optimal map, matching DP. Classic cliff-walking.</p>',
-      'notes.scene12': '<h3>Recap</h3><p>Six cards: MDP, policy, return, Q*, DP, learning. Close: the safe heading depends on where you stand -- strategy is a <em>map</em> of decisions, not a single bet.</p>',
+      'notes.scene12': '<h3>Recap</h3><p>Six cards: MDP, policy, return, Q*, DP, learning. Close: the safe heading depends on where you stand, strategy is a <em>map</em> of decisions, not a single bet.</p>',
     },
 
     jp: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · かぜの たからどうくつ',
       'topbar.prev':  'まえ',
       'topbar.next':  'つぎ',
@@ -104,7 +104,7 @@
       'music.off':    '♪ おんがく オフ',
       'lang.toggle':  'ENGLISH',
 
-      /* ---- concept-badge labels ---- */
+      /*, concept-badge labels, */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -112,7 +112,7 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'TD',
 
-      /* ---- common cave vocabulary ---- */
+      /*, common cave vocabulary, */
       'vocab.tile':     'マス',
       'vocab.heading':  'むき',
       'vocab.wind':     'かぜダイス',
@@ -122,13 +122,13 @@
       'vocab.torch':    'たいまつ',
       'vocab.gust':     'とつぷう',
 
-      /* ---- the four headings ---- */
+      /*, the four headings, */
       'act.UP':    'うえ',
       'act.DOWN':  'した',
       'act.LEFT':  'ひだり',
       'act.RIGHT': 'みぎ',
 
-      /* ---- board widget labels ---- */
+      /*, board widget labels, */
       'board.gold':  'おたから  +10',
       'board.pit':   'おとしあな  -10',
       'board.start': 'スタート',
@@ -136,19 +136,19 @@
       'board.best':  'さいぜんの むき',
       'board.tie':   '= ひきわけ（どちらも さいぜん）',
 
-      /* ---- wind-die widget ---- */
+      /*, wind-die widget, */
       'die.aim':   'ねらいどおり ↑',
       'die.left':  'とつぷう ← ひだり',
       'die.right': 'とつぷう → みぎ',
       'die.badge': '70 / 15 / 15',
       'die.roll':  'ふる',
 
-      /* ---- overlay chrome ---- */
+      /*, overlay chrome, */
       'speakerNotes.title': 'スピーカー ノート · <kbd>n</kbd> で とじる',
       'speakerNotes.empty': '（この シーンの ノートは まだ ありません）',
 
-      /* ---- lecturer speaker notes ---- */
-      'notes.scene0': '<h3>つかみ</h3><p>ひとつの たから（おたから +10）、 ひとつの きけん（おとしあな -10）、 そして いっぴょうを もつ かぜ。 きょうの じゅぎょう： <b>ただしい むきは あなたが どこに いるかで かわる</b> -- きけんは よけて、 あんぜんな ところだけ つっぱしれ。</p>',
+      /*, lecturer speaker notes, */
+      'notes.scene0': '<h3>つかみ</h3><p>ひとつの たから（おたから +10）、 ひとつの きけん（おとしあな -10）、 そして いっぴょうを もつ かぜ。 きょうの じゅぎょう： <b>ただしい むきは あなたが どこに いるかで かわる</b>, きけんは よけて、 あんぜんな ところだけ つっぱしれ。</p>',
       'notes.scene1': '<h3>チュートリアル</h3><p>ことばだけ。 りろんは なし。 <b>マス</b> = いまの じょうきょう。 <b>むき</b> = レバー（ねらう ほうこう）。 <b>かぜダイス</b> = じぶんで きめられない ぶぶん。 かべに ぶつかる = そのまま、 でも -1。</p>',
       'notes.scene2': '<h3>プレイテスト</h3><p>おされる かんじを たいけん。 ほとんどの ひとが いちどは かべや おとしあなの ほうへ おされる。 「あなたは すでに <em>なんらかの</em> いきかたの ルールに したがっていた」。</p>',
       'notes.scene3': '<h3>けいしきか</h3><p>いま あるいた どうくつの うえで よっつの ぶぶんに なまえを： じょうたい s（マス）、 こうどう a（むき）、 せんい P（かぜ、0.7/0.15/0.15）、 ほうしゅう r（1ぽ -1、 おたから +10、 おとしあな -10）。</p>',
@@ -160,7 +160,7 @@
       'notes.scene9': '<h3>DP</h3><p>かぜの かくりつは ひょうじ ずみ、 だから P は きち で Q* は せいかく。 かちは おたからから ひろがり、 あなの まわりに きけんの クレーター。 やじるしばは ひとりでに まがり、 けっして うちがわを むかない。</p>',
       'notes.scene10': '<h3>DP が だめな りゆう</h3><p>(a) ほんとうの かぜの オッズは めったに わからない。 (b) 5x5 は ちいさい。 げんじつ（きり、 アイテム、 うごく きけん）は ばくはつ する。 DP は りそう であって しゅほう では ない。</p>',
       'notes.scene11': '<h3>SARSA たい Q-ラーニング</h3><p>おなじ あゆみ、 ふたつの こうしんルール。 オンポリシーの <b>SARSA</b> は あるく しんちょうな みちの かちを まなび、 あなから きょりを とる（あなの した では はなれる むき）。 オフポリシーの <b>Q-ラーニング</b> は つぎの さいぜんの むきで ブートストラップし、 さいぜんの ちず（DP と いっち）を とりもどす。 がけあるき。</p>',
-      'notes.scene12': '<h3>まとめ</h3><p>6まいの カード： MDP、 ポリシー、 リターン、 Q*、 DP、 がくしゅう。 むすび： あんぜんな むきは どこに いるかで かわる -- せんりゃくは いしけっていの <em>ちず</em>、 ひとつの かけ では ない。</p>',
+      'notes.scene12': '<h3>まとめ</h3><p>6まいの カード： MDP、 ポリシー、 リターン、 Q*、 DP、 がくしゅう。 むすび： あんぜんな むきは どこに いるかで かわる, せんりゃくは いしけっていの <em>ちず</em>、 ひとつの かけ では ない。</p>',
     },
   };
 

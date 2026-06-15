@@ -1,4 +1,4 @@
-/* Windy Treasure Cave -- static MDP solution plus value-iteration fill
+/* Windy Treasure Cave, static MDP solution plus value-iteration fill
  * frames and SARSA / Q-learning training trajectories.
  *
  * Regenerate with `node precompute/build-datasets.js`. The build script

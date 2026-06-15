@@ -1,10 +1,10 @@
-/* Scene 3 — γ as risk preference.
+/* Scene 3, γ as risk preference.
  *
  *   Same board, V-table visible. γ slider 0.70 → 0.99 snapping to 7 precomputed
  *   grid points. Per-square argmax-die badges shift as γ changes. Mix strip
  *   below shows % of squares preferring each die.
  *
- *   Direct interaction — slider, V + policy re-render. No step engine.
+ *   Direct interaction, slider, V + policy re-render. No step engine.
  *   Cold-entry: requires DATA.valueIteration.
  */
 (function () {
@@ -36,7 +36,7 @@
       const empty = document.createElement('div');
       empty.className = 'card';
       empty.innerHTML =
-        '<p class="caption">Value-iteration data is missing — run ' +
+        '<p class="caption">Value-iteration data is missing, run ' +
         '<code>node precompute/build-datasets.js</code> from the viz folder.</p>';
       wrap.appendChild(empty);
       return {};
@@ -91,9 +91,9 @@
     mixStrip.className = 'policy-mix-strip';
     mixStrip.innerHTML =
       '<span class="pm-label">policy mix</span>' +
-      '<span class="pm-die"><span class="die-pill die-d4">d4</span><span id="pm-d4">—</span></span>' +
-      '<span class="pm-die"><span class="die-pill die-d6">d6</span><span id="pm-d6">—</span></span>' +
-      '<span class="pm-die"><span class="die-pill die-d8">d8</span><span id="pm-d8">—</span></span>';
+      '<span class="pm-die"><span class="die-pill die-d4">d4</span><span id="pm-d4">, </span></span>' +
+      '<span class="pm-die"><span class="die-pill die-d6">d6</span><span id="pm-d6">, </span></span>' +
+      '<span class="pm-die"><span class="die-pill die-d8">d8</span><span id="pm-d8">, </span></span>';
     left.appendChild(mixStrip);
 
     const cap = document.createElement('p');
@@ -111,10 +111,10 @@
     const railCard = document.createElement('div');
     railCard.className = 'card';
     railCard.innerHTML =
-      '<div class="vi-stat-row"><span class="vi-k">γ</span><span class="vi-v" id="s3-gamma">—</span></div>' +
-      '<div class="vi-stat-row"><span class="vi-k">iters to converge</span><span class="vi-v" id="s3-iters">—</span></div>' +
-      '<div class="vi-stat-row"><span class="vi-k">V(1)</span><span class="vi-v" id="s3-v1">—</span></div>' +
-      '<div class="vi-stat-row"><span class="vi-k">dice used</span><span class="vi-v" id="s3-dice">—</span></div>';
+      '<div class="vi-stat-row"><span class="vi-k">γ</span><span class="vi-v" id="s3-gamma">, </span></div>' +
+      '<div class="vi-stat-row"><span class="vi-k">iters to converge</span><span class="vi-v" id="s3-iters">, </span></div>' +
+      '<div class="vi-stat-row"><span class="vi-k">V(1)</span><span class="vi-v" id="s3-v1">, </span></div>' +
+      '<div class="vi-stat-row"><span class="vi-k">dice used</span><span class="vi-v" id="s3-dice">, </span></div>';
     rail.appendChild(railCard);
 
     /* V color scale uses γ=0.99 range (widest) so cells don't pop colors across slider positions. */

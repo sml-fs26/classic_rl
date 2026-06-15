@@ -1,10 +1,10 @@
-/* scene6 i18n -- return. */
+/* scene6 i18n, return. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
     en: {
       'scene6.title': 'Return',
-      'scene6.lede':  'The return is the cash summed over the rest of the horizon, discounted by γ = 0.9 -- not just this turn.',
+      'scene6.lede':  'The return is the cash summed over the rest of the horizon, discounted by γ = 0.9, not just this turn.',
       'scene6.formulaLabel': 'PAYOFF SUMMED OVER THE QUARTER',
       'scene6.setup': 'Start AGING with an EMPTY bin. Pick the FIRST lever, then play optimally and stack the quarter totals.',
       'scene6.firstOrder': 'FIRST: ORDER (pre-stock)',
@@ -17,7 +17,7 @@
       'scene6.worst': 'WORST',
       'scene6.axis':  'quarter total',
       'scene6.note':  'Same situation, same first call, wildly different quarters. RUN\'s losing tail is fatter: an empty-bin failure books -8.',
-      'scene6.framing': 'Two managers, same call, same situation -- different quarters. <b>You cannot judge a playbook by one outcome; you judge it by the distribution.</b> That is why we optimise the <em>expected</em> return.',
+      'scene6.framing': 'Two managers, same call, same situation, different quarters. <b>You cannot judge a playbook by one outcome; you judge it by the distribution.</b> That is why we optimise the <em>expected</em> return.',
     },
     jp: {
       'scene6.title': 'リターン',

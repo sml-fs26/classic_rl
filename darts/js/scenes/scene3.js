@@ -1,17 +1,17 @@
-/* Scene 3 — the Robbins-Monro update.
+/* Scene 3, the Robbins-Monro update.
 
    Same dual-track layout, same observation stream, but the estimator is
        x_{n+1} = x_n + α (s_n - x_n)
    with a slider on α (default 0.1). The estimate now *tracks* the
    oscillating bullseye, with lag inversely proportional to α. The slider
    changes
-   future steps only — past estimates aren't retro-actively recomputed,
+   future steps only, past estimates aren't retro-actively recomputed,
    matching how a student would experiment in the notebook.
 
    This scene's caption arc:
    - n=0   "Same data. Now we update each round, not just average."
    - n=30  "α controls how fast the estimate moves toward each new sample."
-   - n=120 "Smaller α — smoother but slower. Larger α — twitchier."
+   - n=120 "Smaller α, smoother but slower. Larger α, twitchier."
    - n=T   "Tracking, not lagging. Next: how do we pick α?" */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -27,7 +27,7 @@
     const initialEstimate = (data.params && data.params.initialEstimate) || 50;
     const ALPHA_DEFAULT = (data.alpha && data.alpha.defaultRM) || 0.1;
 
-    /* ---- DOM ---- */
+    /*, DOM, */
     root.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 's3-wrap';
@@ -46,7 +46,7 @@
     beliefHost.className = 's3-belief-host';
     wrap.appendChild(beliefHost);
 
-    /* The Robbins-Monro update — large, centered. */
+    /* The Robbins-Monro update, large, centered. */
     const formula = window.Katex.display(data.tex.rmUpdate);
     formula.classList.add('s3-formula');
     wrap.appendChild(formula);
@@ -93,7 +93,7 @@
     const errGroup = document.createElement('div'); errGroup.className='control-group';
     errGroup.appendChild(Object.assign(document.createElement('label'), { textContent: 'tracking error' }));
     const errOut = document.createElement('output');
-    errOut.textContent = '—';
+    errOut.textContent = ', ';
     errGroup.appendChild(errOut);
     controls.appendChild(errGroup);
 
@@ -110,20 +110,20 @@
 
     root.appendChild(wrap);
 
-    /* ---- Tracks ---- */
+    /*, Tracks, */
     const truth = window.Track.mount({
       host: truthHost,
-      label: 'truth — oscillating bullseye',
+      label: 'truth, oscillating bullseye',
       showBullseye: true, showEstimate: false, showChips: true, chipLabelLast: 4,
     });
     const belief = window.Track.mount({
       host: beliefHost,
-      label: 'belief — RM estimate  x̂ₙ',
+      label: 'belief, RM estimate  x̂ₙ',
       showBullseye: false, showEstimate: true, showChips: false, showPlayer: false,
     });
     beliefHost.classList.add('belief');
 
-    /* ---- State ---- */
+    /*, State, */
     let n = 0;
     let estimate = initialEstimate;
     let alpha = ALPHA_DEFAULT;
@@ -140,7 +140,7 @@
       truth.setPlayer(data.playerTrace[0]);
       belief.setEstimate(estimate);
       counterOut.textContent = `0 / ${T}`;
-      errOut.textContent = '—';
+      errOut.textContent = ', ';
       dyn.textContent = 'Press Play. Try the α slider.';
     }
 

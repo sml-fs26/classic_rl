@@ -84,7 +84,7 @@
         cell.dataset.lever = id;
         cell.innerHTML =
           '<span class="q-mark"></span>' +
-          '<span class="q-val">—</span>';
+          '<span class="q-val">, </span>';
         grid.appendChild(cell);
         cells[a] = { cell, val: cell.querySelector('.q-val'), mark: cell.querySelector('.q-mark') };
       }
@@ -109,7 +109,7 @@
         if (allZero) {
           for (let a = 0; a < A; a++) {
             const c = node.cells[a];
-            c.val.textContent = '—';
+            c.val.textContent = ', ';
             c.cell.classList.remove('q-argmax', 'q-negative');
             c.mark.textContent = '';
           }
@@ -147,7 +147,7 @@
       for (let rung = 0; rung < NUM_RUNGS; rung++) {
         for (let a = 0; a < A; a++) {
           const c = rowNodes[rung].cells[a];
-          c.val.textContent = '—';
+          c.val.textContent = ', ';
           c.cell.classList.remove('q-argmax', 'q-negative', 'q-flip');
           c.mark.textContent = '';
         }

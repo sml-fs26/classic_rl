@@ -1,4 +1,4 @@
-/* scene11 i18n -- SARSA. */
+/* scene11 i18n, SARSA. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -11,13 +11,13 @@
 
       'scene11.s1.tag': 'THE UPDATE',
       'scene11.s1.title': 'Turn Bellman into a learning rule',
-      'scene11.s1.lead': 'The Bellman equation needs an expectation over the dice -- which you don\'t have without a model. So replace it with ONE observed sample per turn.',
+      'scene11.s1.lead': 'The Bellman equation needs an expectation over the dice, which you don\'t have without a model. So replace it with ONE observed sample per turn.',
       'scene11.s1.f0lab': 'BELLMAN (needs the model)',
       'scene11.s1.replace': 'replace the expectation with one observed turn',
       'scene11.s1.fSarsaLab': 'SARSA (one sample, on-policy)',
       'scene11.s1.sarsaGloss': 'After each lever-pull, compare what you expected to what actually happened, and nudge Q toward it. q[s\',a\'] uses the lever you actually play next.',
       'scene11.epsTitle': 'ε for exploration',
-      'scene11.epsBody': 'Every so often, deliberately try the unproven lever -- so your playbook is based on evidence, not habit. Without it you\'d forever trust today\'s favourite and never learn the better call.',
+      'scene11.epsBody': 'Every so often, deliberately try the unproven lever, so your playbook is based on evidence, not habit. Without it you\'d forever trust today\'s favourite and never learn the better call.',
       'scene11.note': 'No model of the failure odds is ever given. The learner only sees rolled turns.',
 
       'scene11.s2.tag': 'THE LIVE RUN',
@@ -32,7 +32,7 @@
       'scene11.oracleSub':  'the answer from scene 9',
       'scene11.conv':    'matches DP',
       'scene11.value':   'value from (HEALTHY,0)',
-      'scene11.framing': 'Many small experiments: trial → outcome → adjust. SARSA reproduces the <b>exact twist heat-map</b> -- RUN it, pre-order, swap now -- with no model ever given. This is how a seasoned operator learns a playbook.',
+      'scene11.framing': 'Many small experiments: trial → outcome → adjust. SARSA reproduces the <b>exact twist heat-map</b>, RUN it, pre-order, swap now, with no model ever given. This is how a seasoned operator learns a playbook.',
     },
     jp: {
       'scene11.title': 'SARSA： プレイして Q* を まなぶ',

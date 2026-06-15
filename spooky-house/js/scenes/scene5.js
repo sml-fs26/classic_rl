@@ -1,7 +1,7 @@
-/* Scene 5 — Adding γ.
+/* Scene 5, Adding γ.
 
    The student moves a γ slider; the V-table re-sweeps in place (no
-   animation — we earned that in scene 3). The policy arrows update,
+   animation, we earned that in scene 3). The policy arrows update,
    and the optimal path is re-traced.
 
    Three preset buttons (1.0, 0.9, 0.5) snap to canonical γ; left/right
@@ -31,7 +31,7 @@
       return {};
     }
 
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 's5-wrap';
@@ -56,7 +56,7 @@
     side.className = 's5-side';
     row.appendChild(side);
 
-    /* --- Side: discounted Bellman formula --- */
+    /*, Side: discounted Bellman formula, */
     const fH2 = document.createElement('h2');
     fH2.textContent = 'The discounted form.';
     side.appendChild(fH2);
@@ -65,7 +65,7 @@
     fBlock.classList.add('s5-formula');
     side.appendChild(fBlock);
 
-    /* --- γ slider + presets --- */
+    /*, γ slider + presets, */
     const gH2 = document.createElement('h2');
     gH2.textContent = 'Discount γ.';
     side.appendChild(gH2);
@@ -101,19 +101,19 @@
     }
     gammaBlock.appendChild(presetsRow);
 
-    /* --- Comparison block --- */
+    /*, Comparison block, */
     const optScoreLine = document.createElement('div');
     optScoreLine.className = 's5-comparison';
     optScoreLine.innerHTML =
       '<span class="label">V at start (with this γ)</span>' +
-      '<span class="value" data-key="vstart">—</span>';
+      '<span class="value" data-key="vstart">, </span>';
     side.appendChild(optScoreLine);
 
     const undiscScoreLine = document.createElement('div');
     undiscScoreLine.className = 's5-comparison';
     undiscScoreLine.innerHTML =
       '<span class="label">Undiscounted total along this path</span>' +
-      '<span class="value" data-key="undisc">—</span>';
+      '<span class="value" data-key="undisc">, </span>';
     side.appendChild(undiscScoreLine);
 
     const flipCard = document.createElement('div');
@@ -131,7 +131,7 @@
     foot.innerHTML = 'Try the presets, or scrub with <kbd>&larr;</kbd>/<kbd>&rarr;</kbd>.  Press <kbd>&rarr;</kbd> at γ=0.5 to recap.';
     wrap.appendChild(foot);
 
-    /* ---------- Mount the grid ---------- */
+    /*, Mount the grid, */
     const grid = window.Grid.mount(gridHost, {
       M: D.M,
       N: D.N,
@@ -144,11 +144,11 @@
     grid.setCellClass(D.goal.r,  D.goal.c,  'goal-cell',  true);
     grid.setEntity('door', { kind: 'door', r: D.goal.r, c: D.goal.c });
 
-    /* ---------- Reference (γ=1) optimal path for diff display ---------- */
+    /*, Reference (γ=1) optimal path for diff display, */
     const V_REF = window.Bellman.computeV(D.rewards, 1.0);
     const PATH_REF = window.Bellman.computeOptimalPath(V_REF, D.start);
 
-    /* ---------- Render for the current γ ---------- */
+    /*, Render for the current γ, */
     let gamma = 1.0;
     const gammaInput = sliderRow.querySelector('input');
     const gammaOut   = sliderRow.querySelector('.gamma-readout');
@@ -187,14 +187,14 @@
       if (isReference) {
         flipCard.innerHTML =
           `Reference γ = 1.0. The path here is the one scene 4 derived. ` +
-          `Slide γ down — at some point the optimum will flip.`;
+          `Slide γ down, at some point the optimum will flip.`;
       } else if (flipped) {
         flipCard.innerHTML =
           `<span class="flip-marker">Path flipped.</span> Smaller γ shifts the optimum: short, ` +
           `front-loaded reward beats long-horizon reward when the future is discounted.`;
       } else {
         flipCard.innerHTML =
-          `Same path as γ = 1.0. This γ is too gentle to flip the route — try a smaller value.`;
+          `Same path as γ = 1.0. This γ is too gentle to flip the route, try a smaller value.`;
       }
 
       /* Highlight the active preset button. */
@@ -218,7 +218,7 @@
       setGamma(parseFloat(gammaInput.value));
     });
 
-    /* ---------- Keyboard preset scrubbing ---------- */
+    /*, Keyboard preset scrubbing, */
     /* ←/→ cycle the presets when the cursor isn't already at an end-stop.
        This lets the lecturer flip between γ=1, 0.9, 0.5 with arrow keys
        AND still advance to the next scene from the rightmost preset. */
@@ -227,12 +227,12 @@
       return idx;
     }
 
-    /* ---------- &run / &instant ---------- */
+    /*, &run / &instant, */
     function shouldAutoRun() {
       return /[#&?]run\b/.test(window.location.hash);
     }
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       setGamma(1.0);
       if (shouldAutoRun()) {
@@ -250,7 +250,7 @@
       onNextKey() {
         const idx = presetIndex();
         if (idx === -1) {
-          /* Not on a preset — snap to nearest below current */
+          /* Not on a preset, snap to nearest below current */
           setGamma(PRESETS[0].value);
           return true;
         }

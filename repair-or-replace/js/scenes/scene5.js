@@ -1,4 +1,4 @@
-/* Scene 5 -- THE TRAJECTORY: the canonical six-week tape, week by week.
+/* Scene 5, THE TRAJECTORY: the canonical six-week tape, week by week.
  *
  *   One run of the fleet, written down: window.DATA.demoTrajectory, six weeks
  *   of OLD BESSIE. NEXT (or the STEP button) reveals one week at a time:
@@ -53,7 +53,7 @@
        the replace week resets the clock via the VanCard itself). */
     const MILES = { 1: 346, 3: 358, 4: 339, 5: 312 };
 
-    /* ---------- Header + lede ---------- */
+    /*, Header + lede, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title s5-section-title';
     header.textContent = 'ONE RUN, WRITTEN DOWN';
@@ -66,7 +66,7 @@
       'like this is called a TRAJECTORY: the raw material every learner reads.';
     root.appendChild(lede);
 
-    /* ---------- Main row: van board | tape ---------- */
+    /*, Main row: van board | tape, */
     const rowEl = document.createElement('div');
     rowEl.className = 's5-row';
     root.appendChild(rowEl);
@@ -104,7 +104,7 @@
     tape.className = 's5-tape';
     flowEl.appendChild(tape);
 
-    /* ---------- The notation, building in parallel ---------- */
+    /*, The notation, building in parallel, */
     const notation = document.createElement('div');
     notation.className = 's5-notation';
     notation.innerHTML = '<div class="s5-notation-label">THE SAME SIX WEEKS, IN SYMBOLS</div>';
@@ -113,7 +113,7 @@
     notation.appendChild(chunks);
     root.appendChild(notation);
 
-    /* ---------- Caption beats ---------- */
+    /*, Caption beats, */
     const beat = document.createElement('div');
     beat.className = 's5-beat';
     beat.textContent =
@@ -130,7 +130,7 @@
     closing.hidden = true;
     root.appendChild(closing);
 
-    /* ---------- Controls ---------- */
+    /*, Controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 's5-controls';
     const stepBtn = document.createElement('button');
@@ -155,7 +155,7 @@
     ctrls.appendChild(status);
     root.appendChild(ctrls);
 
-    /* ---------- State ---------- */
+    /*, State, */
     let step = 0;          /* 0 = before week 1; 1..6 = weeks; 7 = closing */
     let epoch = 0;         /* bumped on every rebuild; stale callbacks bail */
     let playing = false;
@@ -192,7 +192,7 @@
       return 'AFTER WEEK ' + Math.min(k, LAST);
     }
 
-    /* ---------- Builders ---------- */
+    /*, Builders, */
     function stateChipHtml(wear) {
       return '<span class="s5-chip s5-chip-state vc-wear-' + wear + '">' +
              V.stateName(wear) + '</span>';
@@ -269,7 +269,7 @@
       resetBtn.disabled = playing || step === 0;
     }
 
-    /* ---------- Full rebuild at `step` (cold entry / rewind / reset) ------ */
+    /*, Full rebuild at `step` (cold entry / rewind / reset), */
     function renderAll() {
       epoch += 1;
       clearTimers();
@@ -305,7 +305,7 @@
       syncButtons();
     }
 
-    /* ---------- One animated step forward ---------- */
+    /*, One animated step forward, */
     function stepForward() {
       if (step >= CLOSE) return false;
       step += 1;
@@ -357,7 +357,7 @@
       return true;
     }
 
-    /* ---------- Rewind: reset + replay, animations suppressed ---------- */
+    /*, Rewind: reset + replay, animations suppressed, */
     function stepBack() {
       if (step === 0) return false;
       step -= 1;

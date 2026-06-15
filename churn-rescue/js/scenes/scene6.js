@@ -113,7 +113,7 @@
     root.classList.add('scene-pad', 'concept-scene', 'scene6-scene');
     root.innerHTML = '';
 
-    /* ---- heading + manager hook ---- */
+    /*, heading + manager hook, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = T('scene.title6');
@@ -124,7 +124,7 @@
     hook.innerHTML = T('scene6.manager');
     root.appendChild(hook);
 
-    /* ---- G formula card ---- */
+    /*, G formula card, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene6.formula.label') + '</div>';
@@ -137,7 +137,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- the trajectory tree + weighted-leaf ledger (the centerpiece) ---- */
+    /*, the trajectory tree + weighted-leaf ledger (the centerpiece), */
     const egLabel = document.createElement('div');
     egLabel.className = 'obj-eg-label';
     egLabel.innerHTML = T('scene6.eg.label', {
@@ -189,7 +189,7 @@
     });
     root.appendChild(egTie);
 
-    /* ---- worked expansion of one sampled run ---- */
+    /*, worked expansion of one sampled run, */
     const exWrap = document.createElement('div');
     exWrap.className = 'ret-expansion-wrap';
     exWrap.innerHTML =
@@ -198,7 +198,7 @@
       '<button class="poke-btn ret-resample" id="ret-resample">' + T('scene6.btn.resample') + '</button>';
     root.appendChild(exWrap);
 
-    /* ---- distribution panel (empirical companion, with a target line) ---- */
+    /*, distribution panel (empirical companion, with a target line), */
     const distWrap = document.createElement('div');
     distWrap.className = 'ret-dist-wrap';
     distWrap.innerHTML =
@@ -222,20 +222,20 @@
       '</div>';
     root.appendChild(distWrap);
 
-    /* ---- punchline ---- */
+    /*, punchline, */
     const punch = document.createElement('div');
     punch.className = 'concept-key-question';
     punch.innerHTML = T('scene6.punch');
     root.appendChild(punch);
 
-    /* ---- state ---- */
+    /*, state, */
     let exSeed = (0x6E7 + Math.floor(Math.random() * 0xFFFF)) >>> 0;
     let distLever = 'checkin';
     let samples = [];                 // array of G values
     let distSeed = (0xD157 + Math.floor(Math.random() * 0xFFFF)) >>> 0;
     let targetEG = fixedActionValue(distLever);   // the line mu converges to
 
-    /* --- worked expansion --- */
+    /*, worked expansion, */
     function renderExpansion() {
       exSeed = (exSeed + 0x9E3779B1) >>> 0;
       const rng = Churn.makeRng(exSeed);
@@ -260,7 +260,7 @@
           '<span class="ret-exp-note">' + T('scene6.expansion.note') + '</span></div>';
     }
 
-    /* --- distribution: histogram bins of G --- */
+    /*, distribution: histogram bins of G, */
     function sampleMore(n) {
       for (let i = 0; i < n; i++) {
         distSeed = (distSeed + 0x9E3779B1) >>> 0;
@@ -364,7 +364,7 @@
       sampleMore(60);
     }
 
-    /* ---- wire up ---- */
+    /*, wire up, */
     document.getElementById('ret-resample').addEventListener('click', renderExpansion);
     document.getElementById('ret-run20').addEventListener('click', () => sampleMore(20));
     document.getElementById('ret-run200').addEventListener('click', () => sampleMore(200));

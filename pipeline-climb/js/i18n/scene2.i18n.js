@@ -1,4 +1,4 @@
-/* i18n fragment for Scene 2 (Playtest) -- Pipeline Climb.
+/* i18n fragment for Scene 2 (Playtest), Pipeline Climb.
  *
  *   "You run the deal": the learner IS the rep. From a fresh COLD lead they
  *   pick a lever each touch, watch the STAGE DIE, feel the climb, and play to

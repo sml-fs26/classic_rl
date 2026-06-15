@@ -1,4 +1,4 @@
-/* Darts model — pure functions + tiny class for the bullseye oscillation.
+/* Darts model, pure functions + tiny class for the bullseye oscillation.
 
    Mirrors `darts_utils.py`'s `DartsInTheDark` semantics so the Python notebook
    exercise and this viz speak the same vocabulary: `target_score` is the
@@ -6,7 +6,7 @@
    a triangular `max(0, 100 - 2|d|)` of the distance, with optional Gaussian
    noise on the score (clipped to [0, 100]).
 
-   The bullseye oscillates randomly around a fixed centre (AR(1), no drift) —
+   The bullseye oscillates randomly around a fixed centre (AR(1), no drift), 
    a stationary process. The notebook's classical `DartsInTheDark` uses a
    random walk; the viz uses oscillation so the lesson focuses on noise, not
    non-stationarity.
@@ -15,7 +15,7 @@
    byte-identical trajectory across reloads. */
 (function () {
 
-  /* ------------------------------------------------------------------ rng -- */
+  /*, rng, */
 
   function makeRng(seed) {
     let s = seed >>> 0;
@@ -29,14 +29,14 @@
   }
 
   /* Box-Muller. Two rng() calls per draw; we discard the second. Adequate
-     for our purposes — no rejection-sampling subtlety required. */
+     for our purposes, no rejection-sampling subtlety required. */
   function gaussian(rng) {
     const u1 = Math.max(rng(), 1e-12);
     const u2 = rng();
     return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
   }
 
-  /* ------------------------------------------------------------------ math - */
+  /*, math - */
 
   function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
 
@@ -54,7 +54,7 @@
     return clamp(base + noise, 0, 100);
   }
 
-  /* -------------------------------------------------------------- bullseye - */
+  /*, bullseye - */
 
   /* Initial bullseye position, matching the Python (`10-25` or `75-90`
      uniform). The two-mode start makes the manual scene less trivial. */
@@ -65,7 +65,7 @@
   }
 
   /* One oscillation step around `mean`: AR(1) with mean reversion (a=0.85)
-     plus a clipped Gaussian noise. Stationary — the long-run mean is
+     plus a clipped Gaussian noise. Stationary, the long-run mean is
      `mean`, no drift. Replaces darts_utils.py's random-walk `drift_step`. */
   function oscillateStep(rng, pos, mean) {
     const noise = clamp(gaussian(rng) * 2, -5, 5);
@@ -74,7 +74,7 @@
     return clamp(next, 10, 90);
   }
 
-  /* --------------------------------------------------------------- factory - */
+  /*, factory - */
 
   /* Build a fresh world from a seed. The world owns the rng and the
      bullseye trajectory; callers ask for a single "throw" by passing the
@@ -111,7 +111,7 @@
       },
 
       /* For autoplay scenes that need to advance the bullseye without
-         scoring (kept under the legacy name for backward-compat — the
+         scoring (kept under the legacy name for backward-compat, the
          implementation now oscillates). */
       oscillateBullseye() {
         bullseyePos = oscillateStep(rng, bullseyePos, bullseyeMean);

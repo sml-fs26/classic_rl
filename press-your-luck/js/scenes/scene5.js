@@ -128,8 +128,8 @@
     lede.innerHTML = T('scene5.lede');
     root.appendChild(lede);
 
-    /* ---- Formula card: tau as a sequence of random vars; foot adds the tree
-       reframe "one trajectory = one path." ---- */
+    /*, Formula card: tau as a sequence of random vars; foot adds the tree
+       reframe "one trajectory = one path.", */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene5.formula.label') + '</div>';
@@ -146,7 +146,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Tree caption: names the fixed root + lever (chance-only tree). ---- */
+    /*, Tree caption: names the fixed root + lever (chance-only tree)., */
     const caption = document.createElement('div');
     caption.className = 'traj-tree-caption';
     caption.innerHTML = T('scene5.tree.caption', {
@@ -156,7 +156,7 @@
     });
     root.appendChild(caption);
 
-    /* ---- Tree host: TrajTree mounts the indented tree + the E[G_t] ledger. ---- */
+    /*, Tree host: TrajTree mounts the indented tree + the E[G_t] ledger., */
     const treeHost = document.createElement('div');
     treeHost.className = 'traj-tree-host';
     root.appendChild(treeHost);
@@ -194,7 +194,7 @@
     bootNote.innerHTML = T('scene5.tree.bootnote');
     root.appendChild(bootNote);
 
-    /* ---- Derived tape strip: the lit path AS THE OLD (S, A, R) tape ----
+    /*, Derived tape strip: the lit path AS THE OLD (S, A, R) tape ----
        Empty until a path is sampled/walked. */
     const tapeWrap = document.createElement('div');
     tapeWrap.className = 'traj-derived';
@@ -204,7 +204,7 @@
     root.appendChild(tapeWrap);
     const tapeEl = tapeWrap.querySelector('#traj-derived-tape');
 
-    /* ---- Controls + status ---- */
+    /*, Controls + status, */
     const ctrls = document.createElement('div');
     ctrls.className = 'traj-controls';
     ctrls.innerHTML =
@@ -219,7 +219,7 @@
     caption2.textContent = T('scene5.caption');
     root.appendChild(caption2);
 
-    /* ---- Walk state ----
+    /*, Walk state ----
        A "current path" is a fixed list of edges from root to a leaf, chosen by
        sampling (die-faithful). STEP reveals it one ply at a time and lights the
        prefix; SAMPLE draws a fresh path and lights it whole. */

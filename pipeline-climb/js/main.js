@@ -177,7 +177,7 @@
   }
 
   function init() {
-    if (!window.DATA) console.error('DATA missing -- did data/datasets.js load?');
+    if (!window.DATA) console.error('DATA missing, did data/datasets.js load?');
     if (!window.scenes) window.scenes = {};
 
     function cursorBlip() { if (window.SFX) window.SFX.play('cursor'); }
@@ -219,7 +219,7 @@
       if (!handled) goTo(current + 1);
     });
 
-    /* ---- Concept badges: MDP / POLICY / RETURN / Q* / DP / SARSA ----
+    /*, Concept badges: MDP / POLICY / RETURN / Q* / DP / SARSA ----
        Session-scoped (no persistence dependency). Light up on first
        visit to the owning scene. */
     const BADGES = ['mdp', 'policy', 'return', 'qstar', 'dp', 'sarsa'];
@@ -249,7 +249,7 @@
       maybeAward(key);
     });
 
-    /* ---- Optional one-time intro modal, deferred off the title ----
+    /*, Optional one-time intro modal, deferred off the title ----
        Shown the first time the user advances past scene 0; never blocks
        &run (which skips it). Dismiss with a button, Enter, or Esc. */
     let introShown = false;
@@ -285,7 +285,7 @@
       lastIdx = idx;
     });
 
-    /* ---- Speaker notes overlay ('n') ---- */
+    /*, Speaker notes overlay ('n'), */
     const snOverlay = document.createElement('div');
     snOverlay.id = 'speaker-notes-overlay';
     snOverlay.className = 'speaker-notes-overlay';
@@ -311,7 +311,7 @@
       else snOverlay.hidden = true;
     }
 
-    /* ---- Slide mode ('f') ---- */
+    /*, Slide mode ('f'), */
     function toggleSlideMode() {
       const on = document.body.classList.toggle('slide-mode');
       if (on) showToast(T('slide.toast'));
@@ -327,7 +327,7 @@
       setTimeout(() => { try { toast.remove(); } catch (_e) {} }, 2400);
     }
 
-    /* ---- Quick jump ('g') ---- */
+    /*, Quick jump ('g'), */
     const qjOverlay = document.createElement('div');
     qjOverlay.id = 'quick-jump-overlay';
     qjOverlay.className = 'centered-overlay';
@@ -361,7 +361,7 @@
       else qjOverlay.hidden = true;
     }
 
-    /* ---- Help overlay ('?') ---- */
+    /*, Help overlay ('?'), */
     const helpOverlay = document.createElement('div');
     helpOverlay.id = 'help-overlay';
     helpOverlay.className = 'centered-overlay';
@@ -391,7 +391,7 @@
       helpOverlay.hidden = !helpVisible;
     }
 
-    /* ---- Keyboard ---- */
+    /*, Keyboard, */
     window.addEventListener('keydown', (e) => {
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;

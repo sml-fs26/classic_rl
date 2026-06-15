@@ -55,7 +55,7 @@
     lede.innerHTML = T('scene7.lede');
     root.appendChild(lede);
 
-    /* ---- Q* formula card ---- */
+    /*, Q* formula card, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene7.formula.label') + '</div>';
@@ -71,7 +71,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Standing selector (the "same pot, flip the scoreboard" dial) ---- */
+    /*, Standing selector (the "same pot, flip the scoreboard" dial), */
     const selWrap = document.createElement('div');
     selWrap.className = 'qs-sel-wrap';
     selWrap.innerHTML =
@@ -85,7 +85,7 @@
       '</div>';
     root.appendChild(selWrap);
 
-    /* ---- The Q* panel: table-card on the left, two-column table right ---- */
+    /*, The Q* panel: table-card on the left, two-column table right, */
     const demo = document.createElement('div');
     demo.className = 'qs-demo';
     root.appendChild(demo);
@@ -109,7 +109,7 @@
 
     const card = window.TableCard.mount(cardHost, { showVals: false });
 
-    /* ---- Verdict line + bridge ---- */
+    /*, Verdict line + bridge, */
     const verdict = document.createElement('div');
     verdict.className = 'qs-verdict';
     root.appendChild(verdict);

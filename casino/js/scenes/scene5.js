@@ -1,16 +1,16 @@
-/* Scene 5 — The trade-off.
+/* Scene 5, The trade-off.
 
    No live cards. Centre stage: a single regret chart with four pre-rendered
    curves (median over 10 seeds at T = DATA.horizons.sweep):
-     ε = 0.01    — greedy-ish
-     ε = 0.10    — balanced
-     ε = 0.30    — exploratory
-     decaying ε  — ε(t) = ε₀ · ρ^t with ε₀ = 0.5, ρ = 0.995
+     ε = 0.01, greedy-ish
+     ε = 0.10, balanced
+     ε = 0.30, exploratory
+     decaying ε, ε(t) = ε₀ · ρ^t with ε₀ = 0.5, ρ = 0.995
 
    Hovering or focusing a legend item highlights the corresponding curve.
 
    Caption: "No fixed ε wins everywhere." The curves are PSEUDO-regret
-   (sum_τ μ* − μ_{a_τ}), monotone non-decreasing — labelled accordingly so
+   (sum_τ μ* − μ_{a_τ}), monotone non-decreasing, labelled accordingly so
    the student isn't surprised by the absence of dips. */
 
 (function () {
@@ -33,7 +33,7 @@
       '<p class="subtitle">No fixed ε wins everywhere.</p>' +
       '<p class="lede">Each curve is the median over ' + (sweep ? sweep.seedsPerEps : 10) +
         ' seeds, at T = ' + (sweep ? sweep.T : horz.sweep) +
-        '. ε = 0.3 over-explores, paying for it linearly. ε = 0.01 sometimes locks on a sub-optimal arm and never recovers. ε = 0.1 splits the difference. Decaying ε (start exploratory, commit later) is competitive — and a hint of what comes next.</p>';
+        '. ε = 0.3 over-explores, paying for it linearly. ε = 0.01 sometimes locks on a sub-optimal arm and never recovers. ε = 0.1 splits the difference. Decaying ε (start exploratory, commit later) is competitive, and a hint of what comes next.</p>';
     wrap.appendChild(hero);
 
     if (!sweep || !sweep.strategies) {

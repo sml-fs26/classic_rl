@@ -1,4 +1,4 @@
-/* Scene 12 -- Recap. Six cards, one concept each (MDP, policy, return, Q*, DP,
+/* Scene 12, Recap. Six cards, one concept each (MDP, policy, return, Q*, DP,
    SARSA), in the maintenance visual language, from window.DATA.recap. A small
    glyph per card plus its formula. Closing line ties back to the twist + a
    "replay the optimal policy" button loops the heat-map grid. Cold-entry safe. */

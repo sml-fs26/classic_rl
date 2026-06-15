@@ -49,8 +49,8 @@
   const RENEW_REWARD = +20;
   const CHURN_REWARD = -20;
 
-  /* ---------- The frozen model (do NOT retune without re-validating
-     the at-risk m3->m4 notch; see proposal "Risks"). ---------- */
+  /*, The frozen model (do NOT retune without re-validating
+     the at-risk m3->m4 notch; see proposal "Risks")., */
 
   /* Retention-coin base P(STAY) by tier, index cliff..thriving. */
   const BASE_STAY = [0.50, 0.68, 0.82, 0.93, 0.985];
@@ -91,11 +91,11 @@
   }
   function clampTier(t) { return t < 0 ? 0 : (t > NUM_TIERS - 1 ? NUM_TIERS - 1 : t); }
 
-  /* ---------- Initial state. Lukewarm, 4 months to renewal. ---------- */
+  /*, Initial state. Lukewarm, 4 months to renewal., */
   function initialState() { return { tier: 2, m: 4, terminal: false }; }
   function initialScalar() { return initialState(); }   // legacy alias
 
-  /* ---------- One-month sample (one coin flip + one die roll) ----------
+  /*, One-month sample (one coin flip + one die roll) ----------
      rng() yields a uniform in [0, 1). The coin is consumed first, then
      (only on STAY) the die: animate coin THEN die in that order. The log
      carries everything a scene needs to narrate the month. */
@@ -158,7 +158,7 @@
     return { sNext, reward: -cost, terminal: false, renewed: false, churned: false, log };
   }
 
-  /* ---------- Successors enumeration (for value iteration) ----------
+  /*, Successors enumeration (for value iteration) ----------
      Branches: coin (stay / churn) x die (up / same / down). On CHURN the
      die never rolls (one branch). Reward bakes in the cost and the
      terminal lump. Probabilities aggregate per destination key. */
@@ -204,7 +204,7 @@
   }
   function successorsFromBuckets(s, m) { return successors(s, m); }   // alias
 
-  /* ---------- Indexing over the 25 non-terminal states ----------
+  /*, Indexing over the 25 non-terminal states ----------
      Index order is tier*5 + (m-1): row-major with tier as the row
      (cliff=0..thriving=4) and m-1 as the column (m=1 left..m=5 right). */
   const NON_TERMINAL_STATES = [];
@@ -232,7 +232,7 @@
     return TIERS[idx].toUpperCase();
   }
 
-  /* ---------- Mulberry32: shared with the precompute. ---------- */
+  /*, Mulberry32: shared with the precompute., */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {

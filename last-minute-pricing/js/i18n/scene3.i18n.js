@@ -1,4 +1,4 @@
-/* scene3 i18n fragment -- "What makes this an MDP?" (Formalization).
+/* scene3 i18n fragment, "What makes this an MDP?" (Formalization).
    English is the source of truth; the Japanese mirror gives full parity.
    KaTeX formulas stay in pure math form (symbols cross languages). */
 (function () {
@@ -20,7 +20,7 @@
       /* the card the four parts hang on */
       'scene3.board.label':  'THE SITUATION YOU PLAYED',
 
-      /* step 0 -- the four parts named */
+      /* step 0, the four parts named */
       'scene3.s0.title':     'Four moving parts',
       'scene3.s0.body':
         'Every day you faced the same loop: read your <b>situation</b>, pull a <b>lever</b>, let the market <b>decide</b>, and collect a <b>payoff</b>. Those four parts have names.',
@@ -29,7 +29,7 @@
       'scene3.s0.tagP':      'P, the draw',
       'scene3.s0.tagR':      'R, payoff',
 
-      /* step 1 -- STATE */
+      /* step 1, STATE */
       'scene3.s1.title':     'State: the situation right now',
       'scene3.s1.manager':
         'How many seats you are holding and how little time is left. That is everything you need to decide today; the past does not matter.',
@@ -37,14 +37,14 @@
         '<b>s = (u, d)</b>: seats left <b>u</b> in 1..5, days to departure <b>d</b> in 1..4. The board is every situation at once, a 5x4 grid of 20.',
       'scene3.s1.foot':      'The flight card IS the state: seats on the left, clock on the right.',
 
-      /* step 2 -- ACTION */
+      /* step 2, ACTION */
       'scene3.s2.title':     'Action: the lever you pull',
       'scene3.s2.manager':
         'One price tag per day. Hold out for the premium, or cut the price to fill the cabin.',
       'scene3.s2.formal':
         'The action set <b>A</b> = { PREMIUM, STANDARD }. You choose one each day; that is your only control.',
 
-      /* step 3 -- TRANSITION + REWARD (folded together) */
+      /* step 3, TRANSITION + REWARD (folded together) */
       'scene3.s3.title':     'Transition and reward: the part you do not control',
       'scene3.s3.manager':
         'You set the price; the <b>market</b> decides how many buy. The demand draw sends you to tomorrow’s situation and pays you today’s cash. The probabilities are printed right on the lever, nothing hidden.',
@@ -55,7 +55,7 @@
       'scene3.s3.drawLabel': 'THE DEMAND DRAW',
       'scene3.s3.foot':      'PREMIUM rarely moves seats; STANDARD almost always fills several. Same dice, every time, you just see them.',
 
-      /* step 4 -- the tuple */
+      /* step 4, the tuple */
       'scene3.s4.title':     'Put it together: the 4-tuple',
       'scene3.s4.body':
         'A Markov Decision Process is exactly these four parts bundled together. Nothing more is hidden in your pricing problem.',

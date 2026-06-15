@@ -77,7 +77,7 @@
       r.innerHTML =
         `<div class="qbar-die die-${d}"><span class="die-pill die-${d}">${d}</span></div>` +
         `<div class="qbar-track"><div class="qbar-fill die-${d}"></div></div>` +
-        `<div class="qbar-val">—</div>`;
+        `<div class="qbar-val">, </div>`;
       barsHost.appendChild(r);
       rows[d] = {
         node: r,
@@ -92,7 +92,7 @@
       for (const d of ACTIONS) {
         rows[d].fill.style.width = '0%';
         rows[d].fill.classList.remove('negative');
-        rows[d].val.textContent = '—';
+        rows[d].val.textContent = ', ';
         rows[d].node.classList.remove('argmax');
       }
     }

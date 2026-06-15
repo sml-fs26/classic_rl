@@ -1,4 +1,4 @@
-/* Scene 0 -- Title / hook.
+/* Scene 0, Title / hook.
  *   A single Trial Card center-screen: a fresh signup at the bottom rung of the
  *   adoption ladder, the Trial Clock ticking down from 5, beside the Adoption
  *   Coin. Tagline + START. START reveals the manager framing and a BEGIN prompt
@@ -46,7 +46,7 @@
       const startBtn = wrap.querySelector('.sc0-start');
       if (startBtn) startBtn.style.display = 'none';
       /* one illustrative nudge: the coin lands heads, the user climbs one rung,
-         a day burns -- the loop in miniature. */
+         a day burns, the loop in miniature. */
       coin.flip(true).then(() => { card.setState(1, 4); card.pulse(); });
     }
 

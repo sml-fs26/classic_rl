@@ -1,4 +1,4 @@
-/* scene11 -- "Learn the playbook with SARSA" (the RL capstone).
+/* scene11, "Learn the playbook with SARSA" (the RL capstone).
  *
  *   Three-step pager. One step shows at a time; everything fits one viewport.
  *
@@ -58,7 +58,7 @@
   for (let i = 0; i < QSTAR.length; i++) QSTAR_L1 += Math.abs(QSTAR[i]);
   if (QSTAR_L1 === 0) QSTAR_L1 = 1;
 
-  /* ---------- small helpers ---------- */
+  /*, small helpers, */
   function leverName(id) { return T('lever.' + id); }
   function money(v) { return (Math.round(v * 100) / 100).toFixed(2); }
 
@@ -80,7 +80,7 @@
   }
 
   /* Run one SARSA episode (one selling season) on Q, in place, using only
-     window.Pricing.sample (the visible dice) -- no demand model is read. */
+     window.Pricing.sample (the visible dice), no demand model is read. */
   function runEpisode(Q, eps, rng) {
     /* Exploring start: a uniformly random playable situation. */
     const s0 = START_STATES[Math.floor(rng() * START_STATES.length)];
@@ -127,7 +127,7 @@
   }
 
   /* Exact expected return from the START state (5 units, 4 days) under the
-     GREEDY policy of the current Q -- computed by backward induction over the
+     GREEDY policy of the current Q, computed by backward induction over the
      true transition model. This is policy *evaluation* of what the learner
      would actually do (greedy), not Q* itself; it climbs toward OPT_START as
      the learned greedy policy improves. Cheap: 20 states. */
@@ -159,7 +159,7 @@
     root.className = 'scene-pad s11';
     root.innerHTML = '';
 
-    /* ---- heading + pager controls ---- */
+    /*, heading + pager controls, */
     const h = document.createElement('h2');
     h.className = 'concept-heading s11-heading';
     h.textContent = T('scene11.heading');
@@ -174,7 +174,7 @@
       '<span class="s11-status" id="s11-status"></span>';
     root.appendChild(bar);
 
-    /* ---- two-column body: left = explanation, right = board/illustration ---- */
+    /*, two-column body: left = explanation, right = board/illustration, */
     const rowEl = document.createElement('div');
     rowEl.className = 's11-row';
     root.appendChild(rowEl);
@@ -225,7 +225,7 @@
     const BATCH = [40, 120, 350, 900, 2000];
     /* Tick period. Every speed level runs at BATCH[lvl] episodes per TICK_MS,
        so tripling this period (70 -> 210) slows EVERY slider setting to ~1/3
-       of its former pace uniformly -- the run was reading too fast to follow. */
+       of its former pace uniformly, the run was reading too fast to follow. */
     const TICK_MS = 210;
 
     let oracleShown = false;
@@ -241,7 +241,7 @@
     }
 
     /* ============================================================
-       STEP 1 -- derive the update
+       STEP 1, derive the update
        ============================================================ */
     function renderStep1() {
       boards.classList.remove('s11-boards-split');
@@ -275,7 +275,7 @@
     }
 
     /* ============================================================
-       STEP 2 -- epsilon + one concrete sampled step
+       STEP 2, epsilon + one concrete sampled step
        ============================================================ */
     let s2Deck = null;          // shared Deck handle (built once)
     let s2Shelf = null;         // live ShelfCard handle
@@ -315,7 +315,7 @@
 
       renderKatexSpans(left);
 
-      /* ---- right column: a live single sampled step ---- */
+      /*, right column: a live single sampled step, */
       buildStep2Right();
     }
 
@@ -427,7 +427,7 @@
     }
 
     /* ============================================================
-       STEP 3 -- live training run
+       STEP 3, live training run
        ============================================================ */
     function renderStep3() {
       /* Rebuild the boards container (step 2 may have replaced its innards). */
@@ -583,7 +583,7 @@
       }
     }
 
-    /* ---- PLAY loop ---- */
+    /*, PLAY loop, */
     function playBtn() { return document.getElementById('s11-play'); }
     function setPlayLabel(on) { const b = playBtn(); if (b) b.textContent = on ? T('scene11.s3.pause') : T('scene11.s3.play'); }
     function pausePlay() { if (playTimer) { clearTimeout(playTimer); playTimer = null; } playing = false; setPlayLabel(false); }
@@ -653,7 +653,7 @@
 
     applyCursor();
 
-    /* &s11step=N -- jump to a step (1-indexed) for headless capture / deep links. */
+    /* &s11step=N, jump to a step (1-indexed) for headless capture / deep links. */
     const stepMatch = (window.location.hash || '').match(/[#&?]s11step=(\d+)/);
     if (stepMatch) {
       const tgt = Math.min(STEPS.length, Math.max(1, parseInt(stepMatch[1], 10))) - 1;

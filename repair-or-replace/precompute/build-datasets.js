@@ -27,7 +27,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/* ---------------- Load the real engine under a window shim ---------------- */
+/*, Load the real engine under a window shim, */
 global.window = {};
 require(path.join(__dirname, '..', 'js', 'actions.js'));
 require(path.join(__dirname, '..', 'js', 'van.js'));
@@ -43,7 +43,7 @@ const ACTION_IDS = Actions.MOVE_IDS;                    // [run, service, replac
 const N = Van.NUM_STATES;                               // 4
 const A = ACTION_IDS.length;                            // 3
 
-/* ---------------- Value iteration ---------------- */
+/*, Value iteration, */
 const vi = Bellman.valueIteration(GAMMA, { tol: 1e-12, maxIters: 100000, recordHistory: false });
 const V = vi.V;
 const policy = vi.policy;                               // 4 action ids
@@ -76,7 +76,7 @@ const dpHistory = [];                                   // [{iter, V:[4], policy
   }
 }
 
-/* ---------------- Assertions (throw / exit on mismatch) ---------------- */
+/*, Assertions (throw / exit on mismatch), */
 function fail(msg) { console.error('  [FAIL] ' + msg); process.exit(1); }
 function ok(msg)   { console.log('  [OK]   ' + msg); }
 function approx(a, b, eps) { return Math.abs(a - b) <= (eps == null ? 0.05 : eps); }
@@ -125,7 +125,7 @@ if (!(qAt(3, 'run') < 0)) fail('Q*(FAILING, RUN) should be negative');
 ok('surprise: REPLACE beats SERVICE at SHAKY by +' + (qAt(2, 'replace') - qAt(2, 'service')).toFixed(1) +
    '; RUN at FAILING is ' + qAt(3, 'run').toFixed(1) + ' (loses money)');
 
-/* ---------------- The gamma sweep (scene 6 slider) ----------------
+/*, The gamma sweep (scene 6 slider) ----------------
    Re-solve for a dense grid of gammas; both frontiers must slide left as
    patience rises. Assert the three signpost rows from the plan. */
 function solveAt(gamma) {
@@ -163,7 +163,7 @@ for (let s = 0; s < N; s++) {
 }
 ok('both frontiers slide monotonically left as gamma rises (' + gammaSweep.length + ' grid points)');
 
-/* ---------------- Demo trajectory (scene 5's canonical tape) ----------------
+/*, Demo trajectory (scene 5's canonical tape) ----------------
    One illustrative six-week run under the optimal bands, hand-built (not
    sampled) so the trajectory scene has a clean canonical tape that shows all
    three actions, the wear drift, and the SHAKY replace. Faces use the
@@ -205,12 +205,12 @@ if (demoTrajectory.totalReturn !== 177) fail('demo trajectory raw total = ' + de
 ok('demo trajectory: 6 weeks, all three actions, raw total +' + demoTrajectory.totalReturn +
    ', discounted ' + demoTrajectory.discountedReturn);
 
-/* ---------------- Round helpers ---------------- */
+/*, Round helpers, */
 function round1(x) { return Math.round(x * 10) / 10; }
 const Vout = Array.from(V).map(round1);                 // 4
 const Qout = Array.from(Q).map(round1);                 // 12
 
-/* ---------------- Recap cards (6, Bessie's voice) ---------------- */
+/*, Recap cards (6, Bessie's voice), */
 const recap = [
   {
     key: 'mdp', hue: 'mdp', title: 'The MDP frame',
@@ -250,12 +250,12 @@ const recap = [
   },
 ];
 
-/* ---------------- Actions payload (mirrors js/actions.js) ---------------- */
+/*, Actions payload (mirrors js/actions.js), */
 const actionsPayload = Actions.ACTIONS.map(a => ({
   id: a.id, name: a.name, commitment: a.commitment, tone: a.tone, gloss: a.gloss,
 }));
 
-/* ---------------- Build the payload ---------------- */
+/*, Build the payload, */
 const payload = {
   /* Static MDP config (mirrors js/van.js + js/actions.js). */
   states: Van.STATES,
@@ -295,7 +295,7 @@ const payload = {
   recap,
 };
 
-/* ---------------- Emit data/datasets.js ---------------- */
+/*, Emit data/datasets.js, */
 const datasetsPath = path.join(__dirname, '..', 'data', 'datasets.js');
 const payloadStr = JSON.stringify(payload, null, 2)
   .split('\n').map((line, i) => (i === 0 ? line : '  ' + line)).join('\n');

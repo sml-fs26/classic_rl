@@ -1,4 +1,4 @@
-/* Scene 12 -- Recap. Six dock-themed cards, one concept each (MDP, policy,
+/* Scene 12, Recap. Six dock-themed cards, one concept each (MDP, policy,
    return, Q*, DP, TD), from window.DATA.recap, each with a small dock glyph and
    its formula. Closing line + replay-from-the-top. Cold-entry safe.
    Card copy prefers an i18n string (recap.<key>.title / .text) so a future JP

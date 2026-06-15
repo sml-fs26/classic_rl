@@ -7,15 +7,15 @@
  *      S . . . . G ★          row 2
  *
  *   Two ghosts confined to single columns:
- *     - Ghost 1 col 2, biased random walk P(↑, —, ↓) = (0.50, 0.30, 0.20)  (north-biased, sticks high)
- *     - Ghost 2 col 5, biased random walk P(↑, —, ↓) = (0.20, 0.30, 0.50)  (south-biased, sticks low)
+ *     - Ghost 1 col 2, biased random walk P(↑,, , ↓) = (0.50, 0.30, 0.20)  (north-biased, sticks high)
+ *     - Ghost 2 col 5, biased random walk P(↑,, , ↓) = (0.20, 0.30, 0.50)  (south-biased, sticks low)
  *
  *   Stationary distributions (computed analytically; assertable):
  *     - Ghost 1 in col 2: P(row 0, 1, 2) = (0.6452, 0.2581, 0.0968)
  *     - Ghost 2 in col 5: P(row 0, 1, 2) = (0.0968, 0.2581, 0.6452)
  *
  *   State (for SARSA): s = (r, c) ONLY. Ghost positions are part of the
- *   environment — not the state.
+ *   environment, not the state.
  *
  *   Rewards (matches viz #1 ANYmal):
  *     - step:                     -1
@@ -34,11 +34,11 @@
     right: { dr:  0, dc:  1 },
   };
   /* Reward magnitudes: STEP per move, STAR on goal (terminal), COLLISION on
-     ghost contact (NOT terminal — agent respawns at start). The values match
+     ghost contact (NOT terminal, agent respawns at start). The values match
      the precompute used to train the canonical Q-table. */
   const REWARD = { STEP: -1, STAR: 100, COLLISION: -50 };
 
-  /* Mulberry32 — same as viz #1. Seed captured in History so a replay is exact. */
+  /* Mulberry32, same as viz #1. Seed captured in History so a replay is exact. */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -98,7 +98,7 @@
        1. agent moves
        2. goal check (terminal if reached)
        3. ghosts move
-       4. collision check (NOT terminal — agent respawns at start)
+       4. collision check (NOT terminal, agent respawns at start)
      `params.malfunctionProb` ∈ [0, 0.5] is optional and matches viz #1's
      malfunction model. Default 0 (deterministic agent).
   */
@@ -135,7 +135,7 @@
     if (!next.terminal) {
       next.ghosts = next.ghosts.map(g => moveGhost(rng, g, M));
 
-      /* 4. collision check — collision triggers respawn (NOT terminal) */
+      /* 4. collision check, collision triggers respawn (NOT terminal) */
       for (const g of next.ghosts) {
         if (g.r === next.anymal.r && g.c === next.anymal.c) {
           reward += REWARD.COLLISION;
@@ -156,7 +156,7 @@
     return { state: next, executed, reward, terminal: next.terminal, hitStar, collision };
   }
 
-  /* Build the canonical initial state from DATA. Pure function — every
+  /* Build the canonical initial state from DATA. Pure function, every
      scene's onEnter calls this so cold entry works. */
   function initialState() {
     const cfg = window.DATA && window.DATA.initial;

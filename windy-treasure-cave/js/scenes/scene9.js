@@ -1,4 +1,4 @@
-/* Scene 9 -- Dynamic programming: fill Q*.
+/* Scene 9, Dynamic programming: fill Q*.
  *   Because P is known (the wind odds are printed), we solve it: repeatedly
  *   apply the Bellman backup to every tile and watch the value overlay
  *   converge. STEP (one sweep) and RUN ALL. The warm heat floods OUTWARD from

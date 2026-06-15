@@ -1,4 +1,4 @@
-/* scene3 i18n -- formalization (the four MDP parts). */
+/* scene3 i18n, formalization (the four MDP parts). */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -9,23 +9,23 @@
       'scene3.next':   'NEXT ›',
       'scene3.done':   'On to policy ›',
       'scene3.step':   'Part {n} / {total}',
-      'scene3.framing':'Four parts: state, action, transition, reward -- the tuple ⟨S, A, P, R⟩. That is an MDP. The whole rest of the walkthrough is about solving it.',
+      'scene3.framing':'Four parts: state, action, transition, reward, the tuple ⟨S, A, P, R⟩. That is an MDP. The whole rest of the walkthrough is about solving it.',
 
       'scene3.s0.tag':  'THE TUPLE',
       'scene3.s0.title':'⟨ S, A, P, R ⟩',
       'scene3.s0.body': 'A Markov Decision Process is four things: the <b>states</b> you can be in, the <b>actions</b> you can take, the <b>transition</b> rule for what happens, and the <b>reward</b> you collect. Let’s name each over the trial.',
       'scene3.s1.tag':  'STATE  s',
       'scene3.s1.title':'The situation',
-      'scene3.s1.body': 'A state is <b>(adoption tier, days left)</b> -- where this user sits and how much trial time remains. 5 tiers × 5 days = 25 situations, the whole board.',
+      'scene3.s1.body': 'A state is <b>(adoption tier, days left)</b>, where this user sits and how much trial time remains. 5 tiers × 5 days = 25 situations, the whole board.',
       'scene3.s2.tag':  'ACTION  a',
       'scene3.s2.title':'The lever',
-      'scene3.s2.body': 'An action is one of <b>NUDGE / DO NOTHING / PUSH</b> -- the lever you pull this day.',
+      'scene3.s2.body': 'An action is one of <b>NUDGE / DO NOTHING / PUSH</b>, the lever you pull this day.',
       'scene3.s3.tag':  'TRANSITION  P',
       'scene3.s3.title':'The part you don’t control',
-      'scene3.s3.body': 'P(s′, r | s, a) is the <b>Adoption Coin and the Conversion Wheel</b> -- you set the lever, the customer (the dice) decides what happens, with the printed odds.',
+      'scene3.s3.body': 'P(s′, r | s, a) is the <b>Adoption Coin and the Conversion Wheel</b>, you set the lever, the customer (the dice) decides what happens, with the printed odds.',
       'scene3.s4.tag':  'REWARD  r',
       'scene3.s4.title':'The payoff signal',
-      'scene3.s4.body': 'r is <b>+20</b> convert, <b>−1</b> per nudge, <b>−5</b> abandon, <b>0</b> do-nothing or expiry -- the payoff that tells you how a move turned out.',
+      'scene3.s4.body': 'r is <b>+20</b> convert, <b>−1</b> per nudge, <b>−5</b> abandon, <b>0</b> do-nothing or expiry, the payoff that tells you how a move turned out.',
     },
     jp: {
       'scene3.title':  'なぜ これが MDP なのか？',
@@ -34,23 +34,23 @@
       'scene3.next':   'つぎ ›',
       'scene3.done':   'ポリシーへ ›',
       'scene3.step':   'ぶぶん {n} / {total}',
-      'scene3.framing':'よっつの ぶぶん： じょうたい、 こうどう、 せんい、 ほうしゅう -- タプル ⟨S, A, P, R⟩。 これが MDP。 のこりの ウォークスルーは これを とくこと。',
+      'scene3.framing':'よっつの ぶぶん： じょうたい、 こうどう、 せんい、 ほうしゅう, タプル ⟨S, A, P, R⟩。 これが MDP。 のこりの ウォークスルーは これを とくこと。',
 
       'scene3.s0.tag':  'タプル',
       'scene3.s0.title':'⟨ S, A, P, R ⟩',
       'scene3.s0.body': 'マルコフ けってい かていは よっつ： なりうる <b>じょうたい</b>、 とれる <b>こうどう</b>、 なにが おきるかの <b>せんい</b>ルール、 そして えられる <b>ほうしゅう</b>。 トライアルの うえで それぞれに なまえを。',
       'scene3.s1.tag':  'じょうたい  s',
       'scene3.s1.title':'じょうきょう',
-      'scene3.s1.body': 'じょうたいは <b>（りようレベル、 のこり にっすう）</b> -- この ユーザーの いちと のこり じかん。 5レベル × 5にち = 25の じょうきょう、 ボード ぜんたい。',
+      'scene3.s1.body': 'じょうたいは <b>（りようレベル、 のこり にっすう）</b>, この ユーザーの いちと のこり じかん。 5レベル × 5にち = 25の じょうきょう、 ボード ぜんたい。',
       'scene3.s2.tag':  'こうどう  a',
       'scene3.s2.title':'レバー',
-      'scene3.s2.body': 'こうどうは <b>ナッジ / なにもしない / プッシュ</b> の どれか -- この ひに ひく レバー。',
+      'scene3.s2.body': 'こうどうは <b>ナッジ / なにもしない / プッシュ</b> の どれか, この ひに ひく レバー。',
       'scene3.s3.tag':  'せんい  P',
       'scene3.s3.title':'じぶんで きめられない ぶぶん',
-      'scene3.s3.body': 'P(s′, r | s, a) は <b>りようコインと コンバージョン ホイール</b> -- レバーは あなたが せっと、 なにが おきるかは おきゃくさま（さいころ）が きめる、 ひょうじされた オッズで。',
+      'scene3.s3.body': 'P(s′, r | s, a) は <b>りようコインと コンバージョン ホイール</b>, レバーは あなたが せっと、 なにが おきるかは おきゃくさま（さいころ）が きめる、 ひょうじされた オッズで。',
       'scene3.s4.tag':  'ほうしゅう  r',
       'scene3.s4.title':'ペイオフ しんごう',
-      'scene3.s4.body': 'r は こうにゅう <b>+20</b>、 ナッジごとに <b>−1</b>、 りだつ <b>−5</b>、 なにもしない・しゅうりょう <b>0</b> -- いってが どう なったかを つたえる ペイオフ。',
+      'scene3.s4.body': 'r は こうにゅう <b>+20</b>、 ナッジごとに <b>−1</b>、 りだつ <b>−5</b>、 なにもしない・しゅうりょう <b>0</b>, いってが どう なったかを つたえる ペイオフ。',
     },
   });
 })();

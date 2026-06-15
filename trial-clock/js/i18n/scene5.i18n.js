@@ -1,4 +1,4 @@
-/* scene5 i18n -- trajectory. */
+/* scene5 i18n, trajectory. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -15,7 +15,7 @@
       'scene5.colReward':'reward R',
       'scene5.colNext': 'next S',
       'scene5.note':   'Reward is mostly 0 along the way; the payoff lands at the end. Run the same playbook on the next user and you get a different tape.',
-      'scene5.framing':'One customer’s journey is one sample path. The policy is fixed; the dice are not -- so each user writes a different trajectory.',
+      'scene5.framing':'One customer’s journey is one sample path. The policy is fixed; the dice are not, so each user writes a different trajectory.',
     },
     jp: {
       'scene5.title':  'きせき',
@@ -30,7 +30,7 @@
       'scene5.colReward':'ほうしゅう R',
       'scene5.colNext': 'つぎ S',
       'scene5.note':   'とちゅうの ほうしゅうは ほぼ 0； ペイオフは さいごに くる。 つぎの ユーザーに おなじ プレイブックで ちがう テープに なる。',
-      'scene5.framing':'1にんの おきゃくの たびは 1つの サンプルパス。 ポリシーは こてい、 さいころは ちがう -- だから ユーザーごとに ちがう きせきを かく。',
+      'scene5.framing':'1にんの おきゃくの たびは 1つの サンプルパス。 ポリシーは こてい、 さいころは ちがう, だから ユーザーごとに ちがう きせきを かく。',
     },
   });
 })();

@@ -1,4 +1,4 @@
-/* Scene 8 -- Bellman optimality. The recursive definition as a formula card,
+/* Scene 8, Bellman optimality. The recursive definition as a formula card,
    read in plain English over the ladder, plus two hand-computable one-step
    backups on the edge rungs ($1 and $9, each one flip from a terminal):
      Q*($1,$1) = 0.4 * V*($2)         = V*($1)

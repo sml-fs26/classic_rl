@@ -6,7 +6,7 @@
    X axis: round t (1 .. T).  Y axis: cumulative regret R(t) ≥ 0.
    Auto-scales y to the max value across all visible traces.
 
-   Per-trace styling lives in CSS via classes — never inline. The accepted
+   Per-trace styling lives in CSS via classes, never inline. The accepted
    class set is enumerated in css/style.css under "Regret traces".
 
    Pure DOM + SVG. Theme-aware via the surrounding text color and per-class
@@ -23,10 +23,10 @@
   }
 
   /* opts:
-       host    — DOM node to fill
-       T       — x-axis extent (round count)
-       yMax    — initial y-axis upper bound; auto-grown as traces are added
-       label   — caption above the chart                           */
+       host, DOM node to fill
+       T, x-axis extent (round count)
+       yMax, initial y-axis upper bound; auto-grown as traces are added
+       label, caption above the chart                           */
   function mount(opts) {
     const host = opts.host;
     const T = opts.T;
@@ -43,7 +43,7 @@
       host.appendChild(lbl);
     }
 
-    /* Lock the SVG layout box explicitly — SKILL §"Things to never do" */
+    /* Lock the SVG layout box explicitly, SKILL §"Things to never do" */
     const W = 720;
     const H = 260;
     const PAD_L = 44;
@@ -81,7 +81,7 @@
     function rebuildAxes() {
       gridLayer.innerHTML = '';
 
-      /* Y gridlines at 0, 25%, 50%, 75%, 100% of yMax — rounded to a "nice"
+      /* Y gridlines at 0, 25%, 50%, 75%, 100% of yMax, rounded to a "nice"
          number so labels read cleanly. */
       const tickStep = niceStep(yMax / 4);
       for (let v = 0; v <= yMax + 1e-9; v += tickStep) {
@@ -158,7 +158,7 @@
       }
     }
 
-    /* setTrace(id, points, klass) — points = [{x,y}, ...].
+    /* setTrace(id, points, klass), points = [{x,y}, ...].
        klass is one of the regret-series CSS classes (.regret-series-greedy,
        .regret-series-eps, etc). Caller must pre-validate the class against
        css/style.css. */

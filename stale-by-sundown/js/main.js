@@ -127,7 +127,7 @@
   }
 
   function init() {
-    if (!window.DATA) console.error('DATA missing -- did data/datasets.js load?');
+    if (!window.DATA) console.error('DATA missing, did data/datasets.js load?');
     function cursorBlip() { if (window.SFX) window.SFX.play('cursor'); }
 
     const pager = document.getElementById('dot-pager');
@@ -161,7 +161,7 @@
       if (!handled) goTo(current + 1);
     });
 
-    /* ---- Concept badges ---- */
+    /*, Concept badges, */
     function renderBadgeRow() {
       const row = document.getElementById('concept-badges'); if (!row) return;
       let html = '';
@@ -186,7 +186,7 @@
       maybeAwardBadge(idx);
     });
 
-    /* ---- Speaker-notes overlay (press `n`) ---- */
+    /*, Speaker-notes overlay (press `n`), */
     const snOverlay = document.createElement('div');
     snOverlay.id = 'speaker-notes-overlay'; snOverlay.className = 'speaker-notes-overlay'; snOverlay.hidden = true;
     snOverlay.innerHTML =
@@ -206,7 +206,7 @@
       if (snVisible) { refreshSpeakerNotes(); snOverlay.hidden = false; } else snOverlay.hidden = true;
     }
 
-    /* ---- Keyboard ---- */
+    /*, Keyboard, */
     window.addEventListener('keydown', (e) => {
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;

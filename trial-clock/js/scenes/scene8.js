@@ -1,4 +1,4 @@
-/* Scene 8 -- Bellman optimality. The recursive definition as a formula card,
+/* Scene 8, Bellman optimality. The recursive definition as a formula card,
    read in plain English over a Trial Card, plus one worked backup animated on a
    single cell: from (tier 3, day 2), a PUSH is
      BUY (0.6) -> +20 ; IGNORE (0.4) -> land in (3,1) and play best there ;

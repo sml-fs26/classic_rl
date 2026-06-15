@@ -1,4 +1,4 @@
-/* Scene 2 -- Playtest. The learner IS the gambler: starting at $5 they pick a
+/* Scene 2, Playtest. The learner IS the gambler: starting at $5 they pick a
    stake, flip the (live, RNG-driven) coin, and feel the swing, playing to GOAL
    or RUIN. A HUD tracks flips + capital; a tape records the run; an outcome
    line + framing follow. Cold-entry safe; honours &run (auto-plays a fixed

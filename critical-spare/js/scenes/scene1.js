@@ -1,7 +1,7 @@
-/* Scene 1 -- Tutorial. A guided 6-step walkthrough of the dashboard with zero
+/* Scene 1, Tutorial. A guided 6-step walkthrough of the dashboard with zero
    theory: the health gauge, the spares bin, the turn counter, the three levers
-   (with REPLACE clamped when the bin is empty), the failure die, and -- the
-   load-bearing rule -- the emergency auto-swap (fail WITH a spare -> back to
+   (with REPLACE clamped when the bin is empty), the failure die, and, the
+   load-bearing rule, the emergency auto-swap (fail WITH a spare -> back to
    HEALTHY at -3) vs downtime (fail with an EMPTY bin -> -8), shown side by side.
    Internal stepping; cold-entry safe; honours &run. */
 (function () {

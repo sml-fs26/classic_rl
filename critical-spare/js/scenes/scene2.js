@@ -1,4 +1,4 @@
-/* Scene 2 -- Playtest. The learner IS the plant manager: a 12-turn quarter from
+/* Scene 2, Playtest. The learner IS the plant manager: a 12-turn quarter from
    (HEALTHY, 0 spares). Pick a lever, the world rolls the failure die, cash
    accrues, the machine ages / fails / gets swapped. A HUD tracks turn + cash; a
    tape records the run. They feel the core tension: RUN earns +3 but the red

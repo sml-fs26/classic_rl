@@ -1,4 +1,4 @@
-/* Scene 11 -- SARSA: learn Q* by playing.
+/* Scene 11, SARSA: learn Q* by playing.
  *   Step 1: derive the fix from Bellman by replacing the EXPECTATION you cannot
  *     compute with ONE real sample from a day on the floor. The update, in words:
  *     "nudge this lever's score toward (the payoff you just saw + the score of

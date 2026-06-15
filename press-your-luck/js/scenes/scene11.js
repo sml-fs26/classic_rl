@@ -92,7 +92,7 @@
      Pass opts.learn=false to roll a game WITHOUT touching Q (used to
      pre-sample the step-2 illustration trajectory); then a fixed eps
      (ctx.eps0) and no visit bumps are used.
-     --------------------------------------------------------------- */
+, */
   function trainEpisode(Q, ctx, rng, opts) {
     opts = opts || {};
     const learn = opts.learn !== false;        // default: apply updates
@@ -206,7 +206,7 @@
 
   /* ---------------------------------------------------------------
      Scene
-     --------------------------------------------------------------- */
+, */
   window.scenes.scene11 = function (root) {
     root.className = 'scene-pad s11-scene';
     root.innerHTML = '';
@@ -265,7 +265,7 @@
       '<span class="s11-legend-item"><span class="s11-swatch s11-sw-tgt"></span>' + T('s11.legend.tgt') + '</span>';
     right.appendChild(legend);
 
-    /* ---- live-run state ---- */
+    /*, live-run state, */
     let Q       = makeQ();
     let rng     = Pig.makeRng(20260530);
     let games   = 0;
@@ -309,7 +309,7 @@
       return sampleTape;
     }
 
-    /* ---------- rendering helpers ---------- */
+    /*, rendering helpers, */
 
     function renderTape(host, tape, win, opts) {
       opts = opts || {};
@@ -377,7 +377,7 @@
       cap.textContent = text || '';
     }
 
-    /* ---------- live controls (built into the left column on step 3) ---------- */
+    /*, live controls (built into the left column on step 3), */
     function controlsHTML() {
       const epsPct = Math.round(ctx.eps0 * 100);
       return (
@@ -416,7 +416,7 @@
       });
     }
 
-    /* ---------- the live loop ---------- */
+    /*, the live loop, */
     function playOneGame(suppressFlash) {
       const res = trainEpisode(Q, ctx, rng);
       games += 1;
@@ -469,7 +469,7 @@
       if (b) b.textContent = playing ? T('s11.pause') : T('s11.play');
     }
 
-    /* ---------- per-step render ---------- */
+    /*, per-step render, */
     function renderStep1() {
       left.innerHTML =
         '<div class="s11-kicker">' + T('s11.step1.kicker') + '</div>' +
@@ -582,7 +582,7 @@
       else renderStep3();
     }
 
-    /* ---------- events ---------- */
+    /*, events, */
     document.getElementById('s11-prev').addEventListener('click', () => {
       if (cursor > 0) { cursor--; applyCursor(); }
     });

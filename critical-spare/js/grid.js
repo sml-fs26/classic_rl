@@ -1,4 +1,4 @@
-/* grid.js -- the 3x3 MAINTENANCE GRID, the board AND the whole Q-table.
+/* grid.js, the 3x3 MAINTENANCE GRID, the board AND the whole Q-table.
  *
  *   Health labels the rows (HEALTHY top, AGING, FAILING bottom); spares label
  *   the columns (0 / 1 / 2 left to right). Every one of the nine (health,spares)

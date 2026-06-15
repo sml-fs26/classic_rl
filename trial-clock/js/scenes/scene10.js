@@ -1,4 +1,4 @@
-/* Scene 10 -- Why DP does not scale. A two-reason card: (a) you rarely KNOW the
+/* Scene 10, Why DP does not scale. A two-reason card: (a) you rarely KNOW the
    response curves (the wheel's true wedges differ by segment / channel / season
    and drift); (b) real state spaces explode far beyond 25 cells once you add
    plan type, company size, referral source, weekday, ... Static, cold-entry safe. */
@@ -28,7 +28,7 @@
       '<div class="poke-box sc10-framing">' + T('scene10.framing') + '</div>' +
       '<p class="sc10-bridge muted">' + T('scene10.bridge') + '</p>';
 
-    /* (a) a wheel with a big "?" over its wedges -- the odds you do not know. */
+    /* (a) a wheel with a big "?" over its wedges, the odds you do not know. */
     const wheelHost = root.querySelector('#sc10-wheel-host');
     const wheel = window.Wheel.mount(wheelHost, { tier: 1, compact: true });
     wheel.set(null);

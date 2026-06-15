@@ -20,7 +20,7 @@
         'the <b>exact STAGE-DIE odds</b> and a <b>ladder small enough to enumerate</b>. ' +
         'Both are a fantasy on a real pipeline.',
 
-      /* ---- Reason A: you rarely know the STAGE DIE ---- */
+      /*, Reason A: you rarely know the STAGE DIE, */
       'scale.a.tag':   'REASON 1',
       'scale.a.title': 'YOU RARELY KNOW THE STAGE DIE',
       'scale.a.formula.label': 'THE WARM-UP ODDS ARE NOT PRINTED ANYWHERE',
@@ -35,7 +35,7 @@
       'scale.a.foot':
         'You only get to pull a lever and watch what the lead actually does, one touch at a time.',
 
-      /* ---- Reason B: the state space explodes ---- */
+      /*, Reason B: the state space explodes, */
       'scale.b.tag':   'REASON 2',
       'scale.b.title': 'THE STATE SPACE EXPLODES',
       'scale.b.body':
@@ -52,7 +52,7 @@
         'Even if you somehow knew the STAGE DIE, you could not enumerate, store, or sweep a ' +
         'state space this big, cell by cell.',
 
-      /* ---- verdict + bridge ---- */
+      /*, verdict + bridge, */
       'scale.verdict': 'DP IS THE IDEAL, NOT THE METHOD',
       'scale.bridge':
         'You almost never know the STAGE DIE, and the real pipeline is far too big to fill ' +

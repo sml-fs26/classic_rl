@@ -3,7 +3,7 @@
    Each scene builds its own grid via `Grid.mount(host, { M, N })`. The grid
    draws cell rules statically and positions entities via CSS transform, so
    moving an entity is a single property update and animates for free. No d3,
-   no canvas, no SVG layout — just translated <div>s containing inline SVG
+   no canvas, no SVG layout, just translated <div>s containing inline SVG
    sprites that pick up entity color via currentColor. */
 (function () {
   const SPRITE = {

@@ -1,4 +1,4 @@
-/* Scene 3 -- Formalization. The four MDP parts reveal over the machine they
+/* Scene 3, Formalization. The four MDP parts reveal over the machine they
    just played: the tuple, then State, Action, Transition, Reward, each with a
    KaTeX card and a manager gloss. The transition step draws the branching dice
    (failure die + aging coin) out of one cell. Internal 5-step reveal.

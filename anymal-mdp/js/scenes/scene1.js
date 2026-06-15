@@ -1,4 +1,4 @@
-/* Scene 1 — the state.
+/* Scene 1, the state.
 
    Pedagogical goal: tie every component of the state tuple
      s = (anymal, g_1, g_2, ★)
@@ -6,7 +6,7 @@
    with arrow keys / wasd, and on each step the changed HUD row flashes so
    they *see* what counts as state.
 
-   Stochasticity is introduced in scene 3 — here malfunctionProb is forced
+   Stochasticity is introduced in scene 3, here malfunctionProb is forced
    to 0 so the student is in full control of ANYmal. Ghosts still move
    uniform-randomly each step (handled inside MDP.step). */
 (function () {
@@ -24,7 +24,7 @@
   };
 
   window.scenes.scene1 = function (root) {
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
 
     const wrap = document.createElement('div');
@@ -91,7 +91,7 @@
       lbl.textContent = spec.label;
       const val = document.createElement('span');
       val.className = 'hud-value';
-      val.textContent = '(–, –)';
+      val.textContent = '(, ,, )';
       row.appendChild(lbl);
       row.appendChild(val);
       hud.appendChild(row);
@@ -106,7 +106,7 @@
       '<span class="scene1-summary-row"><span class="hud-label">score</span><span class="hud-value" data-summary="score">0</span></span>';
     rightCol.appendChild(summary);
 
-    /* Terminal banner — hidden until terminal */
+    /* Terminal banner, hidden until terminal */
     const banner = document.createElement('div');
     banner.className = 'scene1-banner card';
     banner.hidden = true;
@@ -118,14 +118,14 @@
     foot.textContent = 'We will introduce stochastic transitions in the next scene.';
     wrap.appendChild(foot);
 
-    /* ---------- Grid mount ---------- */
+    /*, Grid mount, */
     const grid = Grid.mount(gridHost, {
       M: window.DATA.initial.M,
       N: window.DATA.initial.N,
       onLayout: () => renderEntities(),
     });
 
-    /* ---------- Per-scene state ---------- */
+    /*, Per-scene state, */
     const SEED = window.DATA.params.seed;
     let rng = MDP.makeRng(SEED);
     let state = MDP.initialState();
@@ -133,7 +133,7 @@
     let active = false;
     let flashTimers = {};
 
-    /* ---------- Rendering ---------- */
+    /*, Rendering, */
     function renderEntities() {
       grid.setEntity('anymal', { kind: 'anymal', r: state.anymal.r, c: state.anymal.c });
       grid.setEntity('ghost1', { kind: 'ghost',  r: state.ghosts[0].r, c: state.ghosts[0].c });
@@ -167,7 +167,7 @@
 
     function showTerminalBanner() {
       banner.hidden = false;
-      banner.textContent = 'Episode ended — collision. Press → to continue.';
+      banner.textContent = 'Episode ended, collision. Press → to continue.';
     }
 
     function hideTerminalBanner() {
@@ -191,7 +191,7 @@
       }
     }
 
-    /* ---------- Reset + replay (used by onEnter and onPrevKey) ---------- */
+    /*, Reset + replay (used by onEnter and onPrevKey), */
     function resetAndReplay(targetCursor) {
       state = MDP.initialState();
       rng = MDP.makeRng(SEED);
@@ -207,7 +207,7 @@
       renderHud();
     }
 
-    /* ---------- Step forward via a user keystroke ---------- */
+    /*, Step forward via a user keystroke, */
     function performStep(action) {
       if (state.terminal) return;
       const prev = state;
@@ -221,7 +221,7 @@
       if (state.terminal) showTerminalBanner();
     }
 
-    /* ---------- Step forward by replaying a recorded action ---------- */
+    /*, Step forward by replaying a recorded action, */
     function replayForwardOne() {
       /* history.cursor() points at the next action to replay (post-rewind). */
       const idx = history.cursor();
@@ -239,7 +239,7 @@
       return true;
     }
 
-    /* ---------- Keyboard handler ----------
+    /*, Keyboard handler ----------
        Scoped via the `active` guard set by onEnter/onLeave so other scenes
        don't accidentally drive ANYmal here. */
     function onKey(e) {
@@ -253,7 +253,7 @@
     }
     window.addEventListener('keydown', onKey);
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       /* Cold-entry safe: reconstruct from DATA with no recorded history. */
       history.reset();

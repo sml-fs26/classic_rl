@@ -1,6 +1,6 @@
-/* Scene 4 — Reading the policy.
+/* Scene 4, Reading the policy.
 
-   The V-table is reconstructed instantly (no animated sweep — the
+   The V-table is reconstructed instantly (no animated sweep, the
    pedagogical beat of "watch it fill" was scene 3). On every cell, an
    SVG arrow points to the higher-V neighbour. Tied cells get two muted
    arrows. Click any cell to see its argmax computation.
@@ -21,7 +21,7 @@
       return {};
     }
 
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 's4-wrap';
@@ -47,7 +47,7 @@
     side.className = 's4-side';
     row.appendChild(side);
 
-    /* --- Side: policy formula --- */
+    /*, Side: policy formula, */
     const polFormulaH2 = document.createElement('h2');
     polFormulaH2.textContent = 'The policy.';
     side.appendChild(polFormulaH2);
@@ -58,7 +58,7 @@
     polFormula.classList.add('s4-policy-formula');
     side.appendChild(polFormula);
 
-    /* --- Click-explanation --- */
+    /*, Click-explanation, */
     const explainH2 = document.createElement('h2');
     explainH2.textContent = 'Click any cell.';
     side.appendChild(explainH2);
@@ -68,19 +68,19 @@
     explainBox.innerHTML = '<span class="arith-empty">A cell\'s arrow is whichever neighbour has the bigger V.</span>';
     side.appendChild(explainBox);
 
-    /* --- Score & controls --- */
+    /*, Score & controls, */
     const scoreLine = document.createElement('div');
     scoreLine.className = 's4-score-line';
     scoreLine.innerHTML =
       '<span class="label">Optimal score (V at start)</span>' +
-      '<span class="value" data-key="optimal">—</span>';
+      '<span class="value" data-key="optimal">, </span>';
     side.appendChild(scoreLine);
 
     const liveLine = document.createElement('div');
     liveLine.className = 's4-score-line';
     liveLine.innerHTML =
       '<span class="label">Score as ANYmal walks</span>' +
-      '<span class="value" data-key="live">—</span>';
+      '<span class="value" data-key="live">, </span>';
     side.appendChild(liveLine);
 
     const controls = document.createElement('div');
@@ -113,7 +113,7 @@
     foot.textContent = 'Press → to add the discount.';
     wrap.appendChild(foot);
 
-    /* ---------- Mount the grid + cold-entry V-table fill ---------- */
+    /*, Mount the grid + cold-entry V-table fill, */
     const grid = window.Grid.mount(gridHost, {
       M: D.M,
       N: D.N,
@@ -126,7 +126,7 @@
     grid.setCellClass(D.goal.r,  D.goal.c,  'goal-cell',  true);
     grid.setEntity('door', { kind: 'door', r: D.goal.r, c: D.goal.c });
 
-    /* Cold-entry: rebuild V instantly. No animation here — the sweep was
+    /* Cold-entry: rebuild V instantly. No animation here, the sweep was
        scene 3's beat. */
     const GAMMA = 1.0;
     const V = window.Bellman.computeV(D.rewards, GAMMA);
@@ -146,7 +146,7 @@
 
     scoreLine.querySelector('[data-key="optimal"]').textContent = String(optScore);
 
-    /* ---------- ANYmal walker ---------- */
+    /*, ANYmal walker, */
     let cursor = 0; /* 0..optPath.length-1 */
 
     function placeWalker() {
@@ -201,7 +201,7 @@
     stepBtn.addEventListener('click', () => { clearAnim(); step(); });
     resetBtn.addEventListener('click', () => { clearAnim(); reset(); });
 
-    /* ---------- Click-to-explain ---------- */
+    /*, Click-to-explain, */
     grid.onCellClick(({ r, c }) => {
       grid.clearCellClass('click-explained');
       grid.setCellClass(r, c, 'click-explained', true);
@@ -218,12 +218,12 @@
       } else {
         const vd = V[r+1][c], vr = V[r][c+1];
         const cmp = vd > vr ? 'down wins' : (vr > vd ? 'right wins' : 'tied');
-        txt = `(${r}, ${c}): max(V(${r+1},${c}), V(${r},${c+1})) = max(${fmt(vd)}, ${fmt(vr)}) — ${cmp}.`;
+        txt = `(${r}, ${c}): max(V(${r+1},${c}), V(${r},${c+1})) = max(${fmt(vd)}, ${fmt(vr)}), ${cmp}.`;
       }
       explainBox.textContent = txt;
     });
 
-    /* ---------- &run / &instant ---------- */
+    /*, &run / &instant, */
     function shouldAutoRun() {
       return /[#&?]run\b/.test(window.location.hash);
     }
@@ -231,7 +231,7 @@
       return /[#&?]instant\b/.test(window.location.hash);
     }
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       reset();
       if (shouldAutoRun()) {

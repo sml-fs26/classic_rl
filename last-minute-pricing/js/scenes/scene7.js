@@ -1,6 +1,6 @@
-/* Scene 7 -- The value of a lever, Q*.
+/* Scene 7, The value of a lever, Q*.
  *
- *   Q*(s, a) = max_pi E[ G_i(tau) | s, a ]  -- the long-run value of pulling
+ *   Q*(s, a) = max_pi E[ G_i(tau) | s, a ], the long-run value of pulling
  *   lever a in situation s, assuming you price smart every day afterward.
  *   Average the return distribution (scene 6) away and you get ONE honest
  *   number per lever; the best lever is the one with the highest Q*.
@@ -15,7 +15,7 @@
  *   stateIndex*A + leverIdx), never hand-typed.
  *
  *   Cold entry: rebuilds from window.DATA / window.Pricing. No timers, so no
- *   &run needed -- the table is static the moment the scene mounts. */
+ *   &run needed, the table is static the moment the scene mounts. */
 (function () {
   if (!window.scenes) window.scenes = {};
 
@@ -54,7 +54,7 @@
     root.className = 'scene-pad concept-scene scene7';
     root.innerHTML = '';
 
-    /* ---- Heading + lede ---- */
+    /*, Heading + lede, */
     const h = document.createElement('h2');
     h.className = 'concept-heading';
     h.textContent = T('scene7.title');
@@ -65,7 +65,7 @@
     lede.innerHTML = T('scene7.lede');
     root.appendChild(lede);
 
-    /* ---- Formula card: Q*(s,a) = max E[G | s,a] ---- */
+    /*, Formula card: Q*(s,a) = max E[G | s,a], */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene7.formula.label') + '</div>';
@@ -82,7 +82,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- State picker ---- */
+    /*, State picker, */
     const picker = document.createElement('div');
     picker.className = 's7-picker';
     picker.innerHTML = '<span class="s7-picker-label">' + T('scene7.pick.label') + '</span>';
@@ -95,7 +95,7 @@
     }
     root.appendChild(picker);
 
-    /* ---- The reveal: shelf-card icon | Q* table ---- */
+    /*, The reveal: shelf-card icon | Q* table, */
     const panel = document.createElement('div');
     panel.className = 's7-panel';
 
@@ -113,7 +113,7 @@
 
     root.appendChild(panel);
 
-    /* ---- Read-out + punchline ---- */
+    /*, Read-out + punchline, */
     const readEl = document.createElement('p');
     readEl.className = 'concept-note s7-read';
     root.appendChild(readEl);

@@ -1,4 +1,4 @@
-/* scene11 i18n -- TD: SARSA vs Q-learning. */
+/* scene11 i18n, TD: SARSA vs Q-learning. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

@@ -31,7 +31,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/* ---------------- Churn Rescue MDP definition (frozen) ---------------- */
+/*, Churn Rescue MDP definition (frozen), */
 const TIERS = ['cliff', 'at-risk', 'lukewarm', 'healthy', 'thriving'];
 const NUM_TIERS = 5;
 const NUM_MONTHS = 5;
@@ -74,7 +74,7 @@ function pStay(tier, leverId) {
   return Math.min(STAY_CAP, BASE_STAY[tier] + COIN_LIFT[leverId][tier]);
 }
 
-/* ---------------- Successors (coin x die) ---------------- */
+/*, Successors (coin x die), */
 function successors(state, leverId) {
   if (state.terminal) return [{ sNext: state, p: 1, reward: 0 }];
   const cost = COST[leverId];
@@ -109,7 +109,7 @@ function successors(state, leverId) {
   return Array.from(out.values());
 }
 
-/* ---------------- EXACT backward DP (gamma = 1) ---------------- */
+/*, EXACT backward DP (gamma = 1), */
 /* V indexed by stateIndex. Because the MDP is acyclic in m, we fill
    m = 1, then 2, ... 5: each Q backup only references V at m-1, already
    final. No iteration. */
@@ -140,7 +140,7 @@ function backwardDP() {
   return { V, policy, Q };
 }
 
-/* ---------------- Iterative value iteration (for the sweep history) ---- */
+/*, Iterative value iteration (for the sweep history), */
 function valueIteration(tol, maxIters) {
   let V = new Float64Array(N);
   const history = [{ iter: 0, maxDelta: Infinity, V: Array.from(V) }];
@@ -183,7 +183,7 @@ function greedyPolicyFromQ(Q) {
   return out;
 }
 
-/* ---------------- Mulberry32 ---------------- */
+/*, Mulberry32, */
 function makeRng(seed) {
   let s = seed >>> 0;
   return function () {
@@ -195,7 +195,7 @@ function makeRng(seed) {
   };
 }
 
-/* ---------------- One-month sample (mirrors js/account.js) ---------------- */
+/*, One-month sample (mirrors js/account.js), */
 function sampleStep(s, leverId, rng) {
   const cost = COST[leverId];
   const sp = pStay(s.tier, leverId);
@@ -223,7 +223,7 @@ function sampleStep(s, leverId, rng) {
     fromTier: s.tier, toTier, fromM: s.m, toM };
 }
 
-/* ---------------- SARSA training ---------------- */
+/*, SARSA training, */
 /* SARSA config. The at-risk m4 cell (CHECK-IN beats OFFER by only 0.53)
    is the single most fragile thing to learn model-free, exactly as the
    proposal "Risks" section flags; a stochastic learner lands the full
@@ -340,12 +340,12 @@ function sarsaArgmaxPolicy(Q) {
   return out;
 }
 
-/* ---------------- Assertion helpers ---------------- */
+/*, Assertion helpers, */
 function fail(msg) { console.error('  [FAIL] ' + msg); process.exit(1); }
 function ok(msg) { console.log('  [OK]   ' + msg); }
 function near(a, b, eps) { return Math.abs(a - b) <= (eps == null ? 0.01 : eps); }
 
-/* ---------------- Run ---------------- */
+/*, Run, */
 console.log('Churn Rescue precompute: 5 tiers x 5 months MDP');
 console.log('  ' + N + ' states (tier x months-left), 3 levers');
 console.log('  Tiers:  ' + TIERS.join(', '));
@@ -362,7 +362,7 @@ function qOf(tier, m, leverId) {
 }
 function polOf(tier, m) { return policy[stateIndex({ tier, m })]; }
 
-/* --- Assert the full policy grid, rows thriving..cliff, cols m1..m5. --- */
+/*, Assert the full policy grid, rows thriving..cliff, cols m1..m5., */
 const EXPECT = {
   4: ['nothing', 'nothing', 'nothing', 'nothing', 'nothing'],   // thriving
   3: ['checkin', 'checkin', 'checkin', 'checkin', 'checkin'],    // healthy
@@ -390,14 +390,14 @@ for (const tier of [0, 1, 2, 3, 4]) {
 }
 if (gridOK) ok('full optimal policy grid matches (including the at-risk m1-3=OFFER, m4-5=CHECK-IN notch)');
 
-/* --- The notch, called out explicitly. --- */
+/*, The notch, called out explicitly., */
 if (polOf(1, 3) === 'offer' && polOf(1, 4) === 'checkin') {
   ok('the NOTCH: at-risk flips OFFER (m1-3) to CHECK-IN (m4-5) at m4');
 } else {
   fail('the notch did not form: at-risk m3=' + polOf(1, 3) + ', m4=' + polOf(1, 4));
 }
 
-/* --- The hand-checked Q* numbers. --- */
+/*, The hand-checked Q* numbers., */
 const checks = [
   ['thriving m1 NOTHING = 19.40', qOf(4, 1, 'nothing'), 19.40],
   ['thriving m1 OFFER   = 15.60', qOf(4, 1, 'offer'),   15.60],
@@ -420,7 +420,7 @@ else fail('at-risk m3 OFFER not > CHECK-IN');
 if (qOf(1, 4, 'checkin') > qOf(1, 4, 'offer')) ok('at-risk m4: CHECK-IN > OFFER (long runway, the notch)');
 else fail('at-risk m4 CHECK-IN not > OFFER');
 
-/* --- Cross-check: iterative VI agrees with the exact backward DP. --- */
+/*, Cross-check: iterative VI agrees with the exact backward DP., */
 console.log('');
 console.log('Phase 2: iterative value iteration (sweep history for the DP scene)');
 const vi = valueIteration(1e-9, 50);
@@ -439,7 +439,7 @@ for (let i = 0; i < N; i++) if (viPolicy[i] !== policy[i]) viPolMatches = false;
 if (viPolMatches) ok('greedy policy from Q* matches the backward-DP policy');
 else fail('greedy(Q*) disagrees with backward-DP policy');
 
-/* ---------------- SARSA ---------------- */
+/*, SARSA, */
 console.log('');
 console.log('Phase 3: SARSA training (' + SARSA_CFG.episodes + ' episodes, alpha=' +
   SARSA_CFG.alpha + ', eps=' + SARSA_CFG.epsilon + ', gamma=' + SARSA_CFG.gamma + ')');
@@ -529,7 +529,7 @@ if (learnedAtRisk.every((v, i) => v === wantAtRisk[i]))
   ok('SARSA reproduces the FULL at-risk notch (m1-3 OFFER, m4-5 CHECK-IN), notch and all');
 else fail('SARSA lost the notch: at-risk learned [' + learnedAtRisk.join(', ') + ']');
 
-/* ---------------- A scripted demo trajectory (for scenes 2 / 5 / 6) ---------------- */
+/*, A scripted demo trajectory (for scenes 2 / 5 / 6), */
 /* Replayable, seeded; lukewarm m4 under the optimal policy until it
    terminates. Stored so a scene can render a fixed rollout tape without
    re-rolling. */
@@ -570,7 +570,7 @@ console.log('');
 console.log('Phase 4: demo trajectory: seed ' + demoSeed + ', ' + demoTrajectory.length +
   ' months, ends ' + (demoTrajectory[demoTrajectory.length - 1].renewed ? 'RENEWED' : 'CHURNED'));
 
-/* ---------------- Recap cards (6, in the account-card voice) ---------------- */
+/*, Recap cards (6, in the account-card voice), */
 const recap = [
   { key: 'mdp', token: 'nothing', title: 'MDP: THE FOUR-PART FRAME',
     symbol: '\\langle S,\\, A,\\, P,\\, R \\rangle',
@@ -598,7 +598,7 @@ const recap = [
     anchor: 'Scene 11: the live grid converging to the oracle' },
 ];
 
-/* ---------------- Build the payload ---------------- */
+/*, Build the payload, */
 function roundArray(arr, places) {
   const f = Math.pow(10, places);
   return Array.from(arr).map(v => Math.round(v * f) / f);
@@ -643,7 +643,7 @@ const stats = {
   policyAgreementDecisive: Number(agreementDec.toFixed(3)),
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(__dirname, '..', 'data', 'datasets.js');
 
 const fileContent =

@@ -1,6 +1,6 @@
 /* Tiny SVG line chart: episode index vs. cumulative reward.
 
-   Used in scenes 3 + 4 (learning curve). No d3 dependency — straight SVG with
+   Used in scenes 3 + 4 (learning curve). No d3 dependency, straight SVG with
    path string + tick rendering. Theme-aware via CSS. The renderer accepts a
    raw episode_rewards array and computes both the raw line and an N-window
    moving average (the "smooth" line). */

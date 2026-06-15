@@ -1,4 +1,4 @@
-/* Scene 2 — Greedy needs the future.
+/* Scene 2, Greedy needs the future.
 
    Two grids, side by side. Left: a "greedy-local" walker that always
    picks the higher-reward neighbour, ignoring everything past one step.
@@ -11,7 +11,7 @@
    with each piece annotated. The animation is the motivation; the
    formula is the answer.
 
-   `&run` triggers the primary Run button — dev affordance for headless
+   `&run` triggers the primary Run button, dev affordance for headless
    verification. Cold-entry safe: walks rebuild from DATA on each onEnter. */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -23,7 +23,7 @@
       return {};
     }
 
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 's2-wrap';
@@ -37,7 +37,7 @@
       'One picks the bigger neighbour. The other looks past one step.</p>';
     wrap.appendChild(hero);
 
-    /* ---- Pair of grids ---- */
+    /*, Pair of grids, */
     const pair = document.createElement('div');
     pair.className = 's2-pair';
     wrap.appendChild(pair);
@@ -45,7 +45,7 @@
     const greedyCell = makeWalker(pair, 'greedy', 'Greedy', 'Picks the bigger neighbour');
     const optimalCell = makeWalker(pair, 'optimal', 'Optimal', 'Follows V');
 
-    /* ---- Controls ---- */
+    /*, Controls, */
     const controls = document.createElement('div');
     controls.className = 's2-controls controls';
     wrap.appendChild(controls);
@@ -70,7 +70,7 @@
     ctrlGrp.appendChild(resetBtn);
     controls.appendChild(ctrlGrp);
 
-    /* ---- Formula reveal ---- */
+    /*, Formula reveal, */
     const formulaBlock = document.createElement('div');
     formulaBlock.className = 's2-formula-block';
     wrap.appendChild(formulaBlock);
@@ -96,7 +96,7 @@
     foot.textContent = 'Press → to continue.';
     wrap.appendChild(foot);
 
-    /* ---------- Walker construction helper ---------- */
+    /*, Walker construction helper, */
     function makeWalker(parent, kind, title, subtitle) {
       const cell = document.createElement('div');
       cell.className = 's2-cell';
@@ -193,7 +193,7 @@
       return { reset, setPath, step, isDone, repaint, getRunningScore, gridRef: grid };
     }
 
-    /* ---------- Walk computation (cold-entry safe) ---------- */
+    /*, Walk computation (cold-entry safe), */
     const greedyPath = window.Bellman.computeGreedyLocalPath(D.rewards, D.start);
     const V1 = window.Bellman.computeV(D.rewards, 1.0);
     const optimalPath = window.Bellman.computeOptimalPath(V1, D.start);
@@ -201,7 +201,7 @@
     greedyCell.setPath(greedyPath);
     optimalCell.setPath(optimalPath);
 
-    /* ---------- Animation control ---------- */
+    /*, Animation control, */
     let animTimer = null;
     function clearAnim() {
       if (animTimer) { clearInterval(animTimer); animTimer = null; }
@@ -238,7 +238,7 @@
     stepBtn.addEventListener('click', () => { clearAnim(); stepBoth(); });
     resetBtn.addEventListener('click', reset);
 
-    /* ---------- &run hook for headless verification ---------- */
+    /*, &run hook for headless verification, */
     function shouldAutoRun() {
       return /[#&?]run\b/.test(window.location.hash);
     }
@@ -246,7 +246,7 @@
       while (stepBoth()) { /* fast-forward */ }
     }
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       reset();
       if (shouldAutoRun()) {

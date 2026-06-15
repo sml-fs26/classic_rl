@@ -1,4 +1,4 @@
-/* scene9 i18n -- dynamic programming. */
+/* scene9 i18n, dynamic programming. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

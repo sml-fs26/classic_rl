@@ -1,4 +1,4 @@
-/* Scene 9 -- Dynamic programming. Because P is known (the dice odds are printed)
+/* Scene 9, Dynamic programming. Because P is known (the dice odds are printed)
    and the trial has a hard deadline, we solve it RIGHT TO LEFT: the day-1 column
    is one line of arithmetic each (every next state just expires at 0), and each
    earlier column is computed from the column to its right. Watch the 5x5 Q-grid

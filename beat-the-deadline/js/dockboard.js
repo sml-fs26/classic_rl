@@ -1,4 +1,4 @@
-/* dockboard.js -- the dock-state icon AND the 5x5 policy / Q-table board.
+/* dockboard.js, the dock-state icon AND the 5x5 policy / Q-table board.
  *
  *   The recurring state-icon (every scene): a DOCK TILE reading the full state
  *   (p, h) at a glance: a stack of pallet crates (0..4, growing upward), a
@@ -49,7 +49,7 @@
   const DASH = '-';                   // em dash (muted edge marker)
   const STAR = '★';                   // black star (argmax)
 
-  /* ---------- The dock-tile icon (pallets + clock + truck) ---------- */
+  /*, The dock-tile icon (pallets + clock + truck), */
   function tileSvg(p, h) {
     const W = 132, H = 116;
     let s = '<svg class="dock-tile-svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" aria-hidden="true">';
@@ -58,7 +58,7 @@
     s += '<rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" fill="var(--bg-strong)" stroke="var(--rule)" stroke-width="3"/>';
     s += '<line x1="2" y1="86" x2="' + (W - 2) + '" y2="86" stroke="var(--rule-soft)" stroke-width="2"/>';
 
-    /* --- pallet stack (left), 4 slots growing upward --- */
+    /*, pallet stack (left), 4 slots growing upward, */
     const slotW = 30, slotH = 13, baseX = 12, baseY = 80;
     for (let i = 0; i < PMAX; i++) {
       const y = baseY - i * (slotH + 3);
@@ -71,7 +71,7 @@
       }
     }
 
-    /* --- countdown clock (top-right): 4 wedges draining --- */
+    /*, countdown clock (top-right): 4 wedges draining, */
     const cx = 96, cy = 36, r = 24;
     const wedgeColors = ['var(--clock-risk)', 'var(--clock-warn)', 'var(--clock-ok)', 'var(--clock-full)']; // wedge i lit when h > i
     s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 2) + '" fill="var(--clock-dead)" stroke="var(--rule)" stroke-width="2.5"/>';
@@ -85,7 +85,7 @@
     /* hours numeral */
     s += '<text x="' + cx + '" y="' + (cy + r + 16) + '" text-anchor="middle" font-family="Press Start 2P, monospace" font-size="9" fill="var(--ink)">' + h + 'H</text>';
 
-    /* --- truck (bottom-right) at the bay door --- */
+    /*, truck (bottom-right) at the bay door, */
     const tx = 70, ty = 92;
     s += '<rect x="' + tx + '" y="' + ty + '" width="26" height="14" fill="var(--truck)" stroke="var(--truck-rule)" stroke-width="2"/>';      // cargo box
     s += '<rect x="' + (tx + 26) + '" y="' + (ty + 4) + '" width="12" height="10" fill="var(--truck)" stroke="var(--truck-rule)" stroke-width="2"/>'; // cab

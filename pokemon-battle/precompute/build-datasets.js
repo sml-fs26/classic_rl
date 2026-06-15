@@ -1,7 +1,7 @@
 /* Precompute value iteration + SARSA trajectories for the Pokemon battle.
  *
  *   5×5 = 25 non-terminal states, 4 moves. Fully discrete bucketed simulator
- *   (no continuous HP underneath — see js/battle.js header).
+ *   (no continuous HP underneath, see js/battle.js header).
  *
  *   Run with:  node precompute/build-datasets.js
  *
@@ -14,7 +14,7 @@
  *       1) VI converges (max-ΔV < 1e-3) within 80 iters at every γ.
  *       2) Optimal policy at γ=0.90 uses ≥ 2 different moves across the 25 states.
  *       3) Optimal policy at γ=0.30 vs γ=0.99 differs in ≥ 3 states.
- *       4) SARSA mean reward (eps last 500) − mean reward (eps 0–50) ≥ 5.
+ *       4) SARSA mean reward (eps last 500) − mean reward (eps 0 to 50) ≥ 5.
  *       5) SARSA win rate in last 500 episodes ≥ 0.85.
  *       6) SARSA-vs-VI agreement on visited states (≥5 visits) ≥ 0.70.
  *       7) Byte-identical regen given the pinned seed.
@@ -24,7 +24,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/* ---------------- Pokemon battle MDP definition ---------------- */
+/*, Pokemon battle MDP definition, */
 const MOVES = [
   { id: 'quick_attack', name: 'QUICK ATTACK', power: 40,  accuracy: 1.00, type: 'normal'   },
   { id: 'thunderbolt',  name: 'THUNDERBOLT',  power: 90,  accuracy: 1.00, type: 'electric' },
@@ -63,7 +63,7 @@ function stateIndex(s) {
   return s.your * NUM_BUCKETS + s.opp;
 }
 
-/* ---------------- Successors ---------------- */
+/*, Successors, */
 function successors(state, moveId) {
   if (state.terminal) return [{ sNext: state, p: 1, reward: 0 }];
   const move = MOVE_BY_ID[moveId];
@@ -112,7 +112,7 @@ function successors(state, moveId) {
   return Array.from(out.values());
 }
 
-/* ---------------- Mulberry32 ---------------- */
+/*, Mulberry32, */
 function makeRng(seed) {
   let s = seed >>> 0;
   return function () {
@@ -124,7 +124,7 @@ function makeRng(seed) {
   };
 }
 
-/* ---------------- Value iteration ---------------- */
+/*, Value iteration, */
 function valueIteration(gamma, tol, maxIters) {
   let V = new Float64Array(N);
   const history = [{ iter: 0, maxDelta: Infinity, V: Array.from(V) }];
@@ -194,7 +194,7 @@ function moveCounts(p) {
   return c;
 }
 
-/* ---------------- SARSA training ---------------- */
+/*, SARSA training, */
 const SARSA_CFG = {
   alpha: 0.20,
   gamma: 0.90,
@@ -323,18 +323,18 @@ function sarsaArgmaxPolicy(Q) {
 
 function assertInvariant(name, ok, info) {
   if (ok) console.log('  [OK]   ' + name);
-  else { console.error('  [FAIL] ' + name + (info ? ' — ' + info : '')); process.exit(1); }
+  else { console.error('  [FAIL] ' + name + (info ? ', ' + info : '')); process.exit(1); }
 }
 function mean(arr) { return arr.reduce((s, v) => s + v, 0) / arr.length; }
 
-/* ---------------- Run ---------------- */
-console.log('Pokemon battle precompute — 5×5 bucket variant');
+/*, Run, */
+console.log('Pokemon battle precompute, 5×5 bucket variant');
 console.log('  ' + N + ' states (your_HP × opp_HP), 4 moves');
 console.log('  Buckets: ' + BUCKETS.join(', '));
 console.log('  Moves:', MOVE_IDS.join(', '));
 console.log('  Opponent move: ember (40 pwr, 100% acc)');
 console.log('');
-console.log('Phase 1 — Value iteration (7 γ grid points)');
+console.log('Phase 1, Value iteration (7 γ grid points)');
 
 const GAMMA_GRID = [0.30, 0.50, 0.70, 0.80, 0.90, 0.95, 0.99];
 const GAMMA_DEFAULT = 0.90;
@@ -372,7 +372,7 @@ assertInvariant('policy(γ=' + GAMMA_GRID[0] + ') differs from policy(γ=' + GAM
   policyShift >= 3);
 
 console.log('');
-console.log('Phase 2 — SARSA training (' + SARSA_CFG.episodes + ' episodes, α=' + SARSA_CFG.alpha + ', ε=' + SARSA_CFG.epsilon + ')');
+console.log('Phase 2, SARSA training (' + SARSA_CFG.episodes + ' episodes, α=' + SARSA_CFG.alpha + ', ε=' + SARSA_CFG.epsilon + ')');
 const sarsa = trainSARSA(SARSA_CFG);
 const meanRewardEarly = mean(sarsa.rewardPerEpisode.slice(0, 50));
 const lateStart = Math.max(0, SARSA_CFG.episodes - 500);
@@ -403,7 +403,7 @@ console.log('  SARSA-vs-VI agreement on visited states (≥5 visits): ' +
 assertInvariant('SARSA-vs-VI agreement on visited states ≥ 0.70',
   agreement >= 0.70, 'agreed=' + agreed + ', total=' + total);
 
-/* ---------------- Build the payload ---------------- */
+/*, Build the payload, */
 function roundArray(arr, places) {
   const f = Math.pow(10, places);
   return arr.map(v => Math.round(v * f) / f);
@@ -453,13 +453,13 @@ const stats = {
   policyMix_gamma090: moveCounts(POLICY_BY_GAMMA[GAMMA_DEFAULT]),
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(__dirname, '..', 'data', 'datasets.js');
 const viStr = JSON.stringify(viPayload);
 const sarsaStr = JSON.stringify(sarsaPayload);
 const statsStr = JSON.stringify(stats);
 
-const fileContent = "/* Pokemon-battle integrative review — static configuration plus the\n" +
+const fileContent = "/* Pokemon-battle integrative review, static configuration plus the\n" +
 " * (after-precompute) value-iteration history and SARSA training trajectories.\n" +
 " *\n" +
 " * Regenerate with `node precompute/build-datasets.js`. The build script\n" +

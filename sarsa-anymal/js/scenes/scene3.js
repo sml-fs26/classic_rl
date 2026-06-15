@@ -1,4 +1,4 @@
-/* Scene 3 — Episodes accumulate.
+/* Scene 3, Episodes accumulate.
  *
  *   Autoplay scrubber over precomputed training. Numerical Q-table updates
  *   per scrubber position; cells that changed since the last snapshot flash.
@@ -9,7 +9,7 @@
  *   precomputed *oscillating* trajectory.
  *
  *   View toggle: numerical / heatmap+arrows / per-action 4-up. Numerical is
- *   the default — the centerpiece view.
+ *   the default, the centerpiece view.
  *
  *   Toggle: ghost-occupancy heatmap underlay (precomputed stationary
  *   distributions; faint red where ghosts spend time).
@@ -40,7 +40,7 @@
       const empty = document.createElement('div');
       empty.className = 's3-empty';
       empty.innerHTML =
-        '<p class="caption">Training data is missing — run ' +
+        '<p class="caption">Training data is missing, run ' +
         '<code>node precompute/build-datasets.js</code> from the viz folder ' +
         'to populate <code>data/datasets.js</code>.</p>';
       wrap.appendChild(empty);
@@ -50,7 +50,7 @@
     const init = window.MDP.initialState();
     const M = init.M, N = init.N;
 
-    /* ----- Layout ----- */
+    /*, Layout, */
     const layout = document.createElement('div');
     layout.className = 's3-layout';
     wrap.appendChild(layout);
@@ -77,8 +77,8 @@
     alphaGrp.appendChild(alphaLbl);
     const alphaSel = document.createElement('select');
     alphaSel.innerHTML =
-      '<option value="primary">0.1 — converges</option>' +
-      '<option value="oscillating">0.95 — oscillates</option>';
+      '<option value="primary">0.1, converges</option>' +
+      '<option value="oscillating">0.95, oscillates</option>';
     alphaGrp.appendChild(alphaSel);
     ctrlRow.appendChild(alphaGrp);
 
@@ -159,14 +159,14 @@
     /* Right rail: Q-table view (numerical default) */
     const railTitle = document.createElement('div');
     railTitle.className = 'col-label';
-    railTitle.textContent = 'Q-table — 21 states × 4 actions';
+    railTitle.textContent = 'Q-table, 21 states × 4 actions';
     rail.appendChild(railTitle);
 
     const qHost = document.createElement('div');
     qHost.className = 'qtable-rail s3-qhost';
     rail.appendChild(qHost);
 
-    /* ----- Grid mount ----- */
+    /*, Grid mount, */
     const grid = window.Grid.mount(gridHost, {
       M, N,
       onLayout: () => placeStatic(),
@@ -179,7 +179,7 @@
     }
     placeStatic();
 
-    /* ----- Q-table view (multiple modes) ----- */
+    /*, Q-table view (multiple modes), */
     let viewMode = 'numerical';
     let qNumeric = null, qValue = null, qPer = null;
 
@@ -200,7 +200,7 @@
     }
     ensureQHost('numerical');
 
-    /* ----- Pick a training run + render at scrubber position ----- */
+    /*, Pick a training run + render at scrubber position, */
     function getRun() {
       return alphaSel.value === 'oscillating' ? T.oscillating : T.primary;
     }
@@ -258,10 +258,10 @@
       curve.setCursor(ep);
     }
 
-    /* ----- Learning curve ----- */
+    /*, Learning curve, */
     const curve = window.LearningCurve.mount(lcWrap, { W: 540, H: 160, window: 50 });
 
-    /* ----- Wire up controls ----- */
+    /*, Wire up controls, */
     scrInput.addEventListener('input', () => render());
     alphaSel.addEventListener('change', () => { prevQ = null; render(); });
 

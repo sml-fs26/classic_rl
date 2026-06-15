@@ -1,4 +1,4 @@
-/* Scene 10 -- Why DP does not scale. A two-reason card: (a) you rarely know
+/* Scene 10, Why DP does not scale. A two-reason card: (a) you rarely know
    the coin's true odds; (b) real state spaces explode far beyond 11 rungs.
    Static, cold-entry safe. */
 (function () {

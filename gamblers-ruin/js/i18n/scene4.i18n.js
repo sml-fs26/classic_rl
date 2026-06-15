@@ -1,4 +1,4 @@
-/* scene4 i18n -- policy. */
+/* scene4 i18n, policy. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

@@ -1,17 +1,17 @@
-/* Scene 1 — "A wild CHARMANDER appeared!" Click-to-attack battle.
+/* Scene 1, "A wild CHARMANDER appeared!" Click-to-attack battle.
  *
- *   5-bucket version. The simulator is fully discrete now — Battle.sample()
+ *   5-bucket version. The simulator is fully discrete now, Battle.sample()
  *   returns bucket-delta damage rather than continuous HP. Dialog text describes
  *   the bucket transition ("CHARMANDER dropped to MID HP!") instead of a
  *   numerical damage figure. HP bars are segmented (5 visible levels with
  *   tick marks at the boundaries) so what scene 1 *shows* matches what
- *   scenes 2–4 *reason about*.
+ *   scenes 2 to 4 *reason about*.
  */
 (function () {
   window.scenes = window.scenes || {};
 
   /* Map Pikachu moves and opponent forms to SFX names. window.SFX is
-     lazy-loaded — every call is guarded so this scene still works in a
+     lazy-loaded, every call is guarded so this scene still works in a
      build without sfx.js included. */
   const MOVE_SFX = {
     quick_attack: 'quick',
@@ -42,7 +42,7 @@
 
     const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
-    /* ---------- Layout ---------- */
+    /*, Layout, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title';
     header.textContent = T('battle.section_title');
@@ -123,7 +123,7 @@
     caption.textContent = T('battle.caption');
     root.appendChild(caption);
 
-    /* ---------- State ---------- */
+    /*, State, */
     let state = window.Battle.initialState();
     let turn = 0;
     let totalReward = 0;
@@ -146,7 +146,7 @@
        cleanly if the user hits RESTART mid-attack. */
     let episode = 0;
 
-    /* Async helpers — let the cascade wait for *actual* completion instead
+    /* Async helpers, let the cascade wait for *actual* completion instead
        of guessing with fixed timeouts. */
     function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
     function dialogSay(line) {
@@ -175,7 +175,7 @@
       setTimeout(() => { try { stage.removeChild(el); } catch (e) {} }, 720);
     }
 
-    /* Pre-attack windup — leans the attacker back briefly before the
+    /* Pre-attack windup, leans the attacker back briefly before the
        hit lands.  ~220 ms. */
     function triggerWindup(spriteHost) {
       if (!spriteHost) return;
@@ -185,7 +185,7 @@
       setTimeout(() => spriteHost.classList.remove('sc1-windup'), 240);
     }
 
-    /* Full-stage white flash — fires on THUNDER and other big hits. */
+    /* Full-stage white flash, fires on THUNDER and other big hits. */
     function flashStage() {
       stage.classList.remove('sc1-flash');
       void stage.offsetWidth;
@@ -238,7 +238,7 @@
       const oppHostEl = stage.querySelector('.sprite-host.opponent');
       const playerHostEl = stage.querySelector('.sprite-host.player');
 
-      /* ---- Pikachu's turn ---- */
+      /*, Pikachu's turn, */
       await dialogSay(T('battle.used', { name: pikaName(), move: pikaMoveName(moveId) }));
       if (episode !== myEp) return;
       if (window.SFX) window.SFX.play(MOVE_SFX[moveId]);
@@ -271,7 +271,7 @@
       }
       if (episode !== myEp) return;
 
-      /* ---- Opponent evolution? PIKACHU's hit may have pushed the
+      /*, Opponent evolution? PIKACHU's hit may have pushed the
          opponent into a new form. Run the Gen-1 evolution sequence:
          flash on the sprite + white wash on the stage; the actual
          sprite-source swap happens behind the peak of the wash. */
@@ -312,7 +312,7 @@
       }
       if (episode !== myEp) return;
 
-      /* ---- Opponent KO? ---- */
+      /*, Opponent KO?, */
       if (log.oppAfter >= window.Battle.FAINTED) {
         stage.classList.add('sc1-slowmo');
         oppSprite.faint();
@@ -328,7 +328,7 @@
         return;
       }
 
-      /* ---- Opponent's turn — counter-attack name follows the form
+      /*, Opponent's turn, counter-attack name follows the form
          the opponent is in NOW (formAfter, post-evolution if any). */
       const counterName = counterMoveName(log.formAfter);
       await dialogSay(T('battle.wild_used', { name: oppFormName, move: counterName }));
@@ -352,7 +352,7 @@
       await wait(1300);
       if (episode !== myEp) return;
 
-      /* ---- Pikachu KO? ---- */
+      /*, Pikachu KO?, */
       if (log.yourAfter >= window.Battle.FAINTED) {
         stage.classList.add('sc1-slowmo');
         playerSprite.faint();
@@ -403,7 +403,7 @@
       if (oppHostClean) oppHostClean.classList.remove('sc1-evo-host');
       stage.classList.remove('sc1-evo-stage');
 
-      /* ---- Wild-encounter intro setup ----
+      /*, Wild-encounter intro setup ----
          Both sprite hosts start hidden (opacity 0). The opponent flashes
          in BEFORE "A wild CHARMANDER appeared!"; then a Pokeball arcs in
          from off-screen-left, lands on the player platform, pops open,

@@ -89,7 +89,7 @@
     let vanNo = 1;
     let baseName = o.name || 'OLD BESSIE';
 
-    /* ---- Compact form: just the gauge swatch (Q-table row labels). ---- */
+    /*, Compact form: just the gauge swatch (Q-table row labels)., */
     if (o.compact) {
       host.classList.add('vc-compact');
       const gauge = document.createElement('span');
@@ -118,7 +118,7 @@
       };
     }
 
-    /* ---- Full form ---- */
+    /*, Full form, */
     /* health gauge */
     const gauge = document.createElement('div');
     gauge.className = 'vc-gauge';

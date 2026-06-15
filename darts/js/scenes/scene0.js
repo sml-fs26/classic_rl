@@ -1,4 +1,4 @@
-/* Scene 0 — title manifesto: "Aim in the dark."
+/* Scene 0, title manifesto: "Aim in the dark."
 
    First contact. The student sees the game's setup in one screen, before
    any keystroke. A single horizontal track at the top with the player
@@ -7,7 +7,7 @@
    House had exact rewards. Darts has noisy ones.") and the rules of the
    game in three bullets.
 
-   No interactive elements. No internal step engine. Cold-entry safe — the
+   No interactive elements. No internal step engine. Cold-entry safe, the
    only DATA fields touched are tex.score (rendered as the score formula). */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -41,7 +41,7 @@
 
     const track = window.Track.mount({
       host: trackHost,
-      label: 'position (0–100)',
+      label: 'position (0 to 100)',
       showBullseye: false,
       showEstimate: false,
       showChips: false,
@@ -82,7 +82,7 @@
     }
     wrap.appendChild(rules);
 
-    /* Score formula — so the student sees how scores are computed before
+    /* Score formula, so the student sees how scores are computed before
        they start throwing. */
     const scoreFormula = window.Katex.display(window.DATA.tex.score);
     scoreFormula.classList.add('s0-formula');

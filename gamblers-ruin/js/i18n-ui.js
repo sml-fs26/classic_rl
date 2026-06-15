@@ -20,7 +20,7 @@
     if (btn) btn.textContent = T('lang.toggle');
   }
   /* Generic pass over any [data-i18n] element (PREV / NEXT / theme). Skip the
-     lang/music/brand nodes -- those read state and are handled explicitly. */
+     lang/music/brand nodes, those read state and are handled explicitly. */
   function applyDataI18n() {
     document.querySelectorAll('[data-i18n]').forEach((n) => {
       const key = n.getAttribute('data-i18n');

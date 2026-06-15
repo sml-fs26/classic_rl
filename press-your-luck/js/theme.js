@@ -1,4 +1,4 @@
-/* Theme toggle. Two modes — light (Pokémon paper, default) and crt
+/* Theme toggle. Two modes, light (Pokémon paper, default) and crt
    (retro black + orange neon).  Persists to localStorage; 't'
    shortcut toggles mid-lecture.  Hash override via
    #theme=light|crt for headless verification.  Legacy 'dark' / 'gb'

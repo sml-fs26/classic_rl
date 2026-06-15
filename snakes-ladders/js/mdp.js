@@ -6,7 +6,7 @@
  *     overshoots 100, stay put (don't bounce). Apply chute/ladder AFTER the
  *     overshoot check, so a roll that would overshoot doesn't trigger a snake
  *     or ladder at all.
- *   Reward: -1 per turn, 0 at the goal (terminal). Sutton-Barto cliff style —
+ *   Reward: -1 per turn, 0 at the goal (terminal). Sutton-Barto cliff style, 
  *     minimise expected turns to 100.
  *
  *   Board jumps are stored in two ways: a per-square lookup table `jumps[s]`
@@ -69,7 +69,7 @@
     return { roll: r, landing, sNext, jumped };
   }
 
-  /* Mulberry32 — shared across the curriculum. Seed captured in History so a
+  /* Mulberry32, shared across the curriculum. Seed captured in History so a
      replay is exact. */
   function makeRng(seed) {
     let s = seed >>> 0;

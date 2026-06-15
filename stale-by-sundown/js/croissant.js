@@ -1,4 +1,4 @@
-/* croissant.js -- the recurring state-icon sprite, drawn as crisp pixel-art SVG
+/* croissant.js, the recurring state-icon sprite, drawn as crisp pixel-art SVG
    (no image files, so it works offline from file://). One generator that ripens
    a croissant through five freshness frames:
      FRESH  golden, a steam wisp

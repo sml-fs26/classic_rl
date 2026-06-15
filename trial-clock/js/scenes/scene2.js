@@ -1,7 +1,7 @@
-/* Scene 2 -- Playtest. The learner IS the growth PM for one trial. Starting at
+/* Scene 2, Playtest. The learner IS the growth PM for one trial. Starting at
    a cold day-5 user they pick a lever each day; the matching die fires (the
    Adoption Coin on NUDGE, the Conversion Wheel on PUSH, deterministic on DO
-   NOTHING) and they feel the swing -- many will PUSH early and hit the big red
+   NOTHING) and they feel the swing, many will PUSH early and hit the big red
    ABANDON wedge. A HUD tracks day/tier/payoff; a tape records the run; it ends
    in CONVERT / ABANDON / EXPIRY. Cold-entry safe; honours &run. */
 (function () {

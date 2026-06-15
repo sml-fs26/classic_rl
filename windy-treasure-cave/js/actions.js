@@ -1,6 +1,6 @@
 /* Actions: the action space of the Windy Treasure Cave MDP.
  *
- * Four compass headings -- the direction the explorer ATTEMPTS to walk:
+ * Four compass headings, the direction the explorer ATTEMPTS to walk:
  *
  *   id      label     vec (drow, dcol)   role
  *   UP       UP        (-1,  0)          north
@@ -9,7 +9,7 @@
  *   RIGHT    RIGHT     ( 0, +1)          east
  *
  * Unlike Gambler's Ruin (where stakes get clamped by capital), here all four
- * headings are ALWAYS legal at every non-terminal tile -- walking into a wall
+ * headings are ALWAYS legal at every non-terminal tile, walking into a wall
  * just keeps you in place (and still costs a step). So the action set is a
  * constant {UP, DOWN, LEFT, RIGHT}: a clean 4-column Q-table per tile.
  *

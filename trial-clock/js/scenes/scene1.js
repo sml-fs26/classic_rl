@@ -1,4 +1,4 @@
-/* Scene 1 -- Tutorial. A guided 5-step walkthrough of the controls with zero
+/* Scene 1, Tutorial. A guided 5-step walkthrough of the controls with zero
    theory: the Trial Card (situation), the three levers, the two dice you do not
    control (Adoption Coin + Conversion Wheel), the three terminals, and one
    harmless demo nudge. Internal stepping. Cold-entry safe; honours &run. */

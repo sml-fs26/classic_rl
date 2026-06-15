@@ -1,4 +1,4 @@
-/* Scene 4 -- Policy. A policy is a complete maintenance playbook: one lever for
+/* Scene 4, Policy. A policy is a complete maintenance playbook: one lever for
    every one of the nine situations. Paint two real doctrines as coloured
    heat-maps before anyone says which is better: "run-to-failure" (all RUN) and
    "always-stocked" (ORDER until the bin is full), plus a third mixed one. The

@@ -1,4 +1,4 @@
-/* Scene 4 — The policy emerges.
+/* Scene 4, The policy emerges.
  *
  *   Final episode (scrubber pinned to t=500). Default view: max-Q heatmap on
  *   grid + argmax arrows on each cell + ghost-occupancy underlay toggleable.
@@ -8,9 +8,9 @@
  *   ANYmal walks the policy from start to goal, slowly (animated, ~150 ms
  *   per step). Play / step / reset buttons.
  *
- *   Caption: "The arrows zigzag — under each ghost's bias."
+ *   Caption: "The arrows zigzag, under each ghost's bias."
  *
- *   This is the reveal scene — the first time argmax arrows appear on the
+ *   This is the reveal scene, the first time argmax arrows appear on the
  *   grid. Scenes 2-3 deliberately suppress them.
  */
 (function () {
@@ -37,7 +37,7 @@
       const empty = document.createElement('div');
       empty.className = 's4-empty';
       empty.innerHTML =
-        '<p class="caption">Training data is missing — run ' +
+        '<p class="caption">Training data is missing, run ' +
         '<code>node precompute/build-datasets.js</code> from the viz folder.</p>';
       wrap.appendChild(empty);
       return {};
@@ -124,13 +124,13 @@
     /* Caption */
     const cap = document.createElement('p');
     cap.className = 'caption s4-cap';
-    cap.textContent = 'The arrows zigzag — under each ghost\'s bias.';
+    cap.textContent = 'The arrows zigzag, under each ghost\'s bias.';
     left.appendChild(cap);
 
     /* Right rail: numerical Q-table + bar chart for clicked cell */
     const railTitle = document.createElement('div');
     railTitle.className = 'col-label';
-    railTitle.textContent = 'Q-table — click any cell on the grid';
+    railTitle.textContent = 'Q-table, click any cell on the grid';
     rail.appendChild(railTitle);
 
     const qHost = document.createElement('div');
@@ -149,7 +149,7 @@
     barsHost.className = 'q-bars';
     barWrap.appendChild(barsHost);
 
-    /* ----- Mount the grid ----- */
+    /*, Mount the grid, */
     const grid = window.Grid.mount(gridHost, {
       M, N,
       onLayout: () => placeAll(),
@@ -169,7 +169,7 @@
     }
     placeAll();
 
-    /* ----- Q-table view ----- */
+    /*, Q-table view, */
     let viewMode = 'heatmap';
     let qNumeric = null, qValue = null, qPer = null;
 
@@ -234,7 +234,7 @@
       viewBtns[k].addEventListener('click', () => setView(k));
     }
 
-    /* ----- Click-cell payoff ----- */
+    /*, Click-cell payoff, */
     let selected = { r: init.start.r, c: init.start.c };
 
     function renderBars() {
@@ -294,7 +294,7 @@
     /* Default selection */
     selectCell(init.start.r, init.start.c);
 
-    /* ----- Ghost occupancy underlay ----- */
+    /*, Ghost occupancy underlay, */
     let occOn = false;
     const occGrid = (T.ghostOccupancy && T.ghostOccupancy.grid) || null;
     occBtn.addEventListener('click', () => {
@@ -303,7 +303,7 @@
       grid.setGhostOccupancy(occOn ? occGrid : null);
     });
 
-    /* ----- Policy walk (greedy, ε=0) ----- */
+    /*, Policy walk (greedy, ε=0), */
     let walkTimer = null;
     let walkSteps = 0;
 

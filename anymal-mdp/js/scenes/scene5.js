@@ -1,11 +1,11 @@
-/* Scene 5 — recap of the MDP tuple ⟨S, A, P, R, γ⟩.
+/* Scene 5, recap of the MDP tuple ⟨S, A, P, R, γ⟩.
 
    A static five-card layout. Each card carries the symbol (KaTeX), the name,
    a one-line italic caption, and a tiny thumbnail hinting at where the
    element lived earlier in the viz. The γ card is muted with a "next viz"
-   badge — no thumbnail. Below the cards, one closing serif italic line.
+   badge, no thumbnail. Below the cards, one closing serif italic line.
 
-   Static. No grid mount, no autoplay, no interval. Cold-entry safe — built
+   Static. No grid mount, no autoplay, no interval. Cold-entry safe, built
    entirely from DATA.tuple. */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -51,7 +51,7 @@
     }
     if (sym === 'P') {
       /* Two superimposed arrows: blue solid (commanded) and red dashed
-         (executed) — echoes scene 3's stochasticity treatment. */
+         (executed), echoes scene 3's stochasticity treatment. */
       const stack = document.createElement('div');
       stack.className = 's5-thumb-stack';
       const solid = document.createElement('div');

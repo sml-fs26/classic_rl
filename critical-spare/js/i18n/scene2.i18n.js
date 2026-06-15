@@ -1,4 +1,4 @@
-/* scene2 i18n -- playtest. */
+/* scene2 i18n, playtest. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -10,7 +10,7 @@
       'scene2.pick':  'Pick a lever ▶',
       'scene2.restart': 'NEW QUARTER',
       'scene2.tapeTitle': 'YOUR QUARTER',
-      'scene2.end':   'Quarter over. You banked {cash}. Notice you could not control the breakdown -- only the odds you walked into.',
+      'scene2.end':   'Quarter over. You banked {cash}. Notice you could not control the breakdown, only the odds you walked into.',
       'scene2.framing': 'You just <b>were</b> the decision-maker. RUN earns +3, but the red FAIL slice grows as the machine ages, and the world rolls the die, not you. The whole rest of the deck is about finding the lever to pull in <em>every</em> situation.',
     },
     jp: {

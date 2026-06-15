@@ -1,4 +1,4 @@
-/* scene8 i18n fragment -- "Bellman: today vs tomorrow".
+/* scene8 i18n fragment, "Bellman: today vs tomorrow".
    The Bellman optimality equation as a formula card, read in plain English
    over the board, with a worked one-step backup on a last-day corner cell.
    English is the source of truth; the Japanese mirror gives parity. */

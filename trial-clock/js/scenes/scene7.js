@@ -1,4 +1,4 @@
-/* Scene 7 -- Optimal action-value Q*. For a chosen situation, show the Trial
+/* Scene 7, Optimal action-value Q*. For a chosen situation, show the Trial
    Card beside a clean two-column table (lever a | Q*(s,a)) with the best row
    starred. Step through the contrast: a COLD day-5 user (NUDGE wins, PUSH is
    negative), an ACTIVATED day-5 user (the SAME push is the star, ~+20), a mid

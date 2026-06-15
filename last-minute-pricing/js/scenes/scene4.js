@@ -1,11 +1,11 @@
-/* scene4 -- "A policy is a playbook" (the Policy scene, new in the arc).
+/* scene4, "A policy is a playbook" (the Policy scene, new in the arc).
  *
  *   A policy pi: S -> A is a COMPLETE rule: one lever pre-assigned to every
  *   one of the 20 situations on the board. This scene paints TWO hand-written
  *   playbooks as coloured maps over the 5x4 grid so the learner sees a policy
  *   as a colour map, not a single decision:
- *     (a) ALWAYS STANDARD   -- the whole board amber (the constant policy)
- *     (b) HOLD, THEN DUMP   -- PREMIUM where d >= 2, STANDARD on the last day
+ *     (a) ALWAYS STANDARD, the whole board amber (the constant policy)
+ *     (b) HOLD, THEN DUMP, PREMIUM where d >= 2, STANDARD on the last day
  *
  *   Both are HAND policies a manager could write in a minute; neither is the
  *   optimal policy (that is the payoff of the Q-star / DP scenes, so we never
@@ -29,7 +29,7 @@
   const COLS = P.COLS;   // 4 (days 4..1)
   const N = P.N;         // 20
 
-  /* ---- The two hand policies, computed by rule (NOT the optimal map) ---- */
+  /*, The two hand policies, computed by rule (NOT the optimal map), */
   function policyAlwaysStandard(/* s */) { return 'standard'; }
   function policyHoldThenDump(s) {
     /* Hold high while there is runway, clear stock on the last day. */
@@ -48,7 +48,7 @@
 
     let activePreset = 0;
 
-    /* ---------- Title + lede ---------- */
+    /*, Title + lede, */
     const head = document.createElement('div');
     head.className = 'sc4-head';
     head.innerHTML =
@@ -56,7 +56,7 @@
       '<p class="poke-caption sc4-lede">' + T('scene4.lede') + '</p>';
     root.appendChild(head);
 
-    /* ---------- Formula strip: pi : S -> A ---------- */
+    /*, Formula strip: pi : S -> A, */
     const fcard = document.createElement('div');
     fcard.className = 'sc4-formula-card';
     const fbox = document.createElement('div');
@@ -69,7 +69,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---------- Two-column body: board (left) + control panel (right) ---------- */
+    /*, Two-column body: board (left) + control panel (right), */
     const body = document.createElement('div');
     body.className = 'sc4-body';
     root.appendChild(body);
@@ -197,13 +197,13 @@
       '<p class="sc4-callback-tease">' + T('scene4.callback.tease') + '</p>';
     panel.appendChild(callback);
 
-    /* ---------- Hint ---------- */
+    /*, Hint, */
     const hint = document.createElement('div');
     hint.className = 'footnote sc4-hint';
     hint.innerHTML = T('scene4.hint');
     root.appendChild(hint);
 
-    /* ---------- Painting a policy onto the board ---------- */
+    /*, Painting a policy onto the board, */
     const ALL_FILLS = LEVER_IDS.map(function (id) { return 'lever-fill-' + id; });
 
     function paint(presetIdx, animate) {

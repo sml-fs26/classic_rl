@@ -1,4 +1,4 @@
-/* board.js -- the 5x3 DISPLAY CASE widget for Stale by Sundown.
+/* board.js, the 5x3 DISPLAY CASE widget for Stale by Sundown.
  *
  *   The recurring state-board AND the whole Q-table, one object. Five rows
  *   (freshness: FRESH at the warm top .. STALE at the grey bottom) by three
@@ -6,7 +6,7 @@
  *   tier) plus, depending on the scene, a value number and/or the recommended
  *   lever chip, tinted by that lever's colour (HOLD green / DISCOUNT amber /
  *   DUMP red). The converged board therefore shows a GREEN CAP, an AMBER MIDDLE
- *   BAND, and a RED FLOOR -- the three-way flip you can see across the room.
+ *   BAND, and a RED FLOOR, the three-way flip you can see across the room.
  *
  *   mount(host, opts) -> handle {
  *     paintPolicy(policy, opts)   // tint each cell by its lever + show the chip
@@ -216,7 +216,7 @@
         const node = cellNodes[si];
         if (node.vval) node.vval.textContent = (V[si] == null ? '·' : V[si].toFixed(2));
         if (oo.tintByValue) {
-          /* nothing -- values scene keeps neutral cells */
+          /* nothing, values scene keeps neutral cells */
         }
       }
     }

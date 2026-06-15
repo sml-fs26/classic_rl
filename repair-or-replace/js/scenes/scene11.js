@@ -59,7 +59,7 @@
     const GAMMA = (M.gamma != null) ? M.gamma : ((Van && Van.GAMMA) || 0.9);
     const REV = M.revRun || (Van && Van.REV_RUN) || [95, 72, 40, 16];
 
-    /* ---- the worked example (provenance in the header comment) ---- */
+    /*, the worked example (provenance in the header comment), */
     const EX = {
       sFrom: 1, a: 'run', sTo: 2, aNext: 'service',
       r: REV[1],          /* +72: RUN at WORN, no breakdown */
@@ -89,7 +89,7 @@
              ACT.shortLabel(id) + '</span>';
     }
 
-    /* ---------------- DOM ---------------- */
+    /*, DOM, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = 'SARSA: the one-cell nudge';
@@ -111,7 +111,7 @@
       return p;
     }
 
-    /* ---- panel 0: the logbook line ---- */
+    /*, panel 0: the logbook line, */
     const logPanel = mkPanel('s11-logpanel', 'ONE WEEK, ONE LOGBOOK LINE');
     const logRow = document.createElement('div');
     logRow.className = 's11-lrow';
@@ -131,7 +131,7 @@
       return el;
     });
 
-    /* ---- panel 1: the target assembles ---- */
+    /*, panel 1: the target assembles, */
     const targetPanel = mkPanel('s11-targetpanel', 'THE TARGET');
     const tRow = document.createElement('div');
     tRow.className = 's11-trow';
@@ -160,7 +160,7 @@
     ];
     targetToks.forEach((t) => tRow.appendChild(t));
 
-    /* ---- panel 2 + 3: the gap bar and the nudge ---- */
+    /*, panel 2 + 3: the gap bar and the nudge, */
     const gapPanel = mkPanel('s11-gappanel', 'THE GAP: TARGET VS HER GUESS');
     const alphaChip = vchip('is-alpha', '', '0.15', 'step size');
     alphaChip.hidden = true;
@@ -198,7 +198,7 @@
     tdChip.style.left = pct((EX.qB + EX.target) / 2);
     dLab.style.left = pct(EX.qB + EX.delta / 2);
 
-    /* ---- panel 4: the update rule, colour-matched ---- */
+    /*, panel 4: the update rule, colour-matched, */
     const rulePanel = mkPanel('s11-rulepanel', 'THE UPDATE RULE');
     const symRow = document.createElement('div');
     symRow.className = 's11-eq s11-eq-sym';
@@ -250,7 +250,7 @@
     tok(numRow, 'tk-qb', f1(EX.qB));
     tok(numRow, 'tk-op', ')');
 
-    /* ---- caption + hint ---- */
+    /*, caption + hint, */
     const caption = document.createElement('p');
     caption.className = 's11-caption';
     root.appendChild(caption);
@@ -278,7 +278,7 @@
       '&#9654; NEXT: let her drive',
     ];
 
-    /* ---------------- step engine ---------------- */
+    /*, step engine, */
     const panels = [logPanel, targetPanel, gapPanel, rulePanel];
     const SHOW_FROM = [0, 1, 2, 4];    /* panel i visible when cursor >= this */
     const PANEL_STEP = [0, 1, 2, 2, 3]; /* the active panel per step */

@@ -1,15 +1,15 @@
-/* Trainer profile — name + concept badges, all persisted to
+/* Trainer profile, name + concept badges, all persisted to
  * localStorage so returning students see their progress.
  *
- *   - getName() / setName(s)         — trainer-name string, default "TRAINER".
- *   - hasBadge(key) / awardBadge(key) — boolean flags per concept.
+ *   - getName() / setName(s), trainer-name string, default "TRAINER".
+ *   - hasBadge(key) / awardBadge(key), boolean flags per concept.
  *
  * Badge keys (one per major-concept scene):
- *   mdp     — sceneMdpOverlay
- *   return  — sceneObjective
- *   qstar   — sceneQstar
- *   dp      — sceneDp
- *   sarsa   — sceneSarsaDerive
+ *   mdp, sceneMdpOverlay
+ *   return, sceneObjective
+ *   qstar, sceneQstar
+ *   dp, sceneDp
+ *   sarsa, sceneSarsaDerive
  *
  * Awarding an unseen badge fires a CustomEvent "trainer-badge-awarded"
  * on window so the topbar can flash an earned animation.

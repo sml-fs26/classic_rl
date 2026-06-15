@@ -13,7 +13,7 @@
  *   THIS MDP USES ON-POLICY SARSA as its model-free learner. Because days-left
  *   is part of the state (so the finite horizon is fully observed) and the
  *   reward gaps are clean, on-policy SARSA with a Robbins-Monro decaying step
- *   size converges to the SAME optimal staircase that DP gives -- verified
+ *   size converges to the SAME optimal staircase that DP gives, verified
  *   25/25 across many seeds in the precompute. (Off-policy Q-learning's update
  *   is kept below for completeness / a future side-by-side, but the headline
  *   learner here is SARSA, matching most gallery siblings.)

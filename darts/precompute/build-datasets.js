@@ -7,7 +7,7 @@
    bullseye oscillation, same player jitter). The seed is pinned at the top.
 
    The script asserts every invariant downstream scenes rely on, in code,
-   so the data telling the intended story is verified at build time —
+   so the data telling the intended story is verified at build time, 
    not at "screenshot looks ok" time. */
 
 'use strict';
@@ -15,7 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/* ------------------------------------------------------------------ rng -- */
+/*, rng, */
 
 function makeRng(seed) {
   let s = seed >>> 0;
@@ -34,9 +34,9 @@ function gaussian(rng) {
 }
 function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
 
-/* ------------------------------------------------------------------ params */
+/*, params */
 
-/* Pinned seeds. The bullseye oscillates around a fixed centre via AR(1) —
+/* Pinned seeds. The bullseye oscillates around a fixed centre via AR(1), 
    no drift. Seed picked so the oscillation is visible (std ≥ 3) and the
    running mean stays near the initial centre (|drift| ≤ 2). */
 const SEED_BULLSEYE   = 0x42A1B71B;   // bullseye oscillation
@@ -46,11 +46,11 @@ const SEED_SCORENOISE = 0x42A1B703;   // score-noise
 const T = 300;          // total throw count, covers scenes 2-4
 const NOISE_STD = 6;    // Gaussian noise on the score, std in score units
 const OBS_NOISE_STD = 7;  // noise on the loudspeaker's announcement of target_score
-                           // — without this, the α trade-off has no signal to
+                           //, without this, the α trade-off has no signal to
                            //   demonstrate (large-α tracks any noiseless target).
 const PLAYER_JITTER_STD = 6;   // how the (passive) thrower scatters around bullseye
 
-/* ------------------------------------------------------- bullseye dynamics */
+/*, bullseye dynamics */
 
 function randomBullseyeStart(rng) {
   return rng() < 0.5
@@ -65,7 +65,7 @@ function oscillateStep(rng, pos, mean) {
   return clamp(next, 10, 90);
 }
 
-/* ---------------------------------------------------- precompute scenario */
+/*, precompute scenario */
 
 const rngB = makeRng(SEED_BULLSEYE);
 const rngP = makeRng(SEED_PLAYER);
@@ -100,9 +100,9 @@ for (let i = 0; i < T; i++) {
   scoreTrace.push(noisy);
 }
 
-/* ------------------------------------------------- run the three estimators */
+/*, run the three estimators */
 
-/* Mirror of js/estimators.js — we rebuild the traces here too so we can
+/* Mirror of js/estimators.js, we rebuild the traces here too so we can
    assert tracking-error invariants. The observation stream is the
    bullseye trajectory (`target_score`); the estimator's job is to track
    the bullseye through drift and noise from the loudspeaker's after-the-fact
@@ -140,7 +140,7 @@ const traceDecay      = runEstimator(initialEstimate, observationTrace, n => DEC
 const ALPHA_DEFAULT = 0.1;
 const traceRMDefault = runEstimator(initialEstimate, observationTrace, _n => ALPHA_DEFAULT);
 
-/* ---------------------------------------------------- invariant assertions */
+/*, invariant assertions */
 
 function assert(cond, msg) {
   if (!cond) {
@@ -158,7 +158,7 @@ function mae(traceA, traceB) {
   return s / traceA.length;
 }
 function endError(trace) {
-  // tracking error over the last 50 throws — the tail behavior matters
+  // tracking error over the last 50 throws, the tail behavior matters
   // most for "does the estimate track the drifting target".
   let s = 0;
   for (let i = trace.length - 50; i < trace.length; i++) {
@@ -211,14 +211,14 @@ assert(bsMin >= 10 - 1e-9 && bsMax <= 90 + 1e-9,
 //    we asserted RM beat it. With the bullseye oscillating around a fixed
 //    centre (AR(1), no drift), the trade-off depends on the AR coefficient
 //    in subtle ways: sample mean converges to the centre while RM with
-//    moderate α tracks the oscillation. Neither is universally "better" —
+//    moderate α tracks the oscillation. Neither is universally "better", 
 //    it depends what the student is asked to estimate. The decay-vs-fixed
 //    invariants below still encode the "decay is goldilocks" lesson.
 const errSampleMean = endError(traceSampleMean);
 const errRMDefault  = endError(traceRMDefault);
 
 // 5. Decay (notebook schedule) has the lowest *overall* tracking error
-//    among the three estimators — this is the curriculum claim of scene 4
+//    among the three estimators, this is the curriculum claim of scene 4
 //    ("decay wins"). We measure mean error over the post-warm-up window
 //    [n=20, n=300]; in this window decay should dominate both fixed-α
 //    extremes by at least 10%.
@@ -236,7 +236,7 @@ assert(
 
 // 6. Large-α has noticeably higher *mean* error than decay over the full
 //    post-warm-up window. With oscillation (no drift) the tail values
-//    converge — large-α and decay both end up ~3.3 error — but over the
+//    converge, large-α and decay both end up ~3.3 error, but over the
 //    whole run, decay's early tracking + late smoothing wins by a wider
 //    margin than tail-only comparison would suggest.
 assert(
@@ -267,7 +267,7 @@ console.log(`    fixed large α = ${ALPHA_LARGE}      : ${errLarge.toFixed(2)}`)
 console.log(`    decay α₀=${DECAY_ALPHA0} τ=${DECAY_TAU} : ${errDecayTail.toFixed(2)}`);
 console.log(`    fixed α = ${ALPHA_DEFAULT} (scene 3) : ${errRMDefault.toFixed(2)}`);
 
-/* -------------------------------------------------------------- emit JS --- */
+/*, emit JS, */
 
 function fmtArr(arr, prec = 4) {
   return '[' + arr.map(v => v.toFixed(prec)).join(', ') + ']';
@@ -310,14 +310,14 @@ const out = `/* Auto-generated by precompute/build-datasets.js. DO NOT EDIT BY H
 
     /* Canonical 300-step scenario, shared across scenes 2-4. The
        observation each estimator sees is bullseyeTrace[i] (the
-       "loudspeaker announcement" — target_score). The player
+       "loudspeaker announcement", target_score). The player
        trace is purely visual. */
     bullseyeTrace:    ${fmtArr(bullseyeTrace)},
     observationTrace: ${fmtArr(observationTrace)},
     playerTrace:      ${fmtArr(playerTrace)},
     scoreTrace:       ${fmtArr(scoreTrace, 2)},
 
-    /* Pre-baked estimator traces — useful as a cross-check and for cold
+    /* Pre-baked estimator traces, useful as a cross-check and for cold
        entry into scene 4 without running the simulation. */
     estimatorTraces: {
       sampleMean:  ${fmtArr(traceSampleMean)},
@@ -331,7 +331,7 @@ const out = `/* Auto-generated by precompute/build-datasets.js. DO NOT EDIT BY H
     recap: [
       { label: 'estimate',    body: 'a number that updates each round' },
       { label: 'target',      body: 'the noisy thing we approach' },
-      { label: 'learning rate', body: 'α — the size of each step' },
+      { label: 'learning rate', body: 'α, the size of each step' },
       { label: 'decay',       body: 'let α shrink to fine-tune' },
       { label: 'TD update',   body: 'next: SARSA = Robbins-Monro on a TD target', muted: true },
     ],

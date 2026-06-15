@@ -1,4 +1,4 @@
-/* scene8 i18n -- Bellman optimality. */
+/* scene8 i18n, Bellman optimality. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

@@ -1,4 +1,4 @@
-/* caveboard.js -- the 5x5 CAVE FLOOR PLAN widget (the analog of qladder.js).
+/* caveboard.js, the 5x5 CAVE FLOOR PLAN widget (the analog of qladder.js).
  *
  *   The recurring state-icon AND the whole value/policy board, one object.
  *   25 stone tiles in a top-down dungeon view: the GOLD chest at (0,4), the

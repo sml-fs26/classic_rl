@@ -76,7 +76,7 @@
     heading.textContent = T('bell.heading');
     root.appendChild(heading);
 
-    /* ---- Bellman formula card ---- */
+    /*, Bellman formula card, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('bell.formula.label') + '</div>';
@@ -92,7 +92,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Caption naming the backup cell ---- */
+    /*, Caption naming the backup cell, */
     const caption = document.createElement('div');
     caption.className = 'pc-tree-caption';
     caption.innerHTML = T('bell.backup.caption', {
@@ -100,7 +100,7 @@
     });
     root.appendChild(caption);
 
-    /* ---- The depth-1 backup tree + its ledger ---- */
+    /*, The depth-1 backup tree + its ledger, */
     const treeHost = document.createElement('div');
     treeHost.className = 'pc-tree-host';
     root.appendChild(treeHost);

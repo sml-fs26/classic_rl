@@ -4,7 +4,7 @@
  *     row, col in {0,1,2,3,4}. 25 tiles; two are terminal (value baked in,
  *     not playable): the GOLD chest at (0,4) (+10) and the PIT at (2,2)
  *     (-10). That leaves 23 PLAYABLE interior tiles. The whole state space
- *     IS the cave map -- every value / optimal arrow is drawn on the board.
+ *     IS the cave map, every value / optimal arrow is drawn on the board.
  *   Action a: one of 4 compass headings (UP/DOWN/LEFT/RIGHT = the direction
  *     attempted). All four are always legal (a wall just keeps you in place).
  *   Transition: pick a heading, then ROLL the wind die (a d10). With p = 0.7
@@ -52,7 +52,7 @@
   const ACTION_BY_ID = Actions.ACTION_BY_ID;
   const PERP = Actions.PERP;
 
-  /* ---------- Tile classification ---------- */
+  /*, Tile classification, */
   function isGold(r, c) { return r === GOLD.row && c === GOLD.col; }
   function isPit(r, c)  { return r === PIT.row && c === PIT.col; }
   function isTerminalRC(r, c) { return isGold(r, c) || isPit(r, c); }
@@ -65,7 +65,7 @@
     return 0;
   }
 
-  /* ---------- Board geometry ---------- */
+  /*, Board geometry, */
   function row(s) { return s && !s.terminal ? s.row : (s ? s.row : 0); }
   function col(s) { return s && !s.terminal ? s.col : (s ? s.col : 0); }
 
@@ -112,7 +112,7 @@
   function availableActionIds(_r, _c) { return ACTION_IDS.slice(); }
   function isLegal(_r, _c, actionId) { return !!ACTION_BY_ID[actionId]; }
 
-  /* ---------- Apply a displacement with wall-bump (stay if out of bounds) ---------- */
+  /*, Apply a displacement with wall-bump (stay if out of bounds), */
   function moveTo(r, c, dr, dc) {
     const nr = r + dr, nc = c + dc;
     if (!inBounds(nr, nc)) return { r, c, bumped: true };   // wall: stay put
@@ -131,7 +131,7 @@
     ];
   }
 
-  /* ---------- One wind roll (one sample) ---------- */
+  /*, One wind roll (one sample), */
   function sample(state, actionId, rng) {
     if (state.terminal) {
       return { sNext: state, reward: 0, terminal: true,
@@ -165,7 +165,7 @@
     return 10;                                                                                     // right
   }
 
-  /* ---------- Successor enumeration (value iteration) ---------- */
+  /*, Successor enumeration (value iteration), */
   /* Returns the three wind outcomes for a heading. Outcomes that land on the
      SAME tile (e.g. two wall-bumps, or a bump that returns to start) are kept
      separate; the Bellman backup sums their probabilities anyway. */
@@ -184,7 +184,7 @@
   }
   function successorsFromBuckets(s, actionId) { return successors(s, actionId); }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -196,7 +196,7 @@
     };
   }
 
-  /* ---------- Display helpers ---------- */
+  /*, Display helpers, */
   function stateLabel(s) {
     if (!s) return '';
     if (s.terminal) return s.goal ? 'GOLD' : 'PIT';

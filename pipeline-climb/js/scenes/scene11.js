@@ -49,7 +49,7 @@
   const COLD   = (P && P.COLD != null) ? P.COLD : 0;
   const GAMMA  = (P && P.GAMMA != null) ? P.GAMMA : 1;
 
-  /* ---- Live-training hyperparameters (calibrated offline, see header) ---- */
+  /*, Live-training hyperparameters (calibrated offline, see header), */
   const ALPHA     = 0.05;          // learning rate (fixed, labelled)
   const EPS0      = 0.35;          // starting explore rate
   const EPS_MIN   = 0.03;          // floor of the schedule
@@ -57,7 +57,7 @@
   const MAX_TOUCH = 80;            // safety cap on a single deal's length
   const SEED      = 20260604;      // pinned so the live board reproduces DATA.policy
 
-  /* ---- The DP playbook the learner chases (precomputed, never hand-typed) ---- */
+  /*, The DP playbook the learner chases (precomputed, never hand-typed), */
   const QSTAR      = Float64Array.from((window.DATA && window.DATA.Qstar) || new Array(N * A).fill(0));
   const OPT_POLICY = (window.DATA && window.DATA.policy) || [];
   /* Optimal expected return from the natural start (COLD) = DATA.V[COLD]. */
@@ -68,7 +68,7 @@
   for (let i = 0; i < QSTAR.length; i++) QSTAR_L1 += Math.abs(QSTAR[i]);
   if (QSTAR_L1 === 0) QSTAR_L1 = 1;
 
-  /* ---------- small helpers ---------- */
+  /*, small helpers, */
   function leverName(id) { return T('lever.' + id, (LEVERS.MOVE_BY_ID[id] || {}).name || id); }
   function rungName(r) { return T('rung.' + P.RUNGS[r], P.RUNG_DISPLAY[r]); }
   function num2(v) { return (v >= 0 ? '+' : '') + (Math.round(v * 100) / 100).toFixed(2); }
@@ -164,7 +164,7 @@
     root.classList.add('scene-pad', 'scene11-scene', 's11');
     root.innerHTML = '';
 
-    /* ---- heading + pager controls ---- */
+    /*, heading + pager controls, */
     const h = document.createElement('h2');
     h.className = 'concept-heading s11-heading';
     h.textContent = T('scene11.heading');
@@ -179,7 +179,7 @@
       '<span class="s11-status" id="s11-status"></span>';
     root.appendChild(bar);
 
-    /* ---- two-column body: left = explanation, right = board / illustration ---- */
+    /*, two-column body: left = explanation, right = board / illustration, */
     const rowEl = document.createElement('div');
     rowEl.className = 's11-row';
     root.appendChild(rowEl);
@@ -333,7 +333,7 @@
 
       renderKatexSpans(left);
 
-      /* ---- right column: a live single sampled touch ---- */
+      /*, right column: a live single sampled touch, */
       buildStep2Right();
     }
 
@@ -613,7 +613,7 @@
       }
     }
 
-    /* ---- PLAY loop ---- */
+    /*, PLAY loop, */
     function playBtn() { return document.getElementById('s11-play'); }
     function setPlayLabel(on) { const b = playBtn(); if (b) b.textContent = on ? T('scene11.s3.pause') : T('scene11.s3.play'); }
     function pausePlay() { if (playTimer) { clearTimeout(playTimer); playTimer = null; } playing = false; setPlayLabel(false); }

@@ -1,4 +1,4 @@
-/* scene12 i18n -- recap. (Card titles/text fall back to window.DATA.recap when a
+/* scene12 i18n, recap. (Card titles/text fall back to window.DATA.recap when a
    recap.<key>.* string is absent, so EN works from the dataset; here we provide
    the JP overrides + the scene chrome.) */
 (function () {
@@ -6,9 +6,9 @@
   window.I18N.register({
     en: {
       'scene12.title': 'Recap',
-      'scene12.sub':   'Six ideas, one per card -- the bones of how a machine can learn the right maintenance call.',
+      'scene12.sub':   'Six ideas, one per card, the bones of how a machine can learn the right maintenance call.',
       'scene12.close': 'The right call flipped with the situation: RUN it, pre-order, or swap now. You\'ve learned the bones of how a machine can learn that for you.',
-      'scene12.bridge': 'Same skeleton runs every cartridge in this gallery -- only the game changes.',
+      'scene12.bridge': 'Same skeleton runs every cartridge in this gallery, only the game changes.',
       'scene12.replay': 'REPLAY THE OPTIMAL POLICY',
     },
     jp: {

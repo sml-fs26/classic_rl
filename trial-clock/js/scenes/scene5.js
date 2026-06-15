@@ -1,4 +1,4 @@
-/* Scene 5 -- Trajectory. One full trial (the precomputed demo from a cold day-5
+/* Scene 5, Trajectory. One full trial (the precomputed demo from a cold day-5
    user under the optimal policy) replays as a tape of random variables
    tau = (S1,A1,R1, S2,A2,R2, ..., S_T): situation, lever, reward, next
    situation, with the Trial Card marching along. The capitals stress these are

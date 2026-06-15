@@ -1,7 +1,7 @@
-/* Scene 1 — manual throwing.
+/* Scene 1, manual throwing.
 
    The student gets a single horizontal track with their player marker.
-   The bullseye is HIDDEN — they're in the dark. They use ↑/↓ to move
+   The bullseye is HIDDEN, they're in the dark. They use ↑/↓ to move
    ±5 units, a/d (or buttons) to move ±1 unit, and SPACE to throw.
    ArrowLeft/Right are reserved for the scene driver (advance/back).
 
@@ -9,7 +9,7 @@
    chip on the track at the throw position with the score number above
    it. A score history list on the right keeps the last 12 throws.
 
-   Cold-entry safe — onEnter rebuilds from DATA. */
+   Cold-entry safe, onEnter rebuilds from DATA. */
 (function () {
   if (!window.scenes) window.scenes = {};
 
@@ -43,7 +43,7 @@
     const noiseStd = (data.params && data.params.noiseStd) || 6;
     const seed = (data.seeds && data.seeds.manual) || 0x42A1B7C1;
 
-    /* ----- DOM scaffold ------------------------------------------------ */
+    /*, DOM scaffold, */
 
     root.innerHTML = '';
 
@@ -123,7 +123,7 @@
       lbl.textContent = f.label;
       const val = document.createElement('div');
       val.className = 'hud-value';
-      val.textContent = '—';
+      val.textContent = ', ';
       row.appendChild(lbl);
       row.appendChild(val);
       hud.appendChild(row);
@@ -158,11 +158,11 @@
 
     root.appendChild(wrap);
 
-    /* ----- Track + state ------------------------------------------------ */
+    /*, Track + state, */
 
     const track = window.Track.mount({
       host: trackHost,
-      label: 'position (0–100) — bullseye hidden',
+      label: 'position (0 to 100), bullseye hidden',
       showBullseye: false,
       showEstimate: false,
       showChips: true,
@@ -232,9 +232,9 @@
       const last = scores.length ? scores[scores.length-1] : null;
       hudCells.round.val.textContent = String(state.round);
       hudCells.currentPos.val.textContent = state.playerPos.toFixed(1);
-      hudCells.lastScore.val.textContent = last == null ? '—' : last.toFixed(1);
-      hudCells.avgScore.val.textContent = scores.length ? avg.toFixed(1) : '—';
-      hudCells.bestScore.val.textContent = scores.length ? best.toFixed(1) : '—';
+      hudCells.lastScore.val.textContent = last == null ? ', ' : last.toFixed(1);
+      hudCells.avgScore.val.textContent = scores.length ? avg.toFixed(1) : ', ';
+      hudCells.bestScore.val.textContent = scores.length ? best.toFixed(1) : ', ';
       hudCells.lastScore.row.classList.remove('flash');
       if (last != null) {
         void hudCells.lastScore.row.offsetWidth;
@@ -261,10 +261,10 @@
       if (state.round < 3)  return "Try a few throws to feel the noise.";
       if (state.round < 10) return "Watch the chips. High-scoring positions tend to cluster.";
       if (state.round < 20) return "Notice that even the same position scores differently each time. The bullseye oscillates.";
-      return "After enough throws, you can guess where the bullseye is — roughly. Click forward.";
+      return "After enough throws, you can guess where the bullseye is, roughly. Click forward.";
     }
 
-    /* ----- Bindings ----------------------------------------------------- */
+    /*, Bindings, */
 
     throwBtn.addEventListener('click', throwDart);
     m1.addEventListener('click', () => move(-5));

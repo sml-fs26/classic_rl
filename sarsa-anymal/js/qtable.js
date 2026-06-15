@@ -1,7 +1,7 @@
 /* Q-table renderers.
  *
  *   Three views are needed across the viz:
- *     - "numerical view" → 21-row × 4-col monospace table (the centerpiece —
+ *     - "numerical view" → 21-row × 4-col monospace table (the centerpiece, 
  *                          the user's "Q table fills nicely" payoff)
  *     - "value view"     → max_a Q(s,a) heatmap on grid + optional argmax arrow
  *     - "per-action"     → four small heatmaps, one per action
@@ -30,14 +30,14 @@
     return Math.max(0, Math.min(NUM_BINS - 1, b));
   }
 
-  /* Format a Q value for cell text. Two decimal places per plan §6.4 — the
+  /* Format a Q value for cell text. Two decimal places per plan §6.4, the
      point is to see the algebra grind out a number. */
   function fmt(v) {
     if (v === 0) return '0.00';
     return v.toFixed(2);
   }
 
-  /* --------------- Numerical Q-table view (centerpiece) --------------- */
+  /*, Numerical Q-table view (centerpiece), */
 
   /* Mounts a `<table>` with one row per state and one column per action.
      The goal cell `(M-1, N-1)` shows "(terminal)" instead of four numerical
@@ -69,7 +69,7 @@
     thead.appendChild(hr);
     table.appendChild(thead);
 
-    /* Body — 21 rows */
+    /* Body, 21 rows */
     const tbody = document.createElement('tbody');
     const cellByKey = new Map();
     const rowByState = new Map();
@@ -114,7 +114,7 @@
       const o = opts2 || {};
       const lo = (o.lo != null) ? o.lo : SARSA.stats(Q).lo;
       const hi = (o.hi != null) ? o.hi : SARSA.stats(Q).hi;
-      const highlight = o.highlight; /* {r, c} optional — highlights the row */
+      const highlight = o.highlight; /* {r, c} optional, highlights the row */
       /* Clear old highlight first */
       for (const [, tr] of rowByState) tr.classList.remove('qtn-row-highlight');
       if (highlight) {
@@ -160,7 +160,7 @@
     return { update, flashCell, highlightRow, clearHighlight, host, table };
   }
 
-  /* --------------- Value view (heatmap on grid) ---------------------- */
+  /*, Value view (heatmap on grid), */
 
   function mountValue(host, M, N, opts) {
     host.innerHTML = '';
@@ -234,7 +234,7 @@
     return { update, flashCell, host };
   }
 
-  /* --------------- Per-action view (four small heatmaps) ------------- */
+  /*, Per-action view (four small heatmaps), */
 
   function mountPerAction(host, M, N) {
     host.innerHTML = '';

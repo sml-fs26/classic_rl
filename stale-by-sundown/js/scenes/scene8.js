@@ -1,4 +1,4 @@
-/* Scene 8 -- Bellman optimality equation. The recursive definition on one card:
+/* Scene 8, Bellman optimality equation. The recursive definition on one card:
    Q*(s,a) = E[ R + gamma * max_a' Q*(S',a') ], "a lever's value = what it pays
    now plus the value of the best lever in whatever situation you land in next."
    Anchored on the (1,STALE) -> DUMP backup, hand-checkable:

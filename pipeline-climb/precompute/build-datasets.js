@@ -24,7 +24,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/* ---------------- Load the real engine under a window shim ---------------- */
+/*, Load the real engine under a window shim, */
 global.window = {};
 require(path.join(__dirname, '..', 'js', 'levers.js'));
 require(path.join(__dirname, '..', 'js', 'ladder.js'));
@@ -40,7 +40,7 @@ const LEVER_IDS = Levers.MOVE_IDS;                      // [nurture, demo, hardc
 const N = Pipeline.NUM_RUNGS;                           // 5
 const A = LEVER_IDS.length;                             // 3
 
-/* ---------------- Value iteration ---------------- */
+/*, Value iteration, */
 /* Run to a very tight fixed point so the printed cells are exact to 2dp.
    bellman.js already does the backups via window.Battle.successors. */
 const vi = Bellman.valueIteration(GAMMA, { tol: 1e-12, maxIters: 1000, recordHistory: true });
@@ -64,7 +64,7 @@ let policyStableAt = null;
   }
 }
 
-/* ---------------- Assertions (throw / exit on mismatch) ---------------- */
+/*, Assertions (throw / exit on mismatch), */
 function fail(msg) { console.error('  [FAIL] ' + msg); process.exit(1); }
 function ok(msg)   { console.log('  [OK]   ' + msg); }
 function approx(a, b, eps) { return Math.abs(a - b) <= (eps == null ? 0.005 : eps); }
@@ -119,7 +119,7 @@ ok('optimal policy: ' + policy.map((l, i) => RUNG_DISPLAY[i] + '->' + l.toUpperC
   ok('COLD-NURTURE hand check: 0.60*(-1+' + vCur.toFixed(2) + ') + 0.30*(-1+' + vCold.toFixed(2) + ') + 0.10*(-10) = ' + hand.toFixed(2));
 }
 
-/* ---------------- Demo trajectory (the optimal staircase in action) ----------------
+/*, Demo trajectory (the optimal staircase in action) ----------------
    One illustrative signed run that climbs COLD->...->READY->SIGNED under the
    optimal policy, hand-built (not sampled) so the trajectory scene has a clean
    canonical tape: see, act, get paid. Each step records the lever pulled, the
@@ -153,12 +153,12 @@ const demoTrajectory = (function () {
 if (demoTrajectory.totalReturn !== 26) fail('demo trajectory return = ' + demoTrajectory.totalReturn + ' != 26');
 ok('demo trajectory: COLD->CURIOUS->ENGAGED->EVALUATING->READY->SIGNED, return = +' + demoTrajectory.totalReturn);
 
-/* ---------------- Round helpers ---------------- */
+/*, Round helpers, */
 function round2(x) { return Math.round(x * 100) / 100; }
 const Vout = Array.from(V).map(round2);                 // 5
 const Qout = Array.from(Q).map(round2);                 // 15
 
-/* ---------------- Recap cards (6, ladder voice) ----------------
+/*, Recap cards (6, ladder voice) ----------------
    One per concept, tied back to the ladder. KaTeX `symbol` strings use
    standard LaTeX; the JSON.stringify below escapes them for the file.
    `hue` maps to a per-card CSS token in the recap scene. */
@@ -201,12 +201,12 @@ const recap = [
   },
 ];
 
-/* ---------------- Levers payload (mirrors js/levers.js, for the data layer) ---------------- */
+/*, Levers payload (mirrors js/levers.js, for the data layer), */
 const leversPayload = Levers.LEVERS.map(l => ({
   id: l.id, name: l.name, commitment: l.commitment, tone: l.tone, gloss: l.gloss,
 }));
 
-/* ---------------- Build the payload ---------------- */
+/*, Build the payload, */
 const payload = {
   /* Static MDP config (mirrors js/ladder.js + js/levers.js). */
   rungs: Pipeline.RUNGS,
@@ -239,7 +239,7 @@ const payload = {
   recap,
 };
 
-/* ---------------- Emit data/datasets.js ---------------- */
+/*, Emit data/datasets.js, */
 const datasetsPath = path.join(__dirname, '..', 'data', 'datasets.js');
 const payloadStr = JSON.stringify(payload, null, 2)
   .split('\n').map((line, i) => (i === 0 ? line : '  ' + line)).join('\n');

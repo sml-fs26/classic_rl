@@ -1,22 +1,22 @@
-/* Horizontal track widget — used as both the "truth track" (with the
+/* Horizontal track widget, used as both the "truth track" (with the
    bullseye visible) and the "belief track" (with the running estimate as
-   a marker) across scenes 1–4.
+   a marker) across scenes 1 to 4.
 
    The track is a horizontal pill from position 0 to 100. Scenes mount one
    or two stacked tracks; each track exposes setPlayer, setBullseye,
-   setEstimate, addChip, clearChips. Theme-aware via CSS classes only —
+   setEstimate, addChip, clearChips. Theme-aware via CSS classes only, 
    never inline color. */
 (function () {
 
   function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
 
   /* Mount one horizontal track. opts:
-       host           — DOM node to fill
-       label          — (string) shown above the track
-       showBullseye   — bool; if false, bullseye marker stays hidden
-       showEstimate   — bool; if true, an estimate caret is rendered
-       showChips      — bool; if true, history chips render below the rail
-       traceClasses   — array of class strings; one trace marker per class
+       host, DOM node to fill
+       label, (string) shown above the track
+       showBullseye, bool; if false, bullseye marker stays hidden
+       showEstimate, bool; if true, an estimate caret is rendered
+       showChips, bool; if true, history chips render below the rail
+       traceClasses, array of class strings; one trace marker per class
                         is rendered for the multi-estimate scene */
   function mount(opts) {
     const host = opts.host;
@@ -63,7 +63,7 @@
     if (!showChips) chipLayer.style.display = 'none';
     rail.appendChild(chipLayer);
 
-    /* Bullseye marker — hidden if showBullseye is false. */
+    /* Bullseye marker, hidden if showBullseye is false. */
     const bullseye = document.createElement('div');
     bullseye.className = 'track-bullseye' + (showBullseye ? '' : ' track-bullseye-hidden');
     bullseye.innerHTML =
@@ -133,13 +133,13 @@
         chip.appendChild(lbl);
       }
       chipLayer.appendChild(chip);
-      /* Cap chip count — drop old ones to keep the track readable. */
+      /* Cap chip count, drop old ones to keep the track readable. */
       const all = chipLayer.querySelectorAll('.track-chip');
       const keep = (typeof o.maxChips === 'number') ? o.maxChips : 12;
       if (all.length > keep) {
         for (let i = 0; i < all.length - keep; i++) all[i].remove();
       }
-      /* Only the last `chipLabelLast` chips show their score label —
+      /* Only the last `chipLabelLast` chips show their score label, 
          labels collide otherwise when chips cluster. */
       const remaining = chipLayer.querySelectorAll('.track-chip');
       const cutoff = Math.max(0, remaining.length - chipLabelLast);

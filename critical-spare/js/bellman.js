@@ -78,7 +78,7 @@
   }
 
   /* Greedy policy. Ties break toward the LATER lever in MOVE_IDS order
-     [run, order, replace] (iterate with `>=`), so REPLACE wins a RUN tie -- it
+     [run, order, replace] (iterate with `>=`), so REPLACE wins a RUN tie, it
      matches the proposal's "spend the protection" grid. (There are in fact no
      exact ties at the fixed point; this only fixes the rule deterministically.) */
   function greedyPolicy(V, gamma) {

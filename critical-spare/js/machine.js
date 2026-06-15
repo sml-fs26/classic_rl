@@ -1,8 +1,8 @@
 /* MDP transitions for Critical Spare (the gallery's machine-maintenance game).
  *
  *   State s = (health, spares):
- *     health  in {HEALTHY (0), AGING (1), FAILING (2)} -- a condition gauge.
- *     spares  in {0, 1, 2}                              -- parts in the bin.
+ *     health  in {HEALTHY (0), AGING (1), FAILING (2)}, a condition gauge.
+ *     spares  in {0, 1, 2}, parts in the bin.
  *   That is 3 x 3 = 9 states. The whole world fits in a 3x3 MAINTENANCE GRID:
  *   health labels the rows (HEALTHY top, FAILING bottom), spares the columns
  *   (0 / 1 / 2 left to right). Each cell carries up to three lever-values, so
@@ -13,9 +13,9 @@
  *   and hand-checkable).
  *
  *   Action a = one of three levers (window.Levers):
- *     RUN     -- keep producing this turn (earn, but risk a breakdown).
- *     ORDER   -- buy one spare into the bin (pay; earns nothing this turn).
- *     REPLACE -- consume a spare to refurbish the machine to HEALTHY (planned
+ *     RUN, keep producing this turn (earn, but risk a breakdown).
+ *     ORDER, buy one spare into the bin (pay; earns nothing this turn).
+ *     REPLACE, consume a spare to refurbish the machine to HEALTHY (planned
  *                swap; only legal when spares >= 1; clamped otherwise).
  *
  *   Transition (the visible dice):
@@ -30,7 +30,7 @@
  *         FAILING->FAILING). Spares unchanged.
  *     ORDER (reward -2): spares -> min(spares + 1, 2); health unchanged.
  *     REPLACE (reward 0): spares - 1; machine -> HEALTHY; (health otherwise
- *                unchanged is moot -- it becomes HEALTHY).
+ *                unchanged is moot, it becomes HEALTHY).
  *     HOLDING COST -1 x (spares in the bin) is added to EVERY turn's reward,
  *     whatever the action.
  *
@@ -62,7 +62,7 @@
   const LEVER_BY_ID = window.Levers.LEVER_BY_ID;
   const LEVER_IDS   = window.Levers.LEVER_IDS;
 
-  /* ---------- State helpers ---------- */
+  /*, State helpers, */
   function mk(h, s) { return { h: h, s: s, terminal: false }; }
   function stateIndex(st) { return (st && !st.terminal) ? st.h * NS + st.s : -1; }
   function stateFromIndex(i) {
@@ -78,9 +78,9 @@
   const NON_TERMINAL_STATES = [];
   for (let h = 0; h < NH; h++) for (let s = 0; s < NS; s++) NON_TERMINAL_STATES.push(mk(h, s));
 
-  function initialState() { return mk(0, 0); }   // HEALTHY, empty bin -- the cold start
+  function initialState() { return mk(0, 0); }   // HEALTHY, empty bin, the cold start
 
-  /* ---------- Legality ---------- */
+  /*, Legality, */
   /* RUN and ORDER always; REPLACE only when a spare is on hand. */
   function availableLeverIds(st) {
     const out = ['run', 'order'];
@@ -93,7 +93,7 @@
     return leverId === 'run' || leverId === 'order';
   }
 
-  /* ---------- Successor enumeration (value iteration) ----------
+  /*, Successor enumeration (value iteration) ----------
      Holding cost -1 * spares is folded into every reward. A clamped lever
      (REPLACE with an empty bin) returns [] so the backup treats it as
      -Infinity (unavailable). */
@@ -131,7 +131,7 @@
   }
   function successorsFromBuckets(st, leverId) { return successors(st, leverId); }
 
-  /* ---------- One rolled turn (one sample) ---------- */
+  /*, One rolled turn (one sample), */
   function sample(st, leverId, rng) {
     const h = st.h, s = st.s;
     const hold = -1 * s;
@@ -171,7 +171,7 @@
       log: { lever: 'run', kind: 'survive', failed: false, aged: aged, hBefore: h, sBefore: s, hAfter: h2, sAfter: s, reward: 3 + hold } };
   }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -183,7 +183,7 @@
     };
   }
 
-  /* ---------- Display helpers ---------- */
+  /*, Display helpers, */
   function healthName(h) { return HEALTH[h] || ''; }
   function healthShort(h) { return HEALTH_SHORT[h] || ''; }
   function stateLabel(st) {

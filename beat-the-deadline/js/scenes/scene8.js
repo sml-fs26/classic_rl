@@ -1,6 +1,6 @@
-/* Scene 8 -- Bellman optimality. The recursive definition as a formula card,
+/* Scene 8, Bellman optimality. The recursive definition as a formula card,
    read in plain English over the dock tile, then a guided WALK of the WAIT
-   backup at (2,3) -- the razor-thin +0.40 flip cell -- term by term:
+   backup at (2,3), the razor-thin +0.40 flip cell, term by term:
      WAIT(2,3) = 0.2*(-10)               <- the deadline blows
                + 0.8*[0.6*V*(3,2) + 0.4*V*(2,2)]   <- you survive, average the
                                                        arrival die

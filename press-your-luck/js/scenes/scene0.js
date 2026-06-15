@@ -38,7 +38,7 @@
     const T = (k) => (window.I18N ? window.I18N.t(k) : k);
     const firstVisit = isFirstVisit();
 
-    /* ---------------- PHASE A: title ---------------- */
+    /*, PHASE A: title, */
     const titleWrap = document.createElement('div');
     titleWrap.className = 'sc0-title-wrap' + (firstVisit ? ' sc0-first-visit' : '');
 
@@ -111,7 +111,7 @@
       if (tumbleTimer) { clearTimeout(tumbleTimer); tumbleTimer = null; }
     }
 
-    /* ---------------- PHASE B: board tease ---------------- */
+    /*, PHASE B: board tease, */
     let revealed = false;
     function reveal() {
       if (revealed) return;
@@ -168,7 +168,7 @@
       }
     }
 
-    /* ---------------- wiring ---------------- */
+    /*, wiring, */
     const startBtn = titleWrap.querySelector('.sc0-start');
     if (startBtn) startBtn.addEventListener('click', reveal);
 

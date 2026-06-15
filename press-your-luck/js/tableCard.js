@@ -56,7 +56,7 @@
     if (o.compact) host.classList.add('table-card-compact');
     host.innerHTML = '';
 
-    /* ---- Pot meter (left) ---- */
+    /*, Pot meter (left), */
     const meter = document.createElement('div');
     meter.className = 'tc-pot-meter';
     /* Rows are stacked bottom-up: row 0 at the bottom .. DANGER at the top.
@@ -75,7 +75,7 @@
     meter.appendChild(meterLabel);
     host.appendChild(meter);
 
-    /* ---- Standing badge (right) ---- */
+    /*, Standing badge (right), */
     const badge = document.createElement('div');
     badge.className = 'tc-standing-badge';
     badge.innerHTML =

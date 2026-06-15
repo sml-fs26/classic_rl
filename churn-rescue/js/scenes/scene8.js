@@ -123,7 +123,7 @@
       console.warn('[scene8] Bellman total', br.total, '!= DATA.Qstar', oracle);
     }
 
-    /* ---- Heading + manager hook ---- */
+    /*, Heading + manager hook, */
     const h = document.createElement('h2');
     h.className = 's8-heading';
     h.textContent = T('s8.heading');
@@ -134,7 +134,7 @@
     hook.textContent = T('s8.hook');
     root.appendChild(hook);
 
-    /* ---- Bellman formula card ---- */
+    /*, Bellman formula card, */
     const fcard = document.createElement('div');
     fcard.className = 's8-formula poke-formula';
     const fhost = document.createElement('div');
@@ -150,7 +150,7 @@
       '<span class="s8-gloss-term s8-term-future">' + T('s8.gloss.future') + '</span>';
     root.appendChild(gloss);
 
-    /* ---- The backup IS the depth-1 trajectory tree ----
+    /*, The backup IS the depth-1 trajectory tree ----
        A collapsible card holding a depth-1 TrajTree under the SAME teaching
        cell (AT-RISK, m=2, BIG OFFER) with each non-terminal child
        bootstrapped by V*: G_t = r + V*(s'). Its weighted leaf sum equals
@@ -220,7 +220,7 @@
       }
     })();
 
-    /* ---- Controls ---- */
+    /*, Controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 's8-controls';
     ctrls.innerHTML =
@@ -229,8 +229,8 @@
       '<div class="s8-stepcount">' + T('s8.beat') + ' <b id="s8-beat">0 / 4</b></div>';
     root.appendChild(ctrls);
 
-    /* ---- The worked cell: a left "today" column + a right "branches"
-       tree, with a narration strip below. ---- */
+    /*, The worked cell: a left "today" column + a right "branches"
+       tree, with a narration strip below., */
     const stage = document.createElement('div');
     stage.className = 's8-stage';
     root.appendChild(stage);
@@ -350,7 +350,7 @@
     note.className = 's8-note poke-box tight';
     root.appendChild(note);
 
-    /* ---------- Beat machine ---------- */
+    /*, Beat machine, */
     const NOTES = [
       T('s8.note.ready'),
       T('s8.note.cost'),

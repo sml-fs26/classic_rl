@@ -20,11 +20,11 @@
   }
 
   /* Build a chart. opts:
-       host    — DOM node to fill
-       N       — total throw count (x-axis extent)
-       yMin    — y-axis lower bound (default 0)
-       yMax    — y-axis upper bound (default 100)
-       label   — optional caption above the chart */
+       host, DOM node to fill
+       N, total throw count (x-axis extent)
+       yMin, y-axis lower bound (default 0)
+       yMax, y-axis upper bound (default 100)
+       label, optional caption above the chart */
   function mount(opts) {
     const host = opts.host;
     const N = opts.N;
@@ -41,7 +41,7 @@
       host.appendChild(lbl);
     }
 
-    /* Lock the SVG layout box explicitly — SKILL §"Things to never do" */
+    /* Lock the SVG layout box explicitly, SKILL §"Things to never do" */
     const W = 720;
     const H = 260;
     const PAD_L = 36;

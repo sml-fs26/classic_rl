@@ -1,4 +1,4 @@
-/* scene3 i18n -- formalization (MDP). */
+/* scene3 i18n, formalization (MDP). */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

@@ -1,4 +1,4 @@
-/* scene6 i18n -- return G_t. */
+/* scene6 i18n, return G_t. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

@@ -1,4 +1,4 @@
-/* Last-Minute Pricing -- static MDP solution plus value-iteration history
+/* Last-Minute Pricing, static MDP solution plus value-iteration history
  * and SARSA training trajectories.
  *
  * Regenerate with `node precompute/build-datasets.js`. The build script

@@ -41,7 +41,7 @@
     root.classList.add('scene-pad', 's1-tut');
     root.innerHTML = '';
 
-    /* ---------- top bar: step counter + SKIP ---------- */
+    /*, top bar: step counter + SKIP, */
     const topbar = document.createElement('div');
     topbar.className = 's1-topbar';
     root.appendChild(topbar);
@@ -57,36 +57,36 @@
     topbar.appendChild(skipBtn);
     skipBtn.addEventListener('click', () => { window.location.hash = '#scene=2'; });
 
-    /* ---------- section title ---------- */
+    /*, section title, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title s1-section-title';
     root.appendChild(header);
 
-    /* ---------- demo area (changes per step) ---------- */
+    /*, demo area (changes per step), */
     const demoHost = document.createElement('div');
     demoHost.className = 's1-demo';
     root.appendChild(demoHost);
 
-    /* ---------- dialog ---------- */
+    /*, dialog, */
     const dialogHost = document.createElement('div');
     dialogHost.className = 's1-dialog';
     root.appendChild(dialogHost);
     const dialog = window.Dialog.mount(dialogHost);
 
-    /* ---------- nav hint ---------- */
+    /*, nav hint, */
     const navHint = document.createElement('div');
     navHint.className = 's1-nav-hint';
     navHint.innerHTML = T('tut.nav.hint');
     root.appendChild(navHint);
 
-    /* ---------- async helpers + cancellation ---------- */
+    /*, async helpers + cancellation, */
     let episode = 0;            // bumped on every step change / leave; aborts the demo
     function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
     function dialogSay(line) {
       return new Promise((resolve) => { dialog.say(line); dialog.onDone(resolve); });
     }
 
-    /* ---------- step engine ---------- */
+    /*, step engine, */
     let cursor = 0;
 
     function renderStep(c) {
@@ -119,7 +119,7 @@
       demo: renderDemo
     };
 
-    /* ---- step 1: welcome - the table card front and centre ---- */
+    /*, step 1: welcome - the table card front and centre, */
     function renderWelcome(host) {
       const wrap = document.createElement('div');
       wrap.className = 's1-welcome';
@@ -141,7 +141,7 @@
       dialog.say(T('tut.welcome.dialog'));
     }
 
-    /* ---- step 2: the pot meter, with callouts ---- */
+    /*, step 2: the pot meter, with callouts, */
     function renderPot(host) {
       const wrap = document.createElement('div');
       wrap.className = 's1-focus s1-focus-pot';
@@ -177,7 +177,7 @@
       })();
     }
 
-    /* ---- step 3: the standing badge - cycle BEHIND / EVEN / AHEAD ---- */
+    /*, step 3: the standing badge - cycle BEHIND / EVEN / AHEAD, */
     function renderStand(host) {
       const wrap = document.createElement('div');
       wrap.className = 's1-focus s1-focus-stand';
@@ -224,7 +224,7 @@
       })();
     }
 
-    /* ---- step 4: the two levers + the die ---- */
+    /*, step 4: the two levers + the die, */
     function renderLevers(host) {
       const wrap = document.createElement('div');
       wrap.className = 's1-levers-demo';
@@ -270,7 +270,7 @@
       })();
     }
 
-    /* ---- step 5: the demo turn ---- */
+    /*, step 5: the demo turn, */
     function renderDemo(host) {
       const wrap = document.createElement('div');
       wrap.className = 's1-demo-turn';
@@ -443,7 +443,7 @@
       }
     }
 
-    /* ---------- boot ---------- */
+    /*, boot, */
     renderStep(readInitialStep());
 
     return {

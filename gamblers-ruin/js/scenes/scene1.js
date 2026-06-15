@@ -1,4 +1,4 @@
-/* Scene 1 -- Tutorial. A guided 5-step walkthrough of the controls with zero
+/* Scene 1, Tutorial. A guided 5-step walkthrough of the controls with zero
    theory: capital, the three stakes (with clamping), the rigged coin, the two
    terminals, and one slow demo flip. Internal stepping via onNextKey/onPrevKey.
    Cold-entry safe; honours &run (jumps to the last step + plays the demo). */

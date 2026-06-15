@@ -1,8 +1,8 @@
-/* Scene 4 -- Policy: a rule from tiles to actions.
+/* Scene 4, Policy: a rule from tiles to actions.
  *   Define a policy pi: a heading for EVERY tile. Callback to scene 2 ("your gut
  *   was a policy"). Show two hand policies as arrow fields on the board: (a)
- *   "aim straight at the gold" -- every tile points toward the chest, so the
- *   tile below the pit marches straight in; (b) "the optimal map" -- the DP
+ *   "aim straight at the gold", every tile points toward the chest, so the
+ *   tile below the pit marches straight in; (b) "the optimal map", the DP
  *   field that bends around the hazard. The learner eyeballs which looks safer,
  *   and a reach-gold stat makes it concrete. Cold-entry safe. */
 (function () {

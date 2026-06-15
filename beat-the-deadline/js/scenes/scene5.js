@@ -1,4 +1,4 @@
-/* Scene 5 -- Trajectory. Roll one order window forward under the optimal policy
+/* Scene 5, Trajectory. Roll one order window forward under the optimal policy
    and lay it out as a tape tau = (S1,A1,R1, S2,A2,R2, ...). Each step redraws
    the dock tile and shows the dice result inline; capital letters emphasised as
    random variables. ROLL re-samples a fresh window. Cold-entry safe; honours

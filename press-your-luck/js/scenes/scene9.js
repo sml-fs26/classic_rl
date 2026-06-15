@@ -83,7 +83,7 @@
     const startPct = DATA.startWinProb != null
       ? Math.round(DATA.startWinProb * 100) + '%' : '64%';
 
-    /* ---- Heading + manager framing ---- */
+    /*, Heading + manager framing, */
     const h = document.createElement('h2');
     h.className = 's9-heading';
     h.textContent = T('s9.heading');
@@ -94,7 +94,7 @@
     mgr.textContent = T('s9.manager', { hold: rivalHold });
     root.appendChild(mgr);
 
-    /* ---- Bellman formula card + the load-bearing assumption ---- */
+    /*, Bellman formula card + the load-bearing assumption, */
     const fcard = document.createElement('div');
     fcard.className = 's9-formula-card';
     fcard.innerHTML = '<div class="s9-card-label">' + T('s9.formula.label') + '</div>';
@@ -112,7 +112,7 @@
     fcard.appendChild(assume);
     root.appendChild(fcard);
 
-    /* ---- Controls + status ---- */
+    /*, Controls + status, */
     const ctrls = document.createElement('div');
     ctrls.className = 's9-controls-row';
     ctrls.innerHTML =
@@ -127,7 +127,7 @@
       '</div>';
     root.appendChild(ctrls);
 
-    /* ---- Row: board + side narration panel ---- */
+    /*, Row: board + side narration panel, */
     const row = document.createElement('div');
     row.className = 's9-row';
     root.appendChild(row);
@@ -150,13 +150,13 @@
       '<span class="s9-leg s9-leg-pending"><i></i>' + T('s9.legend.pending') + '</span>';
     root.appendChild(legend);
 
-    /* ---- Bridge ---- */
+    /*, Bridge, */
     const bridge = document.createElement('div');
     bridge.className = 's9-bridge';
     bridge.textContent = T('s9.bridge');
     root.appendChild(bridge);
 
-    /* ---- Reveal state machine ---- */
+    /*, Reveal state machine, */
     let phaseIdx = -1;
     const revealed = new Array(N).fill(false);
 

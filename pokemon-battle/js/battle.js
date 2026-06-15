@@ -1,4 +1,4 @@
-/* MDP transitions for the Pikachu-vs-Charmander battle — 5-bucket variant.
+/* MDP transitions for the Pikachu-vs-Charmander battle, 5-bucket variant.
  *
  *   State `s`: (your_HP_bucket, opp_HP_bucket), each in {0..4} = {full, high,
  *   mid, low, critical}. Bucket 5 = fainted = terminal (off-grid).
@@ -6,7 +6,7 @@
  *   Opponent: Charmander uses Ember every turn (deterministic).
  *   Speed: Pikachu always moves first (matches Gen-1 base speed).
  *
- *   The simulator is fully discrete now — no more continuous HP underneath.
+ *   The simulator is fully discrete now, no more continuous HP underneath.
  *   Each move has an explicit probability distribution over bucket-delta
  *   damage (conditional on hitting). Accuracy gates whether the hit branch
  *   triggers. The world the agent sees IS the world it lives in: no hidden
@@ -30,11 +30,11 @@
   const BUCKET_IDX = { full: 0, high: 1, mid: 2, low: 3, critical: 4 };
   const FAINTED = NUM_BUCKETS;       // bucket index that means "off the bottom"
 
-  /* The opponent now has three forms tied to its own HP bucket — a feral
+  /* The opponent now has three forms tied to its own HP bucket, a feral
      Charmander that evolves under battle stress.  Each form has its own
      type-effectiveness matrix on PIKACHU's three moves AND its own
      counter-attack damage profile.  Pikachu's optimal policy is therefore
-     NOT a single move everywhere — it shifts as the opponent evolves.
+     NOT a single move everywhere, it shifts as the opponent evolves.
 
        FORM             OPP HP buckets   Identity                 Counter
        ────             ──────────────   ────────                 ───────
@@ -112,7 +112,7 @@
     return FORM_DISPLAY_NAME[formForOpp(oppBucket)];
   }
 
-  /* Legacy aliases — kept so any external consumer that still imports
+  /* Legacy aliases, kept so any external consumer that still imports
      HIT_DAMAGE_DIST / EMBER_DIST gets the CHARMANDER (baseline) tables.
      All new code should call hitDamageDist(form, moveId) /
      oppDamageDist(form) instead. */
@@ -126,7 +126,7 @@
     return OPP_DIST_BY_FORM[form] || OPP_DIST_BY_FORM.charmander;
   }
 
-  /* ---------- RNG sampling helpers ---------- */
+  /*, RNG sampling helpers, */
   function sampleDist(rng, dist) {
     const u = rng();
     let cum = 0;
@@ -153,7 +153,7 @@
   /* Kept for backwards compat with any callers expecting the old name. */
   function initialScalar() { return initialState(); }
 
-  /* ---------- One-turn sample (discrete) ----------
+  /*, One-turn sample (discrete) ----------
      The agent picks moveId; Pikachu attacks first (matches game speed); if
      Charmander still alive, it counters with Ember. Returns the full log
      so scene 1's dialog can describe what happened. */
@@ -177,7 +177,7 @@
     };
 
     /* Pikachu first. Type-effectiveness depends on the form BEING attacked
-       — Charm-form before Pikachu's hit lands. */
+, Charm-form before Pikachu's hit lands. */
     const formBefore = formForOpp(state.opp);
     log.formBefore = formBefore;
     const hit1 = rng() < move.accuracy;
@@ -195,7 +195,7 @@
       return { sNext, reward: +10, terminal: true, win: true, lose: false, log };
     }
 
-    /* Opponent counters using the form it's in AFTER taking the hit —
+    /* Opponent counters using the form it's in AFTER taking the hit, 
        Pikachu's damage may have triggered an evolution mid-turn (e.g.
        Charmander → Charmeleon when crossing into MID HP). The new form's
        counter is what hits Pikachu. */
@@ -215,7 +215,7 @@
     return { sNext, reward: -1, terminal: false, win: false, lose: false, log };
   }
 
-  /* ---------- Successors enumeration (for value iteration) ----------
+  /*, Successors enumeration (for value iteration) ----------
      Returns the full discrete branch tree of (move outcome × counter outcome)
      with probabilities aggregated per destination state. */
   function successors(state, moveId) {
@@ -279,7 +279,7 @@
   }
   function successorsFromBuckets(s, m) { return successors(s, m); } // alias
 
-  /* ---------- Indexing over the 25 non-terminal states ---------- */
+  /*, Indexing over the 25 non-terminal states, */
   const NON_TERMINAL_STATES = [];
   for (let y = 0; y < NUM_BUCKETS; y++) {
     for (let o = 0; o < NUM_BUCKETS; o++) {
@@ -305,7 +305,7 @@
     return BUCKETS[idx].toUpperCase();
   }
 
-  /* ---------- Mulberry32 — shared with the precompute. ---------- */
+  /*, Mulberry32, shared with the precompute., */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -329,7 +329,7 @@
     /* Legacy single-form damage tables (CHARMANDER baseline). New code
        should call hitDamageDist(form, moveId) / oppDamageDist(form). */
     HIT_DAMAGE_DIST, EMBER_DIST,
-    /* New form-aware surface — read by scenes that render opponent
+    /* New form-aware surface, read by scenes that render opponent
        sprites / names / type-effectiveness explanations. */
     HIT_DAMAGE_BY_FORM, OPP_DIST_BY_FORM,
     FORM_DISPLAY_NAME, FORM_MOVE_NAME,

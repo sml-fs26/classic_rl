@@ -61,7 +61,7 @@
 
     let active = 0;   // index into POLICIES
 
-    /* ---- heading + manager lead ---- */
+    /*, heading + manager lead, */
     const heading = document.createElement('h2');
     heading.className = 'poke-subtitle sc4-heading';
     heading.textContent = T('scene4.heading');
@@ -72,7 +72,7 @@
     lead.textContent = T('scene4.lead');
     root.appendChild(lead);
 
-    /* ---- pi: S -> A formula card ---- */
+    /*, pi: S -> A formula card, */
     const fcard = document.createElement('div');
     fcard.className = 'sc4-formula';
     fcard.innerHTML = '<div class="sc4-formula-label">' + T('scene4.formula.label') + '</div>';
@@ -86,7 +86,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- two-column body: the board (left) + the policy panel (right) ---- */
+    /*, two-column body: the board (left) + the policy panel (right), */
     const row = document.createElement('div');
     row.className = 'sc4-row';
     root.appendChild(row);

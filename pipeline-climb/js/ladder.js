@@ -29,7 +29,7 @@
  */
 (function () {
 
-  /* ---------- Rungs (the 5 living states) ---------- */
+  /*, Rungs (the 5 living states), */
   const NUM_RUNGS = 5;
   const RUNGS = ['cold', 'curious', 'engaged', 'evaluating', 'ready'];
   const RUNG_IDX = { cold: 0, curious: 1, engaged: 2, evaluating: 3, ready: 4 };
@@ -43,7 +43,7 @@
   const TOUCH_REWARD  = -1;        // every non-terminating move
   const GAMMA         = 1;
 
-  /* ---------- The STAGE DIE: up/stay/down per stage x lever ----------
+  /*, The STAGE DIE: up/stay/down per stage x lever ----------
      Rows are rungs 0..4; each entry is [pUp, pStay, pDown].
      HARD CLOSE at READY is special-cased in successors()/sample() because
      its UP face means SIGNED (a terminal), not a rung step. The .05/.20/.75
@@ -73,7 +73,7 @@
     ],
   };
 
-  /* ---------- States ---------- */
+  /*, States, */
   function initialState() { return { rung: COLD, terminal: false }; }
 
   /* The 5 non-terminal states, index order 0..4 (COLD..READY). */
@@ -105,7 +105,7 @@
   function signedState() { return { terminal: true, signed: true, lost: false }; }
   function lostState()   { return { terminal: true, signed: false, lost: true }; }
 
-  /* ---------- successors(state, leverId): full enumeration ----------
+  /*, successors(state, leverId): full enumeration ----------
      Returns the three die-face branches with aggregated probabilities.
      sNext is either a terminal ({signed:true}/{lost:true}) or a living
      {rung, terminal:false}. Reward is baked in: -1 on a non-terminating
@@ -148,7 +148,7 @@
   /* Alias name expected by the reused bellman.js. */
   function successorsFromBuckets(s, leverId) { return successors(s, leverId); }
 
-  /* ---------- sample(state, leverId, rng): one stochastic draw ----------
+  /*, sample(state, leverId, rng): one stochastic draw ----------
      Rolls the STAGE DIE once and returns the resulting transition plus a
      rich `log` the scenes use to narrate the die (face, from/to rung,
      signed/lost). face is 'up' | 'stay' | 'down'. */
@@ -207,7 +207,7 @@
     return { sNext: { rung: r - 1, terminal: false }, reward: TOUCH_REWARD, terminal: false, log };
   }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {

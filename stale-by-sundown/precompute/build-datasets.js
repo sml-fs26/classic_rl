@@ -1,4 +1,4 @@
-/* Stale by Sundown precompute -- the RIGOR GATE.
+/* Stale by Sundown precompute, the RIGOR GATE.
  *
  *   Runs value iteration on the bakery markdown MDP (units 1..3 x tier
  *   FRESH..STALE = 15 states; levers HOLD/DISCOUNT/DUMP; the posted buy-meter;
@@ -45,7 +45,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/* ---------------- Load the verified engine via a window shim ---------------- */
+/*, Load the verified engine via a window shim, */
 const sandbox = { window: {}, console, Math, Float64Array, Float32Array, Int32Array, Array, Map, Set, JSON };
 sandbox.window.window = sandbox.window;
 const ctx = vm.createContext(sandbox);
@@ -66,7 +66,7 @@ const TIERS = Bakery.TIERS;                 // [FRESH, OK, AGING, OLD, STALE]
 const UNITS = Bakery.UNITS;                 // [1,2,3]
 const GAMMA = 0.75;
 
-/* ---------------- Value iteration ---------------- */
+/*, Value iteration, */
 const TOL = 1e-13;
 const MAX_ITERS = 500;
 const vi = Bellman.valueIteration(GAMMA, { tol: TOL, maxIters: MAX_ITERS, recordHistory: true });
@@ -74,7 +74,7 @@ const V = vi.V;                             // Float64Array[15], index = stateIn
 const policy = vi.policy;                   // [15] lever-id strings
 const Qstar = Bellman.qFromV(V, GAMMA);     // Float64Array[15*A]
 
-/* ---------------- Helpers ---------------- */
+/*, Helpers, */
 function sIdx(u, t) { return (u - 1) * TIERS.length + TIERS.indexOf(t); }
 function vAt(u, t) { return V[sIdx(u, t)]; }
 function qRow(u, t) {
@@ -87,19 +87,19 @@ function bestLever(u, t) { return policy[sIdx(u, t)]; }
 function round2(x) { return Math.round(x * 100) / 100; }
 function round3(x) { return Math.round(x * 1000) / 1000; }
 function round4(x) { return Math.round(x * 10000) / 10000; }
-function fmt(x) { return Number.isFinite(x) ? x.toFixed(2).padStart(6) : '  --  '; }
+function fmt(x) { return Number.isFinite(x) ? x.toFixed(2).padStart(6) : ', '; }
 
-/* ---------------- Assertions ---------------- */
+/*, Assertions, */
 function assert(name, ok, info) {
   if (ok) { console.log('  [OK]   ' + name); return; }
-  console.error('  [FAIL] ' + name + (info ? ' -- ' + info : ''));
+  console.error('  [FAIL] ' + name + (info ? ', ' + info : ''));
   process.exit(1);
 }
 
-console.log('Stale by Sundown precompute -- 15-state bakery markdown MDP, 3 levers, gamma = ' + GAMMA);
+console.log('Stale by Sundown precompute, 15-state bakery markdown MDP, 3 levers, gamma = ' + GAMMA);
 console.log('  states = (units 1..3) x (tier FRESH..STALE); terminals CLEARED (0), SPOILED (-6 on entry)');
 console.log('');
-console.log('Phase 1 -- Value iteration');
+console.log('Phase 1, Value iteration');
 const lastSweep = vi.history[vi.history.length - 1];
 console.log('  converged in ' + vi.iters + ' sweeps, final maxDelta = ' + lastSweep.maxDelta.toExponential(2));
 
@@ -194,7 +194,7 @@ assert('age drives the policy: exactly one tier-row (AGING) is stock-sensitive',
   stockSensitiveRows.length === 1 && stockSensitiveRows[0] === 'AGING',
   'stock-sensitive rows = [' + stockSensitiveRows.join(', ') + ']');
 
-/* ---------------- Per-sweep snapshots for the DP scene ----------------
+/*, Per-sweep snapshots for the DP scene ----------------
    The case fills "from the terminals inward": STALE (the spoilage cliff) locks
    first, then OLD/AGING, then the FRESH/OK cap. We record (V, Q, solvedMask)
    after each sweep so the DP scene animates value spreading band by band. A
@@ -224,7 +224,7 @@ const sweepsToStable = sweepSnapshots.length - 1;
 console.log('  DP fill recorded over ' + sweepSnapshots.length + ' sweep-frames ' +
             '(value reaches 3dp stability by ~sweep ' + sweepsToStable + ')');
 
-/* ---------------- Phase 2 -- model-free TD control: ON-POLICY SARSA ----------------
+/*, Phase 2, model-free TD control: ON-POLICY SARSA ----------------
    We learn Q from experience (sell/age/adjust) with NO model of the buy-meter.
    The HEADLINE learner is ON-POLICY SARSA with a GLIE schedule: the bootstrap
    uses the next lever a' we ACTUALLY pick (eps-greedy), epsilon ANNEALS toward
@@ -236,7 +236,7 @@ console.log('  DP fill recorded over ' + sweepSnapshots.length + ' sweep-frames 
    nuance: with steady exploration, SARSA learns the value of the exploratory
    policy it follows and ends up slightly CAUTIOUS (it under-values a few HOLD
    cells, discounting earlier than DP would). As exploration anneals, that bias
-   vanishes -- which is exactly the GLIE story on screen. */
+   vanishes, which is exactly the GLIE story on screen. */
 
 function epsGLIE(ep, cfg) {
   if (cfg.constEps != null) return cfg.constEps;
@@ -328,7 +328,7 @@ function summariseSarsa(Q) {
   return { learned, board, diffs, agreed: agreementWithDP(Q) };
 }
 
-/* GLIE config -- the headline learner (converges to Q*). */
+/* GLIE config, the headline learner (converges to Q*). */
 const SARSA_GLIE = {
   kind: 'sarsa-glie',
   eps0: 0.30, epsMin: 0.02, alphaPow: 0.70,
@@ -336,7 +336,7 @@ const SARSA_GLIE = {
   snapshotEpisodes: [0, 200, 1000, 5000, 20000, 60000, 150000, 300000],
   evalEvery: 5000,
 };
-/* Constant-epsilon config -- shown as the cautious on-policy contrast. */
+/* Constant-epsilon config, shown as the cautious on-policy contrast. */
 const SARSA_CONST = {
   kind: 'sarsa-const',
   constEps: 0.10, constAlpha: 0.05,
@@ -346,7 +346,7 @@ const SARSA_CONST = {
 };
 
 console.log('');
-console.log('Phase 2 -- model-free TD control: ON-POLICY SARSA');
+console.log('Phase 2, model-free TD control: ON-POLICY SARSA');
 console.log('  GLIE   : ' + SARSA_GLIE.episodes + ' eps, eps ' + SARSA_GLIE.eps0 + '->' + SARSA_GLIE.epsMin +
             ' (anneal), alpha=1/(1+n)^' + SARSA_GLIE.alphaPow + ' (Robbins-Monro), exploring starts');
 console.log('  const  : ' + SARSA_CONST.episodes + ' eps, eps=' + SARSA_CONST.constEps +
@@ -398,7 +398,7 @@ assert('constant-epsilon SARSA is more cautious than DP (>=1 cell differs)',
   cstSum.agreed < N && cstSum.diffs.length >= 1,
   'agreement ' + cstSum.agreed + '/' + N + ' diffs=[' + cstSum.diffs.join('; ') + ']');
 
-/* ---------------- A fixed illustrative trajectory ----------------
+/*, A fixed illustrative trajectory ----------------
    One short, deterministic demo day under the OPTIMAL policy from (3,FRESH),
    pinned seed, for the tutorial / trajectory / return scenes. Want a legible
    run that shows an age tick and a sale or two and ends terminal. */
@@ -446,7 +446,7 @@ console.log('');
 console.log('Demo trajectory (optimal policy from 3x FRESH, seed ' + demoTrajectory.seedUsed + '): ' +
             demoTrajectory.len + ' hours, ' + (demoTrajectory.cleared ? 'CLEARED' : 'SPOILED'));
 
-/* ---------------- Return-distribution bars for the Return scene ----------------
+/*, Return-distribution bars for the Return scene ----------------
    Fix the (2,FRESH) start and one chosen FIRST lever, then play OPTIMALLY after,
    and Monte-Carlo the discounted return. The MEAN must equal Q*(2,FRESH,lever).
    We bin the outcomes into a small histogram for the visual. */
@@ -507,7 +507,7 @@ assert('HOLD-first mean return exceeds DISCOUNT-first (higher average, scarier d
   returnDist.hold.mean > returnDist.discount.mean,
   'HOLD mean=' + returnDist.hold.mean + ' DISCOUNT mean=' + returnDist.discount.mean);
 
-/* ---------------- The named spot-Q rows the Q* scene tours ---------------- */
+/*, The named spot-Q rows the Q* scene tours, */
 function spotRow(u, t) {
   const r = qRow(u, t);
   const obj = {};
@@ -518,7 +518,7 @@ function spotRow(u, t) {
    STALE -> DUMP. (2,FRESH), (2,AGING), (2,OLD), (1,STALE) tell the whole story. */
 const spotTour = [spotRow(2, 'FRESH'), spotRow(2, 'AGING'), spotRow(2, 'OLD'), spotRow(1, 'STALE')];
 
-/* ---------------- gamma contrast for the risk note ----------------
+/*, gamma contrast for the risk note ----------------
    The clean HOLD->DISCOUNT->DUMP flip lives around gamma=0.75. Show the board at
    a very patient gamma (0.97): the DISCOUNT band shrinks toward HOLD. */
 function boardAtGamma(g) {
@@ -530,14 +530,14 @@ function boardAtGamma(g) {
 const patientBoard = boardAtGamma(0.97);
 console.log('  contrast: optimal board at gamma=0.97 (very patient):');
 for (const t of TIERS) console.log('    ' + t.padEnd(5) + ' ' + patientBoard[t].map(x => x.padEnd(9)).join(' '));
-/* count DISCOUNT cells at 0.75 vs 0.97 -- the patient board should have fewer */
+/* count DISCOUNT cells at 0.75 vs 0.97, the patient board should have fewer */
 function countLever(board, lev) { let n = 0; for (const t of TIERS) for (const x of board[t]) if (x === lev) n++; return n; }
 const discAtBase = (function () { const b = {}; for (const t of TIERS) b[t] = UNITS.map(u => bestLever(u, t)); return countLever(b, 'DISCOUNT'); })();
 const discAtPatient = countLever(patientBoard, 'DISCOUNT');
 assert('a very patient gamma (0.97) shrinks the DISCOUNT band (gamma does real work)',
   discAtPatient < discAtBase, 'DISCOUNT cells: gamma0.75=' + discAtBase + ' gamma0.97=' + discAtPatient);
 
-/* ---------------- Recap cards (bakery voice) ---------------- */
+/*, Recap cards (bakery voice), */
 const recap = [
   { key: 'mdp', badge: 'MDP', scene: 3, title: 'THE FOUR-PART FRAME',
     text: 'The situation is your SHELF (how many units, how fresh). The lever is your move (HOLD / DISCOUNT / DUMP). The part you do not control is whether the next customer BUYS. The payoff is the till change, summed to closing.',
@@ -546,23 +546,23 @@ const recap = [
     text: 'A policy assigns one lever to EVERY shelf state, the SOP your whole team could run without you. When you ran the shop by gut you already were a policy; you just had not written it down.',
     tex: '\\pi : S \\rightarrow A' },
   { key: 'return', badge: 'RETURN', scene: 6, title: 'A SPREAD, NOT A POINT',
-    text: 'The return is the day\'s till, later money discounted. One lever does not give one payoff -- it gives a DISTRIBUTION. HOLD has the higher average and the scary downside; judge a strategy by its long-run average, not one lucky afternoon.',
+    text: 'The return is the day\'s till, later money discounted. One lever does not give one payoff, it gives a DISTRIBUTION. HOLD has the higher average and the scary downside; judge a strategy by its long-run average, not one lucky afternoon.',
     tex: 'G_i \\;=\\; \\textstyle\\sum_{j \\ge i}\\, \\gamma^{\\,j-i}\\, r_j' },
   { key: 'qstar', badge: 'Q*', scene: 7, title: 'THE HONEST SCORECARD',
     text: 'Q*(s, a) is the true long-run value of pulling lever a in situation s, assuming you play smart afterward. The best lever is the star, and it MARCHES down the age axis: HOLD while fresh, DISCOUNT once aging, DUMP when stale.',
     tex: 'Q^{*}(s,a) \\;=\\; \\max_{\\pi}\\, \\mathbb{E}\\,[\\,G_i \\mid s, a\\,]' },
   { key: 'dp', badge: 'DP', scene: 9, title: 'EXACT PLAYBOOK FROM A KNOWN MODEL',
-    text: 'With the buy-meter posted, Q* solves its own Bellman equation: a lever\'s value is what it pays this hour plus the value of where it leaves you. Sweep the backup and the case fills band by band -- green cap, amber middle, red floor.',
+    text: 'With the buy-meter posted, Q* solves its own Bellman equation: a lever\'s value is what it pays this hour plus the value of where it leaves you. Sweep the backup and the case fills band by band, green cap, amber middle, red floor.',
     tex: 'Q^{*}(s,a) \\;=\\; \\mathbb{E}\\,[\\, R + \\max_{a\'} Q^{*}(S\',a\') \\,]' },
   { key: 'sarsa', badge: 'SARSA', scene: 11, title: 'LEARN THE PLAYBOOK BY PLAYING',
     text: 'No posted odds? Replace the expectation with one real day on the floor: nudge a lever\'s score toward (what you saw + the score of the lever you played next). Explore a little, keep score, and the same green/amber/red playbook emerges from experience.',
     tex: 'q[s,a] \\;\\mathrel{+}=\\; \\alpha\\,(\\, r + \\gamma\\, q[s\',a\'] - q[s,a] \\,)' },
 ];
 
-/* ---------------- Levers for display ---------------- */
+/*, Levers for display, */
 const leversDisplay = Levers.LEVERS.map(l => ({ id: l.id, name: l.name, role: l.role, sale: l.sale }));
 
-/* ---------------- Assemble + round payloads ---------------- */
+/*, Assemble + round payloads, */
 function roundArr(arr, places) { const f = Math.pow(10, places); return Array.from(arr, v => (Number.isFinite(v) ? Math.round(v * f) / f : null)); }
 
 const DATA = {
@@ -646,11 +646,11 @@ const DATA = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(ROOT, 'data', 'datasets.js');
 const payload = JSON.stringify(DATA);
 const fileContent =
-  "/* Stale by Sundown -- static MDP solution plus value-iteration fill frames\n" +
+  "/* Stale by Sundown, static MDP solution plus value-iteration fill frames\n" +
   " * and on-policy SARSA training trajectories.\n" +
   " *\n" +
   " * Regenerate with `node precompute/build-datasets.js`. The build script\n" +

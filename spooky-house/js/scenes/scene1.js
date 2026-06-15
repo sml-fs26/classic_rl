@@ -1,22 +1,22 @@
-/* Scene 1 — Pick a path.
+/* Scene 1, Pick a path.
 
    The student drives ANYmal manually, one cell at a time, with → and ↓
    (or d / s). The cumulative score updates after each step; on reaching
    (4, 4) a banner asks "was that the best?". The optimal answer is NOT
-   revealed here — the reveal lives in scene 4 once the student has had
+   revealed here, the reveal lives in scene 4 once the student has had
    the chance to do the work.
 
    Per the SKILL §"Step engine": state-is-source-of-truth, prev = reset+
    replay. The History module stores recorded actions. Pressing ArrowLeft
    inside the scene rewinds; ArrowRight either replays through history or,
    at the head, yields to the driver to advance the scene. ←/→ are the
-   only "advance scene" affordances — wasd / arrows for moving don't
+   only "advance scene" affordances, wasd / arrows for moving don't
    collide with prev/next. */
 (function () {
   if (!window.scenes) window.scenes = {};
 
   /* Action keys: ArrowDown / ArrowRight are owned by the scene engine for
-     prev/replay/next-scene. We use WASD for path-picking instead — D = right,
+     prev/replay/next-scene. We use WASD for path-picking instead, D = right,
      S = down. This matches the SKILL pattern: arrow keys belong to the
      scene engine, scene-internal advance via onNextKey, scene-internal
      movement via the alternative key set.
@@ -38,7 +38,7 @@
       return {};
     }
 
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 's1-wrap';
@@ -63,7 +63,7 @@
     side.className = 's1-side';
     row.appendChild(side);
 
-    /* ---- Side: live score, step list, banner ---- */
+    /*, Side: live score, step list, banner, */
     const scoreH2 = document.createElement('h2');
     scoreH2.textContent = 'Your score so far.';
     side.appendChild(scoreH2);
@@ -98,7 +98,7 @@
       '<kbd>&larr;</kbd> rewinds; <kbd>&rarr;</kbd> replays or advances the scene.';
     side.appendChild(help);
 
-    /* ---- Mount the grid (rewards + ghost-density both shown for the spooky frame) ---- */
+    /*, Mount the grid (rewards + ghost-density both shown for the spooky frame), */
     const grid = window.Grid.mount(gridHost, {
       M: D.M,
       N: D.N,
@@ -111,7 +111,7 @@
     grid.setCellClass(D.goal.r,  D.goal.c,  'goal-cell',  true);
     grid.setEntity('door', { kind: 'door', r: D.goal.r, c: D.goal.c });
 
-    /* ---------- Per-scene state ---------- */
+    /*, Per-scene state, */
     const TOTAL_STEPS = (D.M - 1) + (D.N - 1);
     const history = window.History.create();
     let pos = { r: D.start.r, c: D.start.c };
@@ -195,7 +195,7 @@
       return pos.r === D.goal.r && pos.c === D.goal.c;
     }
 
-    /* ---------- Step forward via a user keystroke ---------- */
+    /*, Step forward via a user keystroke, */
     function performStep(action) {
       if (isTerminal()) return;
       const downValid = pos.r + 1 < D.M;
@@ -233,7 +233,7 @@
       return true;
     }
 
-    /* ---------- Keyboard ---------- */
+    /*, Keyboard, */
     /* WASD + ArrowDown drive movement. ArrowRight is owned by the scene
        engine (onNextKey). We only register a window-level listener for
        movement keys; ArrowLeft / ArrowRight are routed via the scene
@@ -257,7 +257,7 @@
       else if (r === pos.r + 1 && c === pos.c) performStep('down');
     });
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function fullReset() {
       history.reset();
       pos = { r: D.start.r, c: D.start.c };

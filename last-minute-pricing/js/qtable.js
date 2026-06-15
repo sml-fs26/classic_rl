@@ -1,4 +1,4 @@
-/* qtable.js -- the 5x4 PRICING BOARD widget for Last-Minute Pricing.
+/* qtable.js, the 5x4 PRICING BOARD widget for Last-Minute Pricing.
  *
  *   Reskinned from the Pokemon 5x5 bucket grid. Renders the whole Q-table on
  *   one screen: a 5-row x 4-col board of business situations plus a dark
@@ -22,7 +22,7 @@
  *        update(Q, opts), reset(), host,
  *        setOnCellClick(cb), getCellNode(stateIndex), cells
  *     }
- *        opts.heat (default true) — also paint a max-Q heat tint UNDER the
+ *        opts.heat (default true), also paint a max-Q heat tint UNDER the
  *          policy tint? Off by default for pricing: the lever-region overlay
  *          IS the colour story. Pass { heat:true } to layer a brightness ramp.
  *
@@ -90,7 +90,7 @@
       grid.appendChild(lab);
     }
 
-    /* MIDNIGHT gutter — one tall dark cell spanning all rows on the right. */
+    /* MIDNIGHT gutter, one tall dark cell spanning all rows on the right. */
     const gutter = document.createElement('div');
     gutter.className = 'q-midnight-gutter';
     gutter.style.gridColumn = String(COLS + 2);          // after labels + COLS
@@ -134,7 +134,7 @@
           '<span class="q-mark"></span>' +
           '<span class="q-swatch lever-fill-' + aid + '"></span>' +
           '<span class="q-label">' + shortLeverLabel(aid) + '</span>' +
-          '<span class="q-val">—</span>';
+          '<span class="q-val">, </span>';
         bars.appendChild(row);
         rowNodes[a] = {
           row: row,
@@ -149,7 +149,7 @@
     }
 
     /* Lever-usage strip below the grid (how many of the 20 cells each lever
-       wins) — the pricing analogue of the move-frequency strip. */
+       wins), the pricing analogue of the move-frequency strip. */
     const freqStrip = document.createElement('div');
     freqStrip.className = 'q-freq-strip';
     freqStrip.innerHTML = '<div class="q-freq-title">' + T('qtable.usageTitle', { n: N }) + '</div>';
@@ -219,7 +219,7 @@
           node.cell.classList.add('unvisited');
           if (useHeat) node.cell.classList.add('heat-zero');
           for (let a = 0; a < A; a++) {
-            node.rows[a].val.textContent = '—';
+            node.rows[a].val.textContent = ', ';
             node.rows[a].row.classList.remove('argmax');
             node.rows[a].mark.textContent = '';
           }
@@ -310,7 +310,7 @@
         for (const t of ALL_LEVER_TINTS) node.cell.classList.remove(t);
         for (const h of HEAT_CLASSES) node.cell.classList.remove(h);
         for (let a = 0; a < A; a++) {
-          node.rows[a].val.textContent = '—';
+          node.rows[a].val.textContent = ', ';
           node.rows[a].row.classList.remove('argmax');
           node.rows[a].mark.textContent = '';
         }
@@ -321,7 +321,7 @@
       }
     }
 
-    /* Click wiring — affordance only painted once a caller registers. */
+    /* Click wiring, affordance only painted once a caller registers. */
     let cellClickCb = null;
     for (let s = 0; s < N; s++) {
       const node = cellNodes[s];

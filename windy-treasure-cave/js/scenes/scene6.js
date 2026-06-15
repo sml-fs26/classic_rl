@@ -1,4 +1,4 @@
-/* Scene 6 -- Return G_i.
+/* Scene 6, Return G_i.
  *   Define the return from a step: G_i = sum of every reward from here to the
  *   end. A SAMPLE RUNS button fires episodes from the SAME tile (the twist cell
  *   below the pit) under the SAME chosen heading, and a histogram of their

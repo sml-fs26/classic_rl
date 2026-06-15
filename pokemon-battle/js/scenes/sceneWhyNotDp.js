@@ -1,10 +1,10 @@
-/* Scene — why DP doesn't scale.
+/* Scene, why DP doesn't scale.
  *
  *   Two reasons DP doesn't survive contact with real RL problems:
  *
  *     1. We usually don't know P. The previous scene's DP sweep only
  *        worked because we wrote down the transition table ourselves.
- *        In the wild — playing a real game, controlling a real robot —
+ *        In the wild, playing a real game, controlling a real robot, 
  *        you only get to sample s' from the world, never read P(s'|s,a).
  *
  *     2. Even if we *did* know P, computing Q over a realistic state
@@ -29,7 +29,7 @@
     heading.textContent = T('wndp.heading');
     root.appendChild(heading);
 
-    /* ---- Reason 1: P is unknown in the wild ---- */
+    /*, Reason 1: P is unknown in the wild, */
     const r1 = document.createElement('div');
     r1.className = 'concept-formula-card compact';
     r1.innerHTML =
@@ -46,7 +46,7 @@
     r1.appendChild(r1foot);
     root.appendChild(r1);
 
-    /* ---- Reason 2: even with P, the scale is hopeless ---- */
+    /*, Reason 2: even with P, the scale is hopeless, */
     const r2head = document.createElement('div');
     r2head.className = 'concept-formula-card compact';
     r2head.innerHTML =

@@ -1,7 +1,7 @@
-/* Scene 1 -- Tutorial: how to play.
+/* Scene 1, Tutorial: how to play.
  *   A guided, no-theory walk-through: here is the floor plan, here is YOU, the
  *   GOLD (+10) and the PIT (-10), here are your four headings, and here is the
- *   catch -- press a direction, watch the WIND DIE roll. Most rolls you go where
+ *   catch, press a direction, watch the WIND DIE roll. Most rolls you go where
  *   you aimed; some rolls a gust shoves you sideways. The learner makes a few
  *   throwaway moves just to SEE the die and the leaves. Cold-entry safe. */
 (function () {

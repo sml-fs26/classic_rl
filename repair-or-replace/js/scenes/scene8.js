@@ -93,7 +93,7 @@
     const MAX_STEP = 12;
     let step = hashStep(MAX_STEP);
 
-    /* ---- Heading + formula card (step 0) ---- */
+    /*, Heading + formula card (step 0), */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = 'The Bellman equation';
@@ -117,7 +117,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Mini strip: the table, parked (step 2+) ---- */
+    /*, Mini strip: the table, parked (step 2+), */
     const mini = document.createElement('div');
     mini.className = 's8-mini s8-popin';
     const miniLabel = document.createElement('span');
@@ -144,7 +144,7 @@
     mini.appendChild(miniChip);
     root.appendChild(mini);
 
-    /* ---- Panel: full table (step 1) XOR the week tree (step 2+) ---- */
+    /*, Panel: full table (step 1) XOR the week tree (step 2+), */
     const panel = document.createElement('div');
     panel.className = 's8-panel';
     root.appendChild(panel);
@@ -236,7 +236,7 @@
     treeCol.appendChild(treeCaption);
     panel.appendChild(treeCol);
 
-    /* ---- Substitution skeleton + evaluation ledger ---- */
+    /*, Substitution skeleton + evaluation ledger, */
     const eqCard = document.createElement('div');
     eqCard.className = 's8-math s8-popin';
     root.appendChild(eqCard);
@@ -312,7 +312,7 @@
       '</b>: exactly the cell we picked.</span>';
     ledger.appendChild(verdict);
 
-    /* ---- The catch ---- */
+    /*, The catch, */
     const catchBox = document.createElement('div');
     catchBox.className = 'poke-box tight s8-catch s8-popin';
     catchBox.innerHTML = '<b>THE CATCH:</b> ' + V[0].toFixed(1) + ' and ' + V[1].toFixed(1) +
@@ -320,7 +320,7 @@
       'you do not solve it, you <b class="s8-iterate">ITERATE</b> it. Next: DP.';
     root.appendChild(catchBox);
 
-    /* ---- Hint + the one-step RUN button ---- */
+    /*, Hint + the one-step RUN button, */
     const hint = document.createElement('div');
     hint.className = 's8-hint';
     const hintText = document.createElement('span');

@@ -1,14 +1,14 @@
-/* Three dice — the action space of the Snakes & Ladders MDP.
+/* Three dice, the action space of the Snakes & Ladders MDP.
  *
  * Each die has uniform integer faces 1..N. The pedagogy: lower-variance dice
- * (d4) are "safe" — small steps, less chance to land in trouble; higher-variance
- * dice (d8) are "risky" — bigger expected jumps but bigger spread.
+ * (d4) are "safe", small steps, less chance to land in trouble; higher-variance
+ * dice (d8) are "risky", bigger expected jumps but bigger spread.
  *
  *   d4: mean 2.5, var ≈ 1.25
  *   d6: mean 3.5, var ≈ 2.92
  *   d8: mean 4.5, var ≈ 5.25
  *
- * Outcomes are the action's probability distribution over rolls — used by
+ * Outcomes are the action's probability distribution over rolls, used by
  * Bellman backups (full expectation) and by SARSA (sample one roll).
  */
 (function () {

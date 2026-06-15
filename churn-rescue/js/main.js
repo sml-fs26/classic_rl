@@ -55,7 +55,7 @@
   const sceneState = [];
   let current = -1;
 
-  /* ---------- Hash routing ---------- */
+  /*, Hash routing, */
   function readHashScene() {
     const m = (window.location.hash || '').match(/[#&?]scene=(\d+)/);
     if (!m) return null;
@@ -151,7 +151,7 @@
 
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
-  /* ---------- Concept badges ----------
+  /*, Concept badges ----------
      One chip per concept scene; lights up on first visit, persisted to
      localStorage. Order: MDP, POLICY, RETURN, Q*, DP, SARSA. */
   const BADGES = ['mdp', 'policy', 'return', 'qstar', 'dp', 'sarsa'];
@@ -197,7 +197,7 @@
   }
 
   function init() {
-    if (!window.DATA) console.error('DATA missing -- did data/datasets.js load?');
+    if (!window.DATA) console.error('DATA missing, did data/datasets.js load?');
 
     function cursorBlip() { if (window.SFX) window.SFX.play('cursor'); }
 

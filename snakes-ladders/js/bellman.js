@@ -7,7 +7,7 @@
  *   handling overshoot. Action set: {d4, d6, d8}.
  *
  *   Because S&L has cycles (snakes), the recursion is not unfoldable in one
- *   sweep — we iterate until max-|ΔV| < tol or iter == maxIters. This is the
+ *   sweep, we iterate until max-|ΔV| < tol or iter == maxIters. This is the
  *   real lesson Spooky House couldn't carry.
  */
 (function () {

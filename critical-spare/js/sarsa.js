@@ -19,8 +19,8 @@
  *
  *   NOTE on the model-free choice: on THIS MDP the optimal policy is decisive
  *   (e.g. ORDER beats RUN by ~0.75 at (AGING, 0 spares); REPLACE clearly beats
- *   RUN with a spare in hand), so ON-POLICY SARSA -- with a GLIE-annealed
- *   epsilon and a Robbins-Monro step size -- converges to the exact DP optimal
+ *   RUN with a spare in hand), so ON-POLICY SARSA, with a GLIE-annealed
+ *   epsilon and a Robbins-Monro step size, converges to the exact DP optimal
  *   policy on ALL 9 states, robust across seeds (verified in the precompute).
  *   So the headline learner here is genuinely SARSA (unlike the Gambler's-Ruin
  *   cartridge, whose tiny Q-gaps forced the off-policy split). The off-policy

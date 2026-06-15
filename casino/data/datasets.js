@@ -11,7 +11,7 @@
 
 (function () {
   window.DATA = {
-    /* ----- Static (handwritten) ----- */
+    /*, Static (handwritten), */
 
     /* The bandit. Probabilities pinned to match the notebook
        (Weekend_3/2_Casino.ipynb cell 8): probabilities = [0.2, 0.4, 0.6, 0.8, 0.5].
@@ -25,18 +25,18 @@
       armNames: ['Machine 1', 'Machine 2', 'Machine 3', 'Machine 4', 'Machine 5'],
     },
 
-    /* Seeds — pinned so trajectories are reproducible across loads.
+    /* Seeds, pinned so trajectories are reproducible across loads.
        Scene 3's greedy run replays in scene 4 using this exact seed. */
     seeds: {
-      manual:    20260509,   /* scene 1 — student's pulls */
-      sandbox:   20260510,   /* scene 2 — explore/exploit buttons */
+      manual:    20260509,   /* scene 1, student's pulls */
+      sandbox:   20260510,   /* scene 2, explore/exploit buttons */
       greedy:    20260511,   /* scene 3 + scene 4 baseline */
       epsGreedy: 20260512,   /* scene 4 ε-greedy independent stream */
     },
 
-    /* Per-scene horizon. Scenes 1–2 are manual; the autoplay scenes share T=200,
+    /* Per-scene horizon. Scenes 1 to 2 are manual; the autoplay scenes share T=200,
        and the precomputed sweep uses T=500 (see precompute/build-datasets.js
-       for why — at T=1000 the optimal-arm gap is so wide that ε=0.01 catches
+       for why, at T=1000 the optimal-arm gap is so wide that ε=0.01 catches
        up with ε=0.1 and the trade-off lesson is muddled). */
     horizons: {
       manualGoal: 30,    /* scene 1 caption: "pull 30 times to feel the uncertainty" */
@@ -71,7 +71,7 @@
       muStar:       '\\mu^* \\;=\\; \\max_a \\mu(a)',
     },
 
-    /* Recap cards — five idea-cards in scene 6.
+    /* Recap cards, five idea-cards in scene 6.
        The "muted" flag matches the editorial pattern from anymal-mdp's recap. */
     recap: [
       { sym: '\\pi_{\\text{explore}}', name: 'explore',
@@ -83,11 +83,11 @@
       { sym: '\\pi_\\epsilon', name: 'ε-greedy',
         caption: 'one knob, two behaviours, the first reinforcement-learning algorithm of the course' },
       { sym: '\\epsilon(t)', name: 'decaying ε',
-        caption: 'explore early, commit later — next: many states, many values',
+        caption: 'explore early, commit later, next: many states, many values',
         muted: true },
     ],
 
-    /* ----- Precomputed (filled by precompute/build-datasets.js) -----
+    /*, Precomputed (filled by precompute/build-datasets.js) -----
        Empty placeholder so cold loads of scene 5 don't crash before the
        precompute script has run. The scene falls back to a "data missing"
        caption in this case. */

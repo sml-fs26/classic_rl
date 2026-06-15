@@ -1,4 +1,4 @@
-/* scene5 i18n -- trajectory. */
+/* scene5 i18n, trajectory. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

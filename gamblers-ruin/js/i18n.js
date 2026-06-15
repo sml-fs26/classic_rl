@@ -1,4 +1,4 @@
-/* i18n CORE for Gambler's Ruin -- English (authoritative) + Japanese mirror.
+/* i18n CORE for Gambler's Ruin, English (authoritative) + Japanese mirror.
  *
  *   This file is the THIN core only. It seeds the shared chrome strings
  *   (topbar, concept-badge labels, prev/next, theme/lang/music labels, the
@@ -27,7 +27,7 @@
 
   const STORE = {
     en: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · GAMBLER’S RUIN',
       'topbar.prev':  'PREV',
       'topbar.next':  'NEXT',
@@ -40,7 +40,7 @@
       'sound.on':     '♪ SOUND ON',
       'sound.off':    '♪ SOUND OFF',
 
-      /* ---- concept-badge labels (lit on reaching the relevant scene) ---- */
+      /*, concept-badge labels (lit on reaching the relevant scene), */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -48,7 +48,7 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'TD',
 
-      /* ---- common ladder vocabulary, reused across scenes ---- */
+      /*, common ladder vocabulary, reused across scenes, */
       'vocab.capital':  'capital',
       'vocab.stake':    'stake',
       'vocab.flip':     'the flip',
@@ -59,7 +59,7 @@
       'vocab.win':      'WIN',
       'vocab.loss':     'LOSS',
 
-      /* ---- the three stakes (canonical labels) ---- */
+      /*, the three stakes (canonical labels), */
       'stake.bet1':       'BET $1',
       'stake.bet2':       'BET $2',
       'stake.bet3':       'BET $3',
@@ -67,24 +67,24 @@
       'stake.bet2.role':  'medium',
       'stake.bet3.role':  'bold',
 
-      /* ---- shared ladder / Q-ladder widget labels ---- */
+      /*, shared ladder / Q-ladder widget labels, */
       'ladder.goal':     'GOAL  $10',
       'ladder.ruin':     'RUIN  $0',
       'ladder.bestStake':'BEST STAKE HERE',
       'ladder.clamped':  'clamped',
       'qladder.title':   'BEST STAKE ON EVERY RUNG',
 
-      /* ---- coin widget ---- */
+      /*, coin widget, */
       'coin.win':   'HEADS ↑',
       'coin.loss':  'TAILS ↓',
       'coin.badge': '40 / 60',
       'coin.flip':  'FLIP',
 
-      /* ---- shared overlay chrome ---- */
+      /*, shared overlay chrome, */
       'speakerNotes.title': 'SPEAKER NOTES · press <kbd>n</kbd> to close',
       'speakerNotes.empty': '(No notes for this scene yet.)',
 
-      /* ---- lecturer speaker notes, keyed by scene ---- */
+      /*, lecturer speaker notes, keyed by scene, */
       'notes.scene0': '<h3>Hook</h3><p>One hard target ($10), a coin rigged against you (40% win). The whole lesson: <b>how much you bet should change with how much you hold</b>, and playing it safe can be the riskiest move.</p>',
       'notes.scene1': '<h3>Tutorial</h3><p>Vocabulary only, no theory. <b>Capital</b> = the situation (your rung). <b>Stake</b> = the lever ($1/$2/$3). <b>The flip</b> = the part you do not control. <b>Ruin/Goal</b> = the two ends.</p>',
       'notes.scene2': '<h3>Playtest</h3><p>Let them feel the swing. Most first-timers grind small safe bets and lose, because the 60%-loss coin gets many turns to bite. "You were already following <em>some</em> betting rule."</p>',
@@ -101,7 +101,7 @@
     },
 
     jp: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · ギャンブラーの はさん',
       'topbar.prev':  'まえ',
       'topbar.next':  'つぎ',
@@ -113,7 +113,7 @@
       'sound.on':     '♪ おと オン',
       'sound.off':    '♪ おと オフ',
 
-      /* ---- concept-badge labels ---- */
+      /*, concept-badge labels, */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -121,7 +121,7 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'TD',
 
-      /* ---- common ladder vocabulary ---- */
+      /*, common ladder vocabulary, */
       'vocab.capital':  'しさん',
       'vocab.stake':    'かけきん',
       'vocab.flip':     'コインなげ',
@@ -132,7 +132,7 @@
       'vocab.win':      'かち',
       'vocab.loss':     'まけ',
 
-      /* ---- the three stakes ---- */
+      /*, the three stakes, */
       'stake.bet1':       '$1 かける',
       'stake.bet2':       '$2 かける',
       'stake.bet3':       '$3 かける',
@@ -140,24 +140,24 @@
       'stake.bet2.role':  'ふつう',
       'stake.bet3.role':  'だいたん',
 
-      /* ---- ladder / Q-ladder widget labels ---- */
+      /*, ladder / Q-ladder widget labels, */
       'ladder.goal':     'ゴール  $10',
       'ladder.ruin':     'はさん  $0',
       'ladder.bestStake':'ここでの さいぜんの かけ',
       'ladder.clamped':  'せいげん',
       'qladder.title':   'すべての だんの さいぜんの かけ',
 
-      /* ---- coin widget ---- */
+      /*, coin widget, */
       'coin.win':   'おもて ↑',
       'coin.loss':  'うら ↓',
       'coin.badge': '40 / 60',
       'coin.flip':  'なげる',
 
-      /* ---- overlay chrome ---- */
+      /*, overlay chrome, */
       'speakerNotes.title': 'スピーカー ノート · <kbd>n</kbd> で とじる',
       'speakerNotes.empty': '（この シーンの ノートは まだ ありません）',
 
-      /* ---- lecturer speaker notes ---- */
+      /*, lecturer speaker notes, */
       'notes.scene0': '<h3>つかみ</h3><p>むずかしい もくひょう（$10）、 あなたに ふりな コイン（かちりつ 40%）。 きょうの じゅぎょう： <b>いくら かけるかは いくら もっているかで かわるべき</b>、 そして あんぜんに いくのが いちばん あぶない ことも ある。</p>',
       'notes.scene1': '<h3>チュートリアル</h3><p>ことばだけ。 りろんは なし。 <b>しさん</b> = いまの じょうきょう（だん）。 <b>かけきん</b> = レバー（$1/$2/$3）。 <b>コインなげ</b> = じぶんで きめられない ぶぶん。 <b>はさん/ゴール</b> = りょうたん。</p>',
       'notes.scene2': '<h3>プレイテスト</h3><p>ゆれを かんじて もらう。 はじめての ひとの おおくは ちいさく あんぜんに かけて まける。 60%で かみつく コインに なんども チャンスを あたえるからだ。 「あなたは すでに <em>なんらかの</em> かけかたの ルールに したがっていた」。</p>',
@@ -174,7 +174,7 @@
     },
   };
 
-  /* ---- current language (persisted) ---- */
+  /*, current language (persisted), */
   let lang = 'en';
   try {
     const saved = localStorage.getItem(STORAGE_KEY);

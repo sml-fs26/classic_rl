@@ -1,4 +1,4 @@
-/* Scene 4 -- Policy. A policy is a complete betting playbook: one stake for
+/* Scene 4, Policy. A policy is a complete betting playbook: one stake for
    every rung. Paint two (then three) hand-policies as coloured columns before
    anyone says which is better: always-$1 (all blue), always-bold (all orange),
    and a mixed one. The learner sees a policy as a colour map over the ladder.

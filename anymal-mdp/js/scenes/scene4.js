@@ -1,4 +1,4 @@
-/* Scene 4 — the reward.
+/* Scene 4, the reward.
 
    Pedagogical goal: make R : S × A × S → ℝ concrete. Each step writes a
    row to a ledger that the student watches fill. Step cost is -1, picking
@@ -6,7 +6,7 @@
    s'), and a ghost collision adds -100 (so the terminal row reads -1 + -100
    = -101).
 
-   Stochasticity is off here — malfunctionProb = 0. The lesson is the
+   Stochasticity is off here, malfunctionProb = 0. The lesson is the
    reward, not the transition; if commanded ≠ executed the student would
    conflate the two. Ghosts still drift uniform-randomly inside MDP.step.
 */
@@ -24,7 +24,7 @@
   const ARROW_GLYPH = { up: '↑', down: '↓', left: '←', right: '→' };
 
   window.scenes.scene4 = function (root) {
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
 
     const wrap = document.createElement('div');
@@ -58,7 +58,7 @@
       '<kbd>&darr;</kbd>. Each step writes a row.';
     leftCol.appendChild(caption);
 
-    /* Reward legend — static reference values from DATA.rewards. */
+    /* Reward legend, static reference values from DATA.rewards. */
     const legend = document.createElement('div');
     legend.className = 'controls scene4-legend';
     const rewards = window.DATA.rewards;
@@ -88,7 +88,7 @@
       lbl.textContent = label;
       const val = document.createElement('span');
       val.className = 'hud-value';
-      val.textContent = '–';
+      val.textContent = ', ';
       row.appendChild(lbl);
       row.appendChild(val);
       hud.appendChild(row);
@@ -110,21 +110,21 @@
     banner.hidden = true;
     rightCol.appendChild(banner);
 
-    /* ---------- Grid mount ---------- */
+    /*, Grid mount, */
     const grid = Grid.mount(gridHost, {
       M: window.DATA.initial.M,
       N: window.DATA.initial.N,
       onLayout: () => renderEntities(),
     });
 
-    /* ---------- Per-scene state ---------- */
+    /*, Per-scene state, */
     const SEED = window.DATA.params.seed;
     let rng = MDP.makeRng(SEED);
     let state = MDP.initialState();
     const history = History.create();
     let active = false;
 
-    /* ---------- Helpers ---------- */
+    /*, Helpers, */
     function fmtReward(r) {
       if (r > 0) return `+${r}`;
       return String(r);
@@ -175,7 +175,7 @@
       ledger.scrollTop = ledger.scrollHeight;
     }
 
-    /* ---------- Rendering ---------- */
+    /*, Rendering, */
     function renderEntities() {
       grid.setEntity('anymal', { kind: 'anymal', r: state.anymal.r, c: state.anymal.c });
       grid.setEntity('ghost1', { kind: 'ghost',  r: state.ghosts[0].r, c: state.ghosts[0].c });
@@ -186,19 +186,19 @@
     function renderHud(lastReward) {
       hudRound.textContent = String(state.round);
       hudScore.textContent = String(state.score);
-      hudLastReward.textContent = (lastReward == null) ? '–' : fmtReward(lastReward);
+      hudLastReward.textContent = (lastReward == null) ? ', ' : fmtReward(lastReward);
     }
 
     function showTerminalBanner() {
       banner.hidden = false;
-      banner.textContent = 'Episode ended — collision. Press → to continue.';
+      banner.textContent = 'Episode ended, collision. Press → to continue.';
     }
     function hideTerminalBanner() {
       banner.hidden = true;
       banner.textContent = '';
     }
 
-    /* ---------- Reset + replay ----------
+    /*, Reset + replay ----------
        Rebuild the ledger from scratch, then replay every action. */
     function resetAndReplay(targetCursor) {
       state = MDP.initialState();
@@ -229,7 +229,7 @@
       renderHud(lastReward);
     }
 
-    /* ---------- Step forward via a user keystroke ---------- */
+    /*, Step forward via a user keystroke, */
     function performStep(action) {
       if (state.terminal) return;
       const prev = state;
@@ -251,7 +251,7 @@
       if (state.terminal) showTerminalBanner();
     }
 
-    /* ---------- Step forward by replaying a recorded action ---------- */
+    /*, Step forward by replaying a recorded action, */
     function replayForwardOne() {
       const idx = history.cursor();
       const rec = history.action(idx);
@@ -275,13 +275,13 @@
       return true;
     }
 
-    /* ---------- Keyboard ----------
+    /*, Keyboard ----------
        The driver in main.js attaches its own keydown listener BEFORE this
        scene's listener (registration order: main.js init runs before
        scene builders). For ArrowLeft / ArrowRight, main.js calls our
        onPrevKey / onNextKey first; by the time we get here the rewind /
        replay-forward has already happened. So we skip movement when those
-       keys did navigation work — otherwise pressing ← would BOTH rewind
+       keys did navigation work, otherwise pressing ← would BOTH rewind
        AND execute a 'left' move on the same press, leaving a spurious
        extra row in the ledger. */
     let lastNavConsumedAt = 0;
@@ -300,7 +300,7 @@
     function markNavConsumed() { lastNavConsumedAt = performance.now(); }
     window.addEventListener('keydown', onKey);
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       history.reset();
       resetAndReplay(0);

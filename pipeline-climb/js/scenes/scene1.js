@@ -37,7 +37,7 @@
     root.classList.add('scene-pad', 'tut-scene');
     root.innerHTML = '';
 
-    /* ---------- Top bar: step counter + SKIP button ---------- */
+    /*, Top bar: step counter + SKIP button, */
     const topbar = document.createElement('div');
     topbar.className = 'tut-topbar';
     root.appendChild(topbar);
@@ -52,23 +52,23 @@
     topbar.appendChild(skipBtn);
     skipBtn.addEventListener('click', () => { window.location.hash = '#scene=2'; });
 
-    /* ---------- Section title ---------- */
+    /*, Section title, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title tut-section-title';
     root.appendChild(header);
 
-    /* ---------- Demo area (changes per step) ---------- */
+    /*, Demo area (changes per step), */
     const demoHost = document.createElement('div');
     demoHost.className = 'tut-demo';
     root.appendChild(demoHost);
 
-    /* ---------- Dialog at the bottom ---------- */
+    /*, Dialog at the bottom, */
     const dialogHost = document.createElement('div');
     dialogHost.className = 'tut-dialog';
     root.appendChild(dialogHost);
     const dialog = window.Dialog.mount(dialogHost);
 
-    /* ---------- Page nav (PREV PAGE / NEXT PAGE) + hint ---------- */
+    /*, Page nav (PREV PAGE / NEXT PAGE) + hint, */
     const nav = document.createElement('div');
     nav.className = 'tut-nav';
     nav.innerHTML =
@@ -84,7 +84,7 @@
       else window.location.hash = '#scene=2';
     });
 
-    /* ---------- Step engine ---------- */
+    /*, Step engine, */
     let cursor = 0;
     let stopLoop = null;          /* teardown for the panel-1 climbing loop */
 

@@ -3,7 +3,7 @@
  *   State s = (units left u in 1..5, days-to-deadline d in 1..4) -> 5x4 = 20
  *   playable states. Two off-grid terminals (value 0): DEADLINE (d hits 0;
  *   leftover units worth 0) and SOLD OUT (u hits 0). Two price levers
- *   (PREMIUM, and STANDARD -- the former FIRE-SALE tag, relabelled).
+ *   (PREMIUM, and STANDARD, the former FIRE-SALE tag, relabelled).
  *   gamma = 1 (finite 4-day horizon, so returns are bounded without discounting).
  *
  *   Run with:  node precompute/build-datasets.js
@@ -38,7 +38,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/* ---------------- Load the verified engine via a window shim ---------------- */
+/*, Load the verified engine via a window shim, */
 const sandbox = { window: {}, console, Math, Float64Array, Float32Array, Int32Array, Map, Set, JSON };
 sandbox.window.window = sandbox.window;
 const ctx = vm.createContext(sandbox);
@@ -57,10 +57,10 @@ const N = Pricing.N;                                 // 20
 const NON_TERMINAL_STATES = Pricing.NON_TERMINAL_STATES;
 const GAMMA = 1.0;
 
-/* ---------------- Mulberry32 (shared with the runtime) ---------------- */
+/*, Mulberry32 (shared with the runtime), */
 const makeRng = Pricing.makeRng;
 
-/* ---------------- Value iteration (gamma = 1) ---------------- */
+/*, Value iteration (gamma = 1), */
 const TOL = 1e-9;
 const MAX_ITERS = 50;
 const vi = Bellman.valueIteration(GAMMA, { tol: TOL, maxIters: MAX_ITERS, recordHistory: true });
@@ -68,7 +68,7 @@ const V = vi.V;                       // Float64Array[20]
 const policy = vi.policy;             // [20] lever-id strings (stateIndex order)
 const Qstar = Bellman.qFromV(V, GAMMA); // Float64Array[20*A], index stateIndex*A + leverIdx
 
-/* ---------------- Helpers ---------------- */
+/*, Helpers, */
 function idxOfState(u, d) { return Pricing.stateIndex({ u, d, terminal: false }); }
 function qRow(u, d) {
   const base = idxOfState(u, d) * A;
@@ -83,17 +83,17 @@ function leverCounts(pol) {
   return c;
 }
 
-/* ---------------- Assertions ---------------- */
+/*, Assertions, */
 function assertInvariant(name, ok, info) {
   if (ok) { console.log('  [OK]   ' + name); return; }
-  console.error('  [FAIL] ' + name + (info ? ' -- ' + info : ''));
+  console.error('  [FAIL] ' + name + (info ? ', ' + info : ''));
   throw new Error('precompute assertion failed: ' + name);
 }
 
-console.log('Last-Minute Pricing precompute -- 5x4 board, 2 levers, gamma = 1');
+console.log('Last-Minute Pricing precompute, 5x4 board, 2 levers, gamma = 1');
 console.log('  ' + N + ' playable states (units 1..5 x days 1..4), levers: ' + LEVER_IDS.join(', '));
 console.log('');
-console.log('Phase 1 -- Value iteration (gamma = 1)');
+console.log('Phase 1, Value iteration (gamma = 1)');
 const lastSweep = vi.history[vi.history.length - 1];
 console.log('  converged in ' + vi.iters + ' sweeps, final maxDelta = ' + lastSweep.maxDelta.toExponential(2));
 
@@ -137,7 +137,7 @@ assertInvariant('Q*(u1,d4): PREMIUM beats STANDARD (hold the scarce unit for the
   q14.premium > q14.standard && policy[idxOfState(1, 4)] === 'premium',
   JSON.stringify(q14));
 
-/* ---------------- Phase 2 -- SARSA training ---------------- */
+/*, Phase 2, SARSA training, */
 const SARSA_CFG = {
   alpha: 0.08,
   gamma: GAMMA,
@@ -254,7 +254,7 @@ function sarsaArgmaxPolicy(Q) {
 function mean(arr) { return arr.reduce((s, v) => s + v, 0) / arr.length; }
 
 console.log('');
-console.log('Phase 2 -- SARSA training (' + SARSA_CFG.episodes + ' episodes, alpha=' + SARSA_CFG.alpha +
+console.log('Phase 2, SARSA training (' + SARSA_CFG.episodes + ' episodes, alpha=' + SARSA_CFG.alpha +
             ', eps ' + SARSA_CFG.epsilon + '->' + SARSA_CFG.epsilonMin + ', gamma=' + SARSA_CFG.gamma + ', exploring starts)');
 const sarsa = trainSARSA(SARSA_CFG);
 const optimalStart = V[idxOfState(5, 4)];
@@ -287,7 +287,7 @@ if (seamDisagreements.length) console.log('  seam ties (expected, on-policy bias
 assertInvariant('SARSA reproduces the optimal lever on >= 0.65 of cells',
   agreement >= 0.65, 'agreed=' + agreed + '/' + N);
 
-/* ---------------- Build a fixed illustrative trajectory ---------------- */
+/*, Build a fixed illustrative trajectory, */
 /* One short, hand-pickable demo episode for the tutorial / trajectory
    scenes: from a fresh shelf, follow the OPTIMAL policy, pinned seed. */
 function buildDemoTrajectory(seed) {
@@ -319,7 +319,7 @@ console.log('');
 console.log('Demo trajectory (optimal policy, seed 7): ' + demoTrajectory.length +
             ' days, revenue $' + demoRevenue);
 
-/* ---------------- Recap cards (shelf-card voice) ---------------- */
+/*, Recap cards (shelf-card voice), */
 const recap = [
   { key: 'mdp', badge: 'MDP', title: 'THE MDP FRAME',
     blurb: 'Four parts: the SITUATION (seats left times days left), the LEVER you pull (a price tag), the part you do not control (the demand draw), and the PAYOFF (price times seats sold). An empty cabin at gate-close pays nothing.',
@@ -341,10 +341,10 @@ const recap = [
     formula: 'q[s,a] \\;\\mathrel{+}=\\; \\alpha\\,(\\, r + q[s\',a\'] - q[s,a] \\,)' },
 ];
 
-/* ---------------- Levers for display ---------------- */
+/*, Levers for display, */
 const leversDisplay = Levers.LEVERS.map(l => ({ id: l.id, name: l.name, price: l.price, demand: l.demand }));
 
-/* ---------------- Assemble + round payloads ---------------- */
+/*, Assemble + round payloads, */
 function roundArr(arr, places) { const f = Math.pow(10, places); return Array.from(arr, v => Math.round(v * f) / f); }
 
 const DATA = {
@@ -411,11 +411,11 @@ const DATA = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(ROOT, 'data', 'datasets.js');
 const payload = JSON.stringify(DATA);
 const fileContent =
-  "/* Last-Minute Pricing -- static MDP solution plus value-iteration history\n" +
+  "/* Last-Minute Pricing, static MDP solution plus value-iteration history\n" +
   " * and SARSA training trajectories.\n" +
   " *\n" +
   " * Regenerate with `node precompute/build-datasets.js`. The build script\n" +

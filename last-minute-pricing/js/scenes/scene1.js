@@ -1,12 +1,12 @@
-/* Scene 1 -- TUTORIAL: "How to read the shelf".
+/* Scene 1, TUTORIAL: "How to read the shelf".
  *
  *   The pricing analogue of pokemon-battle's sceneHowToPlay. A guided,
  *   math-free walkthrough of the controls in the shelf-card visual language:
- *     1. welcome  -- the shelf card (one picture, two numbers)
- *     2. units    -- the stock (lit tickets), shown at full / mid / last
- *     3. days     -- the countdown (day-pips) to MIDNIGHT
- *     4. levers   -- the three price tags + their printed demand odds
- *     5. demo     -- one slow day: pull STANDARD, flip the demand deck, a
+ *     1. welcome, the shelf card (one picture, two numbers)
+ *     2. units, the stock (lit tickets), shown at full / mid / last
+ *     3. days, the countdown (day-pips) to MIDNIGHT
+ *     4. levers, the three price tags + their printed demand odds
+ *     5. demo, one slow day: pull STANDARD, flip the demand deck, a
  *                    ticket slides off with +$3, the day tears away
  *
  *   Stepped with the pager arrows (consumed internally until the last step).
@@ -45,7 +45,7 @@
     root.innerHTML = '';
     clearDemoTimers();
 
-    /* ---------- Top bar: step counter + SKIP ---------- */
+    /*, Top bar: step counter + SKIP, */
     const topbar = document.createElement('div');
     topbar.className = 'tut-topbar';
     root.appendChild(topbar);
@@ -64,29 +64,29 @@
       else window.location.hash = '#scene=2';
     });
 
-    /* ---------- Section title ---------- */
+    /*, Section title, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title tut-section-title';
     root.appendChild(header);
 
-    /* ---------- Demo area (swaps per step) ---------- */
+    /*, Demo area (swaps per step), */
     const demoHost = document.createElement('div');
     demoHost.className = 'tut-demo';
     root.appendChild(demoHost);
 
-    /* ---------- Dialog at the bottom ---------- */
+    /*, Dialog at the bottom, */
     const dialogHost = document.createElement('div');
     dialogHost.className = 'tut-dialog';
     root.appendChild(dialogHost);
     const dialog = window.Dialog.mount(dialogHost);
 
-    /* ---------- Nav hint ---------- */
+    /*, Nav hint, */
     const navHint = document.createElement('div');
     navHint.className = 'tut-nav-hint poke-caption';
     navHint.innerHTML = T('scene1.nav.hint');
     root.appendChild(navHint);
 
-    /* ---------- In-scene step nav (BACK / NEXT) ----------
+    /*, In-scene step nav (BACK / NEXT) ----------
        Big, tappable step controls sitting under the content. The arrow keys
        (onPrevKey/onNextKey) and the topbar PREV/NEXT already walk the steps,
        but on a phone there are no arrow keys and the topbar pager is detached
@@ -108,7 +108,7 @@
     backBtn.addEventListener('click', () => { if (cursor > 0) renderStep(cursor - 1); });
     nextBtn.addEventListener('click', () => { if (cursor < STEPS.length - 1) renderStep(cursor + 1); });
 
-    /* ---------- Step engine ---------- */
+    /*, Step engine, */
     let cursor = 0;
 
     function renderStep(c) {
@@ -154,7 +154,7 @@
      Per-step renderers. Each fills the demo host.
      ========================================================================= */
 
-  /* Step 1 -- one big shelf card beside a welcome panel. */
+  /* Step 1, one big shelf card beside a welcome panel. */
   function renderWelcome(host) {
     const wrap = document.createElement('div');
     wrap.className = 'tut-welcome';
@@ -174,7 +174,7 @@
     host.appendChild(wrap);
   }
 
-  /* Step 2 -- the stock: three shelf cards (full / mid / last) with the
+  /* Step 2, the stock: three shelf cards (full / mid / last) with the
      tickets highlighted, plus a footnote. */
   function renderUnits(host) {
     const wrap = document.createElement('div');
@@ -203,7 +203,7 @@
     host.appendChild(note);
   }
 
-  /* Step 3 -- the clock: three shelf cards (4 days / 2 days / midnight) with
+  /* Step 3, the clock: three shelf cards (4 days / 2 days / midnight) with
      the day-pips highlighted. */
   function renderDays(host) {
     const wrap = document.createElement('div');
@@ -237,7 +237,7 @@
     function cap(txt) { const d = document.createElement('div'); d.className = 'tut-strip-cap'; d.textContent = txt; return d; }
   }
 
-  /* Step 4 -- the three price tags. Each shows its price and a one-line role.
+  /* Step 4, the three price tags. Each shows its price and a one-line role.
      The demand odds are deliberately NOT printed (you can't see how many
      buyers will show up); a fewer-to-more buyers axis under the row conveys
      only the direction each tag leans. */
@@ -291,7 +291,7 @@
     return card;
   }
 
-  /* Step 5 -- one slow demo day. We pull STANDARD on a (5 units, 4 days)
+  /* Step 5, one slow demo day. We pull STANDARD on a (5 units, 4 days)
      shelf, flip the shared demand deck to k=1 (a clean single sale so the
      +$3 receipt and the ticket slide read clearly), then tear off a day.
      The day is gated by PLAY THE DAY; &run auto-triggers it for capture. */

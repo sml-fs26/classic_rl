@@ -1,4 +1,4 @@
-/* Beat the Deadline precompute -- the RIGOR GATE.
+/* Beat the Deadline precompute, the RIGOR GATE.
  *
  *   Runs value iteration on the loading-dock dispatch MDP (state (p,h) with
  *   p in 0..4 pallets, h in 0..4 hours; levers {WAIT, SEND}; WAIT rolls a
@@ -50,7 +50,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/* ---------------- Load the verified engine via a window shim ---------------- */
+/*, Load the verified engine via a window shim, */
 const sandbox = { window: {}, console, Math, Float64Array, Float32Array, Int32Array, Array, Map, Set, JSON };
 sandbox.window.window = sandbox.window;
 const ctx = vm.createContext(sandbox);
@@ -72,7 +72,7 @@ const PMAX = Dock.PMAX, HMAX = Dock.HMAX;    // 4, 4
 const GAMMA = 1.0;
 const ARRIVAL = Dock.arrivalProb();          // 0.6
 
-/* ---------------- Value iteration (gamma = 1) ---------------- */
+/*, Value iteration (gamma = 1), */
 const TOL = 1e-12;
 const MAX_ITERS = 400;
 const vi = Bellman.valueIteration(GAMMA, { tol: TOL, maxIters: MAX_ITERS, recordHistory: true });
@@ -80,28 +80,28 @@ const V = vi.V;                              // Float64Array[25], index = p*5 + 
 const policy = vi.policy;                    // [25] action-id strings
 const Qstar = Bellman.qFromV(V, GAMMA);      // Float64Array[25*A], index stateIndex*A + actionIdx
 
-/* ---------------- Helpers ---------------- */
+/*, Helpers, */
 function sIdx(p, h) { return p * NH + h; }
 function vAt(p, h) { return V[sIdx(p, h)]; }
 function polAt(p, h) { return policy[sIdx(p, h)]; }
 function qAt(p, h, aId) { return Qstar[sIdx(p, h) * A + ACTION_IDS.indexOf(aId)]; }
 function round2(x) { return Math.round(x * 100) / 100; }
 function round4(x) { return Math.round(x * 10000) / 10000; }
-function fmt(x) { return Number.isFinite(x) ? x.toFixed(2) : '  --  '; }
+function fmt(x) { return Number.isFinite(x) ? x.toFixed(2) : ', '; }
 function isDecision(p, h) { return p >= 1 && h >= 1; }
 
-/* ---------------- Assertions ---------------- */
+/*, Assertions, */
 function assert(name, ok, info) {
   if (ok) { console.log('  [OK]   ' + name); return; }
-  console.error('  [FAIL] ' + name + (info ? ' -- ' + info : ''));
+  console.error('  [FAIL] ' + name + (info ? ', ' + info : ''));
   process.exit(1);
 }
 
-console.log('Beat the Deadline precompute -- 5x5 dock grid, 2 levers, arrival q=' + ARRIVAL +
+console.log('Beat the Deadline precompute, 5x5 dock grid, 2 levers, arrival q=' + ARRIVAL +
             ', miss(h)=[' + [1,2,3,4].map(h => Dock.missProb(h)).join(',') + '] for h=1..4, gamma=' + GAMMA);
 console.log('  25 states (p,h); SEND terminal (5*min(p,4)-10 on-time / -10 late); WAIT rolls two dice');
 console.log('');
-console.log('Phase 1 -- Value iteration');
+console.log('Phase 1, Value iteration');
 const lastSweep = vi.history[vi.history.length - 1];
 console.log('  converged in ' + vi.iters + ' sweeps, final maxDelta = ' + lastSweep.maxDelta.toExponential(2));
 
@@ -122,7 +122,7 @@ for (let p = PMAX; p >= 0; p--) {
   for (let h = 0; h <= HMAX; h++) {
     const legal = Dock.availableActionIds(p, h);
     let cell;
-    if (p === 0) cell = '  --  ';                       // empty-dock muted row
+    if (p === 0) cell = ', ';                       // empty-dock muted row
     else cell = (' ' + polAt(p, h).toUpperCase()).padEnd(5) + ' ';
     line += cell + '|';
   }
@@ -186,16 +186,16 @@ for (let p = 0; p <= PMAX; p++) {
 assert('V* matches the proposal table exactly (rounded to 2dp)', vOk, 'diffs=[' + vDiffs.join(' ') + ']');
 
 /* (4) the three hand-checkable Q* intuitions. */
-assert('intuition 1 -- (4,4): SEND=+10 and SEND>=WAIT (full truck -> ship)',
+assert('intuition 1, (4,4): SEND=+10 and SEND>=WAIT (full truck -> ship)',
   Math.abs(qAt(4, 4, 'send') - 10) < 1e-9 && qAt(4, 4, 'send') >= qAt(4, 4, 'wait'),
   'SEND=' + qAt(4, 4, 'send') + ' WAIT=' + qAt(4, 4, 'wait'));
-assert('intuition 2a -- (2,3): WAIT=+0.40 > SEND=0 (one hour slack -> hold)',
+assert('intuition 2a, (2,3): WAIT=+0.40 > SEND=0 (one hour slack -> hold)',
   Math.abs(qAt(2, 3, 'wait') - 0.40) < 1e-9 && Math.abs(qAt(2, 3, 'send')) < 1e-9 && qAt(2, 3, 'wait') > qAt(2, 3, 'send'),
   'WAIT=' + qAt(2, 3, 'wait') + ' SEND=' + qAt(2, 3, 'send'));
-assert('intuition 2b -- (2,2): WAIT=-2.20 < SEND=0 (one hour later -> ship; the flip)',
+assert('intuition 2b, (2,2): WAIT=-2.20 < SEND=0 (one hour later -> ship; the flip)',
   Math.abs(qAt(2, 2, 'wait') - (-2.20)) < 1e-9 && Math.abs(qAt(2, 2, 'send')) < 1e-9 && qAt(2, 2, 'send') > qAt(2, 2, 'wait'),
   'WAIT=' + qAt(2, 2, 'wait') + ' SEND=' + qAt(2, 2, 'send'));
-assert('intuition 3 -- (1,4): SEND=-5 and V*=-0.57 (thin order -> hold, honest loss)',
+assert('intuition 3, (1,4): SEND=-5 and V*=-0.57 (thin order -> hold, honest loss)',
   Math.abs(qAt(1, 4, 'send') - (-5)) < 1e-9 && Math.abs(round2(vAt(1, 4)) - (-0.57)) < 1e-6,
   'SEND=' + qAt(1, 4, 'send') + ' V*=' + vAt(1, 4));
 
@@ -222,7 +222,7 @@ console.log('  exact Q* ties among legal levers: ' + (ties.length ? ties.join(',
 assert('the only exact Q* tie among legal levers is (4,4) (WAIT == SEND, broken to SEND)',
   ties.length === 1 && ties[0] === '(4,4)' && polAt(4, 4) === 'send', 'ties=[' + ties.join(',') + ']');
 
-/* ---------------- Per-sweep snapshots for the DP scene ----------------
+/*, Per-sweep snapshots for the DP scene ----------------
    Value fills "from the deadline wall + the full-truck row outward". We record
    (V, Q, solvedMask) after each sweep so the DP scene can animate the diagonal
    staircase drawing itself. A cell is "solved" once its V is 2dp-stable. */
@@ -251,7 +251,7 @@ const sweepsToStable = sweepSnapshots.length - 1;
 console.log('');
 console.log('  DP fill recorded over ' + sweepSnapshots.length + ' sweep-frames');
 
-/* ---------------- Phase 2 -- model-free TD control: TWO learners ----------------
+/*, Phase 2, model-free TD control: TWO learners ----------------
    See the file header + CLAUDE.md. Q-learning (off-policy) recovers the exact
    diagonal; SARSA (on-policy) lands one cell more CONSERVATIVE on the thin-order
    flip. Decision states = the 16 interior cells (p>=1, h>=1). Exploring starts
@@ -402,7 +402,7 @@ function greedyGrid(Q) {
 
 const EVAL_START = { p: 2, h: 4 };   // the canonical fresh-window start
 console.log('');
-console.log('Phase 2 -- model-free TD control: OFF-POLICY Q-learning vs ON-POLICY SARSA');
+console.log('Phase 2, model-free TD control: OFF-POLICY Q-learning vs ON-POLICY SARSA');
 console.log('  Q-learning: ' + QL_CFG.episodes + ' eps, alpha=1/(1+n)^' + QL_CFG.alphaPower +
             ', eps ' + QL_CFG.epsilon + '->' + QL_CFG.epsilonMin + ' (off-policy max bootstrap)');
 console.log('  SARSA:      ' + SARSA_CFG.episodes + ' eps, alpha=' + SARSA_CFG.constAlpha +
@@ -451,7 +451,7 @@ assert('SARSA DP agreement is strictly below Q-learning (cautious vs optimal)',
 assert('SARSA ships early specifically at the (2,3) diagonal-flip cell (the razor-thin +0.40 WAIT edge)',
   sarsaSum.timid.indexOf('(2,3)') >= 0, 'timid=[' + sarsaSum.timid.join(',') + ']');
 
-/* ---------------- A fixed illustrative trajectory ----------------
+/*, A fixed illustrative trajectory ----------------
    One short deterministic demo window from (2,4) under the OPTIMAL policy,
    pinned seed, for the tutorial / trajectory / return scenes. Want a legible
    run: a WAIT or two (a pallet arrives) then a SEND of a fuller truck. */
@@ -502,7 +502,7 @@ console.log('');
 console.log('  Demo trajectory (optimal policy from (2,4), seed ' + demoTrajectory.seedUsed + '): ' +
             demoTrajectory.len + ' steps, ' + (demoTrajectory.sent ? 'SHIPPED' : 'BLOWN'));
 
-/* ---------------- Return-distribution bars for the Return scene ----------------
+/*, Return-distribution bars for the Return scene ----------------
    Fix (2,4) and one chosen FIRST lever, then play OPTIMALLY afterward, and
    Monte-Carlo the return. The exact mean is Q*((2,4), firstLever). */
 function returnBarFor(p0, h0, firstId, trials, seed) {
@@ -534,7 +534,7 @@ const returnBars = {
 console.log('  return from (2,4): start WAIT mean ~ ' + returnBars.wait.exact +
             ' , start SEND ~ ' + returnBars.send.exact);
 
-/* ---------------- The named spot-Q rows the Q* scene calls out ---------------- */
+/*, The named spot-Q rows the Q* scene calls out, */
 function spotRow(p, h) {
   const legal = Dock.availableActionIds(p, h);
   const q = {};
@@ -543,7 +543,7 @@ function spotRow(p, h) {
 }
 const spotQ = { flipHi: spotRow(2, 3), flipLo: spotRow(2, 2), full: spotRow(4, 4), thin: spotRow(1, 4) };
 
-/* ---------------- Hand-policy mean returns (the Policy scene) ----------------
+/*, Hand-policy mean returns (the Policy scene) ----------------
    Monte-Carlo the mean window payoff from (2,4) under three SOPs:
    Always-SEND, Always-WAIT-until-forced, and the OPTIMAL diagonal. Always-SEND
    from (2,4) ships 2 pallets now = 5*2-10 = 0 (a wasteful half-empty truck);
@@ -580,7 +580,7 @@ assert('the OPTIMAL policy beats both flat hand-policies from (2,4)',
   handPolicyReturns.optimal > handPolicyReturns.alwaysSend && handPolicyReturns.optimal > handPolicyReturns.alwaysWait,
   JSON.stringify(handPolicyReturns));
 
-/* ---------------- Two hand-computable backups (the Bellman scene) ---------------- */
+/*, Two hand-computable backups (the Bellman scene), */
 /* WAIT at (2,3) = 0.2*(-10) + 0.8*[0.6*V*(3,2) + 0.4*V*(2,2)]
                  = -2 + 0.8*[0.6*5 + 0.4*0] = +0.40 */
 const hand23 = 0.2 * (-10) + 0.8 * (ARRIVAL * vAt(3, 2) + (1 - ARRIVAL) * vAt(2, 2));
@@ -592,9 +592,9 @@ assert('hand backup WAIT(2,3) = 0.2*(-10)+0.8*[0.6*V*(3,2)+0.4*V*(2,2)] = Q*(2,3
 assert('hand backup WAIT(2,2) = 0.4*(-10)+0.6*[0.6*V*(3,1)+0.4*V*(2,1)] = Q*(2,2,WAIT)',
   Math.abs(hand22 - qAt(2, 2, 'wait')) < 1e-9, 'hand=' + hand22 + ' Q=' + qAt(2, 2, 'wait'));
 
-/* ---------------- Contrast scenario for the "why it flips" intuition ----------------
+/*, Contrast scenario for the "why it flips" intuition ----------------
    Drag the deadline-risk OFF (miss = 0 at every hour): with no timing risk the
-   diagonal collapses -- WAIT becomes weakly dominant wherever the truck is not
+   diagonal collapses, WAIT becomes weakly dominant wherever the truck is not
    full, because waiting is free. Recompute a fresh policy to prove the twist is
    driven by the climbing deadline-risk die, then restore the spec schedule. */
 function policyWithMiss(missArr) {
@@ -608,7 +608,7 @@ function policyWithMiss(missArr) {
 const noRiskGrid = policyWithMiss([0, 0, 0, 0, 0]);
 /* Count WAIT cells under the spec schedule vs with the deadline-risk die OFF.
    Turning risk off should push the frontier toward WAIT (consolidating gets
-   cheaper), so strictly MORE decision cells become WAIT -- proof the climbing
+   cheaper), so strictly MORE decision cells become WAIT, proof the climbing
    deadline-risk die is what tilts the diagonal. (Cells one hour from the wall,
    h=1, still SEND even with no blow-risk, because WAIT there lands at the
    forced-late h=0 wall; so it is "more WAIT", not "all WAIT".) */
@@ -618,7 +618,7 @@ for (const { p, h } of DECISION) {
   if (noRiskGrid[p + ',' + h] === 'wait') noRiskWaits++;
 }
 /* Sanity: no cell that is WAIT under the (risky) spec should flip to SEND when
-   risk is removed -- removing risk never makes you ship sooner. */
+   risk is removed, removing risk never makes you ship sooner. */
 let monotone = true;
 for (const { p, h } of DECISION) {
   if (polAt(p, h) === 'wait' && noRiskGrid[p + ',' + h] !== 'wait') monotone = false;
@@ -628,13 +628,13 @@ console.log('  contrast: WAIT cells under spec risk = ' + specWaits + '/16; with
 assert('removing the deadline-risk die tilts the frontier toward WAIT (strictly more WAIT cells, none flip back to SEND)',
   noRiskWaits > specWaits && monotone, 'spec=' + specWaits + ' noRisk=' + noRiskWaits + ' monotone=' + monotone);
 
-/* ---------------- Recap cards (dock voice) ---------------- */
+/*, Recap cards (dock voice), */
 const recap = [
   { key: 'mdp', badge: 'MDP', scene: 3, title: 'THE FOUR-PART FRAME',
-    text: 'The situation is the DOCK STATE: how many pallets are waiting and how many hours are left. The lever is WAIT or SEND. The part you do not control is the two DICE -- whether a pallet arrives, and whether the deadline blows. The payoff is +5 a pallet, -10 the truck, -5 a stranded pallet.',
+    text: 'The situation is the DOCK STATE: how many pallets are waiting and how many hours are left. The lever is WAIT or SEND. The part you do not control is the two DICE, whether a pallet arrives, and whether the deadline blows. The payoff is +5 a pallet, -10 the truck, -5 a stranded pallet.',
     tex: '\\langle\\, S,\\; A,\\; P,\\; R \\,\\rangle' },
   { key: 'policy', badge: 'POLICY', scene: 4, title: 'YOUR DISPATCH SOP',
-    text: 'A policy assigns one lever to EVERY one of the 25 dock states -- the standing rule your whole team follows without you. When you ran the dock by gut you already were a policy; you just had not drawn it on the board.',
+    text: 'A policy assigns one lever to EVERY one of the 25 dock states, the standing rule your whole team follows without you. When you ran the dock by gut you already were a policy; you just had not drawn it on the board.',
     tex: '\\pi : S \\rightarrow A' },
   { key: 'return', badge: 'RETURN', scene: 6, title: 'THE WINDOW PAYOFF, AVERAGED',
     text: 'The return is the payoff summed over the whole order window. Run the same rule twice and the dice give two different totals. Judge a rule by its EXPECTED total over many windows, never by one lucky dispatch.',
@@ -650,10 +650,10 @@ const recap = [
     tex: 'q[s,a] \\;\\mathrel{+}=\\; \\alpha\\,(\\, r + q[s\',a\'] - q[s,a] \\,)' },
 ];
 
-/* ---------------- Actions for display ---------------- */
+/*, Actions for display, */
 const actionsDisplay = Actions.ACTIONS.map(a => ({ id: a.id, name: a.name, role: a.role }));
 
-/* ---------------- Assemble + round payloads ---------------- */
+/*, Assemble + round payloads, */
 function roundArr(arr, places) { const f = Math.pow(10, places); return Array.from(arr, v => (Number.isFinite(v) ? Math.round(v * f) / f : null)); }
 
 const DATA = {
@@ -751,11 +751,11 @@ const DATA = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(ROOT, 'data', 'datasets.js');
 const payload = JSON.stringify(DATA);
 const fileContent =
-  "/* Beat the Deadline -- static MDP solution plus value-iteration fill frames\n" +
+  "/* Beat the Deadline, static MDP solution plus value-iteration fill frames\n" +
   " * and the two model-free TD learners (Q-learning + SARSA).\n" +
   " *\n" +
   " * Regenerate with `node precompute/build-datasets.js`. The build script\n" +

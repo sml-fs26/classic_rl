@@ -1,4 +1,4 @@
-/* Scene 2 — the action.
+/* Scene 2, the action.
 
    Pedagogical goal: make the action set
      A = {↑, ↓, ←, →}
@@ -36,7 +36,7 @@
   const TRACE_LIMIT = 12;
 
   window.scenes.scene2 = function (root) {
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
 
     const wrap = document.createElement('div');
@@ -108,10 +108,10 @@
     lastRow.className = 'hud-row';
     lastRow.innerHTML =
       '<span class="hud-label">last action</span>' +
-      '<span class="hud-value" data-key="last"><span class="scene2-last-symbol">–</span><span class="scene2-last-name">none</span></span>';
+      '<span class="hud-value" data-key="last"><span class="scene2-last-symbol">, </span><span class="scene2-last-name">none</span></span>';
     hud.appendChild(lastRow);
 
-    /* Terminal banner — hidden until terminal */
+    /* Terminal banner, hidden until terminal */
     const banner = document.createElement('div');
     banner.className = 'scene2-banner card';
     banner.hidden = true;
@@ -137,14 +137,14 @@
     foot.textContent = 'In the next scene, the executed action may differ from the commanded one.';
     wrap.appendChild(foot);
 
-    /* ---------- Grid mount ---------- */
+    /*, Grid mount, */
     const grid = Grid.mount(gridHost, {
       M: window.DATA.initial.M,
       N: window.DATA.initial.N,
       onLayout: () => renderEntities(),
     });
 
-    /* ---------- Per-scene state ---------- */
+    /*, Per-scene state, */
     const SEED = window.DATA.params.seed;
     let rng = MDP.makeRng(SEED);
     let state = MDP.initialState();
@@ -152,7 +152,7 @@
     let active = false;
     let commandedTimer = null;
 
-    /* ---------- Rendering ---------- */
+    /*, Rendering, */
     function renderEntities() {
       grid.setEntity('anymal', { kind: 'anymal', r: state.anymal.r, c: state.anymal.c });
       grid.setEntity('ghost1', { kind: 'ghost',  r: state.ghosts[0].r, c: state.ghosts[0].c });
@@ -164,7 +164,7 @@
       const sym = lastRow.querySelector('.scene2-last-symbol');
       const name = lastRow.querySelector('.scene2-last-name');
       if (!action) {
-        sym.textContent = '–';
+        sym.textContent = ', ';
         name.textContent = 'none';
       } else {
         sym.textContent = ARROW_CHAR[action];
@@ -217,7 +217,7 @@
 
     function showTerminalBanner() {
       banner.hidden = false;
-      banner.textContent = 'Episode ended — collision. Press → to continue.';
+      banner.textContent = 'Episode ended, collision. Press → to continue.';
     }
     function hideTerminalBanner() {
       banner.hidden = true;
@@ -234,7 +234,7 @@
       }
     }
 
-    /* ---------- Reset + replay ---------- */
+    /*, Reset + replay, */
     function resetAndReplay(targetCursor) {
       state = MDP.initialState();
       rng = MDP.makeRng(SEED);
@@ -254,7 +254,7 @@
       rebuildTrace();
     }
 
-    /* ---------- Step forward via a user keystroke ---------- */
+    /*, Step forward via a user keystroke, */
     function performStep(action) {
       if (state.terminal) return;
       const out = MDP.step(state, action, { malfunctionProb: 0 }, rng);
@@ -268,7 +268,7 @@
       if (state.terminal) showTerminalBanner();
     }
 
-    /* ---------- Step forward by replaying a recorded action ---------- */
+    /*, Step forward by replaying a recorded action, */
     function replayForwardOne() {
       const idx = history.cursor();
       const rec = history.action(idx);
@@ -285,7 +285,7 @@
       return true;
     }
 
-    /* ---------- Keyboard handler ---------- */
+    /*, Keyboard handler, */
     function onKey(e) {
       if (!active) return;
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
@@ -297,7 +297,7 @@
     }
     window.addEventListener('keydown', onKey);
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       history.reset();
       resetAndReplay(0);

@@ -1,4 +1,4 @@
-/* Scene 0 -- Title / hook.
+/* Scene 0, Title / hook.
  *   The cash ladder rising from a dark RUIN slab to a gold $10 GOAL, a token
  *   on a fresh starting rung, and the rigged coin with its 40/60 badge.
  *   Tagline + START. START reveals the manager framing and a BEGIN prompt that

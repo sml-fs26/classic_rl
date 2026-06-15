@@ -1,9 +1,9 @@
-/* Scene 4 — the α trade-off.
+/* Scene 4, the α trade-off.
 
    Three estimators run side-by-side on the same observation stream:
-     - α = small  (e.g. 0.04) — slow, lagging
-     - α = large  (e.g. 0.65) — fast, noisy
-     - α decaying (notebook schedule α₀/(1+n/τ)) — wins overall
+     - α = small  (e.g. 0.04), slow, lagging
+     - α = large  (e.g. 0.65), fast, noisy
+     - α decaying (notebook schedule α₀/(1+n/τ)), wins overall
    The estimators see the same s_n, so the difference is entirely the
    schedule. The dual-track layout mirrors scenes 2/3, with three estimate
    carets on the belief track. Below the tracks is a time-series chart
@@ -33,7 +33,7 @@
     const A0 = (data.alpha && data.alpha.decayAlpha0) || 0.7;
     const TAU = (data.alpha && data.alpha.decayTau) || 25;
 
-    /* ---- DOM ---- */
+    /*, DOM, */
     root.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 's4-wrap';
@@ -89,7 +89,7 @@
     condCaption.className = 's4-cond-caption';
     condCaption.textContent =
       'Both conditions hold for α_n = 1/n and for α_n = α₀/(1+n/τ). ' +
-      'A constant α satisfies neither — it never settles.';
+      'A constant α satisfies neither, it never settles.';
     condBox.appendChild(condCaption);
     wrap.appendChild(condBox);
 
@@ -100,7 +100,7 @@
       const g = document.createElement('div'); g.className = 'control-group';
       g.appendChild(Object.assign(document.createElement('label'), { textContent: label }));
       const out = document.createElement('output');
-      out.textContent = '—';
+      out.textContent = ', ';
       g.appendChild(out);
       return { g, out };
     }
@@ -117,9 +117,9 @@
     counterGroup.appendChild(counterOut);
     errBox.appendChild(counterGroup);
 
-    const errSmall = makeStatGroup('mean err — small α');
-    const errLarge = makeStatGroup('mean err — large α');
-    const errDecay = makeStatGroup('mean err — decay');
+    const errSmall = makeStatGroup('mean err, small α');
+    const errLarge = makeStatGroup('mean err, large α');
+    const errDecay = makeStatGroup('mean err, decay');
     errBox.appendChild(errSmall.g);
     errBox.appendChild(errLarge.g);
     errBox.appendChild(errDecay.g);
@@ -130,27 +130,27 @@
     foot.className = 'footnote s4-foot';
     foot.innerHTML =
       'With α<sub>n</sub> = 1/n the RM update <em>is</em> the empirical mean ' +
-      'from the Casino viz — the same one that lagged in scene 2. The decay ' +
+      'from the Casino viz, the same one that lagged in scene 2. The decay ' +
       'we want here shrinks more gently: aggressive at first, calm at the tail.';
     wrap.appendChild(foot);
 
     root.appendChild(wrap);
 
-    /* ---- Tracks ---- */
+    /*, Tracks, */
     const truth = window.Track.mount({
       host: truthHost,
-      label: 'truth — oscillating bullseye',
+      label: 'truth, oscillating bullseye',
       showBullseye: true, showEstimate: false, showChips: true, chipLabelLast: 4,
     });
     const belief = window.Track.mount({
       host: beliefHost,
-      label: 'belief — three estimators',
+      label: 'belief, three estimators',
       showBullseye: false, showEstimate: true, showChips: false, showPlayer: false,
       traceClasses: ['trace-fixed-small', 'trace-fixed-large', 'trace-decay'],
     });
     beliefHost.classList.add('belief');
 
-    /* ---- Chart ---- */
+    /*, Chart, */
     const chart = window.Chart.mount({
       host: chartHost,
       N: T,
@@ -158,7 +158,7 @@
       label: 'positions over throws',
     });
 
-    /* ---- State ---- */
+    /*, State, */
     let n = 0;
     let xS = initialEstimate;   // small α
     let xL = initialEstimate;   // large α
@@ -181,9 +181,9 @@
       belief.setEstimate(xL, 1);
       belief.setEstimate(xD, 2);
       counterOut.textContent = `0 / ${T}`;
-      errSmall.out.textContent = '—';
-      errLarge.out.textContent = '—';
-      errDecay.out.textContent = '—';
+      errSmall.out.textContent = ', ';
+      errLarge.out.textContent = ', ';
+      errDecay.out.textContent = ', ';
       chart.clear();
     }
 
@@ -216,7 +216,7 @@
       largePts.push({ x: i, y: xL });
       decayPts.push({ x: i, y: xD });
       /* Re-render every step is cheap because polylines are single nodes.
-         The truth trace is drawn LAST so it sits on top — it's the anchor
+         The truth trace is drawn LAST so it sits on top, it's the anchor
          the eye returns to when reading the estimator traces. */
       chart.setTrace('small',     smallPts, 'trace-fixed-small');
       chart.setTrace('large',     largePts, 'trace-fixed-large');

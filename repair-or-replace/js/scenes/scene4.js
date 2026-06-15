@@ -60,7 +60,7 @@
       return a ? a.name : id;
     }
 
-    /* ---- The two hand-written seeds (NOT the optimal map) ---- */
+    /*, The two hand-written seeds (NOT the optimal map), */
     const PRESETS = [
       { name: "GRANDPA'S WAY", sub: 'run till she dies',
         map: ['run', 'run', 'run', 'replace'] },
@@ -68,7 +68,7 @@
         map: ['run', 'service', 'service', 'service'] },
     ];
 
-    /* ---- One caption per step, max 2 short lines ---- */
+    /*, One caption per step, max 2 short lines, */
     const CAPTIONS = [
       'One call per wear level, written down before the week starts.',
       'HEALTHY gets its call. Three rows still blank.',
@@ -80,7 +80,7 @@
       'That question has an exact answer. Next: a number for a whole playbook.',
     ];
 
-    /* ---------- Replayable state ---------- */
+    /*, Replayable state, */
     let cursor = 0;
     let policy = [null, null, null, null];   // action id per wear, or null
     let mondayWear = 2;                      // the lookup example: SHAKY
@@ -103,7 +103,7 @@
     }
     function complete() { return policy.every(Boolean); }
 
-    /* ---------- Timers (cleared on every render and on leave) ---------- */
+    /*, Timers (cleared on every render and on leave), */
     const timers = [];
     let counterRaf = null;
     let cycleTimer = null;
@@ -115,7 +115,7 @@
       if (cycleTimer) { clearInterval(cycleTimer); cycleTimer = null; }
     }
 
-    /* ---------- Head: one-line headline + step counter ---------- */
+    /*, Head: one-line headline + step counter, */
     const head = document.createElement('div');
     head.className = 's4-head';
     head.innerHTML =
@@ -124,7 +124,7 @@
     root.appendChild(head);
     const stepCounter = head.querySelector('.s4-step-counter');
 
-    /* ---------- Two-column body ---------- */
+    /*, Two-column body, */
     const body = document.createElement('div');
     body.className = 's4-body';
     root.appendChild(body);
@@ -318,7 +318,7 @@
       ' IS BEST?</div>';
     rail.appendChild(hookCard);
 
-    /* ---------- Caption dialog + hint ---------- */
+    /*, Caption dialog + hint, */
     const dialogHost = document.createElement('div');
     dialogHost.className = 's4-dialog';
     root.appendChild(dialogHost);
@@ -331,7 +331,7 @@
       'Press <kbd>n</kbd> for speaker notes.';
     root.appendChild(hint);
 
-    /* ---------- Painting ---------- */
+    /*, Painting, */
     function paintRow(w) {
       const slot = rows[w].slot;
       const id = policy[w];
@@ -446,7 +446,7 @@
       }, 1400);
     }
 
-    /* ---- The 81 counter ---- */
+    /*, The 81 counter, */
     function paintCount() {
       countCard.hidden = cursor < 6;
       if (countCard.hidden) return;
@@ -484,7 +484,7 @@
       }, delay || 0);
     }
 
-    /* ---------- Render: everything derives from cursor + state ---------- */
+    /*, Render: everything derives from cursor + state, */
     function render(fresh) {
       /* fresh: the step index being animated in, or null (replay/jump). */
       clearTimers();
@@ -549,7 +549,7 @@
       }
     }
 
-    /* ---------- Interaction (stays live at every step) ---------- */
+    /*, Interaction (stays live at every step), */
     function refreshAfterEdit() {
       paintName();
       paintTabs();
@@ -575,7 +575,7 @@
       refreshAfterEdit();
     }
 
-    /* ---------- Step engine: reset + replay, never inverse ---------- */
+    /*, Step engine: reset + replay, never inverse, */
     function jumpTo(k) {
       cursor = Math.max(0, Math.min(N_STEPS - 1, k));
       resetState();

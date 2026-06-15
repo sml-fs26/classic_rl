@@ -1,4 +1,4 @@
-/* Scene 7 -- Optimal action-value Q*. For a chosen shelf state, show the
+/* Scene 7, Optimal action-value Q*. For a chosen shelf state, show the
    croissant-icon beside a clean two-column table (lever a | Q*(s,a)) with the
    best row starred. Step through the tour (2,FRESH) -> (2,AGING) -> (2,OLD) ->
    (1,STALE): the star MARCHES HOLD -> DISCOUNT -> DUMP, almost purely down the

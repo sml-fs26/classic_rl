@@ -26,7 +26,7 @@
   /* The live string tables. Fragments register into these. */
   const STRINGS = {
     en: {
-      /* ---- topbar ---- */
+      /*, topbar, */
       'brand':            'SML · CHURN',
       'music.on':         '♪ MUSIC ON',
       'music.off':        '♪ MUSIC OFF',
@@ -35,7 +35,7 @@
       'topbar.next':      'NEXT',
       'topbar.theme':     'theme',
 
-      /* ---- six concept-badge labels (topbar) ---- */
+      /*, six concept-badge labels (topbar), */
       'badge.mdp':        'MDP',
       'badge.policy':     'POL',
       'badge.return':     'RTN',
@@ -49,7 +49,7 @@
       'badge.dp.full':     'DP',
       'badge.sarsa.full':  'SARSA',
 
-      /* ---- tier names (engagement bar, cliff=0..thriving=4) ---- */
+      /*, tier names (engagement bar, cliff=0..thriving=4), */
       'tier.cliff':     'ON THE CLIFF',
       'tier.at-risk':   'AT-RISK',
       'tier.lukewarm':  'LUKEWARM',
@@ -61,14 +61,14 @@
       'tier.short.healthy':  'HEALTHY',
       'tier.short.thriving': 'THRIVING',
 
-      /* ---- months / renewal countdown ---- */
+      /*, months / renewal countdown, */
       'months.label':     'MONTHS TO RENEWAL',
       'months.one':       '{n} mo. to renewal',
       'months.many':      '{n} mo. to renewal',
       'months.imminent':  'RENEWAL IMMINENT',
       'months.short':     'm={n}',
 
-      /* ---- lever names + costs (action space) ---- */
+      /*, lever names + costs (action space), */
       'lever.nothing':       'DO NOTHING',
       'lever.checkin':       'CHECK-IN',
       'lever.offer':         'BIG OFFER',
@@ -80,7 +80,7 @@
       'lever.cost.offer':    '−4',
       'lever.tagline':       '← cheaper · passive    ·    expensive · aggressive →',
 
-      /* ---- the two dice ---- */
+      /*, the two dice, */
       'coin.name':        'RETENTION COIN',
       'coin.stay':        'STAYS',
       'coin.churn':       'CHURNS',
@@ -89,7 +89,7 @@
       'die.same':         'SAME',
       'die.down':         'DOWN',
 
-      /* ---- terminals ---- */
+      /*, terminals, */
       'terminal.renewed': '✓ RENEWED',
       'terminal.churned': '✗ CHURNED',
       'terminal.renewed_short': 'RENEW',
@@ -98,18 +98,18 @@
       'terminal.churn_lump': '−20',
       'terminal.mini':    '(terminal)',
 
-      /* ---- margin ledger ---- */
+      /*, margin ledger, */
       'ledger.title':     'MARGIN LEDGER',
       'ledger.debit':     'DEBIT',
       'ledger.credit':    'CREDIT',
       'ledger.balance':   'BALANCE',
       'ledger.value_units': 'value points',
 
-      /* ---- generic state-icon label ---- */
+      /*, generic state-icon label, */
       'account.label':    'ACCOUNT',
       'account.engagement': 'ENGAGEMENT',
 
-      /* ---- retention map (the 5x5 Q-grid widget) ---- */
+      /*, retention map (the 5x5 Q-grid widget), */
       'retmap.corner':      'TIER \\ MONTHS',
       'retmap.empty':       '·',
       'retmap.freqTitle':   'WINNING LEVER ACROSS THE {n} STATES',
@@ -117,7 +117,7 @@
       'retmap.legendStar':  '★ = BEST LEVER',
       'retmap.legendEmpty': '· = NOT YET FILLED',
 
-      /* ---- overlays (shared) ---- */
+      /*, overlays (shared), */
       'help.title':           'KEYBOARD SHORTCUTS',
       'help.row.arrows':      'navigate scenes (or step within a scene)',
       'help.row.down':        'fast-fill the typewriter dialog',
@@ -130,7 +130,7 @@
     },
 
     jp: {
-      /* ---- topbar ---- */
+      /*, topbar, */
       'brand':            'SML · チャーン',
       'music.on':         '♪ おんがく オン',
       'music.off':        '♪ おんがく オフ',
@@ -224,9 +224,9 @@
     },
   };
 
-  /* ---- register: merge a fragment's strings into the tables. Later
+  /*, register: merge a fragment's strings into the tables. Later
      registrations win on key collisions (a fragment overrides core only
-     if it intentionally redefines a shared key). ---- */
+     if it intentionally redefines a shared key)., */
   function register(bundle) {
     if (!bundle) return;
     for (const lang of ['en', 'jp']) {

@@ -43,7 +43,7 @@
     root.classList.add('scene-pad', 'tut-scene');
     root.innerHTML = '';
 
-    /* ---------- Top bar: step counter + SKIP-to-playtest ---------- */
+    /*, Top bar: step counter + SKIP-to-playtest, */
     const topbar = document.createElement('div');
     topbar.className = 'tut-topbar';
     root.appendChild(topbar);
@@ -62,29 +62,29 @@
       if (window.ChurnViz) window.ChurnViz.goTo(2);
     });
 
-    /* ---------- Section title ---------- */
+    /*, Section title, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title tut-section-title';
     root.appendChild(header);
 
-    /* ---------- Demo area (changes per panel) ---------- */
+    /*, Demo area (changes per panel), */
     const demoHost = document.createElement('div');
     demoHost.className = 'tut-demo';
     root.appendChild(demoHost);
 
-    /* ---------- Dialog at the bottom (manager voice) ---------- */
+    /*, Dialog at the bottom (manager voice), */
     const dialogHost = document.createElement('div');
     dialogHost.className = 'tut-dialog';
     root.appendChild(dialogHost);
     const dialog = window.Dialog.mount(dialogHost);
 
-    /* ---------- Nav hint ---------- */
+    /*, Nav hint, */
     const navHint = document.createElement('div');
     navHint.className = 'tut-nav-hint';
     navHint.innerHTML = T('tut.nav.hint');
     root.appendChild(navHint);
 
-    /* ---------- Step engine ---------- */
+    /*, Step engine, */
     let cursor = 0;
     let panelCleanup = null;
 
@@ -151,7 +151,7 @@
     const wrap = document.createElement('div');
     wrap.className = 'tut-card-panel';
 
-    /* ---- Hero card + callouts ---- */
+    /*, Hero card + callouts, */
     const hero = document.createElement('div');
     hero.className = 'tut-card-hero';
     const cardHost = document.createElement('div');
@@ -166,7 +166,7 @@
     hero.appendChild(callouts);
     wrap.appendChild(hero);
 
-    /* ---- Reference strip: all 5 tiers, thriving (top) down to cliff. ---- */
+    /*, Reference strip: all 5 tiers, thriving (top) down to cliff., */
     const strip = document.createElement('div');
     strip.className = 'tut-tier-strip';
     const stripTitle = document.createElement('div');
@@ -189,9 +189,9 @@
 
     host.appendChild(wrap);
 
-    /* ---- Live cooling loop on the hero card. The account drifts
+    /*, Live cooling loop on the hero card. The account drifts
        thriving toward at-risk while the renewal clock ticks, so the bar +
-       badge feel alive. Reduced-motion users get a single static frame. ---- */
+       badge feel alive. Reduced-motion users get a single static frame., */
     const reduce = window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) { card.set({ tier: 3, m: 3 }); return null; }

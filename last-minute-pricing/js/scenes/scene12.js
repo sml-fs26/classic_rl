@@ -1,4 +1,4 @@
-/* Scene 12 -- Recap ("You have learned the bones").
+/* Scene 12, Recap ("You have learned the bones").
  *
  *   Six concept cards in the shelf-card visual language, one per badge:
  *   MDP, POLICY, RETURN G_t, Q*, DP, SARSA. Each card carries:
@@ -37,7 +37,7 @@
     return L ? L.name : id;
   }
 
-  /* ---------- Per-card miniature glyphs (HTML strings) ----------
+  /*, Per-card miniature glyphs (HTML strings) ----------
      Deliberately small reminders of the full visuals, NOT new content. */
 
   function glyphMdp() {
@@ -60,7 +60,7 @@
     );
   }
 
-  /* The three lever price tags -- the action set, the playbook's choices. */
+  /* The three lever price tags, the action set, the playbook's choices. */
   function leverTag(id) {
     return (
       '<span class="lever-tag" data-lever="' + id + '">' +
@@ -306,7 +306,7 @@
     replayWrap.appendChild(replay);
     root.appendChild(replayWrap);
 
-    /* Victory fanfare -- defer so it lands while cards animate in. Plays on
+    /* Victory fanfare, defer so it lands while cards animate in. Plays on
        first build and on revisit. */
     function fanfare() {
       setTimeout(() => { if (window.SFX && window.SFX.play) window.SFX.play('win'); }, 180);

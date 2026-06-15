@@ -1,7 +1,7 @@
-/* Scene — the trajectory, drawn as a TREE.
+/* Scene, the trajectory, drawn as a TREE.
  *
  *   τ = (S₁, A₁, R₁, S₂, A₂, R₂, …) is usually drawn as a flat tape of
- *   random-variable boxes. But that tape is ONE realization — one
+ *   random-variable boxes. But that tape is ONE realization, one
  *   root-to-leaf PATH through a branching process. This scene draws the
  *   *set* of possible paths as a tree (window.TrajTree):
  *
@@ -19,7 +19,7 @@
  *   primary one.
  *
  *   Hero root (engine-verified, see mdp-gallery/reference/trajectory-tree.md):
- *   LOW/MID (your=3, opp=2) under THUNDER — depth ≤ 2, exactly 4 terminal
+ *   LOW/MID (your=3, opp=2) under THUNDER, depth ≤ 2, exactly 4 terminal
  *   leaves, Σp = 1, E[G_t] = -3.4875 = Q*(LOW/MID, THUNDER) = V(LOW/MID),
  *   and THUNDER is the optimal action there. Every leaf is a real terminal
  *   with a PURE G_t (no bootstrap), so the G_t → E[G_t] lesson is clean.
@@ -100,7 +100,7 @@
     heading.textContent = T('traj.heading');
     root.appendChild(heading);
 
-    /* Formula card — τ as a sequence of random variables. The foot now adds
+    /* Formula card, τ as a sequence of random variables. The foot now adds
        the tree reframe: "one trajectory = one path." */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
@@ -117,7 +117,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* Tree caption — names the fixed root + action so the student knows the
+    /* Tree caption, names the fixed root + action so the student knows the
        action is held constant (chance-only tree). */
     const caption = document.createElement('div');
     caption.className = 'traj-tree-caption';
@@ -127,12 +127,12 @@
     });
     root.appendChild(caption);
 
-    /* Tree host — TrajTree mounts the tree + the E[G_t] ledger here. */
+    /* Tree host, TrajTree mounts the tree + the E[G_t] ledger here. */
     const treeHost = document.createElement('div');
     treeHost.className = 'traj-tree-host';
     root.appendChild(treeHost);
 
-    /* ---- Mount the trajectory tree ---- */
+    /*, Mount the trajectory tree, */
     /* expandPolicy: after the forced root action, act optimally so the
        weighted leaf sum is exactly Q*(root, HERO_ACTION). All leaves are
        terminal at depth ≤ 2 here, so the policy never actually fires, but
@@ -174,7 +174,7 @@
       assertTol: 1e-6,
     });
 
-    /* ---- Derived tape strip: the lit path AS THE OLD (s, a, r) tape ----
+    /*, Derived tape strip: the lit path AS THE OLD (s, a, r) tape ----
        This makes the flat tape a *derived* view of one path through the tree,
        not the primary object. Empty until a path is sampled/walked. */
     const tapeWrap = document.createElement('div');
@@ -185,7 +185,7 @@
     root.appendChild(tapeWrap);
     const tapeEl = tapeWrap.querySelector('#traj-derived-tape');
 
-    /* ---- Controls ---- */
+    /*, Controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 'traj-controls';
     ctrls.innerHTML =
@@ -195,7 +195,7 @@
       '<div class="traj-status">' + T('traj.status.hint') + '</div>';
     root.appendChild(ctrls);
 
-    /* ---- Walk state ----
+    /*, Walk state ----
        A "current path" is a fixed list of edges from root to a leaf, chosen
        by sampling (engine-faithful). STEP reveals it one ply at a time and
        lights the prefix; SAMPLE draws a fresh path and lights it whole. */
@@ -249,7 +249,7 @@
       setTimeout(() => tapeEl.scrollLeft = tapeEl.scrollWidth, 60);
     }
 
-    /* One (s, a, r) triple in the derived tape — same box vocabulary as the
+    /* One (s, a, r) triple in the derived tape, same box vocabulary as the
        old flat rollout (red s / blue a / purple r), so the student literally
        sees "this path = that tape." */
     function appendTapeTriple(host, step, sBefore, aId, r, terminal, won, finalState) {
@@ -354,7 +354,7 @@
         walkPly++;
         renderTape();
       } else {
-        /* Path complete — next STEP draws a fresh one. */
+        /* Path complete, next STEP draws a fresh one. */
         curPath = null; walkPly = 0;
         sample();
       }

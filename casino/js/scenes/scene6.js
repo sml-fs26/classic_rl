@@ -1,10 +1,10 @@
-/* Scene 6 — Recap.
+/* Scene 6, Recap.
 
    Five idea-cards (mirrors anymal-mdp's recap pattern):
      explore  · exploit  · cumulative regret  · ε-greedy  · decaying ε (muted)
 
    Below: the five slot-machine cards from scene 0 with a "reveal true means"
-   toggle. Default OFF — the lesson's mystery survives the recap. Lecturer
+   toggle. Default OFF, the lesson's mystery survives the recap. Lecturer
    can flip it mid-lecture.
 
    At the bottom: a single foreshadow line bridging to the next viz:
@@ -29,7 +29,7 @@
     hero.className = 'hero';
     hero.innerHTML =
       '<h1>What you carry forward.</h1>' +
-      '<p class="subtitle">Five ideas — and a hint of what comes next.</p>';
+      '<p class="subtitle">Five ideas, and a hint of what comes next.</p>';
     wrap.appendChild(hero);
 
     /* Five recap cards */

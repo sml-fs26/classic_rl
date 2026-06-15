@@ -1,4 +1,4 @@
-/* i18n CORE for Last-Minute Pricing -- English (source of truth) + Japanese.
+/* i18n CORE for Last-Minute Pricing, English (source of truth) + Japanese.
  *
  *   This file holds ONLY the engine plus the small set of SHARED strings
  *   (topbar chrome, the six concept-badge labels, common pricing vocabulary).
@@ -19,7 +19,7 @@
  *     I18N.lang            getter, same as current()
  *     I18N.onChange(cb)    subscribe to language changes; returns unsubscribe
  *
- *   KaTeX-rendered formulas stay in pure math form -- symbols cross languages.
+ *   KaTeX-rendered formulas stay in pure math form, symbols cross languages.
  */
 (function () {
   const STORAGE_KEY = 'pricing-viz.lang';
@@ -36,7 +36,7 @@
     if (obj.jp) Object.assign(DICT.jp, obj.jp);
   }
 
-  /* ---- SHARED strings only (scene copy lives in fragments) ---- */
+  /*, SHARED strings only (scene copy lives in fragments), */
   register({
     en: {
       /* topbar / chrome */
@@ -161,7 +161,7 @@
     },
   });
 
-  /* ---- Initial language: #lang= hash override, else localStorage, else en ---- */
+  /*, Initial language: #lang= hash override, else localStorage, else en, */
   let lang = 'en';
   const hashMatch = (window.location.hash || '').match(/[#&?]lang=(\w+)/);
   if (hashMatch && (hashMatch[1] === 'en' || hashMatch[1] === 'jp')) {

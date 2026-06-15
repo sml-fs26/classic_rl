@@ -1,4 +1,4 @@
-/* Gambler's Ruin -- static MDP solution plus value-iteration fill frames
+/* Gambler's Ruin, static MDP solution plus value-iteration fill frames
  * and SARSA training trajectories.
  *
  * Regenerate with `node precompute/build-datasets.js`. The build script

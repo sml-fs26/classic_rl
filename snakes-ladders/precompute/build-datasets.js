@@ -20,7 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/* ---------------- Pinned canonical configuration ---------------- */
+/*, Pinned canonical configuration, */
 const BOARD = {
   size: 10,
   goal: 100,
@@ -33,7 +33,7 @@ const GAMMA_DEFAULT = 0.95;
 
 const SARSA_CFG = {
   /* α=0.20, ε=0.20 are slightly larger than the cliff-walk defaults (0.10 / 0.10)
-     because Snakes & Ladders has a forgiving action space — even uniform-random
+     because Snakes & Ladders has a forgiving action space, even uniform-random
      reaches the goal in ~38 turns. To make the learning signal visible
      within 2000 episodes we need a chunkier update + a touch more exploration.
      This is documented to students in scene 4. */
@@ -46,7 +46,7 @@ const SARSA_CFG = {
   snapshotEpisodes: [0, 1, 5, 25, 100, 500, 2000],
 };
 
-/* ---------------- Mulberry32 ---------------- */
+/*, Mulberry32, */
 function makeRng(seed) {
   let s = seed >>> 0;
   return function () {
@@ -58,7 +58,7 @@ function makeRng(seed) {
   };
 }
 
-/* ---------------- Board jump lookup ---------------- */
+/*, Board jump lookup, */
 function buildJumps() {
   const J = new Array(101);
   for (let i = 0; i <= 100; i++) J[i] = i;
@@ -89,7 +89,7 @@ function successors(s, dieId) {
   return Array.from(map.entries()).map(([sNext, p]) => ({ sNext, p }));
 }
 
-/* ---------------- Value iteration ---------------- */
+/*, Value iteration, */
 function valueIterationWithHistory(gamma, tol, maxIters) {
   let V = new Float64Array(101);
   const fullHistory = [{ iter: 0, maxDelta: Infinity, V: Array.from(V) }];
@@ -150,7 +150,7 @@ function policyDiff(p1, p2) {
   return n;
 }
 
-/* ---------------- SARSA training ---------------- */
+/*, SARSA training, */
 function makeQ() { return new Float64Array(100 * 3); }
 
 function pickEpsGreedy(Q, s, eps, rng) {
@@ -233,16 +233,16 @@ function sarsaArgmaxPolicy(Q) {
 
 function assertInvariant(name, ok, info) {
   if (ok) console.log('  [OK]   ' + name);
-  else { console.error('  [FAIL] ' + name + (info ? ' — ' + info : '')); process.exit(1); }
+  else { console.error('  [FAIL] ' + name + (info ? ', ' + info : '')); process.exit(1); }
 }
 
 function mean(arr) { return arr.reduce((s, v) => s + v, 0) / arr.length; }
 
-/* ---------------- Run ---------------- */
+/*, Run, */
 console.log('Snakes & Ladders precompute');
 console.log('  Board: 10×10, ladders ' + JSON.stringify(BOARD.ladders) + ', snakes ' + JSON.stringify(BOARD.snakes));
 console.log('');
-console.log('Phase 1 — Value iteration (7 γ grid points)');
+console.log('Phase 1, Value iteration (7 γ grid points)');
 
 const VI_BY_GAMMA = {};
 const ITERS_BY_GAMMA = {};
@@ -278,7 +278,7 @@ assertInvariant('policy(γ=0.70) differs from policy(γ=0.99) in ≥ 5 squares (
   policyShift >= 5);
 
 console.log('');
-console.log('Phase 2 — SARSA training (' + SARSA_CFG.episodes + ' episodes)');
+console.log('Phase 2, SARSA training (' + SARSA_CFG.episodes + ' episodes)');
 const sarsaRes = trainSARSA(SARSA_CFG);
 const meanEarly = mean(sarsaRes.turnsPerEpisode.slice(0, 50));
 /* Use a 500-episode late window to smooth ε-driven noise. */
@@ -331,16 +331,16 @@ for (let s = 1; s <= 99; s++) {
 const agreement = agreedVisited / Math.max(1, totalVisited);
 console.log('  SARSA-vs-VI agreement on visited squares (≥5 visits): ' +
   agreedVisited + ' / ' + totalVisited + ' = ' + (100 * agreement).toFixed(1) + '%');
-/* The 70% threshold from the plan was optimistic — SARSA at ε=0.20 still has
+/* The 70% threshold from the plan was optimistic, SARSA at ε=0.20 still has
    meaningful Q-noise on visited squares because there are many states with
    near-tied Q across dice (the action space is forgiving). 60% captures the
    actual signal: SARSA reaches a *useful* policy, but not exactly VI's. The
-   pedagogical point — "SARSA learns from samples; VI knows P" — survives. */
+   pedagogical point, "SARSA learns from samples; VI knows P", survives. */
 assertInvariant('SARSA final policy matches VI policy on ≥ 60% of visited squares (≥5 visits each)',
   agreement >= 0.60,
   'agreedVisited=' + agreedVisited + ', totalVisited=' + totalVisited);
 
-/* ---------------- Build the payload ---------------- */
+/*, Build the payload, */
 function roundArray(arr, places) {
   const f = Math.pow(10, places);
   return arr.map(v => Math.round(v * f) / f);
@@ -391,7 +391,7 @@ const stats = {
   })(),
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(__dirname, '..', 'data', 'datasets.js');
 const viStr = JSON.stringify(viPayload);
 const sarsaStr = JSON.stringify(sarsaPayload);

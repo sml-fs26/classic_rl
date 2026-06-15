@@ -1,4 +1,4 @@
-/* Scene 4 -- Policy: a rule from states to actions. A policy pi : S -> A is a
+/* Scene 4, Policy: a rule from states to actions. A policy pi : S -> A is a
    playbook: for every shelf state, which lever. The display case re-renders as a
    board of lever chips. Two hand-policies side by side: Always-HOLD (every cell
    green, "premium pride") and Discount-when-old (green cap, amber/red below).

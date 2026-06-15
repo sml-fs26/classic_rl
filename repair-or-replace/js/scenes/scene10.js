@@ -58,7 +58,7 @@
       window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const A = (ms) => (RUN || reduceMotion) ? Math.min(ms, 50) : ms;
 
-    /* ---------------- DOM ---------------- */
+    /*, DOM, */
     const h = document.createElement('h2');
     h.className = 'concept-heading';
     h.textContent = "WHY DP DOESN'T SCALE";
@@ -158,7 +158,7 @@
     const noteEl = bigWrap.querySelector('#s10-note');
     const tagEl  = bigWrap.querySelector('#s10-bigtag');
 
-    /* ---------------- step engine ---------------- */
+    /*, step engine, */
     let step = 0;
     let shown = 0;               /* the number currently on the big readout */
     let rampId = null;           /* in-flight odometer rAF, if any */

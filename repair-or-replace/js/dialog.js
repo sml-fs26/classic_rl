@@ -1,6 +1,6 @@
 /* Pokemon dialog box with typewriter reveal.
  *
- * The classic Gen-1 dialog reveals one character every ~45 ms — slightly
+ * The classic Gen-1 dialog reveals one character every ~45 ms, slightly
  * slower than the Game Boy NORMAL speed (~30 ms) so the rhythm matches the
  * full Pokemon turn cadence. Press DOWN (or click anywhere on the box) to
  * skip-to-end. A small blinking ▼ appears after the reveal completes,
@@ -54,7 +54,7 @@
       }
       revealIdx++;
       text.textContent = currentText.slice(0, revealIdx);
-      /* Gen-1 ticks one pip per visible character — every 3rd char keeps
+      /* Gen-1 ticks one pip per visible character, every 3rd char keeps
          the rhythm without crowding the music. Skip whitespace so spaces
          don't beat at twice the rate of letters. */
       const ch = currentText.charAt(revealIdx - 1);
@@ -100,7 +100,7 @@
       if (timer) skipToEnd();
     });
 
-    /* DOWN-arrow fast-forwards the typewriter — same as clicking the box.
+    /* DOWN-arrow fast-forwards the typewriter, same as clicking the box.
        Listener is window-level (so the user doesn't have to focus the box
        first); a `host.isConnected` guard makes it a no-op once the host
        has been removed from the DOM by a scene swap. */

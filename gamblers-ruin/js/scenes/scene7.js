@@ -1,4 +1,4 @@
-/* Scene 7 -- Optimal action-value Q*. For a chosen capital, show the ladder
+/* Scene 7, Optimal action-value Q*. For a chosen capital, show the ladder
    icon (token on that rung) beside a clean two-column table (stake a | Q*(s,a))
    with the best row starred and clamped stakes greyed. Step through $3 (bold
    wins), $5 (the tie), $8 (forced $2), $9 (forced $1): the star moves. Reads

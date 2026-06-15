@@ -1,4 +1,4 @@
-/* Scene 6 -- Return G_t. From (2,4) fix the first lever (WAIT or SEND) then play
+/* Scene 6, Return G_t. From (2,4) fix the first lever (WAIT or SEND) then play
    optimally, and drop each window's total into a histogram. WAIT-first gives a
    spread (mostly +5, a few -10); SEND-first a certain 0. A live sampler stacks
    bars toward the precomputed distribution; the mean is Q*((2,4), firstLever).

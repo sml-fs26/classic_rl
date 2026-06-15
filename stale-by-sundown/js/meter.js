@@ -1,4 +1,4 @@
-/* meter.js -- the "DID A CUSTOMER BUY?" buy-meter, the visible dice.
+/* meter.js, the "DID A CUSTOMER BUY?" buy-meter, the visible dice.
  *
  *   A horizontal bar whose green fill IS the buy probability for the current
  *   (tier, lever): it visibly RISES when you DISCOUNT and SHRINKS as the tier

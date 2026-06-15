@@ -1,4 +1,4 @@
-/* Scene 9 -- Dynamic programming. Because the dice are known (P is known), we
+/* Scene 9, Dynamic programming. Because the dice are known (P is known), we
    compute Q* exactly by sweeping the Bellman backup across all 25 tiles. The
    board fills "from the deadline wall + the full-truck row outward" using the
    precomputed sweep snapshots in window.DATA.valueIteration: the h=0 wall locks

@@ -43,7 +43,7 @@
     root.classList.add('scene-pad', 'scene1-scene');
     root.innerHTML = '';
 
-    /* ---------- The numbers, read once from DATA / Van ---------- */
+    /*, The numbers, read once from DATA / Van, */
     const M = (window.DATA && window.DATA.model) || {};
     const V = window.Van || {};
     const rev = M.revRun || V.REV_RUN || [];
@@ -70,7 +70,7 @@
       return window.Actions ? window.Actions.leverIconSvg(id) : '';
     }
 
-    /* ---------- Step copy: ONE short line, numbers live in the cards ---------- */
+    /*, Step copy: ONE short line, numbers live in the cards, */
     const STEPS = [
       {
         title: 'OLD BESSIE AND HER WEAR',
@@ -116,7 +116,7 @@
       5: 'card3', 6: 'svcrows', 7: 'card4', 8: 'ask',
     };
 
-    /* ---------- Chrome ---------- */
+    /*, Chrome, */
     const bar = document.createElement('div');
     bar.className = 'tut-bar';
     bar.innerHTML =
@@ -158,7 +158,7 @@
       else if (window.VanViz) window.VanViz.goTo(2);
     });
 
-    /* ---------- The fleet sheet, re-rendered at every step ---------- */
+    /*, The fleet sheet, re-rendered at every step, */
 
     /* The WORN / SHAKY columns light up at the two-cliffs step. */
     function cliffCls(k, w, fresh) {
@@ -330,7 +330,7 @@
       });
     }
 
-    /* ---------- Step engine ---------- */
+    /*, Step engine, */
     let cursor = -1;
 
     function step(k, opts) {

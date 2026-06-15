@@ -7,7 +7,7 @@
  *   Scene rebuild on language change uses PokeViz.rebuildAll() (exposed
  *   from main.js). That clears the cached scene DOM and re-runs the
  *   current scene's builder; other scenes lazily rebuild on next visit.
- *   A mid-battle toggle resets the battle — accepted side-effect for a
+ *   A mid-battle toggle resets the battle, accepted side-effect for a
  *   flavour feature.
  */
 (function () {
@@ -30,7 +30,7 @@
       const on = m.classList.contains('active');
       m.textContent = window.I18N.t(on ? 'music.on' : 'music.off');
     }
-    /* Generic pass over any element with a data-i18n attribute — used
+    /* Generic pass over any element with a data-i18n attribute, used
        by the topbar buttons (PREV / NEXT / theme) so per-element wiring
        isn't needed. Skip the lang/music/brand nodes; those are handled
        explicitly above so they can read state (lang.toggle, music on/off). */
@@ -47,7 +47,7 @@
     btn.addEventListener('click', () => {
       const next = window.I18N.lang === 'en' ? 'jp' : 'en';
       window.I18N.setLang(next);
-      /* setLang fires onChange synchronously — listeners (below) handle
+      /* setLang fires onChange synchronously, listeners (below) handle
          label refresh + scene rebuild. */
     });
 

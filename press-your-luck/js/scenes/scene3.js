@@ -35,7 +35,7 @@
 
     const TARGET = (window.Pig && window.Pig.TARGET) || (window.DATA && window.DATA.target) || 50;
 
-    /* ---- heading + manager lead ---- */
+    /*, heading + manager lead, */
     const heading = document.createElement('h2');
     heading.className = 'poke-subtitle sc3-heading';
     heading.textContent = T('scene3.heading');
@@ -46,7 +46,7 @@
     lead.textContent = T('scene3.lead');
     root.appendChild(lead);
 
-    /* ---- two-column row: the state-icon stage (left) + the beat panel (right) ---- */
+    /*, two-column row: the state-icon stage (left) + the beat panel (right), */
     const row = document.createElement('div');
     row.className = 'sc3-row';
     root.appendChild(row);
@@ -146,7 +146,7 @@
       String.raw`\mathcal{M} = (\,\underbrace{S}_{\text{situation}},\ \underbrace{A}_{\text{lever}},\ \underbrace{P}_{\text{the die}},\ \underbrace{R}_{\text{payoff}}\,)`,
       tuple.querySelector('.sc3-tuple-host'), true);
 
-    /* ---- controls ---- */
+    /*, controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 'sc3-ctrls';
     ctrls.innerHTML =

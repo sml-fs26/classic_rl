@@ -1,4 +1,4 @@
-/* Scene 1 -- Tutorial: how to play. A guided panel walks the controls with no
+/* Scene 1, Tutorial: how to play. A guided panel walks the controls with no
    theory: the SHELF (units x freshness), the three LEVERS (HOLD/DISCOUNT/DUMP
    with colour + margin), the CUSTOMER-BUY METER, and the CLOCK that ages the
    batch each hour. One scripted hour plays: HOLD a FRESH tray, a customer buys,

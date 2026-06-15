@@ -51,7 +51,7 @@
   const STAKE_BY_ID = window.Stakes.STAKE_BY_ID;
   const STAKE_IDS   = window.Stakes.STAKE_IDS;
 
-  /* ---------- Board geometry (one column of 9 rungs) ---------- */
+  /*, Board geometry (one column of 9 rungs), */
   /* Capital $9 sits at the TOP (row 0, nearest the goal), $1 at the BOTTOM
      (row 8, nearest ruin), so the rendered ladder climbs upward. */
   function row(s) { return GOAL - 1 - capitalOf(s); }   // $9 -> row 0, $1 -> row 8
@@ -92,7 +92,7 @@
     return a >= 1 && a <= c && a <= GOAL - c;
   }
 
-  /* ---------- Build the next state from a coin outcome ---------- */
+  /*, Build the next state from a coin outcome, */
   /* delta = +a on a win (heads), -a on a loss (tails). */
   function step(c, delta) {
     const c2 = c + delta;
@@ -101,7 +101,7 @@
     return { cap: c2, terminal: false };
   }
 
-  /* ---------- One coin flip (one sample) ---------- */
+  /*, One coin flip (one sample), */
   function sample(state, stakeId, rng) {
     if (state.terminal) {
       return { sNext: state, reward: 0, terminal: true,
@@ -126,7 +126,7 @@
     return { sNext, reward, terminal: !!sNext.terminal, log };
   }
 
-  /* ---------- Successor enumeration (value iteration) ---------- */
+  /*, Successor enumeration (value iteration), */
   /* Returns the two coin outcomes for a LEGAL stake; an illegal stake
      returns [] so the backup treats it as minus Infinity (unavailable). */
   function successors(state, stakeId) {
@@ -144,7 +144,7 @@
   }
   function successorsFromBuckets(s, stakeId) { return successors(s, stakeId); }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -156,7 +156,7 @@
     };
   }
 
-  /* ---------- Display helpers ---------- */
+  /*, Display helpers, */
   function capital(s) { return s && !s.terminal ? s.cap : 0; }
   function stateLabel(s) {
     if (!s) return '';

@@ -1,4 +1,4 @@
-/* Scene 2 -- Playtest. The learner IS the dispatcher: from (2,4) they pull
+/* Scene 2, Playtest. The learner IS the dispatcher: from (2,4) they pull
    WAIT or SEND, watch the dice, and feel the swing across order windows. A HUD
    tracks the running payoff + windows; a tape records the current window; an
    outcome line + framing follow. Cold-entry safe; honours &run (auto-plays a

@@ -1,4 +1,4 @@
-/* Scene 2 -- Playtest: you run it.
+/* Scene 2, Playtest: you run it.
  *   The learner plays a FULL episode: pick headings, the wind die rolls each
  *   step, leaves blow, the torch burns down (-1 a step), until gold (+10) or
  *   pit (-10). They will almost certainly get gusted toward a wall or the pit

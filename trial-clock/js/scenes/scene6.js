@@ -1,4 +1,4 @@
-/* Scene 6 -- Return G_t. Fix a mid-adoption user (tier 2, day 4) and a chosen
+/* Scene 6, Return G_t. Fix a mid-adoption user (tier 2, day 4) and a chosen
    FIRST lever (PUSH or NUDGE), then play OPTIMALLY afterward and stack the
    RETURNS (sum of rewards over the rest of the trial) into a histogram: PUSH
    spikes at +20 (BUY), clusters near 0 (IGNORE then later), with a -5 tail

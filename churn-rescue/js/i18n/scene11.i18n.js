@@ -13,12 +13,12 @@
       'scene.title11': "SARSA: learn by playing",
       'scene11.hook':  "Learn the playbook from experience, no model needed.",
 
-      /* ---- pager controls ---- */
+      /*, pager controls, */
       's11.btn.prev':  '◀ BACK',
       's11.btn.next':  'NEXT ▶',
       's11.step.label': 'STEP {i} / {n}',
 
-      /* ---- step A: the manager problem ---- */
+      /*, step A: the manager problem, */
       's11.step.A.title': "You don't have the model",
       's11.step.A.body':
         "Scene 9 computed the playbook because we knew the coin and the die. " +
@@ -31,7 +31,7 @@
         "all starting at zero. The board is blank because we have learned nothing yet.",
       's11.illus.A': "25 situations × 3 levers. Every estimate starts at zero: an empty map.",
 
-      /* ---- step B: one observed sample of Bellman ---- */
+      /*, step B: one observed sample of Bellman, */
       's11.step.B.title': "One month is one sample",
       's11.step.B.body':
         "Bellman says a lever's true value is an average over every way the coin " +
@@ -45,7 +45,7 @@
       's11.illus.B':
         "One played episode. The highlighted month is the sample: lever a in s, reward r, on to s′.",
 
-      /* ---- step C: the SARSA nudge ---- */
+      /*, step C: the SARSA nudge, */
       's11.step.C.title': "Nudge toward what you saw",
       's11.step.C.body':
         "One sample is noisy, so don't overwrite your estimate, ease it. Move " +
@@ -59,7 +59,7 @@
       's11.illus.C':
         "q starts at 0; the target is the sampled r. One update slides q a fraction α of the way over.",
 
-      /* ---- step D: epsilon-greedy exploration ---- */
+      /*, step D: epsilon-greedy exploration, */
       's11.step.D.title': "Sometimes try the unproven lever",
       's11.step.D.body':
         "If you always pull the lever that looks best so far, you never learn what " +
@@ -73,7 +73,7 @@
       's11.illus.D':
         "In the sampled cell, ε occasionally swaps the believed-best lever for an untried one.",
 
-      /* ---- step E: the live trainer ---- */
+      /*, step E: the live trainer, */
       's11.step.E.title': "Watch it learn the map",
       's11.step.E.body':
         "Now run it for real, with no model: every episode samples the world, " +
@@ -97,22 +97,22 @@
       's11.live.explored':    'explored',
       's11.live.nudge':       'q[s,a] nudged by α={a}  →  <b>{q1}</b>',
 
-      /* ---- trajectory tape ---- */
+      /*, trajectory tape, */
       's11.tape.title':  'TRAJECTORY TAPE',
       's11.tape.illus':  'one sampled episode · {n} months',
       's11.tape.live':   'episode #{e}',
       's11.tape.live0':  'no episode yet · {e} done',
 
-      /* ---- target callout (on the active cell) ---- */
+      /*, target callout (on the active cell), */
       's11.target.label': 'TARGET',
 
-      /* ---- number line (the nudge) ---- */
+      /*, number line (the nudge), */
       's11.numline.title': 'q moves a fraction α = {a} of the way to the target',
       's11.numline.qold':  'q = +0.00',
       's11.numline.qnew':  'q → {v}',
       's11.numline.tgt':   'target {v}',
 
-      /* ---- convergence bar + meta ---- */
+      /*, convergence bar + meta, */
       's11.conv.label':  'MATCH TO ORACLE',
       's11.conv.agree':  'policy: {a}/{n} cells right',
       's11.conv.return': 'greedy return ≈ {v}',

@@ -1,4 +1,4 @@
-/* Speaker notes for each scene — instructor-facing crib sheet that
+/* Speaker notes for each scene, instructor-facing crib sheet that
  * pops up in a corner overlay on the `n` hotkey.  Notes are written
  * for a lecturer at a podium: bullet-point what to say, what to
  * pause on, common student traps, and a hook to the next scene.
@@ -13,7 +13,7 @@
     if (!sceneKey) return '';
     if (window.I18N) {
       const html = window.I18N.t('notes.' + sceneKey);
-      /* I18N.t returns the key itself when no entry exists — treat that
+      /* I18N.t returns the key itself when no entry exists, treat that
          as "no notes" so we fall through to the empty placeholder. */
       if (html && html !== 'notes.' + sceneKey) return html;
     }

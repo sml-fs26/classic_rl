@@ -1,4 +1,4 @@
-/* Scene 6 -- Return G_t. Fix a $5 start and a chosen FIRST stake (bold or
+/* Scene 6, Return G_t. Fix a $5 start and a chosen FIRST stake (bold or
    timid), then play OPTIMALLY afterward and stack the 0/1 outcomes into a bar.
    The running win-rate converges to the exact Q*($5, first stake): ~0.318
    (bold) vs ~0.311 (timid). Live Monte-Carlo; cold-entry safe. */

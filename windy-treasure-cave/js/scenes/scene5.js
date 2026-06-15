@@ -1,4 +1,4 @@
-/* Scene 5 -- Trajectory.
+/* Scene 5, Trajectory.
  *   Play one episode under the optimal policy and record the run as a sequence
  *   tau = (S1, A1, R1, S2, A2, R2, ...). Each step lights up on the board and
  *   appends to a trajectory ribbon below; the capital letters flag that every

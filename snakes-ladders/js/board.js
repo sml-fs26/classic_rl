@@ -67,7 +67,7 @@
 
     const cellByN = new Map();
     for (let n = 100; n >= 1; n--) {
-      /* iterate in CSS DOM order (top-down, row-major) — we still index by n,
+      /* iterate in CSS DOM order (top-down, row-major), we still index by n,
          but the appendChild order maps the cells onto the visual rows. */
     }
     /* Walk top-down rows (lrow = 9, 8, ..., 0). For lrow=9 (top, odd), the
@@ -129,7 +129,7 @@
     function drawJumps(snakes, ladders) {
       jumpsLayer.innerHTML = '';
 
-      /* Ladders — two parallel rails plus rungs. */
+      /* Ladders, two parallel rails plus rungs. */
       for (const [from, to] of ladders || []) {
         const a = svgCenter(from);
         const b = svgCenter(to);
@@ -186,9 +186,9 @@
         jumpsLayer.appendChild(g);
       }
 
-      /* Snakes — curved path from head (high square) to tail (low square). */
+      /* Snakes, curved path from head (high square) to tail (low square). */
       for (const [from, to] of snakes || []) {
-        const head = svgCenter(from); /* high square — snake's head */
+        const head = svgCenter(from); /* high square, snake's head */
         const tail = svgCenter(to);
         const dx = tail.x - head.x, dy = tail.y - head.y;
         const len = Math.hypot(dx, dy) || 1;
@@ -206,7 +206,7 @@
         const g = document.createElementNS(svgNS, 'g');
         g.setAttribute('class', 'snake');
 
-        /* Snake body — thick curved path. */
+        /* Snake body, thick curved path. */
         const body = document.createElementNS(svgNS, 'path');
         const d = `M ${head.x} ${head.y} C ${c1x} ${c1y} ${c2x} ${c2y} ${tail.x} ${tail.y}`;
         body.setAttribute('d', d);
@@ -215,7 +215,7 @@
         body.dataset.to = String(to);
         g.appendChild(body);
 
-        /* Head — slightly larger circle. */
+        /* Head, slightly larger circle. */
         const headDot = document.createElementNS(svgNS, 'circle');
         headDot.setAttribute('cx', head.x);
         headDot.setAttribute('cy', head.y);
@@ -223,7 +223,7 @@
         headDot.setAttribute('class', 'snake-head');
         g.appendChild(headDot);
 
-        /* Tail — smaller marker. */
+        /* Tail, smaller marker. */
         const tailDot = document.createElementNS(svgNS, 'circle');
         tailDot.setAttribute('cx', tail.x);
         tailDot.setAttribute('cy', tail.y);
@@ -235,7 +235,7 @@
       }
     }
 
-    /* --------- Token rendering --------- */
+    /*, Token rendering, */
     const TOKEN_R = 22; /* token radius in SVG units */
 
     const tokenGroup = document.createElementNS(svgNS, 'g');
@@ -298,7 +298,7 @@
       tokenGroup.style.display = tokenVisible ? '' : 'none';
     }
 
-    /* --------- Cell badges (per-square argmax-die markers) --------- */
+    /*, Cell badges (per-square argmax-die markers), */
     function setCellBadge(n, html) {
       const c = cellByN.get(n);
       if (!c) return;
@@ -308,7 +308,7 @@
       for (const [, c] of cellByN) c.badge.innerHTML = '';
     }
 
-    /* --------- Cell value labels (V-values during iteration) --------- */
+    /*, Cell value labels (V-values during iteration), */
     function setCellLabel(n, html) {
       const c = cellByN.get(n);
       if (!c) return;
@@ -318,7 +318,7 @@
       for (const [, c] of cellByN) c.text.innerHTML = '';
     }
 
-    /* --------- Cell highlight (for selection in scene 4) --------- */
+    /*, Cell highlight (for selection in scene 4), */
     function highlightCell(n) {
       for (const [, c] of cellByN) c.cell.classList.remove('selected');
       if (!n) return;

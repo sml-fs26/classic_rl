@@ -1,9 +1,9 @@
-/* Scene 9 -- Dynamic programming. Because P is known (the failure odds + aging
+/* Scene 9, Dynamic programming. Because P is known (the failure odds + aging
    are printed), we compute Q* exactly by sweeping the Bellman backup. The 3x3
    grid fills region by region (precomputed sweep snapshots in
    window.DATA.valueIteration): HEALTHY locks to RUN almost immediately, the
    empty-bin AGING/FAILING cells settle on ORDER, the spare-in-hand cells settle
-   on REPLACE -- the twist heat-map draws itself. STEP / RUN ALL / RESET drive
+   on REPLACE, the twist heat-map draws itself. STEP / RUN ALL / RESET drive
    the sweeps. Cold-entry safe; honours &run (auto RUN ALL). */
 (function () {
   window.scenes = window.scenes || {};

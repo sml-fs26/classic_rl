@@ -1,4 +1,4 @@
-/* Scene 6 -- Return G_t. Fix (AGING, empty bin) and a chosen FIRST lever (ORDER
+/* Scene 6, Return G_t. Fix (AGING, empty bin) and a chosen FIRST lever (ORDER
    vs RUN), then play OPTIMALLY for a 12-turn quarter and stack the quarter
    totals into a histogram. ORDER (acquire protection) earns a higher mean; RUN
    (gamble) has a fatter LOSING tail (an empty-bin failure books -8). The running

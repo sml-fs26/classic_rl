@@ -54,7 +54,7 @@
     root.classList.add('scene-pad', 's10-scene');
     root.innerHTML = '';
 
-    /* ---- Heading + hook ---- */
+    /*, Heading + hook, */
     const h = document.createElement('h2');
     h.className = 's10-heading';
     h.textContent = T('s10.heading');
@@ -65,7 +65,7 @@
     hook.textContent = T('s10.hook');
     root.appendChild(hook);
 
-    /* ---- Two-panel grid ---- */
+    /*, Two-panel grid, */
     const panels = document.createElement('div');
     panels.className = 's10-panels';
     root.appendChild(panels);
@@ -173,7 +173,7 @@
     pb.appendChild(pbBody);
     panels.appendChild(pb);
 
-    /* ---- Bridge to SARSA ---- */
+    /*, Bridge to SARSA, */
     const bridge = document.createElement('div');
     bridge.className = 's10-bridge poke-box tight';
     bridge.innerHTML = T('s10.bridge') + '<span class="triangle"></span>';

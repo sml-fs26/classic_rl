@@ -1,4 +1,4 @@
-/* Scene 6 — Recap.
+/* Scene 6, Recap.
 
    Five cards arranged in a row: states (S), value V(s), Bellman recursion,
    policy from V, discount γ. Below them, a one-line foreshadow that names
@@ -7,7 +7,7 @@
       estimated one value from samples. Next, we estimate many values
       under noise."
 
-   No interaction. Cold-entry safe — built entirely from DATA. */
+   No interaction. Cold-entry safe, built entirely from DATA. */
 (function () {
   if (!window.scenes) window.scenes = {};
 
@@ -21,7 +21,7 @@
     {
       sym: 'V(s)',
       title: 'value',
-      body: 'A number per state — the maximum spookiness collectable from there. ' +
+      body: 'A number per state, the maximum spookiness collectable from there. ' +
             'V at the start is the optimal total.',
     },
     {
@@ -89,7 +89,7 @@
     fore.innerHTML =
       '<span class="label">Coming next</span>' +
       'Bellman gives V <strong>if you know the rewards exactly</strong>. In Casino we ' +
-      'estimated one value from samples. Next, we estimate <strong>many values under noise</strong> — ' +
+      'estimated one value from samples. Next, we estimate <strong>many values under noise</strong>, ' +
       'with a darts board and Robbins-Monro.';
     wrap.appendChild(fore);
 

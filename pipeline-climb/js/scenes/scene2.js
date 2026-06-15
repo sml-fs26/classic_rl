@@ -1,4 +1,4 @@
-/* Scene 2 -- PLAYTEST: "You run the deal".
+/* Scene 2, PLAYTEST: "You run the deal".
  *
  *   The learner IS the sales rep. From a fresh COLD lead they pick ONE lever
  *   each touch; the
@@ -9,7 +9,7 @@
  *   the lead drops out (LOST). Then a summary lands with the total and a PLAY
  *   AGAIN control that resets to COLD.
  *
- *   The STAGE DIE odds stay HIDDEN -- the rep feels them out by playing, two
+ *   The STAGE DIE odds stay HIDDEN, the rep feels them out by playing, two
  *   identical openings end differently. No optimal lever is shown.
  *
  *   Each touch is recorded on a window.History tape as { action: leverId,
@@ -43,18 +43,18 @@
     /* Collapse delays under &run / reduced motion. */
     function A(ms) { return (RUN || reduceMotion) ? Math.min(ms, 50) : ms; }
 
-    /* ---------- Header ---------- */
+    /*, Header, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title s2-section-title';
     header.textContent = T('scene2.section');
     root.appendChild(header);
 
-    /* ---------- Main row: board (ladder + HUD + die) | controls ---------- */
+    /*, Main row: board (ladder + HUD + die) | controls, */
     const row = document.createElement('div');
     row.className = 's2-row';
     root.appendChild(row);
 
-    /* --- left: the live board --- */
+    /*, left: the live board, */
     const board = document.createElement('div');
     board.className = 's2-board';
     row.appendChild(board);
@@ -88,7 +88,7 @@
     stage.appendChild(dieHost);
     const die = window.StageDie.mount(dieHost);
 
-    /* --- right: dialog + lever menu + restart --- */
+    /*, right: dialog + lever menu + restart, */
     const rightCol = document.createElement('div');
     rightCol.className = 's2-right';
     row.appendChild(rightCol);
@@ -139,7 +139,7 @@
     ctrlRow.appendChild(restartBtn);
     rightCol.appendChild(ctrlRow);
 
-    /* ---------- The RETURN tape (the rollout of the run) ---------- */
+    /*, The RETURN tape (the rollout of the run), */
     const tapeWrap = document.createElement('div');
     tapeWrap.className = 's2-tape-wrap';
     tapeWrap.innerHTML = '<div class="s2-tape-label">' + T('scene2.tapeLabel') + '</div>';
@@ -148,13 +148,13 @@
     tapeWrap.appendChild(tape);
     root.appendChild(tapeWrap);
 
-    /* ---------- Caption ---------- */
+    /*, Caption, */
     const caption = document.createElement('div');
     caption.className = 'poke-caption s2-caption';
     caption.textContent = T('scene2.caption');
     root.appendChild(caption);
 
-    /* ---------- State ---------- */
+    /*, State, */
     let state, touch, total, busy, episode, ended;
     let baseSeed = 0;                  /* per-episode seed; per-touch seeds derive from it */
     const log = window.History.create();   /* the action tape: { action, seed } per touch */
@@ -311,7 +311,7 @@
       sum.querySelector('.s2-again').addEventListener('click', () => resetRun());
     }
 
-    /* ---------- Reset to a fresh COLD lead ---------- */
+    /*, Reset to a fresh COLD lead, */
     function resetRun() {
       clearTimers();
       episode = (episode || 0) + 1;

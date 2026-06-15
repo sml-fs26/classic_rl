@@ -1,4 +1,4 @@
-/* scene1 i18n -- tutorial / how to play. */
+/* scene1 i18n, tutorial / how to play. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

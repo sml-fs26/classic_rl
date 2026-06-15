@@ -1,4 +1,4 @@
-/* Scene 5 -- Trajectory. One day's run as a tape: tau = (S1, A1, R1, S2, ...),
+/* Scene 5, Trajectory. One day's run as a tape: tau = (S1, A1, R1, S2, ...),
    capital letters because each is a RANDOM VARIABLE until the dice land. The
    croissant-icon, lever chip, and till change scroll left to right. STEP reveals
    the tape hour by hour. Reads the precomputed demo day from DATA. Cold-entry

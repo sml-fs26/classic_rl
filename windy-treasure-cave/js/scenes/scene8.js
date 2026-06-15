@@ -1,4 +1,4 @@
-/* Scene 8 -- Bellman optimality equation.
+/* Scene 8, Bellman optimality equation.
  *   Show Q*(s,a) = E[ R + max_{a'} Q*(S', a') ] and unpack it on the board for
  *   the below-the-pit tile aiming UP: 70% -> land on the pit (R=-10, done),
  *   15% -> gust left to (3,1), 15% -> gust right to (3,3), each with its own

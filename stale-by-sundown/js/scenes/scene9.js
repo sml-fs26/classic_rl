@@ -1,4 +1,4 @@
-/* Scene 9 -- Dynamic programming: fill Q*. Because the buy-meter is posted, P is
+/* Scene 9, Dynamic programming: fill Q*. Because the buy-meter is posted, P is
    known and we can compute the scorecard exactly. "Run the backups" sweeps the
    Bellman equation over all 15 states; the display case fills band by band:
    STALE locks RED first (the spoilage cliff is obvious), then the OLD/AGING

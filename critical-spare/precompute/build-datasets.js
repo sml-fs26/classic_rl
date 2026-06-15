@@ -1,4 +1,4 @@
-/* Critical Spare precompute -- the RIGOR GATE.
+/* Critical Spare precompute, the RIGOR GATE.
  *
  *   Runs value iteration on the machine-maintenance MDP (state = (health,
  *   spares); levers RUN / ORDER / REPLACE; failure die 0/30/70% by health;
@@ -39,7 +39,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/* ---------------- Load the verified engine via a window shim ---------------- */
+/*, Load the verified engine via a window shim, */
 const sandbox = { window: {}, console, Math, Float64Array, Float32Array, Int32Array, Array, Map, Set, JSON };
 sandbox.window.window = sandbox.window;
 const ctx = vm.createContext(sandbox);
@@ -60,7 +60,7 @@ const NS = Machine.NS;                      // 3
 const GAMMA = Machine.GAMMA;                // 0.9
 const HEALTH = Machine.HEALTH;              // ['HEALTHY','AGING','FAILING']
 
-/* ---------------- Value iteration ---------------- */
+/*, Value iteration, */
 const TOL = 1e-12;
 const MAX_ITERS = 4000;
 const vi = Bellman.valueIteration(GAMMA, { tol: TOL, maxIters: MAX_ITERS, recordHistory: true });
@@ -68,25 +68,25 @@ const V = vi.V;                             // Float64Array[9], index = h*3 + s
 const policy = vi.policy;                   // [9] lever-id strings
 const Qstar = Bellman.qFromV(V, GAMMA);     // Float64Array[9*A]
 
-/* ---------------- Helpers ---------------- */
+/*, Helpers, */
 function sIdx(h, s) { return h * NS + s; }
 function vAt(h, s) { return V[sIdx(h, s)]; }
 function qAt(h, s, leverId) { return Qstar[sIdx(h, s) * A + LEVER_IDS.indexOf(leverId)]; }
 function bestLeverAt(h, s) { return policy[sIdx(h, s)]; }
 function round3(x) { return Math.round(x * 1000) / 1000; }
 function round4(x) { return Math.round(x * 10000) / 10000; }
-function fmt(x) { return Number.isFinite(x) ? x.toFixed(3) : '  --  '; }
+function fmt(x) { return Number.isFinite(x) ? x.toFixed(3) : ', '; }
 
 function assert(name, ok, info) {
   if (ok) { console.log('  [OK]   ' + name); return; }
-  console.error('  [FAIL] ' + name + (info ? ' -- ' + info : ''));
+  console.error('  [FAIL] ' + name + (info ? ', ' + info : ''));
   process.exit(1);
 }
 
-console.log('Critical Spare precompute -- 3x3 maintenance grid, 3 levers, gamma = ' + GAMMA);
+console.log('Critical Spare precompute, 3x3 maintenance grid, 3 levers, gamma = ' + GAMMA);
 console.log('  states = (health {HEALTHY,AGING,FAILING}) x (spares {0,1,2}); failure die 0/30/70%; hold -1/spare');
 console.log('');
-console.log('Phase 1 -- Value iteration');
+console.log('Phase 1, Value iteration');
 const lastSweep = vi.history[vi.history.length - 1];
 console.log('  converged in ' + vi.iters + ' sweeps, final maxDelta = ' + lastSweep.maxDelta.toExponential(2));
 
@@ -96,7 +96,7 @@ console.log('   state          |  RUN     ORDER   REPLACE |  V*    | best');
 for (let h = 0; h < 3; h++) for (let s = 0; s < NS; s++) {
   const bId = bestLeverAt(h, s);
   const star = id => (id === bId ? '*' : ' ');
-  const qr = id => (Machine.isLegal(Machine.mk(h, s), id) ? fmt(qAt(h, s, id)) : '  --  ');
+  const qr = id => (Machine.isLegal(Machine.mk(h, s), id) ? fmt(qAt(h, s, id)) : ', ');
   console.log('  ' + (HEALTH[h] + ',sp=' + s).padEnd(14) + ' | ' +
     qr('run') + star('run') + ' ' + qr('order') + star('order') + ' ' + qr('replace') + star('replace') +
     ' | ' + vAt(h, s).toFixed(3).padStart(6) + ' | ' + Levers.nameOf(bId));
@@ -164,7 +164,7 @@ for (let h = 0; h < 3; h++) for (let s = 0; s < NS; s++) {
 assert('no exact Q* ties among legal levers (the policy is unambiguous)',
   ties.length === 0, 'ties=[' + ties.join(',') + ']');
 
-/* ---------------- Per-sweep snapshots for the DP scene ----------------
+/*, Per-sweep snapshots for the DP scene ----------------
    The grid fills region by region: HEALTHY locks to RUN almost immediately,
    empty-bin AGING/FAILING settle on ORDER, spare-in-hand AGING/FAILING settle
    on REPLACE. We record (V, Q, solvedMask) after each sweep so the DP scene can
@@ -195,7 +195,7 @@ console.log('');
 console.log('  DP fill recorded over ' + sweepSnapshots.length + ' sweep-frames ' +
             '(policy regions appear within the first few sweeps; values 3dp-stable by ~sweep ' + sweepsToStable + ')');
 
-/* ---------------- Phase 2 -- model-free TD control: ON-POLICY SARSA ----------------
+/*, Phase 2, model-free TD control: ON-POLICY SARSA ----------------
    Learn Q from experience (roll a turn, observe the outcome, adjust) with NO
    model of the failure die or the aging coin. The headline learner is on-policy
    SARSA: it bootstraps on the lever it ACTUALLY plays next. With a GLIE-annealed
@@ -304,7 +304,7 @@ function summariseSarsa(learner, evalSeed) {
 }
 
 console.log('');
-console.log('Phase 2 -- model-free TD control: ON-POLICY SARSA');
+console.log('Phase 2, model-free TD control: ON-POLICY SARSA');
 console.log('  ' + SARSA_CFG.episodes + ' episodes, horizon ' + SARSA_CFG.horizon +
             ', alpha=1/(1+n)^' + SARSA_CFG.alphaPower + ', eps ' + SARSA_CFG.epsilon + ' to ' + SARSA_CFG.epsilonMin + ' (GLIE)');
 const t0 = Date.now();
@@ -330,7 +330,7 @@ assert('SARSA greedy mean discounted return from (H,0) is within 0.5 of V*(H,0)'
 assert('SARSA greedy return from (H,0) improved over training',
   sarsaSum.finalReturn >= sarsaSum.earlyReturn, 'early ' + sarsaSum.earlyReturn + ' final ' + sarsaSum.finalReturn);
 
-/* ---------------- A fixed illustrative trajectory ----------------
+/*, A fixed illustrative trajectory ----------------
    One short, deterministic demo quarter from (HEALTHY,0) under the OPTIMAL
    policy, pinned seed, for the trajectory / return scenes. Picked so it shows
    the twist in action: aging, an ORDER, then a REPLACE, and at least one rolled
@@ -376,7 +376,7 @@ console.log('Demo quarter (optimal policy from HEALTHY/0, seed ' + demoTrajector
             demoTrajectory.turns + ' turns, total reward ' +
             demoTrajectory.steps.reduce((a, x) => a + x.reward, 0));
 
-/* ---------------- Return-distribution bars for the Return scene ----------------
+/*, Return-distribution bars for the Return scene ----------------
    Fix (AGING, 0 spares) and a chosen FIRST lever, then play OPTIMALLY for a
    12-turn quarter; build a histogram of the (undiscounted) quarter totals. The
    empty-bin AGING cell is the twist's jewel: ORDER (acquire protection) beats
@@ -412,7 +412,7 @@ const returnBars = {
 console.log('  return from (AGING,0): start ORDER quarter-mean ~ ' + returnBars.order.mean +
             ' , start RUN ~ ' + returnBars.run.mean + ' (worst RUN quarter ' + returnBars.run.lo + ')');
 
-/* ---------------- Named spot-Q rows the Q* scene calls out ---------------- */
+/*, Named spot-Q rows the Q* scene calls out, */
 function spotRow(h, s) {
   const ids = Machine.availableLeverIds(Machine.mk(h, s));
   const obj = {};
@@ -426,7 +426,7 @@ const spotQ = {
   h2s1: spotRow(2, 1),   // FAILING, 1 spare -> REPLACE
 };
 
-/* ---------------- Recap cards (machine-maintenance voice) ---------------- */
+/*, Recap cards (machine-maintenance voice), */
 const recap = [
   { key: 'mdp', badge: 'MDP', scene: 3, title: 'THE FOUR-PART FRAME',
     text: 'The situation is two gauges you already watch: machine HEALTH and SPARES on hand. The lever is RUN / ORDER / REPLACE. The part you do not control is the failure die (and the aging coin). The payoff is this turn\'s cash: +3 to run, -2 to order, -8 for downtime, -3 for a rushed swap, -1 per spare held.',
@@ -448,10 +448,10 @@ const recap = [
     tex: 'q[s,a] \\;\\mathrel{+}=\\; \\alpha\\,(\\, r + \\gamma\\,q[s\',a\'] - q[s,a] \\,)' },
 ];
 
-/* ---------------- Levers for display ---------------- */
+/*, Levers for display, */
 const leversDisplay = Levers.LEVERS.map(l => ({ id: l.id, name: l.name, role: l.role }));
 
-/* ---------------- Assemble + round payloads ---------------- */
+/*, Assemble + round payloads, */
 function roundArr(arr, places) { const f = Math.pow(10, places); return Array.from(arr, v => (Number.isFinite(v) ? Math.round(v * f) / f : null)); }
 
 const DATA = {
@@ -533,11 +533,11 @@ const DATA = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(ROOT, 'data', 'datasets.js');
 const payload = JSON.stringify(DATA);
 const fileContent =
-  "/* Critical Spare -- static MDP solution plus value-iteration fill frames and\n" +
+  "/* Critical Spare, static MDP solution plus value-iteration fill frames and\n" +
   " * an on-policy SARSA training trajectory.\n" +
   " *\n" +
   " * Regenerate with `node precompute/build-datasets.js`. The build script loads\n" +

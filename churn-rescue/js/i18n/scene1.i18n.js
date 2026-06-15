@@ -8,13 +8,13 @@
       'scene.title1': "Tutorial: how to play",
       'scene1.hook':  "Meet the account card, the three levers, and the two dice.",
 
-      /* ---- step engine chrome ---- */
+      /*, step engine chrome, */
       'tut.step_of':     "STEP {i} / {total}",
       'tut.skip':        "SKIP TO PLAYTEST ▸",
       'tut.go_playtest': "GO TO PLAYTEST ▸",
       'tut.nav.hint':    "Use <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to walk the three panels.",
 
-      /* ---- panel 1: the account card ---- */
+      /*, panel 1: the account card, */
       'tut.step.card.title':  "The account card",
       'tut.step.card.dialog':
         "This card is one customer. The bar up top is how engaged they are " +
@@ -25,7 +25,7 @@
       'tut.card.callout.countdown': "↓ RENEWAL COUNTDOWN",
       'tut.card.strip_title':       "THE FIVE TIERS",
 
-      /* ---- panel 2: the three levers ---- */
+      /*, panel 2: the three levers, */
       'tut.step.levers.title': "The three levers",
       'tut.step.levers.dialog':
         "Each month you pull ONE lever. Doing nothing is free; a check-in " +
@@ -38,7 +38,7 @@
       'tut.lever.axis.l':       "cheaper · passive",
       'tut.lever.axis.r':       "expensive · aggressive",
 
-      /* ---- panel 3: the two dice ---- */
+      /*, panel 3: the two dice, */
       'tut.step.dice.title': "The two dice",
       'tut.step.dice.dialog':
         "Pull a lever and the world answers with TWO rolls, in order. First " +

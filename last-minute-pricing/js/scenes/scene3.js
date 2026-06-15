@@ -1,4 +1,4 @@
-/* scene3 -- "What makes this an MDP?" (Formalization).
+/* scene3, "What makes this an MDP?" (Formalization).
  *
  *   Slides the four MDP parts over a shelf card the learner "just played",
  *   one click at a time. Reskins the Pokemon sceneMdpOverlay step-ladder into
@@ -39,7 +39,7 @@
     let step = 0;
     let drawHandle = null;     // Deck handle, mounted lazily on step 3
 
-    /* ---------- Title + lede ---------- */
+    /*, Title + lede, */
     const head = document.createElement('div');
     head.className = 'sc3-head';
     head.innerHTML =
@@ -47,7 +47,7 @@
       '<p class="poke-caption sc3-lede">' + T('scene3.lede') + '</p>';
     root.appendChild(head);
 
-    /* ---------- Two-column body: stage (left) + panel (right) ---------- */
+    /*, Two-column body: stage (left) + panel (right), */
     const body = document.createElement('div');
     body.className = 'sc3-body';
     root.appendChild(body);
@@ -149,7 +149,7 @@
     foot.className = 'sc3-foot';
     panel.appendChild(foot);
 
-    /* ---------- Nav controls ---------- */
+    /*, Nav controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 'sc3-ctrls';
     ctrls.innerHTML =
@@ -167,7 +167,7 @@
     const nextBtn = ctrls.querySelector('#sc3-next');
     const stepofEl = ctrls.querySelector('#sc3-stepof');
 
-    /* ---------- Demand-draw demo (step 3) ---------- */
+    /*, Demand-draw demo (step 3), */
     function runDraw() {
       if (!drawHandle) {
         drawHandle = window.Deck.mount(deckHost, {});
@@ -200,7 +200,7 @@
       setTimeout(function () { try { cardWrap.removeChild(el); } catch (e) {} }, 1300);
     }
 
-    /* ---------- Step state machine ---------- */
+    /*, Step state machine, */
     function renderFormula() {
       formula.innerHTML = '';
       if (step === 0) {

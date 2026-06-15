@@ -16,7 +16,7 @@
  *             (1) deadline-risk die: w.p. miss(h) the shipment is BLOWN this
  *                 hour -> TERMINAL, reward -5p (the whole held load stranded).
  *             (2) if it survives (w.p. 1 - miss(h)): the clock ticks h -> h-1
- *                 and the arrival die rolls -- w.p. 0.6 a pallet slides on
+ *                 and the arrival die rolls, w.p. 0.6 a pallet slides on
  *                 (p -> min(p+1, 4)), else p unchanged. Reward 0 on this
  *                 transition (the payoff comes when you finally SEND). Lands
  *                 in the non-terminal state (p', h-1).
@@ -75,7 +75,7 @@
   const ACTION_BY_ID = window.Actions.ACTION_BY_ID;
   const ACTION_IDS   = window.Actions.ACTION_IDS;   // [wait, send]
 
-  /* ---------- Board geometry (5 pallet rows x 5 hour cols) ---------- */
+  /*, Board geometry (5 pallet rows x 5 hour cols), */
   /* Row 0 is the TOP of the rendered board (p = 4); row 4 is the bottom
      (p = 0). Col 0 is the leftmost (h = 0); col 4 the rightmost (h = 4). */
   function row(s) { return PMAX - palletsOf(s); }   // p=4 -> row 0, p=0 -> row 4
@@ -126,7 +126,7 @@
     return false;
   }
 
-  /* ---------- SEND reward ---------- */
+  /*, SEND reward, */
   /* On-time ship (h >= 1): deliver value minus the fixed truck cost.
      Forced late ship at the wall (h = 0): 5p - 10 - 5p = -10. */
   function sendReward(p, h) {
@@ -135,7 +135,7 @@
   }
   function blownReward(p) { return -LATE_PENALTY * p; }
 
-  /* ---------- One rolled outcome (one sample) ---------- */
+  /*, One rolled outcome (one sample), */
   function sample(state, actionId, rng) {
     if (state.terminal) {
       return { sNext: state, reward: 0, terminal: true,
@@ -185,7 +185,7 @@
     };
   }
 
-  /* ---------- Successor enumeration (value iteration) ---------- */
+  /*, Successor enumeration (value iteration), */
   /* Returns the full outcome distribution for a LEGAL action; an illegal
      action returns [] so the backup scores it -Infinity (unavailable). */
   function successors(state, actionId) {
@@ -219,7 +219,7 @@
   }
   function successorsFromBuckets(s, actionId) { return successors(s, actionId); }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -231,7 +231,7 @@
     };
   }
 
-  /* ---------- Display helpers ---------- */
+  /*, Display helpers, */
   function stateLabel(s) {
     if (!s) return '';
     if (s.terminal) return s.kind === 'blown' ? 'BLOWN' : 'SENT';

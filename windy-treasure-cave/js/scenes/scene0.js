@@ -1,4 +1,4 @@
-/* Scene 0 -- Title / hook.
+/* Scene 0, Title / hook.
  *   A dark cave with the gold deep inside, the wind die idling, the explorer on
  *   the start tile, and the title dropping in. START reveals the manager framing
  *   and a BEGIN prompt that yields to the engine (-> scene 1). Cold-entry safe;

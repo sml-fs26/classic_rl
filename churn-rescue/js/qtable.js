@@ -142,7 +142,7 @@
     }
 
     /* Lever-frequency strip below the grid (how many of the 25 states pick
-       each lever as argmax) -- the policy-region census. */
+       each lever as argmax), the policy-region census. */
     const freqStrip = document.createElement('div');
     freqStrip.className = 'rm-freq-strip';
     const freqTitle = document.createElement('div');
@@ -297,7 +297,7 @@
       }
     }
 
-    /* Click wiring -- a single registered callback gets the state index +
+    /* Click wiring, a single registered callback gets the state index +
        cell node; the 'clickable' affordance is painted only while set. */
     let cellClickCb = null;
     for (let s = 0; s < N; s++) {

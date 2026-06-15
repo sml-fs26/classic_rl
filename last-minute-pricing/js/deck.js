@@ -1,14 +1,14 @@
-/* deck.js -- the shared DEMAND-DRAW primitive for Last-Minute Pricing.
+/* deck.js, the shared DEMAND-DRAW primitive for Last-Minute Pricing.
  *
  *   THE DEMAND JAR. You pull a price lever and a glass jar shows THAT lever's
- *   own population of outcome marbles -- PREMIUM pours a pile that is mostly
+ *   own population of outcome marbles, PREMIUM pours a pile that is mostly
  *   grey "0" duds with a couple of gold sales; STANDARD pours a jar full of
- *   gold 2s and 3s and no 0 at all -- then the jar shakes and ONE marble rolls
+ *   gold 2s and 3s and no 0 at all, then the jar shakes and ONE marble rolls
  *   out into a catch-cup: the units sold today, k. Because the jar VISIBLY
  *   re-pours to a different mix when you switch levers, it is obvious the draw
  *   is sampled from an ACTION-SPECIFIC population. That is the fix for the old
  *   card deck, whose identical face-down back made the draw look independent of
- *   the lever -- the jar literally IS P(k | lever).
+ *   the lever, the jar literally IS P(k | lever).
  *
  *   The exact odds stay HIDDEN: the pile is a small, jumbled, fixed visual
  *   budget that leans low vs high without being countable. No percentages.
@@ -164,7 +164,7 @@
           timers.push(setTimeout(() => root.classList.add('is-shaking'), 110));
           timers.push(setTimeout(() => root.classList.remove('is-shaking'), 110 + 190));
           /* 3) one marble rolls out into the cup at the draw beat (~flipMs/2),
-             tinted/numbered as k -- this is when scenes slide the sold seats. */
+             tinted/numbered as k, this is when scenes slide the sold seats. */
           timers.push(setTimeout(() => {
             root.classList.add('is-drawing');
             showDrawn(k);

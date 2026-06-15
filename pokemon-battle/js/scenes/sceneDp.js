@@ -1,4 +1,4 @@
-/* Scene — filling Q* with dynamic programming.
+/* Scene, filling Q* with dynamic programming.
  *
  *   We compute Q*(s, a) for the 25-state battle MDP using value iteration
  *   (offline, once at mount), then STEP through 6 phases of pedagogical
@@ -10,7 +10,7 @@
  *     2. Bottom edge: YOUR = CRITICAL row. PIKACHU is one Ember from
  *        fainting; most cells are negative.
  *
- *     3. The detail cell — (YOUR=LOW, OPP=LOW). Side panel renders the
+ *     3. The detail cell, (YOUR=LOW, OPP=LOW). Side panel renders the
  *        full Bellman expansion for BOLT here, term by term, all the
  *        way down to the +6.75 total.
  *
@@ -19,7 +19,7 @@
  *
  *     5. Fill the remaining inner 3×3.
  *
- *     6. Done — recap.
+ *     6. Done, recap.
  *
  *   The Bellman optimality formula sits in a card at the top. STEP /
  *   RUN ALL / RESET drive the phases. The right-hand side panel shows
@@ -35,7 +35,7 @@
   const A       = ACTIONS.length;
   const STATES  = window.Bellman.STATES;
   const N       = STATES.length;                       // 25
-  const GAMMA   = 1;     // Undiscounted — every trajectory terminates (win/loss).
+  const GAMMA   = 1;     // Undiscounted, every trajectory terminates (win/loss).
 
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
   function bucketName(b) { return b >= NB ? T('hp.bucket.faint_short') : T('hp.bucket.' + BUCKETS[b]); }
@@ -192,7 +192,7 @@
       }
     }
 
-    /* Miss branch — opp stays in formBefore, counters Pikachu. */
+    /* Miss branch, opp stays in formBefore, counters Pikachu. */
     if (pMiss > 0) {
       const COUNTER = window.Battle.oppDamageDist(formBefore);
       const sub = [];
@@ -347,7 +347,7 @@
     heading.textContent = T('dp.heading');
     root.appendChild(heading);
 
-    /* Premise — we wrote down P explicitly when we set the battle up
+    /* Premise, we wrote down P explicitly when we set the battle up
        (Battle.successors enumerates it). That's the gift that makes DP
        even possible here; next scene yanks it back. */
     const premise = document.createElement('div');
@@ -367,7 +367,7 @@
     );
     root.appendChild(fcard);
 
-    /* ---- The backup IS the depth-1 trajectory tree ----
+    /*, The backup IS the depth-1 trajectory tree ----
        A collapsible card holding a depth-1 TrajTree under (FULL/MID, THUNDER)
        with each frontier child bootstrapped by V: G_t = r + V(s'). Its
        weighted leaf sum equals Q*(FULL/MID, THUNDER) = 5.77, exactly the
@@ -427,12 +427,12 @@
     panel.className = 'dp-panel poke-box tight';
     row.appendChild(panel);
 
-    /* ---- Compute Q* once and prep the detail breakdown ---- */
+    /*, Compute Q* once and prep the detail breakdown, */
     const { Q: qStar, V } = computeQstar();
     const detailBreakdown = buildBreakdown(DETAIL_CELL.yourB, DETAIL_CELL.oppB, DETAIL_CELL.moveId, V);
     const detailCellIdx = DETAIL_CELL.yourB * NB + DETAIL_CELL.oppB;
 
-    /* ---- Mount the depth-1 backup tree (root = the detail cell) ----
+    /*, Mount the depth-1 backup tree (root = the detail cell) ----
        Bootstrapped frontier leaves: G_t = r + V(s'). The weighted leaf sum
        is asserted in code to equal Q*(s, a) from this very value iteration,
        so the picture is honest, never hard-coded. */
@@ -473,9 +473,9 @@
       }
     })();
 
-    /* ---- Phase definitions ----
+    /*, Phase definitions ----
        Fill order matches the new dynamics: the right two columns (Charizard
-       territory) are pedagogically easiest — QUICK ATTACK super-effective,
+       territory) are pedagogically easiest, QUICK ATTACK super-effective,
        always wins from LOW or CRITICAL. Then the YOUR=CRITICAL losing row,
        then a detail walk-through of (FULL, MID, THUNDER) against
        CHARMELEON, then the rest of the MID column, then the Charmander
@@ -518,7 +518,7 @@
         fillCells: [] },
     ];
 
-    /* ---- Phase rendering state ---- */
+    /*, Phase rendering state, */
     let phaseIdx = -1;
     const filledMask = new Array(N).fill(false);
 
@@ -627,7 +627,7 @@
         if (phaseIdx < PHASES.length - 1) { step(); return true; }
         return false;
       },
-      /* Rewinding phases would require unfilling cells — use RESET
+      /* Rewinding phases would require unfilling cells, use RESET
          instead. Let left arrow advance to the previous scene. */
       onPrevKey() { return false; },
     };

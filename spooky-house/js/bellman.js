@@ -1,7 +1,7 @@
 /* Bellman recursion utilities for the Spooky House viz.
 
    The pedagogy is: V(r, c) = R(r, c) + γ · max(V(r+1, c), V(r, c+1)),
-   solved on a 5×5 reward grid by a single backward sweep (no iteration —
+   solved on a 5×5 reward grid by a single backward sweep (no iteration, 
    right/down on a finite-horizon DAG, so antidiagonals fill cleanly).
 
    Pure functions throughout: every scene rebuilds V on demand from
@@ -75,7 +75,7 @@
         } else {
           const vd = V[r + 1][c];
           const vr = V[r][c + 1];
-          /* Strict inequality only — ties get both arrows. */
+          /* Strict inequality only, ties get both arrows. */
           if (vd > vr) row.push({ down: true,  right: false });
           else if (vr > vd) row.push({ down: false, right: true });
           else row.push({ down: true, right: true });
@@ -87,7 +87,7 @@
   }
 
   /* Trace the optimal path from `start` by following the policy. On ties,
-     prefer right (for tie-break determinism — matches the conventional
+     prefer right (for tie-break determinism, matches the conventional
      reading order). Returns [(r, c), …] including the terminal cell. */
   function computeOptimalPath(V, start) {
     const { M, N } = dims(V);

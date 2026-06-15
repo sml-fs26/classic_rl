@@ -18,7 +18,7 @@
       'scene11.reset':  'RESET',
       'scene11.status': 'STEP {i} / {n}',
 
-      /* ---- STEP 1: derive the update ---- */
+      /*, STEP 1: derive the update, */
       'scene11.s1.tag':   'STEP 1 / 3',
       'scene11.s1.title': 'NO DIE ODDS? LEARN FROM ONE TOUCH.',
       'scene11.s1.lead':
@@ -39,7 +39,7 @@
       'scene11.s1.alphaName': 'learning rate',
       'scene11.s1.alphaNote': 'alpha = step size: how hard one touch moves the estimate. Fixed here.',
 
-      /* ---- STEP 2: epsilon, the explore / exploit dial ---- */
+      /*, STEP 2: epsilon, the explore / exploit dial, */
       'scene11.s2.tag':   'STEP 2 / 3',
       'scene11.s2.title': 'EPSILON: THE EXPLORE / EXPLOIT DIAL',
       'scene11.s2.lead':
@@ -67,7 +67,7 @@
       'scene11.s2.tupleAn':  'a′ = {lever}',
       'scene11.s2.tupleAnTerm': 'a′ = (deal closed, no next lever)',
 
-      /* ---- STEP 3: live run ---- */
+      /*, STEP 3: live run, */
       'scene11.s3.tag':   'STEP 3 / 3',
       'scene11.s3.title': 'WATCH IT LEARN THE PLAYBOOK',
       'scene11.s3.lead':

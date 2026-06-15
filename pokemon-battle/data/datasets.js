@@ -1,4 +1,4 @@
-/* Pokemon-battle integrative review — static configuration plus the
+/* Pokemon-battle integrative review, static configuration plus the
  * (after-precompute) value-iteration history and SARSA training trajectories.
  *
  * Regenerate with `node precompute/build-datasets.js`. The build script

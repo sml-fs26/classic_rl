@@ -69,7 +69,7 @@
     drop:    (t) => { sweep(420, 120, t, 0.22, 'sawtooth', 0.16); noiseHit(t, 0.10, 0.10); },
     win:     (t) => { [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.09, 0.16, 'square', 0.15)); },
     loss:    (t) => { [392, 311, 233].forEach((f, i) => tone(f, t + i * 0.11, 0.18, 'sawtooth', 0.14)); noiseHit(t, 0.18, 0.08); },
-    /* ---- cave cues ---- */
+    /*, cave cues, */
     dieroll: (t) => { sweep(260, 760, t, 0.20, 'triangle', 0.11); tone(1300, t + 0.17, 0.03, 'square', 0.07); },
     step:    (t) => { tone(523, t, 0.06, 'square', 0.12); },                                   /* a clean footstep on the intended tile */
     gust:    (t) => { sweep(700, 240, t, 0.26, 'sawtooth', 0.10); noiseHit(t, 0.20, 0.07); },  /* the wind shoves you sideways */

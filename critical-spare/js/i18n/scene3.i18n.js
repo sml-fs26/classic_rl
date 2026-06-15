@@ -1,4 +1,4 @@
-/* scene3 i18n -- formalization. */
+/* scene3 i18n, formalization. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -16,7 +16,7 @@
       'scene3.s0.body': 'State, action, transition, reward. We\'ll gloss each one in plain terms, then the maths.',
       'scene3.s1.tag': 'STATE  s',
       'scene3.s1.title': 'The situation now',
-      'scene3.s1.body': '<em>The situation</em> = (machine health, spares in bin). Nine situations in all -- a 3×3 grid.',
+      'scene3.s1.body': '<em>The situation</em> = (machine health, spares in bin). Nine situations in all, a 3×3 grid.',
       'scene3.s2.tag': 'ACTION  a',
       'scene3.s2.title': 'The lever',
       'scene3.s2.body': '<em>The lever</em> = RUN, ORDER, or REPLACE. REPLACE is only on the menu when a spare is in the bin.',

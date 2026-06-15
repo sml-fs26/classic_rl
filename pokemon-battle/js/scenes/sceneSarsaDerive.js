@@ -1,4 +1,4 @@
-/* Scene — deriving SARSA, then watching it run on one trajectory.
+/* Scene, deriving SARSA, then watching it run on one trajectory.
  *
  *   Eight-step pager (A → B → D → E1 → E2 → E3 → E4 → F).  One step
  *   shows at a time; everything fits in one viewport without scroll.
@@ -35,7 +35,7 @@
 
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
-  /* ---------- Step content (left column) ----------
+  /*, Step content (left column) ----------
      A through E4 carry text + KaTeX formulas.  F is the live demo
      and uses the left column as the step-detail panel instead.  The
      `title` / `body` / `foot` strings live in i18n.js under
@@ -77,7 +77,7 @@
     return T('sd.step.' + step.id + '.foot');
   }
 
-  /* ---------- Helpers ---------- */
+  /*, Helpers, */
   function shortMove(id) { return T('move.short.' + id); }
   function fullMove(id)  { return T('move.' + id); }
   function bucketName(b) {
@@ -199,7 +199,7 @@
     right.appendChild(numline);
 
     /* F-step controls live in the left column alongside the step-detail
-       panel — see fControlsHTML() / wireFControls().  The bottom-row
+       panel, see fControlsHTML() / wireFControls().  The bottom-row
        layout was dropped to fit the F step on a single viewport. */
 
     /* ==========================================================
@@ -207,17 +207,17 @@
        ========================================================== */
     let cursor = 0;
 
-    /* Pre-sampled trajectory for the illustration steps (D–E4).  Fixed
+    /* Pre-sampled trajectory for the illustration steps (D, E4).  Fixed
        seed so the same path appears on every visit. */
     const illusRng = window.Battle.makeRng(20260515);
     const illusTraj = genTrajectory(window.SARSA.makeQ(), 0.40, illusRng, 6);
-    const illusActiveIdx = 0;   /* which tuple is "the sample" emphasised in E1–E4 */
+    const illusActiveIdx = 0;   /* which tuple is "the sample" emphasised in E1, E4 */
 
-    /* F state — independent of illustration trajectory. */
+    /* F state, independent of illustration trajectory. */
     let Q       = window.SARSA.makeQ();
     let fRng    = window.Battle.makeRng(20260520);
     const ALPHA = 0.20;     /* Step size, fixed.  Standard tabular SARSA
-                               sits in 0.1–0.3; 0.2 gives a visible per-
+                               sits in 0.1 to 0.3; 0.2 gives a visible per-
                                tuple nudge without being chaotic. */
     let eps     = 0.40;     /* Exploration rate.  Live-tunable via the
                                slider in the F controls so students can
@@ -225,14 +225,14 @@
     let fTraj   = [];
     let fCursor = 0;
 
-    /* PLAY mode state — speed level (0=slowest .. 4=fastest) maps to a
+    /* PLAY mode state, speed level (0=slowest .. 4=fastest) maps to a
        ms cadence between transitions. */
     let playing       = false;
     let playTimer     = null;
     let playSpeedLvl  = 2;     /* default = middle (= ~700 ms) */
     const SPEED_MS    = [700, 500, 350, 225, 125];
 
-    /* DP-computed Q* — the ground truth.  Used by the convergence
+    /* DP-computed Q*, the ground truth.  Used by the convergence
        indicator in the F step to show how close our SARSA q is to
        optimal.  Computed lazily (and cached) the first time F is
        shown so we don't pay the value-iteration cost up front. */
@@ -296,7 +296,7 @@
     }
 
     /* ==========================================================
-       Right-column rendering — per-step illustration logic
+       Right-column rendering, per-step illustration logic
        ========================================================== */
 
     function clearOverlays() {
@@ -470,7 +470,7 @@
       renderConvergence();
     }
 
-    /* Convergence-to-Q* indicator — a thin bar that sits where the
+    /* Convergence-to-Q* indicator, a thin bar that sits where the
        caption usually lives, only on step F.  Recomputed after every
        SARSA update and on REROLL / CLEAR.  Cheap (25*3 cells). */
     function renderConvergence() {
@@ -546,7 +546,7 @@
       /* The F-step controls live on the left, alongside the step-detail
          panel.  Speed slider is 0..4; α is fixed at 0.20; ε is a live
          slider 0..1 so students discover the exploration tradeoff.
-         REROLL / CLEAR-q dropped — PLAY auto-rerolls and student-driven
+         REROLL / CLEAR-q dropped, PLAY auto-rerolls and student-driven
          reset comes from the scene-level RESET button. */
       const epsPct = Math.round(eps * 100);
       return (
@@ -580,7 +580,7 @@
         eps = Math.max(0, Math.min(1, (parseInt(e.target.value, 10) || 0) / 100));
         const lbl = document.getElementById('sd-f-eps-val');
         if (lbl) lbl.textContent = eps.toFixed(2);
-        /* New ε kicks in on the next REROLL — current trajectory was
+        /* New ε kicks in on the next REROLL, current trajectory was
            sampled under the old ε. */
       });
     }
@@ -684,7 +684,7 @@
       renderConvergence();
     }
 
-    /* ---- PLAY mode ---- */
+    /*, PLAY mode, */
     function playButton() { return document.getElementById('sd-f-play'); }
     function setPlayLabel(isPlay) {
       const b = playButton();
@@ -717,7 +717,7 @@
     function togglePlay() { if (playing) pausePlay(); else startPlay(); }
 
     /* ==========================================================
-       Pager — apply current step
+       Pager, apply current step
        ========================================================== */
     function applyCursor() {
       pausePlay();
@@ -730,7 +730,7 @@
       clearOverlays();
 
       if (step.id === 'F') {
-        /* F step — live demo.  The left column is built from scratch
+        /* F step, live demo.  The left column is built from scratch
            by renderFDetail (it contains the step-detail + the
            PLAY/NEXT/REROLL/CLEAR/SPEED controls). */
         if (!fTraj.length) fReroll();
@@ -798,11 +798,11 @@
 
     applyCursor();
 
-    /* &run flag for headless capture — jump to last step (F). */
+    /* &run flag for headless capture, jump to last step (F). */
     if (/[#&?]run\b/.test(window.location.hash)) {
       setTimeout(() => { cursor = STEPS.length - 1; applyCursor(); }, 200);
     }
-    /* &sd=N flag — jump to step N (1-indexed). */
+    /* &sd=N flag, jump to step N (1-indexed). */
     const sdMatch = (window.location.hash || '').match(/[#&?]sd=(\d+)/);
     if (sdMatch) {
       const target = Math.min(STEPS.length - 1, Math.max(0, parseInt(sdMatch[1], 10) - 1));

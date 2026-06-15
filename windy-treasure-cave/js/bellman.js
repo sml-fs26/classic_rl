@@ -17,8 +17,8 @@
  *
  *   TIE-BREAK for the optimal policy: at a tile where several headings achieve
  *   the max Q (the cave has a few exact UP==RIGHT ties), prefer the heading
- *   whose INTENDED target tile is closest (Manhattan) to the gold -- i.e. the
- *   move that makes progress toward the prize -- then a fixed order
+ *   whose INTENDED target tile is closest (Manhattan) to the gold, i.e. the
+ *   move that makes progress toward the prize, then a fixed order
  *   UP > RIGHT > DOWN > LEFT. This is a principled, position-aware rule; it
  *   reproduces the proposal's drawn arrow field at every tile that has a unique
  *   argmax, and resolves the genuine ties consistently. (The proposal's hand
@@ -139,7 +139,7 @@
     return bestM;
   }
 
-  /* All headings (within eps) that achieve the max Q at state index i -- used
+  /* All headings (within eps) that achieve the max Q at state index i, used
      by the renderer to draw a faint secondary arrow at genuine tie tiles. */
   function tiedActionsAt(i, V, gamma) {
     const s = STATES[i];

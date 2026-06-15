@@ -1,4 +1,4 @@
-/* Scene 1 -- Tutorial / how to play.
+/* Scene 1, Tutorial / how to play.
  *   Three guided panels (the state, the two levers, the two dice) plus a live
  *   "ROLL A WAIT" demo that tumbles both dice from (2,4) and narrates the
  *   outcome. No theory. Cold-entry safe; honours &run (auto-rolls once). */

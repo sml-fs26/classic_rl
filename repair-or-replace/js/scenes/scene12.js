@@ -49,7 +49,7 @@
     const recap = (window.DATA && window.DATA.recap) || [];
     const total = recap.length;
 
-    /* ---- banner + heading + sub ---- */
+    /*, banner + heading + sub, */
     const banner = document.createElement('div');
     banner.className = 'sc12-banner';
     banner.textContent = 'THE MAINTENANCE PLAYBOOK';
@@ -66,7 +66,7 @@
       'The bones of a fleet ledger, and of reinforcement learning.';
     root.appendChild(sub);
 
-    /* ---- flip counter + hint ---- */
+    /*, flip counter + hint, */
     const hint = document.createElement('div');
     hint.className = 'sc12-hint';
     hint.innerHTML = '<span class="sc12-count"></span><span class="sc12-hint-txt"></span>';
@@ -74,7 +74,7 @@
     const countEl = hint.querySelector('.sc12-count');
     const hintTxt = hint.querySelector('.sc12-hint-txt');
 
-    /* ---- the six cards, face-down ---- */
+    /*, the six cards, face-down, */
     const grid = document.createElement('div');
     grid.className = 'sc12-grid' + (instantMode() ? ' sc12-noanim' : '');
     root.appendChild(grid);
@@ -129,7 +129,7 @@
       cardEls.push(box);
     });
 
-    /* ---- FLIP control (the scene's primary button) ---- */
+    /*, FLIP control (the scene's primary button), */
     const ctrl = document.createElement('div');
     ctrl.className = 'sc12-ctrl';
     ctrl.innerHTML =
@@ -137,7 +137,7 @@
     root.appendChild(ctrl);
     const flipBtn = ctrl.querySelector('.sc12-flip');
 
-    /* ---- sign-off (appears after the sixth flip) ---- */
+    /*, sign-off (appears after the sixth flip), */
     const signoff = document.createElement('div');
     signoff.className = 'sc12-signoff';
     signoff.innerHTML =
@@ -166,7 +166,7 @@
       'State, call, odds, payoff, repeat.';
     root.appendChild(foot);
 
-    /* ---- flip engine ---- */
+    /*, flip engine, */
     let k = 0;
 
     function apply(animate) {

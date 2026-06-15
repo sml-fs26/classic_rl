@@ -1,4 +1,4 @@
-/* Scene 6 -- Return G_t. Define the payoff-over-time G_i = sum gamma^(j-i) r_j,
+/* Scene 6, Return G_t. Define the payoff-over-time G_i = sum gamma^(j-i) r_j,
    "everything you bank from here to closing, later money discounted." Then fix
    the SAME start (2, FRESH) and the SAME first lever, replay 20,000 days, and
    draw the HISTOGRAM of returns: HOLD-first mean ~5.8 but wide (down to -1.2);

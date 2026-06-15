@@ -95,7 +95,7 @@
       return LOCK_AT + 1;
     })();
 
-    /* ---------------- DOM ---------------- */
+    /*, DOM, */
     const h = document.createElement('h2');
     h.className = 'concept-heading';
     h.textContent = 'FILLING Q* WITH DP';
@@ -220,7 +220,7 @@
       'Next: when you do not have them.';
     side.appendChild(closing);
 
-    /* ---------------- state ---------------- */
+    /*, state, */
     let V = new Float64Array(NUM_STATES);
     let Vb = new Float64Array(NUM_STATES);  /* V one sweep behind: board = qFromV(Vb) */
     let sweep = 0;
@@ -353,7 +353,7 @@
       document.getElementById('s9-fp').disabled = converged;
     }
 
-    /* ---------------- actions ---------------- */
+    /*, actions, */
     function showSpot() {
       if (converged || sweep !== 0 || spot) return;
       snap();

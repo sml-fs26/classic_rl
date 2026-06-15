@@ -1,8 +1,8 @@
-/* Scene 5 -- Trajectory. The precomputed demo quarter (12 turns under the
+/* Scene 5, Trajectory. The precomputed demo quarter (12 turns under the
    optimal policy from HEALTHY/0) replays as a rollout tape of random variables
    tau = (S1,A1,R1, S2,A2,R2, ...): situation, lever, outcome, reward, next
    situation, with the machine icon marching along. Stresses that each Si,Ai,Ri
-   is a random variable -- the same playbook gives a different tape each quarter.
+   is a random variable, the same playbook gives a different tape each quarter.
    Cold-entry safe. */
 (function () {
   window.scenes = window.scenes || {};

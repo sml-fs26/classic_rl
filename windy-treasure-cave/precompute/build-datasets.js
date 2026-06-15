@@ -1,4 +1,4 @@
-/* Windy Treasure Cave precompute -- the RIGOR GATE.
+/* Windy Treasure Cave precompute, the RIGOR GATE.
  *
  *   Runs value iteration on the cave MDP (5x5 grid; gold (0,4)=+10 terminal,
  *   pit (2,2)=-10 terminal, start (4,0); headings UP/DOWN/LEFT/RIGHT; wind die
@@ -49,7 +49,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/* ---------------- Load the verified engine via a window shim ---------------- */
+/*, Load the verified engine via a window shim, */
 const sandbox = { window: {}, console, Math, Float64Array, Float32Array, Int32Array, Array, Map, Set, JSON };
 sandbox.window.window = sandbox.window;
 const ctx = vm.createContext(sandbox);
@@ -70,14 +70,14 @@ const ROWS = Cave.ROWS, COLS = Cave.COLS;  // 5, 5
 const GAMMA = 1.0;
 const ARROW = { UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' };
 
-/* ---------------- Value iteration (gamma = 1) ---------------- */
+/*, Value iteration (gamma = 1), */
 const TOL = 1e-12, MAX_ITERS = 1000;
 const vi = Bellman.valueIteration(GAMMA, { tol: TOL, maxIters: MAX_ITERS, recordHistory: true });
 const V = vi.V;                            // Float64Array[23]
 const policy = vi.policy;                  // [23] heading-id strings
 const Qstar = Bellman.qFromV(V, GAMMA);    // Float64Array[23*4]
 
-/* ---------------- Helpers ---------------- */
+/*, Helpers, */
 function idxRC(r, c) { return Cave.stateIndex({ row: r, col: c, terminal: false }); }
 function vRC(r, c) {
   if (Cave.isGold(r, c)) return Cave.GOLD_R;     // display: GOLD
@@ -97,14 +97,14 @@ function round4(x) { return Math.round(x * 10000) / 10000; }
 
 function assert(name, ok, info) {
   if (ok) { console.log('  [OK]   ' + name); return; }
-  console.error('  [FAIL] ' + name + (info ? ' -- ' + info : ''));
+  console.error('  [FAIL] ' + name + (info ? ', ' + info : ''));
   process.exit(1);
 }
 
-console.log('Windy Treasure Cave precompute -- 5x5 grid, 4 headings, wind die 0.7/0.15/0.15, gamma = ' + GAMMA);
+console.log('Windy Treasure Cave precompute, 5x5 grid, 4 headings, wind die 0.7/0.15/0.15, gamma = ' + GAMMA);
 console.log('  ' + N + ' playable tiles; terminals gold (0,4)=+10, pit (2,2)=-10; start (4,0)');
 console.log('');
-console.log('Phase 1 -- Value iteration');
+console.log('Phase 1, Value iteration');
 const lastSweep = vi.history[vi.history.length - 1];
 console.log('  converged in ' + vi.iters + ' sweeps, final maxDelta = ' + lastSweep.maxDelta.toExponential(2));
 
@@ -225,7 +225,7 @@ assert('argmax pit-right (2,3) is RIGHT', policyRC(2, 3) === 'RIGHT', policyRC(2
   /* the four bracketing tiles fan into >= 2 distinct safe headings (they do
      NOT all march the same way, and none points inward). The proposal's prose
      ("each a different direction") over-states it slightly: the verified field
-     splits into two pairs -- (1,2) & (2,1) aim UP, (3,2) & (2,3) aim RIGHT --
+     splits into two pairs, (1,2) & (2,1) aim UP, (3,2) & (2,3) aim RIGHT --
      i.e. each tile steers toward the gold side it can reach without crossing
      the pit. */
   const dirs = new Set(adj.map(t => policyRC(t.r, t.c)));
@@ -249,7 +249,7 @@ assert('argmax pit-right (2,3) is RIGHT', policyRC(2, 3) === 'RIGHT', policyRC(2
     'hand=' + hand + ' exact=' + exact);
 })();
 
-/* ---------------- Per-sweep snapshots for the DP scene ----------------
+/*, Per-sweep snapshots for the DP scene ----------------
    Value floods OUTWARD from the gold tile: early sweeps light tiles a step
    from the gold, later sweeps push value across the cave and set the danger
    crater around the pit. We record (V, Q, solvedMask) after each sweep so the
@@ -281,10 +281,10 @@ console.log('');
 console.log('  DP fill recorded over ' + sweepSnapshots.length + ' sweep-frames ' +
             '(value reaches 1dp stability by ~sweep ' + sweepsToStable + ')');
 
-/* ---------------- Phase 2 -- model-free TD control: TWO learners ----------------
+/*, Phase 2, model-free TD control: TWO learners ----------------
    Learn Q from experience (move, see where the wind took you, adjust) with no
    model of the wind. Both learners use a FIXED start tile (the cave's spawn at
-   (4,0)) -- the canonical cliff-walking setup -- so the on-policy / off-policy
+   (4,0)), the canonical cliff-walking setup, so the on-policy / off-policy
    distinction is visible:
 
      - OFF-POLICY Q-LEARNING (qLearningUpdate; bootstraps on the BEST next
@@ -402,7 +402,7 @@ function greedyEvalFrom(Q, episodes, rng) {
 }
 
 /* Behavior-policy visit counts (how often each tile is seen under eps-greedy
-   from the start) -- so DP-agreement is judged only on tiles the learner has
+   from the start), so DP-agreement is judged only on tiles the learner has
    actually visited enough to have learned. */
 function behaviorVisits(Q, cfg, rng, episodes) {
   const vc = new Float64Array(N);
@@ -464,7 +464,7 @@ function bestActionAt(Q, r, c) {
 }
 
 console.log('');
-console.log('Phase 2 -- model-free TD control: OFF-POLICY Q-learning vs ON-POLICY SARSA (fixed start)');
+console.log('Phase 2, model-free TD control: OFF-POLICY Q-learning vs ON-POLICY SARSA (fixed start)');
 console.log('  Q-learning: ' + QL_CFG.episodes + ' eps, alpha=1/(1+n)^' + QL_CFG.aPow +
             ', eps ' + QL_CFG.epsilon + '->' + QL_CFG.epsilonMin + ' (off-policy max bootstrap)');
 console.log('  SARSA:      ' + SARSA_CFG.episodes + ' eps, alpha=' + SARSA_CFG.constAlpha +
@@ -510,7 +510,7 @@ assert('SARSA agrees with DP on strictly FEWER visited tiles than Q-learning',
   saAgree.ok < qlAgree.ok || saAgree.tot < qlAgree.ok,
   'sarsa ' + saAgree.ok + '/' + saAgree.tot + ' vs ql ' + qlAgree.ok + '/' + qlAgree.tot);
 
-/* ---------------- A fixed illustrative trajectory (optimal policy) ----------------
+/*, A fixed illustrative trajectory (optimal policy) ----------------
    One short, deterministic demo episode from the start tile under the OPTIMAL
    policy, pinned seed, for the tutorial / trajectory / return scenes. Chosen so
    the run is legible (a gust or two), reaches the gold, and shows the explorer
@@ -559,13 +559,13 @@ console.log('Demo trajectory (optimal policy from start, seed ' + demoTrajectory
             demoTrajectory.len + ' steps, ' + demoTrajectory.gusts + ' gusts, ' +
             (demoTrajectory.won ? 'reached GOLD' : 'fell in PIT'));
 
-/* ---------------- Return-distribution sampling for the Return scene ----------------
+/*, Return-distribution sampling for the Return scene ----------------
    Fix a tile and one chosen FIRST heading, then play OPTIMALLY after; Monte-Carlo
    the total return. Q*(tile, a) is the exact expected return of that choice. We
    sample from the TWIST cell directly below the pit (3,2): the optimal sideways
    RIGHT vs the reckless "aim straight at the gold" UP. The histograms fan into
-   two very different shapes -- RIGHT mostly reaches the gold, UP mostly falls in
-   the pit -- which makes the "one heading -> a SPREAD of payoffs" point vivid. */
+   two very different shapes, RIGHT mostly reaches the gold, UP mostly falls in
+   the pit, which makes the "one heading -> a SPREAD of payoffs" point vivid. */
 function returnSamples(r, c, firstActionId, trials, seed) {
   const rng = Cave.makeRng(seed);
   let sum = 0, sumSq = 0, wins = 0, pits = 0;
@@ -605,10 +605,10 @@ console.log('  return from (3,2): RIGHT mean ' + returnBars.optimal.mean +
             ' (exact ' + returnBars.optimal.exact + ', reach-gold ' + returnBars.optimal.reachGold + ') ; ' +
             'UP mean ' + returnBars.naive.mean + ' (exact ' + returnBars.naive.exact + ', fell-pit ' + returnBars.naive.fellPit + ')');
 
-/* ---------------- Two hand-policies for the Policy scene ----------------
-   (a) "aim at the gold" -- every tile points toward the chest (greedy by
+/*, Two hand-policies for the Policy scene ----------------
+   (a) "aim at the gold", every tile points toward the chest (greedy by
        direction, ignoring the wind), so the tile below the pit marches UP into
-       it. (b) "the optimal map" -- the DP arrow field that bends around the pit.
+       it. (b) "the optimal map", the DP arrow field that bends around the pit.
    We give the greedy-by-direction field plus its reach-gold rate so the scene
    can contrast the two risk profiles. */
 function aimAtGoldHeading(r, c) {
@@ -649,7 +649,7 @@ const aimEval = evalFixedPolicy((r, c) => aimPolicy[r + ',' + c], 20000, 303);
 const optEval = evalFixedPolicy((r, c) => policyRC(r, c), 20000, 404);
 console.log('  hand policies: aim-at-gold reach-gold ' + aimEval.winRate + ' vs optimal ' + optEval.winRate);
 
-/* ---------------- The per-tile spot Q rows (Q* scene calls out (3,2)) ---------------- */
+/*, The per-tile spot Q rows (Q* scene calls out (3,2)), */
 function spotRow(r, c) {
   const q = qRowRC(r, c);
   const obj = {};
@@ -658,7 +658,7 @@ function spotRow(r, c) {
 }
 const spotQ = { belowPit: spotRow(3, 2), topSafe: spotRow(0, 2), pitLeft: spotRow(2, 1), pitRight: spotRow(2, 3) };
 
-/* ---------------- Recap cards (cave voice) ---------------- */
+/*, Recap cards (cave voice), */
 const recap = [
   { key: 'mdp', badge: 'MDP', scene: 3, title: 'THE FOUR-PART FRAME',
     text: 'The situation is your TILE on the floor plan. The lever is your HEADING (up/down/left/right). The part you do not control is the WIND DIE. The payoff is the torch you burn (-1 a step) plus +10 on the gold, -10 in the pit.',
@@ -680,10 +680,10 @@ const recap = [
     tex: 'q[s,a] \\;\\mathrel{+}=\\; \\alpha\\,(\\, r + q[s\',a\'] - q[s,a] \\,)' },
 ];
 
-/* ---------------- Headings for display ---------------- */
+/*, Headings for display, */
 const actionsDisplay = Actions.ACTIONS.map(a => ({ id: a.id, name: a.name, arrow: a.arrow, role: a.role }));
 
-/* ---------------- Assemble + round payloads ---------------- */
+/*, Assemble + round payloads, */
 function roundArr(arr, places) { const f = Math.pow(10, places); return Array.from(arr, v => (Number.isFinite(v) ? Math.round(v * f) / f : null)); }
 
 /* Optimal policy as a row-major action-id grid (25 cells; gold/pit are null). */
@@ -790,11 +790,11 @@ const DATA = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(ROOT, 'data', 'datasets.js');
 const payload = JSON.stringify(DATA);
 const fileContent =
-  "/* Windy Treasure Cave -- static MDP solution plus value-iteration fill\n" +
+  "/* Windy Treasure Cave, static MDP solution plus value-iteration fill\n" +
   " * frames and SARSA / Q-learning training trajectories.\n" +
   " *\n" +
   " * Regenerate with `node precompute/build-datasets.js`. The build script\n" +

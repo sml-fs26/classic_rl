@@ -1,4 +1,4 @@
-/* scene11 i18n -- SARSA. */
+/* scene11 i18n, SARSA. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

@@ -1,8 +1,8 @@
-/* Scene 0 — title manifesto: "An MDP is five things."
+/* Scene 0, title manifesto: "An MDP is five things."
 
    First contact. The student opens the page; before any keystroke, they read
    what an MDP is. Single column, max-width ~60ch, generous vertical rhythm.
-   No interactive elements. No internal step engine. Cold-entry safe — built
+   No interactive elements. No internal step engine. Cold-entry safe, built
    entirely from DATA.tuple. */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -50,7 +50,7 @@
       if (isMuted && item.deferred) {
         const deferred = document.createElement('span');
         deferred.className = 's0-tuple-deferred';
-        deferred.textContent = ' — ' + item.deferred;
+        deferred.textContent = ', ' + item.deferred;
         captionCell.appendChild(deferred);
       }
 

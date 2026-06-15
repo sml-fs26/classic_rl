@@ -1,4 +1,4 @@
-/* Scene 0 -- Title / hook.
+/* Scene 0, Title / hook.
  *   A pastry case at dawn: a single FRESH croissant steaming under a hanging
  *   OPEN sign, the title, and a blinking OPEN THE SHOP prompt. Clicking reveals
  *   the manager framing + a BEGIN prompt that yields to the engine (-> scene 1).

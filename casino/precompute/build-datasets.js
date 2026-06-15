@@ -22,7 +22,7 @@
      I3: regret(eps=0.01) > regret(eps=0.1) at t=T (greedy-failure lesson).
      I4: regret(eps=0.3) > regret(eps=0.1) at t=T (over-exploration loses too).
      I5: regret(decay) competitive with regret(eps=0.1) at t=T
-         (within a relative tolerance — the recap teaser is honest).
+         (within a relative tolerance, the recap teaser is honest).
 
    Writes the result by rewriting `data/datasets.js`'s `sweep:` field while
    preserving the rest of the file. */
@@ -32,7 +32,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/* ----------------- Mulberry32 RNG (matches js/bandit.js) ----------------- */
+/*, Mulberry32 RNG (matches js/bandit.js), */
 
 function makeRng(seed) {
   let s = seed >>> 0;
@@ -45,7 +45,7 @@ function makeRng(seed) {
   };
 }
 
-/* ----------------- Bandit (matches js/bandit.js semantics) ----------------- */
+/*, Bandit (matches js/bandit.js semantics), */
 
 function makeBandit(probs, rng) {
   const K = probs.length;
@@ -55,12 +55,12 @@ function makeBandit(probs, rng) {
   let round = 0;
   const optimal = Math.max.apply(null, probs);
   /* Pseudo-regret: R̄(t) = sum_τ (μ* − μ_{a_τ}). Strictly non-decreasing
-     by construction since each term is ≥ 0. This is what scene 5 plots —
+     by construction since each term is ≥ 0. This is what scene 5 plots, 
      a 10-seed median of REALISED regret would oscillate locally because the
      optimal arm sometimes wins (per-step regret = 0.8 − 1 = −0.2). The
      notebook's `compare_strategies` plots realised regret, but for the
      four-curve sweep we want a clean monotone shape so the lesson reads
-     unambiguously. Scenes 3/4 still display realised regret live — they
+     unambiguously. Scenes 3/4 still display realised regret live, they
      match the notebook's vocabulary exactly. */
   let pseudoRegret = 0;
 
@@ -85,7 +85,7 @@ function makeBandit(probs, rng) {
   };
 }
 
-/* ----------------- Policies (match js/policies.js semantics) ----------------- */
+/*, Policies (match js/policies.js semantics), */
 
 function argmaxRandomTiebreak(values, rng) {
   let max = values[0];
@@ -111,7 +111,7 @@ function makeEpsGreedyDecay(eps0, decay, rng) {
   };
 }
 
-/* ----------------- Run a single seeded trajectory ----------------- */
+/*, Run a single seeded trajectory, */
 
 function runOne(probs, T, policy) {
   /* The strategy's RNG is a separate stream from the bandit's RNG; we pass
@@ -129,7 +129,7 @@ function runOne(probs, T, policy) {
   return out;
 }
 
-/* ----------------- Median across seeds ----------------- */
+/*, Median across seeds, */
 
 function median(arr) {
   const sorted = arr.slice().sort((a, b) => a - b);
@@ -150,7 +150,7 @@ function pointwiseMedian(curves) {
   return out;
 }
 
-/* ----------------- Main ----------------- */
+/*, Main, */
 
 const PROBS = [0.2, 0.4, 0.6, 0.8, 0.5];
 /* Horizon picked to make the trade-off lesson visually clean. At T=1000
@@ -159,7 +159,7 @@ const PROBS = [0.2, 0.4, 0.6, 0.8, 0.5];
    four curves spread cleanly: ε=0.3 worst (over-exploration), ε=0.01
    second-worst (early misallocation hasn't yet been amortised), ε=0.1 best,
    decay competitive. T=500 with 10 seeds is enough for the median to
-   robustly satisfy I1–I5. */
+   robustly satisfy I1, I5. */
 const T = 500;
 const SEEDS_PER_EPS = 10;
 const SEED_BASE = 700000;
@@ -205,7 +205,7 @@ for (let sIdx = 0; sIdx < STRATEGIES.length; sIdx++) {
   });
 }
 
-/* ----------------- Invariants ----------------- */
+/*, Invariants, */
 
 function assertInvariants(sweep) {
   const get = (id) => sweep.strategies.find(s => s.id === id);
@@ -239,10 +239,10 @@ function assertInvariants(sweep) {
   if (!(f30 > f10)) {
     throw new Error(`I4 fail: regret(0.3)=${f30} not > regret(0.1)=${f10}`);
   }
-  /* I5: decay competitive with eps=0.1 — within 2x. The recap teaser claims
+  /* I5: decay competitive with eps=0.1, within 2x. The recap teaser claims
      decay is competitive; a 2x bound is loose enough to survive 10-seed
      median noise without lying about the relationship (decay should not be
-     several times worse — that would defeat the recap). */
+     several times worse, that would defeat the recap). */
   const fdec  = final('decay');
   if (!(fdec <= 2.0 * f10)) {
     throw new Error(`I5 fail: regret(decay)=${fdec} > 2.0 * regret(0.1)=${2.0 * f10}`);
@@ -252,7 +252,7 @@ function assertInvariants(sweep) {
 
 const finals = assertInvariants(sweep);
 
-/* ----------------- Write into data/datasets.js ----------------- */
+/*, Write into data/datasets.js, */
 
 const datasetsPath = path.resolve(__dirname, '..', 'data', 'datasets.js');
 const original = fs.readFileSync(datasetsPath, 'utf8');
@@ -290,7 +290,7 @@ block += '      ],\n';
 block += '    },\n';
 
 /* Replace the existing `sweep: ...,` line (which is `sweep: null,` in the
-   skeleton) — match the line and any whitespace, replace through the
+   skeleton), match the line and any whitespace, replace through the
    trailing comma+newline. */
 const re = /(    sweep: )(?:null|\{[\s\S]*?\n    \}),\n/m;
 if (!re.test(original)) {
@@ -300,7 +300,7 @@ const updated = original.replace(re, block);
 
 fs.writeFileSync(datasetsPath, updated, 'utf8');
 
-/* ----------------- Console summary ----------------- */
+/*, Console summary, */
 
 console.log('--- Casino sweep summary ---');
 console.log('Bandit probs:', PROBS.join(', '));

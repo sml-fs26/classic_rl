@@ -1,4 +1,4 @@
-/* Scene 10 -- Why DP does not scale.
+/* Scene 10, Why DP does not scale.
  *   Two killers, each pinned to a stat card. (1) You rarely KNOW P: the sweep
  *   only worked because we wrote the wind table; a real cave never hands you the
  *   gust odds, you only sample. (2) The state space explodes: this cave is 25

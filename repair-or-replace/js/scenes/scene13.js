@@ -56,13 +56,13 @@
     const MAX_STEP = 3;
     let step = hashStep(MAX_STEP);
 
-    /* ---- Heading ---- */
+    /*, Heading, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = 'Turn the patience knob';
     root.appendChild(heading);
 
-    /* ---- The knob panel ---- */
+    /*, The knob panel, */
     const knob = document.createElement('div');
     knob.className = 's13-knob';
     root.appendChild(knob);
@@ -154,7 +154,7 @@
       shakyChips.push(chip);
     });
 
-    /* ---- Caption + step hint ---- */
+    /*, Caption + step hint, */
     const caption = document.createElement('p');
     caption.className = 's13-caption';
     root.appendChild(caption);
@@ -163,7 +163,7 @@
     hint.className = 's13-hint';
     root.appendChild(hint);
 
-    /* ---- Dial logic (everything reads straight from gammaSweep) ---- */
+    /*, Dial logic (everything reads straight from gammaSweep), */
     let lastPolicyKey = null;
 
     function frontierRunSvc(pol) {
@@ -237,7 +237,7 @@
     slider.addEventListener('pointerup', unfocus);
     slider.addEventListener('touchend', unfocus);
 
-    /* ---- Step engine ---- */
+    /*, Step engine, */
     const CAPTIONS = [
       'One dial: how much tomorrow counts.',
       'Patience moves the scrap line.',

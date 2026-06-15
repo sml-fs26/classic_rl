@@ -7,13 +7,13 @@
       "scene11.title": "SARSA - learn the playbook by playing",
       "scene11.heading": "LEARN Q* BY PLAYING",
 
-      /* ---- pager chrome ---- */
+      /*, pager chrome, */
       "s11.prev":   "PREV",
       "s11.next":   "NEXT",
       "s11.reset":  "RESET",
       "s11.status": "STEP {i} / {total}",
 
-      /* ---- STEP 1: learn by playing (manager + goal) ---- */
+      /*, STEP 1: learn by playing (manager + goal), */
       "s11.step1.kicker": "STEP 1 / 3",
       "s11.step1.title":  "NO ODDS, NO RIVAL'S RULE - JUST PLAY",
       "s11.step1.body":
@@ -24,7 +24,7 @@
         "Goal: the same 6x3 board, but learned. q creeps toward the true Q* - the DP oracle's climbing staircase from scene 9.",
       "s11.step1.cap": "The board starts blank. The dashed seam is the DP oracle from scene 9 - the answer we are aiming at, never shown to the learner.",
 
-      /* ---- STEP 2: one sample, one nudge (derive) ---- */
+      /*, STEP 2: one sample, one nudge (derive), */
       "s11.step2.kicker": "STEP 2 / 3",
       "s11.step2.title":  "ONE GAME, ONE NUDGE",
       "s11.step2.body":
@@ -37,7 +37,7 @@
       "s11.step2.cap": "One sampled game. The bold tuple is the single (s, a, r, s', a') that drives one nudge.",
       "s11.tape.title": "ONE SAMPLED GAME (your turns)",
 
-      /* ---- STEP 3: live run ---- */
+      /*, STEP 3: live run, */
       "s11.step3.kicker": "STEP 3 / 3",
       "s11.step3.title":  "GRIND THE GAMES",
       "s11.step3.body":
@@ -60,7 +60,7 @@
       "s11.lose": "LOSE",
       "s11.run_hint": "Tip: nudge epsilon to 0 and the learner stops exploring - it gets stuck on its first habits and the board never finishes.",
 
-      /* ---- legend ---- */
+      /*, legend, */
       "s11.legend.q":   "q[s,a] - our learned win-odds guess",
       "s11.legend.tgt": "DP oracle Q* - the target (scene 9)",
     },

@@ -1,4 +1,4 @@
-/* Scene 2 -- PLAYTEST: "You run the shelf".
+/* Scene 2, PLAYTEST: "You run the shelf".
  *
  *   The learner IS the pricing manager (the pricing analogue of pokemon
  *   scene1's click-to-attack battle). From a fresh shelf (5 units, 4 days)
@@ -10,7 +10,7 @@
  *   leftover units crumble to grey and a summary lands.
  *
  *   The stochastic outcome is FELT, not described: two identical openings end
- *   differently. No optimal answer is shown -- the learner prices by gut.
+ *   differently. No optimal answer is shown, the learner prices by gut.
  *
  *   Cold entry rebuilds from window.Pricing / window.Levers / window.ShelfCard
  *   / window.Deck. &run (window.PRICING_AUTORUN) auto-plays a short sequence so
@@ -26,18 +26,18 @@
     root.className = 'scene-pad play-scene';
     root.innerHTML = '';
 
-    /* ---------- Header ---------- */
+    /*, Header, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title';
     header.textContent = T('scene2.section');
     root.appendChild(header);
 
-    /* ---------- Main row: board (shelf + HUD + deck) | controls ---------- */
+    /*, Main row: board (shelf + HUD + deck) | controls, */
     const row = document.createElement('div');
     row.className = 'play-row';
     root.appendChild(row);
 
-    /* --- left: the live board --- */
+    /*, left: the live board, */
     const board = document.createElement('div');
     board.className = 'play-board';
     row.appendChild(board);
@@ -73,7 +73,7 @@
        instantly so the whole sequence settles inside the screenshot budget. */
     const deck = window.Deck.mount(deckHost, { reduced: !!window.PRICING_AUTORUN });
 
-    /* --- right: dialog + lever menu + restart --- */
+    /*, right: dialog + lever menu + restart, */
     const rightCol = document.createElement('div');
     rightCol.className = 'play-right';
     row.appendChild(rightCol);
@@ -98,7 +98,7 @@
       btn.type = 'button';
       btn.className = 'play-lever-btn';
       btn.setAttribute('data-lever', lever.id);
-      /* Name + price only -- the demand odds are intentionally hidden, so the
+      /* Name + price only, the demand odds are intentionally hidden, so the
          player has to feel out each tag by playing it. */
       btn.innerHTML =
         '<span class="play-lever-name">' + T('lever.' + lever.id) + '</span>' +
@@ -118,7 +118,7 @@
     ctrlRow.appendChild(restartBtn);
     rightCol.appendChild(ctrlRow);
 
-    /* ---------- The RETURN tape (rollout of the run) ---------- */
+    /*, The RETURN tape (rollout of the run), */
     const tapeWrap = document.createElement('div');
     tapeWrap.className = 'play-tape-wrap';
     tapeWrap.innerHTML = '<div class="play-tape-label">' + T('scene2.tapeLabel') + '</div>';
@@ -127,13 +127,13 @@
     tapeWrap.appendChild(tape);
     root.appendChild(tapeWrap);
 
-    /* ---------- Caption ---------- */
+    /*, Caption, */
     const caption = document.createElement('div');
     caption.className = 'poke-caption play-caption';
     caption.textContent = T('scene2.caption');
     root.appendChild(caption);
 
-    /* ---------- State ---------- */
+    /*, State, */
     let state, day, total, busy, rng, episode, ended;
     /* Per-day timer ids, cancelled on restart / leave. */
     let timers = [];
@@ -335,7 +335,7 @@
       sum.querySelector('.play-again').addEventListener('click', () => resetRun());
     }
 
-    /* ---------- Reset to a fresh shelf ---------- */
+    /*, Reset to a fresh shelf, */
     function resetRun() {
       clearTimers();
       episode = (episode || 0) + 1;

@@ -2,7 +2,7 @@
 
    Drives a function `step()` at a configurable rate via setInterval. Plays /
    pauses / steps / resets. The scene supplies the step function and is
-   responsible for actually mutating state and re-rendering on each tick —
+   responsible for actually mutating state and re-rendering on each tick, 
    the engine is just a clock with the right knobs.
 
    Concretely:
@@ -22,8 +22,8 @@
        playBtn, pauseBtn, stepBtn, resetBtn, speedSlider,
      });
 
-   Scene's onLeave must call `engine.dispose()` to clear the interval — SKILL
-   §"persistent widget caveat" — otherwise the timer keeps firing after the
+   Scene's onLeave must call `engine.dispose()` to clear the interval, SKILL
+   §"persistent widget caveat", otherwise the timer keeps firing after the
    user has navigated away. */
 
 (function () {

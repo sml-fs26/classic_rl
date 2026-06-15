@@ -1,4 +1,4 @@
-/* Scene 3 -- Formalization: what makes this an MDP.
+/* Scene 3, Formalization: what makes this an MDP.
  *   Reveal the four parts one click at a time, each pinned to the board:
  *   S (the tile), A (the four headings), P (the wind, probabilistic), R (-1 per
  *   step / +10 gold / -10 pit). Builds the tuple <S, A, P, R> and makes the

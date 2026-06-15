@@ -1,13 +1,13 @@
-/* shelfCard.js -- the recurring STATE-ICON for Last-Minute Pricing.
+/* shelfCard.js, the recurring STATE-ICON for Last-Minute Pricing.
  *
  *   A "shelf card" renders one MDP state s = (seats left u, days-to-departure d)
  *   so the learner builds one mental picture across every scene: HOW MANY
  *   SEATS, HOW MUCH TIME. It is the pricing analogue of the Pokemon HP-bar
  *   sprite pair, and it replaces js/hpbar.js + js/sprite.js.
  *
- *   THEME -- a last-minute airline fare desk: an empty seat is worth real
+ *   THEME, a last-minute airline fare desk: an empty seat is worth real
  *   money today and exactly $0 the moment the gate closes. (The structural
- *   class names below -- .shelf-*, .cal-* -- are kept for back-compat with the
+ *   class names below, .shelf-*, .cal-*, are kept for back-compat with the
  *   scene animations that target them; only what they RENDER is a seat / a
  *   departure board.)
  *
@@ -58,7 +58,7 @@
   /* A single airplane seat seen FROM ABOVE (the seat-map glyph): a rounded
      CUSHION pad with a raised SEATBACK bar along the top edge. `filled` picks
      the for-sale (bright gold) vs sold (greyed) token set. The CSS lays five of
-     these out as ONE cabin row -- two seats, an aisle, then three -- so the
+     these out as ONE cabin row, two seats, an aisle, then three, so the
      icon reads as literal airline seating at every size. A square-ish viewBox
      with preserveAspectRatio "meet" keeps the seat from distorting. Class name
      kept as `shelf-ticket` so the scene sell / crumble animations keep targeting it. */

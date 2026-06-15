@@ -38,7 +38,7 @@
   function toneClass(id) { return (window.Levers && window.Levers.toneClass(id)) || ''; }
   function leverIcon(id) { return (window.Levers && window.Levers.leverIconSvg(id)) || ''; }
 
-  /* ---- Two hand playbooks, by rule (NOT the optimal map) ---- */
+  /*, Two hand playbooks, by rule (NOT the optimal map), */
   function policyAlwaysDemo(/* rung */) { return 'demo'; }
   function policyWarmThenClose(rung) {
     /* Soft at the cold end, close only once the lead is READY. */
@@ -62,7 +62,7 @@
     let activePreset = 0;     // -1 once the learner edits a rung by hand
     let dirty = false;
 
-    /* ---------- Title + lede ---------- */
+    /*, Title + lede, */
     const headEl = document.createElement('div');
     headEl.className = 'sc4-head';
     headEl.innerHTML =
@@ -70,7 +70,7 @@
       '<p class="poke-caption sc4-lede">' + T('scene4.lede') + '</p>';
     root.appendChild(headEl);
 
-    /* ---------- Formula strip: pi : S -> A ---------- */
+    /*, Formula strip: pi : S -> A, */
     const fcard = document.createElement('div');
     fcard.className = 'sc4-formula-card';
     const fbox = document.createElement('div');
@@ -83,7 +83,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---------- Two-column body: board (left) + control panel (right) ---------- */
+    /*, Two-column body: board (left) + control panel (right), */
     const body = document.createElement('div');
     body.className = 'sc4-body';
     root.appendChild(body);
@@ -214,13 +214,13 @@
       '<p class="sc4-callback-tease">' + T('scene4.callback.tease') + '</p>';
     panel.appendChild(callback);
 
-    /* ---------- Hint ---------- */
+    /*, Hint, */
     const hint = document.createElement('div');
     hint.className = 'footnote sc4-hint';
     hint.innerHTML = T('scene4.hint');
     root.appendChild(hint);
 
-    /* ---------- Paint the live policy onto the chips ---------- */
+    /*, Paint the live policy onto the chips, */
     const ALL_TONES = LEVER_IDS.map(toneClass);
     function paintRow(rung) {
       const node = rows[rung];

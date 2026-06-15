@@ -1,6 +1,6 @@
 /* Discrete 5-segment HP bar.
  *
- *   The simulator is fully bucketed now (see js/battle.js header) — HP is one
+ *   The simulator is fully bucketed now (see js/battle.js header), HP is one
  *   of 5 levels {full, high, mid, low, critical}. The bar drains in 5 visible
  *   segments instead of smoothly, with 4 tick marks at the bucket boundaries.
  *   Each level has its own color tier (light-green → green → yellow → orange
@@ -33,14 +33,14 @@
       '<span class="lvl">:L' + o.level + '</span>';
     host.appendChild(row1);
 
-    /* HP bar — segmented track with tick marks. */
+    /* HP bar, segmented track with tick marks. */
     const barRow = document.createElement('div');
     barRow.className = 'hp-bar-row';
     barRow.innerHTML = '<span class="hp-label">' + T('hp.label') + '</span>';
     const track = document.createElement('div');
     track.className = 'hp-bar-track';
 
-    /* The fill — width snaps to bucket levels via .hp-bar-fill[data-bucket]. */
+    /* The fill, width snaps to bucket levels via .hp-bar-fill[data-bucket]. */
     const fill = document.createElement('div');
     fill.className = 'hp-bar-fill';
     fill.dataset.bucket = '0';   /* 0 = full */
@@ -57,7 +57,7 @@
     barRow.appendChild(track);
     host.appendChild(barRow);
 
-    /* Bucket label row (replaces the old "100/100" HP number — that wasn't
+    /* Bucket label row (replaces the old "100/100" HP number, that wasn't
        meaningful in a bucketed world). Only shown on the player box, to
        match Gen-1 layout. */
     if (o.side === 'player') {
@@ -79,7 +79,7 @@
       fill.dataset.bucket = String(cur);
       const label = host.querySelector('.hp-num');
       if (label) label.textContent = bucketLabel(cur);
-      /* Drain ticks — one short tick per bucket crossed downward, in
+      /* Drain ticks, one short tick per bucket crossed downward, in
          sync with the CSS width transition (1100 ms total).  Skip if
          we're going UP (rare, but possible on reset). */
       if (window.SFX && cur > prev) {
@@ -89,7 +89,7 @@
         }
       }
     }
-    /* Update the displayed name — used in scene 1 when CHARMANDER
+    /* Update the displayed name, used in scene 1 when CHARMANDER
        evolves into CHARMELEON / CHARIZARD mid-battle. */
     function setName(newName) {
       const nameEl = host.querySelector('.name');
@@ -97,7 +97,7 @@
     }
     /* Backwards-compat name used by scene 1's old call site. */
     function drainTo(bucket) { set(bucket); }
-    function refreshClass() { /* no-op — CSS reads data-bucket. */ }
+    function refreshClass() { /* no-op, CSS reads data-bucket. */ }
 
     return { set, drainTo, refreshClass, setName, hp: () => cur };
   }

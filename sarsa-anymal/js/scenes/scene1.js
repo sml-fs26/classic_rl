@@ -1,14 +1,14 @@
-/* Scene 1 — The SARSA update.
+/* Scene 1, The SARSA update.
  *
  *   Centred large KaTeX of the SARSA update, each chunk colour-keyed by
  *   wrapping the inline KaTeX fragment in a `.comp-*` span. The four hues
- *   are CSS variables (theme-aware) — no hardcoded colors here.
+ *   are CSS variables (theme-aware), no hardcoded colors here.
  *
  *   Below the equation: a small components table mapping each chunk →
  *   its viz of origin. Below that: an inline callout on ε-greedy in
  *   Casino-blue.
  *
- *   Static — no step engine.
+ *   Static, no step engine.
  */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -100,8 +100,8 @@
 
     const PIECES = [
       { key: 'mdp',     tex: 'Q(s, a)',                role: 'the (s, a) value we update',     from: 'ANYmal' },
-      { key: 'rm',      tex: '\\alpha',                role: 'step size — Robbins–Monro',       from: 'Darts' },
-      { key: 'bellman', tex: "r + \\gamma\\, Q(s', a')", role: 'TD target — bootstrapped Bellman', from: 'Spooky House' },
+      { key: 'rm',      tex: '\\alpha',                role: 'step size, Robbins, Monro',       from: 'Darts' },
+      { key: 'bellman', tex: "r + \\gamma\\, Q(s', a')", role: 'TD target, bootstrapped Bellman', from: 'Spooky House' },
       { key: 'eps',     tex: "a' \\sim \\varepsilon\\text{-greedy}(Q)", role: 'on-policy action selection',     from: 'Casino' },
     ];
     for (const p of PIECES) {
@@ -125,7 +125,7 @@
     /* Footer caption. */
     const cap = document.createElement('p');
     cap.className = 'caption s1-cap';
-    cap.textContent = 'TD error in brackets — the gap between what we expected and what we just saw.';
+    cap.textContent = 'TD error in brackets, the gap between what we expected and what we just saw.';
     wrap.appendChild(cap);
 
     return {};

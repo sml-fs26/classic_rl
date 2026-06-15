@@ -41,7 +41,7 @@
   const ROLL_GAIN = [2, 3, 4, 5, 6];     // non-bust faces add their value
   const P_FACE = 1 / 6;
 
-  /* ---------------- Display bucketing ---------------- */
+  /*, Display bucketing, */
   /* Pot buckets: 0 / 1-5 / 6-10 / 11-15 / 16-20 / 21+  -> 0..5.
      Representative (midpoint) pot per bucket, used to project the exact
      optimal action onto each display cell. Bucket 0 is the empty pot. */
@@ -89,7 +89,7 @@
     return { my: rep.my, riv: rep.riv, pot: POT_BUCKET_REP[potBucket] };
   }
 
-  /* ---------------- Mulberry32 (shared with the precompute) ---------------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {

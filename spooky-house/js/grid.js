@@ -1,20 +1,20 @@
 /* Grid renderer for the Spooky House viz.
 
    Three layered DOM regions inside the host:
-     1. .grid-cells    — per-cell <div>s with optional reward-intensity tone,
+     1. .grid-cells, per-cell <div>s with optional reward-intensity tone,
                          reward label, V-value, and ghost-density visual
-     2. .grid-entities — translated entity sprites (anymal, goal door)
-     3. .grid-overlay  — SVG layer for policy arrows / path traces
+     2. .grid-entities, translated entity sprites (anymal, goal door)
+     3. .grid-overlay, SVG layer for policy arrows / path traces
    Cells inherit their tone via class (.reward-1 .. .reward-9) so theme
    tokens drive the colour. Per-cell content (reward number, V label, ghost
    stack) is built once at mount and toggled via classes / textContent on
-   updates — never re-built. Entities are positioned via CSS transform on the
+   updates, never re-built. Entities are positioned via CSS transform on the
    cell-grid coordinates. */
 (function () {
   const SPRITE = {
     /* All sprites use fill="currentColor" so theme tokens drive the colour.
        The anymal sprite is borrowed from the sibling viz for curriculum
-       continuity — same agent, new environment. */
+       continuity, same agent, new environment. */
     anymal:
       '<svg viewBox="0 0 64 64" aria-hidden="true">' +
         '<g fill="currentColor">' +
@@ -37,7 +37,7 @@
           '<circle cx="39" cy="30" r="3" fill="#fff" opacity="0.9"/>' +
         '</g>' +
       '</svg>',
-    /* Goal door — a haunted-door silhouette for the bottom-right cell. */
+    /* Goal door, a haunted-door silhouette for the bottom-right cell. */
     door:
       '<svg viewBox="0 0 64 64" aria-hidden="true">' +
         '<g fill="currentColor">' +
@@ -119,12 +119,12 @@
     }
     host.appendChild(cellsLayer);
 
-    /* Entity layer — agent / goal sprites, positioned via CSS transform. */
+    /* Entity layer, agent / goal sprites, positioned via CSS transform. */
     const entLayer = document.createElement('div');
     entLayer.className = 'grid-entities';
     host.appendChild(entLayer);
 
-    /* SVG overlay — policy arrows, path traces. */
+    /* SVG overlay, policy arrows, path traces. */
     const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     overlay.setAttribute('class', 'grid-overlay');
     overlay.setAttribute('preserveAspectRatio', 'none');
@@ -181,7 +181,7 @@
       node.classList.add('flash');
     }
 
-    /* ---------- V-value rendering on cells ---------- */
+    /*, V-value rendering on cells, */
     function setV(r, c, val) {
       const node = cellNodes[r] && cellNodes[r][c];
       if (!node) return;
@@ -224,7 +224,7 @@
       }
     }
 
-    /* ---------- Click handler ---------- */
+    /*, Click handler, */
     function onCellClick(handler) {
       cellsLayer.addEventListener('click', (e) => {
         const cell = e.target.closest('.grid-cell');
@@ -235,7 +235,7 @@
       });
     }
 
-    /* ---------- Policy arrow overlay (SVG) ----------
+    /*, Policy arrow overlay (SVG) ----------
        drawArrows({ pi: [[{down,right}, ...]], opts: { faded: bool } })
        Tied cells (both flags) are drawn as two muted arrows. Existing
        arrows are wiped first so cold-entry / re-render is idempotent. */
@@ -291,7 +291,7 @@
       line.setAttribute('stroke-width', '0.05');
       line.setAttribute('stroke-linecap', 'round');
       g.appendChild(line);
-      /* Arrowhead — small triangle at the tip. */
+      /* Arrowhead, small triangle at the tip. */
       const head = document.createElementNS(ns, 'polygon');
       const hx = x2, hy = y2;
       const hLen = 0.13;
@@ -330,7 +330,7 @@
       while (overlay.firstChild) overlay.removeChild(overlay.firstChild);
     }
 
-    /* ---------- Layout reflow ----------
+    /*, Layout reflow ----------
        Re-place entities when the host resizes, since (--tx, --ty) depend
        on cellSize(). Scenes pass an `onLayout` callback to mount() and
        re-issue their setEntity calls. */

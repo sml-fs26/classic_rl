@@ -1,4 +1,4 @@
-/* Scene 9 -- Dynamic programming. Because P is known (the bias is printed), we
+/* Scene 9, Dynamic programming. Because P is known (the bias is printed), we
    compute Q* exactly by sweeping the Bellman backup. The ladder fills from the
    goal outward (precomputed sweep snapshots in window.DATA.valueIteration): the
    first sweep lights rungs one flip from $10, later sweeps push value down, and

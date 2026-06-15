@@ -1,4 +1,4 @@
-/* Scene 10 -- Why DP does not scale.
+/* Scene 10, Why DP does not scale.
  *
  *   Two reasons the clean sweep of scene 9 does not survive contact with a
  *   real revenue-management problem, on a two-panel card:
@@ -53,19 +53,19 @@
     root.className = 'scene-pad scene10';
     root.innerHTML = '';
 
-    /* ---- Heading ---- */
+    /*, Heading, */
     const h = document.createElement('h2');
     h.className = 's10-heading';
     h.textContent = T('scene10.title');
     root.appendChild(h);
 
-    /* ---- Manager lede ---- */
+    /*, Manager lede, */
     const lede = document.createElement('p');
     lede.className = 's10-lede';
     lede.innerHTML = T('scene10.lede');
     root.appendChild(lede);
 
-    /* ---- Two-panel card ---- */
+    /*, Two-panel card, */
     const grid = document.createElement('div');
     grid.className = 's10-grid';
     root.appendChild(grid);
@@ -167,13 +167,13 @@
     panelB.appendChild(bFoot);
     grid.appendChild(panelB);
 
-    /* ---- Verdict banner ---- */
+    /*, Verdict banner, */
     const verdict = document.createElement('div');
     verdict.className = 's10-verdict';
     verdict.textContent = T('scene10.verdict');
     root.appendChild(verdict);
 
-    /* ---- Bridge to SARSA ---- */
+    /*, Bridge to SARSA, */
     const bridge = document.createElement('p');
     bridge.className = 's10-bridge';
     bridge.innerHTML = T('scene10.bridge');

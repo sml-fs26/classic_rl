@@ -1,4 +1,4 @@
-/* Scene 12 -- Recap.
+/* Scene 12, Recap.
  *   One card per concept (MDP, policy, return, Q*, DP, TD), each with its hue
  *   chip + formula + cave gloss, plus a closing line. A small optimal-map board
  *   anchors the "strategy is a map" message. Cold-entry safe. */

@@ -1,4 +1,4 @@
-/* machineIcon.js -- the recurring STATE-ICON for Critical Spare.
+/* machineIcon.js, the recurring STATE-ICON for Critical Spare.
  *
  *   A small factory-machine sprite whose colour + posture encode HEALTH:
  *     HEALTHY  green, humming (steady)

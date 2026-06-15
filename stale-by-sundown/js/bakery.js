@@ -4,8 +4,8 @@
  *     units in {1, 2, 3}; tier in {FRESH, OK, AGING, OLD, STALE}. That is
  *     3 x 5 = 15 NON-TERMINAL states, drawn as a 5-row (age) x 3-col (stock)
  *     display case. Two terminals (value baked in, not playable):
- *       CLEARED  -- the shelf went empty (the win), value 0
- *       SPOILED  -- a stale unit aged out unsold (the loss), value baked into
+ *       CLEARED, the shelf went empty (the win), value 0
+ *       SPOILED, a stale unit aged out unsold (the loss), value baked into
  *                   the -6 reward on the transition INTO it.
  *
  *   Action a = one of 3 levers (window.Levers):
@@ -14,7 +14,7 @@
  *     DUMP     write off the whole batch and restock FRESH (same unit count)
  *   All three are ALWAYS legal at every shelf state.
  *
- *   Transition P -- the visible "did a customer buy?" meter:
+ *   Transition P, the visible "did a customer buy?" meter:
  *     HOLD / DISCOUNT: with prob pbuy(tier, lever) a customer BUYS -> one unit
  *       sells, the rest of the batch KEEPS its tier (a modelling
  *       simplification: the whole batch shares one freshness tier). If units
@@ -69,7 +69,7 @@
   function nextTier(t) { const i = tierIndex(t); return i + 1 < NTIER ? TIERS[i + 1] : null; } // STALE -> null = SPOILED
   function buyProb(leverId, tier) { return (PBUY[leverId] && PBUY[leverId][tier] != null) ? PBUY[leverId][tier] : 0; }
 
-  /* ---------- State helpers ---------- */
+  /*, State helpers, */
   function makeState(units, tier) { return { units, tier, terminal: false }; }
   const TERM_CLEARED = { terminal: true, cleared: true, spoiled: false };
   const TERM_SPOILED = { terminal: true, cleared: false, spoiled: true };
@@ -107,7 +107,7 @@
   function availableBets(_u) { return ALL_LEVERS.slice(); }
   function isLegal(_u, _leverId) { return true; }
 
-  /* ---------- One customer slot (one sample) ---------- */
+  /*, One customer slot (one sample), */
   function sample(state, leverId, rng) {
     if (state.terminal) {
       return { sNext: state, reward: 0, terminal: true,
@@ -142,7 +142,7 @@
       log: { lever: leverId, sold: false, aged: true, tierBefore: t, tierAfter: nt, unitsBefore: u, unitsAfter: u } };
   }
 
-  /* ---------- Successor enumeration (value iteration) ---------- */
+  /*, Successor enumeration (value iteration), */
   function successors(state, leverId) {
     if (state.terminal) return [{ sNext: state, p: 1, reward: 0 }];
     const u = state.units, t = state.tier;
@@ -163,7 +163,7 @@
   }
   function successorsFromBuckets(s, leverId) { return successors(s, leverId); }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -175,7 +175,7 @@
     };
   }
 
-  /* ---------- Display helpers ---------- */
+  /*, Display helpers, */
   function stateLabel(s) {
     if (!s) return '';
     if (s.terminal) return s.cleared ? 'CLEARED' : 'SPOILED';

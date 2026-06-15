@@ -1,13 +1,13 @@
-/* Scene 11 -- SARSA, learn Q* by playing.
+/* Scene 11, SARSA, learn Q* by playing.
  *   Step 1: derive model-free TD control from Bellman by replacing the
- *     expectation with one observed attempt -- pull a lever, see the dice, see
- *     the next situation and next lever, nudge q toward what you saw -- and
+ *     expectation with one observed attempt, pull a lever, see the dice, see
+ *     the next situation and next lever, nudge q toward what you saw, and
  *     introduce epsilon as the discipline of occasionally trying an unproven
  *     lever.
  *   Step 2: a live run that replays the precomputed SARSA Q snapshots into a
  *     learning board, with the exact DP oracle shown beside it. The colours
  *     converge to the bold staircase (== DP), a "matches DP" bar fills to 100%,
- *     and a value readout from a cold day-5 user approaches V* -- WITHOUT ever
+ *     and a value readout from a cold day-5 user approaches V*, WITHOUT ever
  *     being told the dice odds. Cold-entry safe; honours &run.
  */
 (function () {

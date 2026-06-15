@@ -1,20 +1,20 @@
-/* Shared machine-row widget. Used by scenes 0–4 and 6.
+/* Shared machine-row widget. Used by scenes 0 to 4 and 6.
 
    Renders five slot-machine cards. Each card has:
      - the slot-machine line-art sprite (arm-coloured)
      - the machine name
-     - the "screen" — empirical probability or '?'
+     - the "screen", empirical probability or '?'
      - a pulls counter
 
    The row is fully data-driven from a Bandit instance:
-       update(bandit)       — re-render screen text and pulls counts
+       update(bandit), re-render screen text and pulls counts
    plus optional decoration calls:
-       flashWin(arm)        — flash card + chip rises
-       flashLoss(arm)       — flash card grey
-       setLastChosen(arm)   — ring around most-recent pull (autoplay scenes)
-       clearLastChosen()    — drop the ring
-       setClickable(fn)     — attach click + key-1..K handlers (scenes 1-2)
-       setRevealed(boolean) — show/hide the 'true: 0.NN' line (scene 6)
+       flashWin(arm), flash card + chip rises
+       flashLoss(arm), flash card grey
+       setLastChosen(arm), ring around most-recent pull (autoplay scenes)
+       clearLastChosen(), drop the ring
+       setClickable(fn), attach click + key-1..K handlers (scenes 1-2)
+       setRevealed(boolean), show/hide the 'true: 0.NN' line (scene 6)
 
    The widget is theme-agnostic: all colours come from CSS classes on the
    cards (.arm-1 … .arm-K). No inline colour. */
@@ -52,9 +52,9 @@
 
   /* mount(host, opts) builds the row and returns a controller.
      opts:
-       K              — number of arms
-       armNames       — string[] of length K
-       trueProbs      — optional number[] of length K (only used when revealed) */
+       K, number of arms
+       armNames, string[] of length K
+       trueProbs, optional number[] of length K (only used when revealed) */
   function mount(host, opts) {
     const K = opts.K;
     const armNames = opts.armNames;

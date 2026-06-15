@@ -1,4 +1,4 @@
-/* scene3 i18n -- formalization (S, A, P, R). */
+/* scene3 i18n, formalization (S, A, P, R). */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

@@ -3,7 +3,7 @@
  *   • Reads previous preference from localStorage('vanviz-music').
  *   • If "on", the loop starts on the *first* user gesture anywhere in
  *     the page (Chrome / Safari refuse to let an AudioContext run
- *     before a user click — we honour that).
+ *     before a user click, we honour that).
  *   • If "off" (default), nothing happens until the user clicks the
  *     button. The first click on the button counts as the unlock
  *     gesture for AudioContext.
@@ -39,7 +39,7 @@
     if (wantOn) {
       /* First user gesture anywhere unlocks the AudioContext. We attach
          a one-shot listener; once it fires, music starts and the label
-         updates. We DON'T auto-start without a gesture — browsers won't
+         updates. We DON'T auto-start without a gesture, browsers won't
          let us anyway, and a sudden tune would surprise users. */
       const onFirstGesture = () => {
         if (window.Music.start()) {

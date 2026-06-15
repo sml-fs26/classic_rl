@@ -1,7 +1,7 @@
 /* Scene 9 - Filling Q* with dynamic programming.
  *
  *   Because the STAGE-DIE odds are PRINTED on every lever, P is known, so we
- *   can compute Q* exactly -- no playing required. We sweep the Bellman
+ *   can compute Q* exactly, no playing required. We sweep the Bellman
  *   optimality backup
  *       Q*(s, a) = E[ R + max_a' Q*(S', a') ]
  *   over all 5 rungs at once, again and again. Each NEXT is ONE sweep; the
@@ -106,13 +106,13 @@
     root.classList.add('scene-pad', 'concept-scene', 'pc-dp-scene');
     root.innerHTML = '';
 
-    /* ---- Heading ---- */
+    /*, Heading, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = T('dp.heading');
     root.appendChild(heading);
 
-    /* ---- Lede + premise (we know P) ---- */
+    /*, Lede + premise (we know P), */
     const lede = document.createElement('p');
     lede.className = 'pc-lede';
     lede.innerHTML = T('dp.lede');
@@ -123,7 +123,7 @@
     premise.innerHTML = T('dp.premise');
     root.appendChild(premise);
 
-    /* ---- Bellman backup card ---- */
+    /*, Bellman backup card, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('dp.formula.label') + '</div>';
@@ -135,7 +135,7 @@
     );
     root.appendChild(fcard);
 
-    /* ---- Controls + status ---- */
+    /*, Controls + status, */
     const ctrls = document.createElement('div');
     ctrls.className = 'pc-dp-controls-row';
     ctrls.innerHTML =
@@ -150,7 +150,7 @@
       '</div>';
     root.appendChild(ctrls);
 
-    /* ---- Board + side narration ---- */
+    /*, Board + side narration, */
     const row = document.createElement('div');
     row.className = 'pc-dp-row';
     root.appendChild(row);
@@ -164,14 +164,14 @@
     sidePanel.className = 'pc-dp-panel';
     row.appendChild(sidePanel);
 
-    /* ---- Bridge footer (revealed on convergence) ---- */
+    /*, Bridge footer (revealed on convergence), */
     const bridge = document.createElement('div');
     bridge.className = 'pc-dp-bridge';
     bridge.innerHTML = T('dp.bridge');
     bridge.style.display = 'none';
     root.appendChild(bridge);
 
-    /* ---- Build the sweep tape ---- */
+    /*, Build the sweep tape, */
     const built = buildSweepTape();
     const tape = built.tape;
     const LAST = tape.length - 1;                  // index of the converged sweep

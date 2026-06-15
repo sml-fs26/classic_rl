@@ -1,4 +1,4 @@
-/* scene2 i18n fragment -- PLAYTEST ("You run the cabin").
+/* scene2 i18n fragment, PLAYTEST ("You run the cabin").
    The learner IS the pricing manager: from a fresh cabin (5 seats, 4 days)
    they pull a price lever each day, flip demand, feel the outcome, and play
    to departure. English authoritative; Japanese mirror for parity. */

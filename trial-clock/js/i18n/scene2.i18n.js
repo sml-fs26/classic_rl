@@ -1,4 +1,4 @@
-/* scene2 i18n -- playtest / you run it. */
+/* scene2 i18n, playtest / you run it. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -14,7 +14,7 @@
       'scene2.win':    'CONVERT! They upgraded. Total payoff {pay}. Notice what it took to get there.',
       'scene2.abandon':'ABANDON. The early ask soured them and they bailed. Total payoff {pay}. The big red wedge bit.',
       'scene2.expiry': 'EXPIRY. The clock ran out with no sale. Total payoff {pay}. A lost-but-not-poisoned user.',
-      'scene2.framing':'That was your gut playbook, stress-tested. Most people PUSH a cold user too early and eat the ABANDON. The same lever feels great or terrible depending on the situation -- which is exactly the point.',
+      'scene2.framing':'That was your gut playbook, stress-tested. Most people PUSH a cold user too early and eat the ABANDON. The same lever feels great or terrible depending on the situation, which is exactly the point.',
     },
     jp: {
       'scene2.title':  'じぶんで やる',
@@ -28,7 +28,7 @@
       'scene2.win':    'こうにゅう！ アップグレード した。 ごうけい ペイオフ {pay}。 そこに たどりつくのに なにが ひつようだったか みて。',
       'scene2.abandon':'りだつ。 はやい おねがいで そっぽを むかれ、 ぬけた。 ごうけい ペイオフ {pay}。 おおきな あかい ウェッジが かみついた。',
       'scene2.expiry': 'しゅうりょう。 うれずに とけいぎれ。 ごうけい ペイオフ {pay}。 うしなったが どくは ない ユーザー。',
-      'scene2.framing':'いまのが あなたの かんの プレイブック、 ストレステスト ずみ。 おおくの ひとは つめたい ユーザーに はやく プッシュして りだつを くらう。 おなじ レバーでも じょうきょうで すばらしくも さいあくにも かんじる -- それが まさに ポイント。',
+      'scene2.framing':'いまのが あなたの かんの プレイブック、 ストレステスト ずみ。 おおくの ひとは つめたい ユーザーに はやく プッシュして りだつを くらう。 おなじ レバーでも じょうきょうで すばらしくも さいあくにも かんじる, それが まさに ポイント。',
     },
   });
 })();

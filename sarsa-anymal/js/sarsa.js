@@ -1,4 +1,4 @@
-/* SARSA primitives. Pure functions — caller owns the Q-table object.
+/* SARSA primitives. Pure functions, caller owns the Q-table object.
 
    The notebook's helpers `epsilon_greedy_action`, `get_q_value`, `set_q_value`
    are reproduced here in array form. State here is just (r, c). The Q-table is

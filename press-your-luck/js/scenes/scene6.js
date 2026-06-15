@@ -135,7 +135,7 @@
     lede.innerHTML = T('scene6.lede');
     root.appendChild(lede);
 
-    /* ---- G_i formula card ---- */
+    /*, G_i formula card, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene6.formula.label') + '</div>';
@@ -151,7 +151,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- The trajectory tree + weighted-leaf ledger (the E[G_t] reveal) ---- */
+    /*, The trajectory tree + weighted-leaf ledger (the E[G_t] reveal), */
     const egLabel = document.createElement('div');
     egLabel.className = 'obj-eg-label';
     egLabel.innerHTML = T('scene6.eg.label', {
@@ -193,7 +193,7 @@
     });
     root.appendChild(egTie);
 
-    /* ---- Q* formula card (the objective is the MAX expected return) ---- */
+    /*, Q* formula card (the objective is the MAX expected return), */
     const c2 = document.createElement('div');
     c2.className = 'concept-formula-card';
     c2.innerHTML = '<div class="concept-formula-label">' + T('scene6.qstar.label') + '</div>';
@@ -209,7 +209,7 @@
     c2.appendChild(foot2);
     root.appendChild(c2);
 
-    /* ---- The empirical companion: sample games, watch the mean converge ---- */
+    /*, The empirical companion: sample games, watch the mean converge, */
     const exp = document.createElement('div');
     exp.className = 'ret-exp collapsed';
     exp.innerHTML =
@@ -251,13 +251,13 @@
       if (c) c.innerHTML = exp.classList.contains('collapsed') ? '&#9654;' : '&#9660;';
     });
 
-    /* ---- Bridge question ---- */
+    /*, Bridge question, */
     const bridge = document.createElement('div');
     bridge.className = 'concept-key-question';
     bridge.textContent = T('scene6.bridge');
     root.appendChild(bridge);
 
-    /* ---- Experiment state ---- */
+    /*, Experiment state, */
     let lever = 'roll';
     let rng = Pig.makeRng(0x5EED ^ 0x9999);
     let wins = 0, total = 0;

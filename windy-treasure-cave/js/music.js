@@ -1,4 +1,4 @@
-/* Chiptune background music -- two-voice Game-Boy-style synth.
+/* Chiptune background music, two-voice Game-Boy-style synth.
  *
  *   Multiple tracks, one per scene mood. Music.setTrack(key) cross-fades
  *   between them: master gain ramps to ~0 over 180 ms, the pattern + tempo +
@@ -10,15 +10,15 @@
  *   Ported from the sibling cartridges so the whole gallery shares one score.
  *
  *   Tracks (mapped to scenes in main.js):
- *     title    -- heroic D major arpeggios (scene 0)
- *     tutorial -- gentle F-major loop (scene 1)
- *     boss     -- Andalusian battle theme (scene 2 -- the playtest swing)
- *     concept  -- contemplative E-minor (scenes 3-6 -- MDP/policy/traj/return)
- *     discover -- I-V-vi-IV "lightbulb" staircase (scene 7 -- Q* reveal)
- *     dp       -- methodical A-minor puzzle loop (scenes 8-9 -- Bellman/DP)
- *     bridge   -- tense C-minor build (scene 10 -- why DP fails)
- *     sarsa    -- D-Mixolydian training-montage (scene 11 -- learning)
- *     champion -- slow anthemic C-major Hall-of-Fame (scene 12 -- recap)
+ *     title, heroic D major arpeggios (scene 0)
+ *     tutorial, gentle F-major loop (scene 1)
+ *     boss, Andalusian battle theme (scene 2, the playtest swing)
+ *     concept, contemplative E-minor (scenes 3-6, MDP/policy/traj/return)
+ *     discover, I-V-vi-IV "lightbulb" staircase (scene 7, Q* reveal)
+ *     dp, methodical A-minor puzzle loop (scenes 8-9, Bellman/DP)
+ *     bridge, tense C-minor build (scene 10, why DP fails)
+ *     sarsa, D-Mixolydian training-montage (scene 11, learning)
+ *     champion, slow anthemic C-major Hall-of-Fame (scene 12, recap)
  *
  *   Browser autoplay policies: AudioContext starts suspended. Music starts
  *   only after a user gesture (handled by music-ui.js); we honour that here.
@@ -28,7 +28,7 @@
  *     Music.setTrack(key)
  */
 (function () {
-  /* ----- Note frequencies (equal temperament, A4 = 440 Hz) ----- */
+  /*, Note frequencies (equal temperament, A4 = 440 Hz), */
   const NOTES = {
     D2: 73.42,  E2: 82.41,  F2: 87.31,  G2: 98.00,
     Gs2: 103.83, A2: 110.00, As2: 116.54, B2: 123.47,
@@ -71,7 +71,7 @@
     ],
   };
 
-  /* BOSS -- the playtest "swing" theme. Andalusian cadence Am-G-F-E, octave-
+  /* BOSS, the playtest "swing" theme. Andalusian cadence Am-G-F-E, octave-
      jumping bass, climbing second half. */
   const TRACK_BOSS = {
     tempoBpm: 172, leadGain: 0.42, bassGain: 0.32,
@@ -95,7 +95,7 @@
     ],
   };
 
-  /* DISCOVER -- Q*-reveal "lightbulb" arpeggio staircase, I-V-vi-IV climbing
+  /* DISCOVER, Q*-reveal "lightbulb" arpeggio staircase, I-V-vi-IV climbing
      G4 -> C6. */
   const TRACK_DISCOVER = {
     tempoBpm: 118, leadGain: 0.34, bassGain: 0.22,
@@ -111,7 +111,7 @@
     ],
   };
 
-  /* CHAMPION -- Hall-of-Fame anthem, half-time C-major, perfect cadence to C6. */
+  /* CHAMPION, Hall-of-Fame anthem, half-time C-major, perfect cadence to C6. */
   const TRACK_CHAMPION = {
     tempoBpm: 96, leadGain: 0.42, bassGain: 0.34,
     pattern: [
@@ -126,7 +126,7 @@
     ],
   };
 
-  /* CONCEPT -- sparse, contemplative: MDP / policy / trajectory / return. */
+  /* CONCEPT, sparse, contemplative: MDP / policy / trajectory / return. */
   const TRACK_CONCEPT = {
     tempoBpm: 96, leadGain: 0.28, bassGain: 0.20,
     pattern: [
@@ -141,7 +141,7 @@
     ],
   };
 
-  /* DP -- methodical, puzzle-y: Bellman / dynamic programming. */
+  /* DP, methodical, puzzle-y: Bellman / dynamic programming. */
   const TRACK_DP = {
     tempoBpm: 110, leadGain: 0.32, bassGain: 0.26,
     pattern: [
@@ -156,7 +156,7 @@
     ],
   };
 
-  /* BRIDGE -- tense, building: "DP fails". */
+  /* BRIDGE, tense, building: "DP fails". */
   const TRACK_BRIDGE = {
     tempoBpm: 128, leadGain: 0.36, bassGain: 0.28,
     pattern: [
@@ -171,7 +171,7 @@
     ],
   };
 
-  /* SARSA -- training-montage in D Mixolydian, arpeggio-up / scale-down. */
+  /* SARSA, training-montage in D Mixolydian, arpeggio-up / scale-down. */
   const TRACK_SARSA = {
     tempoBpm: 160, leadGain: 0.40, bassGain: 0.32,
     pattern: [
@@ -207,7 +207,7 @@
   };
   let currentTrackKey = 'title';
 
-  /* ----- Engine state ----- */
+  /*, Engine state, */
   const LOOKAHEAD_MS   = 90;
   const SCHEDULE_AHEAD = 0.4;     // s
   let   volume         = 0.18;

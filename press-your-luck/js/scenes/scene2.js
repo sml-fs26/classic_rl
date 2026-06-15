@@ -31,7 +31,7 @@
     root.classList.add('scene-pad', 's2-play');
     root.innerHTML = '';
 
-    /* ---------- header ---------- */
+    /*, header, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title s2-section-title';
     header.textContent = T('pt.section');
@@ -48,7 +48,7 @@
     subBar.appendChild(rivalRule);
     root.appendChild(subBar);
 
-    /* ---------- stage: banks | card + die | controls ---------- */
+    /*, stage: banks | card + die | controls, */
     const stage = document.createElement('div');
     stage.className = 's2-stage';
     root.appendChild(stage);
@@ -91,13 +91,13 @@
         } };
     }
 
-    /* ---------- dialog ---------- */
+    /*, dialog, */
     const dialogHost = document.createElement('div');
     dialogHost.className = 's2-dialog';
     root.appendChild(dialogHost);
     const dialog = window.Dialog.mount(dialogHost);
 
-    /* ---------- controls ---------- */
+    /*, controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 's2-ctrls';
     const rollBtn = document.createElement('button');
@@ -120,7 +120,7 @@
     caption.textContent = T('pt.caption');
     root.appendChild(caption);
 
-    /* ---------- state ---------- */
+    /*, state, */
     let state, rng, busy, episode = 0;
 
     function reducedMotion() {
@@ -178,7 +178,7 @@
       setButtons({ disable: b });
     }
 
-    /* ---- terminal banner ---- */
+    /*, terminal banner, */
     function showBanner(win) {
       clearBanner();
       const b = document.createElement('div');

@@ -1,4 +1,4 @@
-/* Scene 2 -- Playtest: you run it. The learner IS the shop owner. Start with
+/* Scene 2, Playtest: you run it. The learner IS the shop owner. Start with
    3 units FRESH and a full day's clock; click a lever each hour, the buy-meter
    resolves live, units sell or the batch ages, the running till ticks, until the
    shelf is CLEARED (win) or a unit goes SPOILED (loss). Most players over-HOLD a

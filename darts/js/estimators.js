@@ -1,4 +1,4 @@
-/* Estimators — pure functions over a stream of (player_pos, score) pairs.
+/* Estimators, pure functions over a stream of (player_pos, score) pairs.
 
    The Robbins-Monro update we teach in scenes 3 and 4 is
 
@@ -6,7 +6,7 @@
 
    where x_n is the running estimate of *bullseye position* and s_n is the
    nth observation. The "observation" here is the player's position when
-   the score was high — concretely, we use a score-weighted target:
+   the score was high, concretely, we use a score-weighted target:
 
      s_n = player_pos_n + (gradient hint)
 
@@ -23,12 +23,12 @@
 
    For the trade-off scene 4 we drive three estimators from the **same**
    observation stream, so the differences are entirely in the schedule
-   `α_n`, not in the data — this makes the comparison fair. */
+   `α_n`, not in the data, this makes the comparison fair. */
 
 (function () {
 
   /* Sample-mean estimator: x_{n+1} = x_n + (1/(n+1)) · (s_n - x_n)
-     (the classic incremental average). Same algebra, different framing —
+     (the classic incremental average). Same algebra, different framing, 
      we expose this as a separate function for scene 2's "the sample mean
      fails" caption to read sensibly. */
   function sampleMean(prevEstimate, observation, n) {
@@ -41,8 +41,8 @@
     return prevEstimate + alpha * (observation - prevEstimate);
   }
 
-  /* Decaying-α RM update: α_n = 1/n. This is the canonical RM schedule —
-     it satisfies Σα_n = ∞ and Σα_n² < ∞ — and (with α_n = 1/n) is exactly
+  /* Decaying-α RM update: α_n = 1/n. This is the canonical RM schedule, 
+     it satisfies Σα_n = ∞ and Σα_n² < ∞, and (with α_n = 1/n) is exactly
      equivalent to the empirical mean from the Casino viz. n is 1-indexed:
      n = 1 for the first throw. */
   function rmDecay(prevEstimate, observation, n) {

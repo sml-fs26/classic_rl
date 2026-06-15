@@ -153,15 +153,15 @@
     window.dispatchEvent(new CustomEvent('scene-change', { detail: { idx: idx, key: SCENES[idx].key } }));
   }
 
-  /* I18N helper — falls back to the literal key when i18n hasn't loaded. */
+  /* I18N helper, falls back to the literal key when i18n hasn't loaded. */
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
   function cursorBlip() { if (window.SFX) window.SFX.play('cursor'); }
 
   function init() {
-    if (!window.DATA) console.error('DATA missing -- did data/datasets.js load?');
+    if (!window.DATA) console.error('DATA missing, did data/datasets.js load?');
 
-    /* ---- Dot pager ---- */
+    /*, Dot pager, */
     const pager = document.getElementById('dot-pager');
     if (pager) {
       for (let i = 0; i < SCENES.length; i++) {
@@ -199,7 +199,7 @@
       if (!handled) goTo(current + 1);
     });
 
-    /* ---- Concept badges (in-memory, lit on reaching the relevant scene) ----
+    /*, Concept badges (in-memory, lit on reaching the relevant scene) ----
        Order: MDP POLICY RETURN Q* DP SARSA. No persistence (a fresh session
        starts dark); reaching scene N lights its badge. */
     const BADGE_FOR_SCENE = {
@@ -243,7 +243,7 @@
       maybeAwardBadge(key);
     });
 
-    /* ---- Speaker-notes overlay (lecturer crib), toggled by `n` ---- */
+    /*, Speaker-notes overlay (lecturer crib), toggled by `n`, */
     const snOverlay = document.createElement('div');
     snOverlay.id = 'speaker-notes-overlay';
     snOverlay.className = 'speaker-notes-overlay';
@@ -269,7 +269,7 @@
       else snOverlay.hidden = true;
     }
 
-    /* ---- Key handling: arrows (delegate to scene), n, m. theme.js owns `t`. ---- */
+    /*, Key handling: arrows (delegate to scene), n, m. theme.js owns `t`., */
     window.addEventListener('keydown', (e) => {
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -313,7 +313,7 @@
   }
 
   /* Drop every cached scene DOM + state and rebuild the current scene from
-     scratch (used by the language toggle — cached scenes hold stale text). */
+     scratch (used by the language toggle, cached scenes hold stale text). */
   function rebuildAll() {
     for (let i = 0; i < sceneNodes.length; i++) {
       const node = sceneNodes[i];

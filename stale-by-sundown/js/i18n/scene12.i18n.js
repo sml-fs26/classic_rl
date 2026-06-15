@@ -1,4 +1,4 @@
-/* scene12 i18n -- recap. */
+/* scene12 i18n, recap. */
 (function () {
   if (!window.I18N) return;
   const M = '−';

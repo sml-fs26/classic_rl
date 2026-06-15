@@ -36,7 +36,7 @@
   const LEVER_BY_ID = window.Levers.LEVER_BY_ID;
   const LEVER_IDS   = window.Levers.LEVER_IDS;
 
-  /* ---------- Board geometry ---------- */
+  /*, Board geometry, */
   function row(s) { return NUM_UNITS - s.u; }      // 0..4, units 5..1 top..bottom
   function col(s) { return NUM_DAYS  - s.d; }      // 0..3, days 4..1 left..right
 
@@ -65,7 +65,7 @@
 
   function initialState() { return { u: 5, d: 4, terminal: false }; }
 
-  /* ---------- Build the next state from a sale ---------- */
+  /*, Build the next state from a sale, */
   function step(u, d, sold) {
     const u2 = u - sold;
     const d2 = d - 1;
@@ -74,7 +74,7 @@
     return { u: u2, d: d2, terminal: false };
   }
 
-  /* ---------- RNG sampling helper ---------- */
+  /*, RNG sampling helper, */
   function sampleDist(rng, dist) {
     const u = rng();
     let cum = 0;
@@ -86,7 +86,7 @@
      for API parity with the old engine. */
   function rewardFor(sNext) { return 0; }
 
-  /* ---------- One-day sample (one demand draw) ---------- */
+  /*, One-day sample (one demand draw), */
   function sample(state, leverId, rng) {
     if (state.terminal) {
       return { sNext: state, reward: 0, terminal: true,
@@ -108,7 +108,7 @@
     return { sNext, reward, terminal: !!sNext.terminal, log };
   }
 
-  /* ---------- Successor enumeration (value iteration) ---------- */
+  /*, Successor enumeration (value iteration), */
   function successors(state, leverId) {
     if (state.terminal) return [{ sNext: state, p: 1, reward: 0 }];
     const lever = LEVER_BY_ID[leverId];
@@ -129,7 +129,7 @@
   }
   function successorsFromBuckets(s, leverId) { return successors(s, leverId); }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -141,7 +141,7 @@
     };
   }
 
-  /* ---------- Display helpers ---------- */
+  /*, Display helpers, */
   function unitsLeft(s) { return s && !s.terminal ? s.u : 0; }
   function daysLeft(s)  { return s && !s.terminal ? s.d : 0; }
   function stateLabel(s) {

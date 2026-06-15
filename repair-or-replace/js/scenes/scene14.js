@@ -92,7 +92,7 @@
     }
     const aIdx = (id) => A_IDS.indexOf(id);
 
-    /* ---------------- DOM ---------------- */
+    /*, DOM, */
     const h = document.createElement('h2');
     h.className = 'concept-heading';
     h.textContent = 'SARSA: LET HER DRIVE';
@@ -103,7 +103,7 @@
     lede.innerHTML = 'No printed odds out here. Press <b>DRIVE</b>.';
     root.appendChild(lede);
 
-    /* ---- main two-column row ---- */
+    /*, main two-column row, */
     const main = document.createElement('div');
     main.className = 's14-row';
     root.appendChild(main);
@@ -200,7 +200,7 @@
     closing.innerHTML = 'DP needed the odds. SARSA needed <b>only the logbook</b>.';
     right.appendChild(closing);
 
-    /* ---- bottom: learning curve (gated) + controls (entry) ---- */
+    /*, bottom: learning curve (gated) + controls (entry), */
     const bottom = document.createElement('div');
     bottom.className = 's14-bottom';
     root.appendChild(bottom);
@@ -246,7 +246,7 @@
     bottom.appendChild(panel);
     const tray = panel.querySelector('.s14-tray');
 
-    /* ---------------- staged reveals ---------------- */
+    /*, staged reveals, */
     function revealOnce(el, slot) {
       if (!el || el.dataset.shown) return;
       el.dataset.shown = '1';
@@ -266,7 +266,7 @@
       if (week >= 8) revealTray();   /* a dedicated hand-stepper gets the dials too */
     }
 
-    /* ---------------- training state ---------------- */
+    /*, training state, */
     let Q, rng, baseSeed, week, sCur, aCur, aCurExp, lastObs, rewards;
     let eps = 0.15, alpha = 0.15, speed = 0;
     let playing = false, timer = null, tickCount = 0;
@@ -303,7 +303,7 @@
       updateCallPulse();
     }
 
-    /* ---- one SARSA week (the continuing task: always bootstraps) ---- */
+    /*, one SARSA week (the continuing task: always bootstraps), */
     function stepWeek() {
       if (aCur === null) {
         const p0 = pickTagged(Q, sCur.wear, eps, rng);
@@ -329,7 +329,7 @@
       return lastObs;
     }
 
-    /* ---------------- rendering ---------------- */
+    /*, rendering, */
     const fmt1 = (v) => (Math.round(v * 10) / 10).toFixed(1);
     const fmtSigned = (v) => (v >= 0 ? '+' : '') + v;
 
@@ -480,7 +480,7 @@
       updateCallPulse();
     }
 
-    /* ---------------- the driver ---------------- */
+    /*, the driver, */
     function driveBtn() { return document.getElementById('s14-drive'); }
     function setDriveLabel() {
       driveBtn().innerHTML = playing ? '&#9632; PAUSE' : '&#9654; DRIVE';
@@ -543,7 +543,7 @@
       refreshCurve();
     }
 
-    /* ---------------- wiring ---------------- */
+    /*, wiring, */
     document.getElementById('s14-step').addEventListener('click', stepOnce);
     document.getElementById('s14-reset').addEventListener('click', hardReset);
     driveBtn().addEventListener('click', togglePlay);

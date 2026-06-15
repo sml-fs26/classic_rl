@@ -46,7 +46,7 @@
     const START = Churn.initialState();            // { tier:2, m:4 }
     const START_IDX = Churn.stateIndex(START);     // 13
 
-    /* ---------- The hand-built playbooks (full-board pi : S -> A) ----------
+    /*, The hand-built playbooks (full-board pi : S -> A) ----------
        Defined as functions of the state so they are unambiguous and not a
        hand-typed 25-array of answers. */
     function presetNever(s) { return 'nothing'; }
@@ -66,7 +66,7 @@
     }
     loadPreset('never');
 
-    /* ---------- EXACT policy evaluation (engine-derived) ----------
+    /*, EXACT policy evaluation (engine-derived) ----------
        V^pi(s) and the eventual-renewal probability R^pi(s), by one backward
        pass in ascending m (the MDP is acyclic in months). Mirrors
        bellman.js's backup but with the action FIXED to the policy. */
@@ -92,7 +92,7 @@
       return { V, Rp };
     }
 
-    /* ---------- Scaffold ---------- */
+    /*, Scaffold, */
     const wrap = document.createElement('div');
     wrap.className = 's4-wrap';
     root.appendChild(wrap);
@@ -123,7 +123,7 @@
     row.className = 's4-row';
     wrap.appendChild(row);
 
-    /* ----- LEFT: the playbook board ----- */
+    /*, LEFT: the playbook board, */
     const left = document.createElement('div');
     left.className = 's4-left';
     row.appendChild(left);
@@ -242,7 +242,7 @@
       }
     }
 
-    /* ----- RIGHT: the outcome panel ----- */
+    /*, RIGHT: the outcome panel, */
     const right = document.createElement('div');
     right.className = 's4-right';
     row.appendChild(right);
@@ -323,7 +323,7 @@
       return T('tier.short.' + Churn.TIERS[START.tier]) + ' / ' + T('months.short', { n: START.m });
     }
 
-    /* ----- BELOW: the scene-2 callback ----- */
+    /*, BELOW: the scene-2 callback, */
     const callback = document.createElement('div');
     callback.className = 's4-callback poke-box';
     callback.innerHTML =
@@ -336,7 +336,7 @@
     hint.innerHTML = T('scene4.hint');
     wrap.appendChild(hint);
 
-    /* ---------- preset button wiring ---------- */
+    /*, preset button wiring, */
     for (const name of ['never', 'panic']) {
       presetBtns[name].addEventListener('click', () => {
         loadPreset(name);
@@ -347,7 +347,7 @@
       });
     }
 
-    /* ---------- first paint ---------- */
+    /*, first paint, */
     paintBoard();
     paintOutcome();
     paintPresetButtons();

@@ -1,4 +1,4 @@
-/* scene8 i18n -- Bellman optimality. */
+/* scene8 i18n, Bellman optimality. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -16,7 +16,7 @@
       'scene8.repF1.match': '{v} = Q*(FAILING, 1, REPLACE). It reproduces the value iteration exactly.',
       'scene8.ordA0.expr': 'ORDER buys a spare into the bin (no holding cost yet, the bin was empty); land for certain in (AGING, 1), worth γ·V*.',
       'scene8.ordA0.match': '{v} = Q*(AGING, 0, ORDER). It reproduces the value iteration exactly.',
-      'scene8.framing': 'Both deterministic backups land on the value iteration\'s answer. The stochastic cells (RUN) work the same way, just averaged over the failure die and the aging coin -- which is exactly what the next scene sweeps.',
+      'scene8.framing': 'Both deterministic backups land on the value iteration\'s answer. The stochastic cells (RUN) work the same way, just averaged over the failure die and the aging coin, which is exactly what the next scene sweeps.',
     },
     jp: {
       'scene8.title': 'ベルマン さいてきせい',

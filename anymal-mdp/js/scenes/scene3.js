@@ -1,9 +1,9 @@
-/* Scene 3 — stochasticity.
+/* Scene 3, stochasticity.
 
    Pedagogical goal: make P(s' | s, a) viscerally felt. The student presses
    ↑, and sometimes ANYmal goes left or right or down instead. Both arrows
-   are drawn — solid for the commanded direction, dashed for what the
-   environment actually executed — so the surprise registers as a visible
+   are drawn, solid for the commanded direction, dashed for what the
+   environment actually executed, so the surprise registers as a visible
    difference rather than as a number on a slider.
 
    Mechanics:
@@ -11,7 +11,7 @@
      - A slider (0..0.5) controls malfunction probability for *future*
        steps. Each history entry stores the p that was in effect when the
        step was performed, so a reset+replay rewinds faithfully.
-     - Ghosts move uniform-randomly regardless of the slider — their
+     - Ghosts move uniform-randomly regardless of the slider, their
        randomness is hardcoded in MDP.step. The slider is ANYmal-only.
 */
 (function () {
@@ -29,7 +29,7 @@
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
   window.scenes.scene3 = function (root) {
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
 
     const wrap = document.createElement('div');
@@ -116,7 +116,7 @@
       lbl.textContent = label;
       const val = document.createElement('span');
       val.className = 'hud-value';
-      val.textContent = '–';
+      val.textContent = ', ';
       row.appendChild(lbl);
       row.appendChild(val);
       hud.appendChild(row);
@@ -140,7 +140,7 @@
     foot.textContent = 'Slider changes apply to future steps. Past steps stay as you played them.';
     rightCol.appendChild(foot);
 
-    /* ---------- Grid mount ---------- */
+    /*, Grid mount, */
     const grid = Grid.mount(gridHost, {
       M: window.DATA.initial.M,
       N: window.DATA.initial.N,
@@ -156,7 +156,7 @@
     arrowSvg.style.inset = '0';
     arrowSvg.style.pointerEvents = 'none';
 
-    /* Two arrowhead markers — one for commanded, one for executed. The
+    /* Two arrowhead markers, one for commanded, one for executed. The
        marker fill picks up the line stroke via fill="context-stroke" where
        supported, with a colored fallback via CSS. */
     const defs = document.createElementNS(SVG_NS, 'defs');
@@ -173,7 +173,7 @@
 
     grid.overlay.appendChild(arrowSvg);
 
-    /* ---------- Per-scene state ---------- */
+    /*, Per-scene state, */
     const SEED = window.DATA.params.seed;
     let rng = MDP.makeRng(SEED);
     let state = MDP.initialState();
@@ -184,7 +184,7 @@
        (preState.anymal, commanded, executedDestination). */
     let lastArrow = null;
 
-    /* ---------- Rendering ---------- */
+    /*, Rendering, */
     function renderEntities() {
       grid.setEntity('anymal', { kind: 'anymal', r: state.anymal.r, c: state.anymal.c });
       grid.setEntity('ghost1', { kind: 'ghost',  r: state.ghosts[0].r, c: state.ghosts[0].c });
@@ -192,13 +192,13 @@
       grid.setEntity('star',   { kind: 'star',   r: state.star.r,      c: state.star.c });
     }
 
-    function fmtAction(a) { return a ? `${ARROW_GLYPH[a]} ${a}` : '–'; }
+    function fmtAction(a) { return a ? `${ARROW_GLYPH[a]} ${a}` : ', '; }
 
     function renderHud(commanded, executed) {
       hudCommanded.textContent = fmtAction(commanded);
       hudExecuted.textContent  = fmtAction(executed);
       if (commanded == null) {
-        hudMatch.textContent = '–';
+        hudMatch.textContent = ', ';
       } else {
         hudMatch.textContent = (commanded === executed) ? '✓' : '✗';
       }
@@ -207,7 +207,7 @@
 
     function showTerminalBanner() {
       banner.hidden = false;
-      banner.textContent = 'Episode ended — collision. Press → to continue.';
+      banner.textContent = 'Episode ended, collision. Press → to continue.';
     }
     function hideTerminalBanner() {
       banner.hidden = true;
@@ -220,7 +220,7 @@
       return { x: px.x + px.w / 2, y: px.y + px.h / 2 };
     }
 
-    /* The "commanded destination" — where ANYmal would have ended up if the
+    /* The "commanded destination", where ANYmal would have ended up if the
        commanded action had executed. We compute and clamp identically to
        MDP.applyAction + clamp so the arrow tip lands on a cell centre. */
     function commandedDest(fromRc, action) {
@@ -284,7 +284,7 @@
       return line;
     }
 
-    /* ---------- Reset + replay ----------
+    /*, Reset + replay ----------
        Every history entry stores its own p, so replay is faithful even if
        the slider has been moved since. */
     function resetAndReplay(targetCursor) {
@@ -317,7 +317,7 @@
       redrawArrows();
     }
 
-    /* ---------- Step forward via a user keystroke ---------- */
+    /*, Step forward via a user keystroke, */
     function performStep(action) {
       if (state.terminal) return;
       const p = readSliderP();
@@ -343,7 +343,7 @@
       if (state.terminal) showTerminalBanner();
     }
 
-    /* ---------- Step forward by replaying a recorded action ---------- */
+    /*, Step forward by replaying a recorded action, */
     function replayForwardOne() {
       const idx = history.cursor();
       const rec = history.action(idx);
@@ -377,11 +377,11 @@
       sliderOut.textContent = `p = ${p.toFixed(2)}`;
     });
 
-    /* ---------- Keyboard ----------
+    /*, Keyboard ----------
        main.js's keydown handler runs BEFORE this scene's (registration
        order). For ArrowLeft / ArrowRight, main.js calls our onPrevKey /
        onNextKey first; if they consumed the keystroke (rewind / replay),
-       we suppress the movement here — otherwise pressing ← would BOTH
+       we suppress the movement here, otherwise pressing ← would BOTH
        rewind AND execute a 'left' move on the same press. */
     let lastNavConsumedAt = 0;
     function onKey(e) {
@@ -399,7 +399,7 @@
     function markNavConsumed() { lastNavConsumedAt = performance.now(); }
     window.addEventListener('keydown', onKey);
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       history.reset();
       mismatchCount = 0;

@@ -1,4 +1,4 @@
-/* Scene 2 — Bellman, but for cycles.
+/* Scene 2, Bellman, but for cycles.
  *
  *   Board with V(s) slots. Above the board: the Bellman equation.
  *   Below: a "Run value iteration" button + iteration counter + max-|ΔV| chip
@@ -57,7 +57,7 @@
       const empty = document.createElement('div');
       empty.className = 'card';
       empty.innerHTML =
-        '<p class="caption">Value-iteration data is missing — run ' +
+        '<p class="caption">Value-iteration data is missing, run ' +
         '<code>node precompute/build-datasets.js</code> from the viz folder.</p>';
       wrap.appendChild(empty);
       return {};
@@ -127,7 +127,7 @@
     const scrDelta = document.createElement('span');
     scrDelta.className = 'scr-label';
     scrDelta.style.textAlign = 'right';
-    scrDelta.textContent = 'max-|ΔV|: —';
+    scrDelta.textContent = 'max-|ΔV|:, ';
     scrubWrap.appendChild(scrDelta);
 
     /* Side rail: a few key V values + policy info. */
@@ -140,19 +140,19 @@
     railCard.className = 'card';
     railCard.innerHTML =
       '<div class="vi-stat-row"><span class="vi-k">iters to converge</span><span class="vi-v" id="vi-iters-conv">' + totalIters + '</span></div>' +
-      '<div class="vi-stat-row"><span class="vi-k">V(1) — start square</span><span class="vi-v" id="vi-v1">—</span></div>' +
-      '<div class="vi-stat-row"><span class="vi-k">expected turns from 1</span><span class="vi-v" id="vi-exp">—</span></div>' +
-      '<div class="vi-stat-row"><span class="vi-k">dice in policy</span><span class="vi-v" id="vi-dice">—</span></div>';
+      '<div class="vi-stat-row"><span class="vi-k">V(1), start square</span><span class="vi-v" id="vi-v1">, </span></div>' +
+      '<div class="vi-stat-row"><span class="vi-k">expected turns from 1</span><span class="vi-v" id="vi-exp">, </span></div>' +
+      '<div class="vi-stat-row"><span class="vi-k">dice in policy</span><span class="vi-v" id="vi-dice">, </span></div>';
     rail.appendChild(railCard);
 
     const railNote = document.createElement('p');
     railNote.className = 'caption';
     railNote.style.marginTop = '8px';
     railNote.textContent =
-      'Spooky House solved this in one sweep — its graph had no cycles. Snakes give cycles, so we iterate.';
+      'Spooky House solved this in one sweep, its graph had no cycles. Snakes give cycles, so we iterate.';
     rail.appendChild(railNote);
 
-    /* --------- Rendering ---------- */
+    /*, Rendering, */
     /* The V-color scale is computed over the *final* iteration's V range so
        cells don't jitter colour across iterations. */
     const finalV = history[history.length - 1].V;
@@ -161,7 +161,7 @@
       if (finalV[s] < lo) lo = finalV[s];
       if (finalV[s] > hi) hi = finalV[s];
     }
-    /* Goal cell (s=100) has V=0 — include it in range. */
+    /* Goal cell (s=100) has V=0, include it in range. */
     if (0 < lo) lo = -Math.max(-lo, 1);
     if (0 > hi) hi = Math.max(hi, 0.01);
 
@@ -183,7 +183,7 @@
       scrLabel.textContent = 'iter ' + i + ' / ' + totalIters;
       const md = frame.maxDelta;
       if (!Number.isFinite(md)) {
-        scrDelta.textContent = 'max-|ΔV|: —';
+        scrDelta.textContent = 'max-|ΔV|:, ';
       } else {
         scrDelta.textContent = 'max-|ΔV|: ' + md.toFixed(4);
       }
@@ -195,7 +195,7 @@
         for (let b = 0; b < 8; b++) c.cell.classList.remove('v-bin-' + b);
         const v = V[s] || 0;
         if (i === 0) {
-          /* Iter 0: don't tint, don't label — V is uniformly 0. */
+          /* Iter 0: don't tint, don't label, V is uniformly 0. */
           c.text.textContent = '';
         } else {
           const bin = vBin(v, lo, hi);
@@ -223,7 +223,7 @@
         }
         document.getElementById('vi-dice').textContent = parts.join(' · ');
       } else {
-        document.getElementById('vi-dice').textContent = '—';
+        document.getElementById('vi-dice').textContent = ', ';
       }
     }
 

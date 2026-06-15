@@ -9,7 +9,7 @@
 
    This JS module wraps a list of those into a Bandit object, plus a seeded
    Mulberry32 RNG so the same seed reproduces a trajectory exactly. Scenes
-   never call Math.random — the rng is part of each scene's state, and a
+   never call Math.random, the rng is part of each scene's state, and a
    reset+replay sequence rebuilds the bandit from scratch.
 
    Vocabulary pinned to match the notebook:
@@ -21,7 +21,7 @@
 
 (function () {
 
-  /* Mulberry32 — identical to anymal-mdp/js/mdp.js so behaviour matches the
+  /* Mulberry32, identical to anymal-mdp/js/mdp.js so behaviour matches the
      sibling viz when seeds are reused (e.g. the same Mulberry32 generator
      drives ε-greedy in scene 4 as drives random ghost moves in ANYmal). */
   function makeRng(seed) {
@@ -68,7 +68,7 @@
       return wins[arm] / pulls[arm];
     }
 
-    /* Empirical row across all arms — convenience for the policy modules. */
+    /* Empirical row across all arms, convenience for the policy modules. */
     function empiricalRow() {
       const out = new Array(K);
       for (let i = 0; i < K; i++) out[i] = empirical(i);
@@ -78,7 +78,7 @@
     /* Realised cumulative regret at the current round:
          R(t) = t * mu_star  -  sum_{tau<=t} r_tau
        where mu_star is the largest true probability. Note this can DROP
-       on a single trajectory whenever a pull pays out — Bernoulli rewards
+       on a single trajectory whenever a pull pays out, Bernoulli rewards
        give increments of (mu_star - 1) ≈ -0.2 on a win. Useful when you
        want honest per-realisation noise on the chart. */
     function cumulativeRegret() {
@@ -87,7 +87,7 @@
 
     /* Cumulative pseudo-regret at the current round:
          R̄(t) = sum_a pulls[a] * (mu_star - probs[a])
-       Each term is >= 0, so this is monotone non-decreasing in t — the
+       Each term is >= 0, so this is monotone non-decreasing in t, the
        version you want when the audience expects "regret can only grow".
        Equivalent to sum_{tau<=t} (mu_star - mu(a_tau)) where mu(a_tau)
        is the TRUE mean of the chosen arm at step tau (not the realised

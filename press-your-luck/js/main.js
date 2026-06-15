@@ -65,10 +65,10 @@
   const sceneState = [];
   let current = -1;
 
-  /* ---- &run global ---- */
+  /*, &run global, */
   const RUN = /[#&?]run\b/.test(window.location.hash || '');
 
-  /* ---- badge persistence ---- */
+  /*, badge persistence, */
   function loadBadges() {
     try {
       const raw = localStorage.getItem(BADGE_STORE_KEY);
@@ -81,7 +81,7 @@
     try { localStorage.setItem(BADGE_STORE_KEY, JSON.stringify(earnedBadges)); } catch (_e) {}
   }
 
-  /* ---- hash routing ---- */
+  /*, hash routing, */
   function readHashScene() {
     const m = (window.location.hash || '').match(/[#&?]scene=(\d+)/);
     if (!m) return null;
@@ -177,7 +177,7 @@
   }
 
   function init() {
-    if (!window.DATA) console.error('DATA missing -- did data/datasets.js load?');
+    if (!window.DATA) console.error('DATA missing, did data/datasets.js load?');
 
     function cursorBlip() { if (window.SFX) window.SFX.play('cursor'); }
 
@@ -221,7 +221,7 @@
       if (!handled) goTo(current + 1);
     });
 
-    /* ---- Concept badges ---- */
+    /*, Concept badges, */
     function renderBadgeRow() {
       const row = document.getElementById('concept-badges');
       if (!row) return;
@@ -253,8 +253,8 @@
       maybeAwardBadge(idx);
     });
 
-    /* ---- One-time intro modal ("You are the player"), deferred to the
-       first advance off the title (index 0). Triggered once per browser. ---- */
+    /*, One-time intro modal ("You are the player"), deferred to the
+       first advance off the title (index 0). Triggered once per browser., */
     const INTRO_KEY = 'pyl-intro-seen';
     function introSeen() { try { return !!localStorage.getItem(INTRO_KEY); } catch (_e) { return false; } }
     function markIntroSeen() { try { localStorage.setItem(INTRO_KEY, '1'); } catch (_e) {} }
@@ -280,7 +280,7 @@
       if (idx > 0) maybeShowIntroModal();
     });
 
-    /* ---- Speaker-notes overlay (lecturer crib), toggled by `n`. ---- */
+    /*, Speaker-notes overlay (lecturer crib), toggled by `n`., */
     const snOverlay = document.createElement('div');
     snOverlay.id = 'speaker-notes-overlay';
     snOverlay.className = 'speaker-notes-overlay';
@@ -307,7 +307,7 @@
       else snOverlay.hidden = true;
     }
 
-    /* ---- Keyboard ---- */
+    /*, Keyboard, */
     window.addEventListener('keydown', (e) => {
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -334,14 +334,14 @@
 
     window.addEventListener('scene-change', () => { if (snVisible) refreshSpeakerNotes(); });
 
-    /* ---- hashchange ---- */
+    /*, hashchange, */
     window.addEventListener('hashchange', () => {
       const n = readHashScene();
       if (n != null) goTo(n);
     });
 
-    /* ---- Language toggle: rebuild every cached scene so new strings take
-       effect. Unvisited scenes rebuild lazily on first visit. ---- */
+    /*, Language toggle: rebuild every cached scene so new strings take
+       effect. Unvisited scenes rebuild lazily on first visit., */
     if (window.I18N && typeof window.I18N.onChange === 'function') {
       window.I18N.onChange(() => { renderBadgeRow(); rebuildAll(); });
     }

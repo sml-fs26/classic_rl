@@ -1,4 +1,4 @@
-/* scene11 i18n -- SARSA vs Q-learning, side by side (model-free TD control). */
+/* scene11 i18n, SARSA vs Q-learning, side by side (model-free TD control). */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -14,8 +14,8 @@
       'scene11.s1.title':'Drop the model. Learn from one flip at a time.',
       'scene11.s1.lead': 'We no longer know the coin. So replace the expectation in Bellman with <b>one observed flip</b>: after staking a at s, seeing reward r, landing at s-prime, nudge your estimate q toward what actually happened. Two classic update rules do this, differing only in <b>which next stake they assume</b>.',
       'scene11.s1.f0lab':'Bellman (needs the model we no longer have)',
-      'scene11.s1.fSarsaLab':'SARSA -- use the stake you ACTUALLY play next',
-      'scene11.s1.fQLab':'Q-learning -- use the BEST next stake',
+      'scene11.s1.fSarsaLab':'SARSA, use the stake you ACTUALLY play next',
+      'scene11.s1.fQLab':'Q-learning, use the BEST next stake',
       'scene11.s1.sarsaGloss':'On-policy: <b>play it safe</b>. SARSA learns the value of the cautious rule it actually follows, exploration and all. A stray exploratory bet that derails a bold run is part of what it learns from, so it leans timid.',
       'scene11.s1.qGloss':'Off-policy: <b>assume you’ll play optimally afterward</b>. Q-learning bootstraps on the best next stake, so it learns the value of the optimal playbook no matter how it explored.',
       'scene11.epsTitle':'Both keep exploring with epsilon',
@@ -53,8 +53,8 @@
       'scene11.s1.title':'モデルを すてる。 1かいの コインなげから まなぶ。',
       'scene11.s1.lead': 'もう コインは わからない。 だから ベルマンの きたいちを <b>じっさいの 1かいの なげ</b>で おきかえる： s で a を かけ、 ほうしゅう r を み、 s\' に ついたら、 すいていち q を じっさいに おきた ことへ よせる。 これを する こてんてきな こうしんルールが ふたつ あり、 ちがうのは <b>つぎの どの かけを そうていするか</b>だけ。',
       'scene11.s1.f0lab':'ベルマン（もう ない モデルが ひつよう）',
-      'scene11.s1.fSarsaLab':'SARSA -- じっさいに つぎ プレイする かけを つかう',
-      'scene11.s1.fQLab':'Q-ラーニング -- つぎの さいぜんの かけを つかう',
+      'scene11.s1.fSarsaLab':'SARSA, じっさいに つぎ プレイする かけを つかう',
+      'scene11.s1.fQLab':'Q-ラーニング, つぎの さいぜんの かけを つかう',
       'scene11.s1.sarsaGloss':'オンポリシー： <b>あんぜんに いく</b>。 SARSA は じっさいに したがう しんちょうな ルールの かちを、 たんさくも ふくめて まなぶ。 だいたんな れんぞくを くずす まよいの かけも まなびの ぶぶん なので、 こしぬけに なる。',
       'scene11.s1.qGloss':'オフポリシー： <b>あとは さいぜんに プレイすると そうてい</b>。 Q-ラーニングは つぎの さいぜんの かけで ブートストラップ するので、 どう たんさく しても さいぜんの プレイブックの かちを まなぶ。',
       'scene11.epsTitle':'どちらも eps で たんさくを つづける',

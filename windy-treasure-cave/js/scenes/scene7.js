@@ -1,4 +1,4 @@
-/* Scene 7 -- Optimal action-value Q*(s, a).
+/* Scene 7, Optimal action-value Q*(s, a).
  *   Pick a tile (default: the one directly below the pit) and show its
  *   state-icon (the board with that tile glowing) beside a two-column table:
  *   heading a | Q*(s, a), the argmax starred. The numbers tell the story:

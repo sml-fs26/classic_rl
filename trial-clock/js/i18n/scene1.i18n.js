@@ -1,10 +1,10 @@
-/* scene1 i18n -- tutorial / how to play. */
+/* scene1 i18n, tutorial / how to play. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
     en: {
       'scene1.title':  'How to play',
-      'scene1.lede':   'No theory yet -- just the controls. Meet the Trial Card, the three levers, and the two dice you do not control.',
+      'scene1.lede':   'No theory yet, just the controls. Meet the Trial Card, the three levers, and the two dice you do not control.',
       'scene1.back':   '‹ BACK',
       'scene1.next':   'NEXT ›',
       'scene1.done':   'I run it ›',
@@ -26,7 +26,7 @@
     },
     jp: {
       'scene1.title':  'あそびかた',
-      'scene1.lede':   'まだ りろんは なし -- そうさだけ。 トライアル カード、 3つの レバー、 そして じぶんで きめられない 2つの さいころに あおう。',
+      'scene1.lede':   'まだ りろんは なし, そうさだけ。 トライアル カード、 3つの レバー、 そして じぶんで きめられない 2つの さいころに あおう。',
       'scene1.back':   '‹ もどる',
       'scene1.next':   'つぎ ›',
       'scene1.done':   'じぶんで やる ›',

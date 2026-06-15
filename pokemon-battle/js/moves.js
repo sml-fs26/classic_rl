@@ -1,7 +1,7 @@
-/* Pokemon move definitions — the action space of Pikachu's MDP.
+/* Pokemon move definitions, the action space of Pikachu's MDP.
  *
  * The `power` field is retained internally for Pokemon-canon flavour but is
- * NO LONGER surfaced on the move buttons — the on-screen PWR/ACC strip used
+ * NO LONGER surfaced on the move buttons, the on-screen PWR/ACC strip used
  * to confuse students because the numbers don't drive the MDP. The actual
  * damage is a per-move bucket-drop distribution defined in `battle.js`
  * (HIT_DAMAGE_BY_FORM). `accuracy` IS real and used as the hit probability.
@@ -30,7 +30,7 @@
 
   const OPP_MOVE = { id: 'ember', name: 'EMBER', power: 80, accuracy: 1.00, type: 'fire' };
 
-  /* Inline SVG icon per type — cheap pixel-art glyphs, no extra asset. */
+  /* Inline SVG icon per type, cheap pixel-art glyphs, no extra asset. */
   function typeIconSvg(type) {
     if (type === 'electric') {
       return '<svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">' +
@@ -57,7 +57,7 @@
 
   /* Format the actual bucket-drop distribution for display on the move button.
      Reads `window.Battle.HIT_DAMAGE_DIST` lazily (Battle loads after Moves in
-     index.html). Returns "DROPS 1 (50%) / 2 (50%)" — or with an "ON HIT:"
+     index.html). Returns "DROPS 1 (50%) / 2 (50%)", or with an "ON HIT:"
      prefix when accuracy < 100% to flag that the distribution is conditional
      on the move landing.
 
@@ -76,7 +76,7 @@
     return prefix + 'DROPS ' + parts.join(' / ');
   }
 
-  /* Render the move-button sub-line — just the type pill now. The old
+  /* Render the move-button sub-line, just the type pill now. The old
      PWR/ACC strip was dropped: the numbers were flavour, not MDP truth,
      and they cluttered the choice without informing it. The rightward
      ordering (weak/reliable → strong/risky) and the form-dependent

@@ -20,7 +20,7 @@
  *   window.Bakery) and window.Moves (aliased to window.Levers). The greedy
  *   tie-break here favors the EARLIER action in MOVE_IDS order
  *   [HOLD, DISCOUNT, DUMP] (premium > act-now > cut-loss), so a tie reads as the
- *   higher-margin lever -- the bakery's natural preference. The proposal board
+ *   higher-margin lever, the bakery's natural preference. The proposal board
  *   has a strict winner in every cell, so the tie-break never actually fires;
  *   the precompute asserts this. */
 (function () {

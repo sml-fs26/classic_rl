@@ -1,4 +1,4 @@
-/* Scene 3 -- Formalization: what makes this an MDP. The four parts reveal over
+/* Scene 3, Formalization: what makes this an MDP. The four parts reveal over
    the same shop screen: State s = (units, freshness); Action a in {HOLD,
    DISCOUNT, DUMP}; Transition P (the buy-meter: a sale clears one unit, a
    no-sale ages a tier); Reward r (+5/+2/−3/−6). A small box names gamma = 0.75

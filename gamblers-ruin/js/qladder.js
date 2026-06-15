@@ -1,4 +1,4 @@
-/* qladder.js -- the vertical CASH LADDER widget for Gambler's Ruin.
+/* qladder.js, the vertical CASH LADDER widget for Gambler's Ruin.
  *
  *   The recurring state-icon AND the whole Q-table, one object. Eleven rungs
  *   stacked from $0 (RUIN, dark slab) at the BOTTOM to $10 (GOAL, gold plate)

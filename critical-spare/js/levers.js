@@ -9,8 +9,8 @@
  *
  * RUN and ORDER are always available. REPLACE needs a spare on hand
  * (spares >= 1); when the bin is empty REPLACE is clamped out (greyed,
- * never chosen). The single stochastic element -- the failure die on RUN,
- * plus the aging coin -- lives in machine.js, not here.
+ * never chosen). The single stochastic element, the failure die on RUN,
+ * plus the aging coin, lives in machine.js, not here.
  *
  * Mirrors the shape of the gallery engine's window.Moves (MOVE_IDS /
  * MOVE_BY_ID) so bellman.js / sarsa.js consume it unchanged; aliased to

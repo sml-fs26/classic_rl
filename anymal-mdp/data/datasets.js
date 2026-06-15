@@ -1,7 +1,7 @@
 /* Static configuration for the ANYmal MDP first-contact viz.
 
    With 100% manual driving there is no canonical pre-canned trajectory to
-   precompute — this file only carries grid dimensions, initial entity
+   precompute, this file only carries grid dimensions, initial entity
    positions, sample reward values for legends/captions, and KaTeX strings
    reused across scenes. */
 (function () {
@@ -25,7 +25,7 @@
       seed: 20260509,
     },
 
-    /* Reward magnitudes — duplicated from MDP.REWARD for prose/legend use. */
+    /* Reward magnitudes, duplicated from MDP.REWARD for prose/legend use. */
     rewards: {
       step: -1,
       star: 10,

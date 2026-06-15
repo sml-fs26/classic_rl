@@ -51,7 +51,7 @@
 
     let step = 0;
 
-    /* ---------- Scaffold ---------- */
+    /*, Scaffold, */
     const wrap = document.createElement('div');
     wrap.className = 's3-wrap';
     root.appendChild(wrap);
@@ -65,7 +65,7 @@
     row.className = 's3-row';
     wrap.appendChild(row);
 
-    /* ----- LEFT: the frozen "live board" ----- */
+    /*, LEFT: the frozen "live board", */
     const board = document.createElement('div');
     board.className = 's3-board';
     row.appendChild(board);
@@ -120,7 +120,7 @@
     diceRing.appendChild(transTag);
     board.appendChild(diceRing);
 
-    /* ----- RIGHT: the lever menu + the four part-cards ----- */
+    /*, RIGHT: the lever menu + the four part-cards, */
     const rightCol = document.createElement('div');
     rightCol.className = 's3-right';
     row.appendChild(rightCol);
@@ -179,7 +179,7 @@
       partNodes[def.key] = c;
     }
 
-    /* ----- BELOW: the reward ledger, the Markov line, the tuple ----- */
+    /*, BELOW: the reward ledger, the Markov line, the tuple, */
     const below = document.createElement('div');
     below.className = 's3-below';
     wrap.appendChild(below);
@@ -228,7 +228,7 @@
     markov.appendChild(tupleBox);
     below.appendChild(markov);
 
-    /* ----- Caption + step controls ----- */
+    /*, Caption + step controls, */
     const caption = document.createElement('div');
     caption.className = 'poke-caption s3-caption';
     wrap.appendChild(caption);
@@ -246,7 +246,7 @@
     hint.innerHTML = T('scene3.hint');
     wrap.appendChild(hint);
 
-    /* ---------- Step state machine ---------- */
+    /*, Step state machine, */
     function applyStep(c) {
       step = Math.max(0, Math.min(STEP_COUNT - 1, c));
 

@@ -72,7 +72,7 @@
   const LEVER_BY_ID = window.Levers.LEVER_BY_ID;
   const LEVER_IDS   = window.Levers.LEVER_IDS;
 
-  /* ---------- Board geometry (5 tiers x 5 days) ----------
+  /*, Board geometry (5 tiers x 5 days) ----------
      row(s): tier 4 (ACTIVATED) at the TOP -> row 0; tier 0 (none) -> row 4.
      col(s): days 5 on the LEFT -> col 0; days 1 -> col 4. */
   function row(s) { return MAX_TIER - tierOf(s); }
@@ -119,7 +119,7 @@
   function availableLeverIds(_tier, _days) { return LEVER_IDS.slice(); }
   function isLegal(_tier, _days, leverId) { return !!LEVER_BY_ID[leverId]; }
 
-  /* ---------- One realized dice roll (one sample) ---------- */
+  /*, One realized dice roll (one sample), */
   function sample(state, leverId, rng) {
     if (state.terminal) {
       return { sNext: state, reward: 0, terminal: true,
@@ -165,7 +165,7 @@
       log: Object.assign(base, { kind: 'wheel', wedge: 'abandon', outcome: 'abandon' }) };
   }
 
-  /* ---------- Successor enumeration (value iteration) ----------
+  /*, Successor enumeration (value iteration) ----------
      Returns every outcome of a lever with its probability and reward. No lever
      is ever clamped, so this never returns []. */
   function successors(state, leverId) {
@@ -192,7 +192,7 @@
   }
   function successorsFromBuckets(s, leverId) { return successors(s, leverId); }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
@@ -204,7 +204,7 @@
     };
   }
 
-  /* ---------- Display helpers ---------- */
+  /*, Display helpers, */
   function tierLabel(t) {
     return t === MAX_TIER ? 'ACTIVATED' : (t === 0 ? 'none' : String(t));
   }

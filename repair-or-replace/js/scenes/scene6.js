@@ -60,7 +60,7 @@
         '<span>' + ACT.shortLabel(id) + '</span></span>';
     }
 
-    /* ---- Heading + lede ---- */
+    /*, Heading + lede, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = "Return over the van's life";
@@ -71,7 +71,7 @@
     lede.textContent = 'One run of the playbook left a tape of weekly money.';
     root.appendChild(lede);
 
-    /* ---- The six-week tape ---- */
+    /*, The six-week tape, */
     const card = document.createElement('div');
     card.className = 's6-tape';
     root.appendChild(card);
@@ -165,7 +165,7 @@
     caption.className = 's6-caption';
     card.appendChild(caption);
 
-    /* ---- The return formula (last step) ---- */
+    /*, The return formula (last step), */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card s6-formula';
     fcard.innerHTML = '<div class="concept-formula-label">ONE NUMBER FOR THE WHOLE TAPE</div>';
@@ -178,12 +178,12 @@
     fcard.appendChild(gchip);
     root.appendChild(fcard);
 
-    /* ---- Step hint ---- */
+    /*, Step hint, */
     const hint = document.createElement('div');
     hint.className = 's6-hint';
     root.appendChild(hint);
 
-    /* ---- Step engine ---- */
+    /*, Step engine, */
     const CAPTIONS = [
       'Week by week: the call, then the money.',
       'Add the tape up: one score for the run. But week-six money is not week-one money.',

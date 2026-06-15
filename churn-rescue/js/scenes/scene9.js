@@ -117,7 +117,7 @@
     for (let i = 0; i < N * A; i++) maxDiff = Math.max(maxDiff, Math.abs(finalQ[i] - DATA.Qstar[i]));
     if (maxDiff > 1e-2) console.warn('[scene9] DP fill != DATA.Qstar, maxDiff', maxDiff);
 
-    /* ---- Heading + hook + premise ---- */
+    /*, Heading + hook + premise, */
     const h = document.createElement('h2');
     h.className = 's9-heading';
     h.textContent = T('s9.heading');
@@ -133,7 +133,7 @@
     premise.innerHTML = T('s9.premise');
     root.appendChild(premise);
 
-    /* ---- Controls + status ---- */
+    /*, Controls + status, */
     const ctrls = document.createElement('div');
     ctrls.className = 's9-controls';
     ctrls.innerHTML =
@@ -146,7 +146,7 @@
       '</div>';
     root.appendChild(ctrls);
 
-    /* ---- Row: retention map + side panel ---- */
+    /*, Row: retention map + side panel, */
     const row = document.createElement('div');
     row.className = 's9-row';
     root.appendChild(row);
@@ -170,7 +170,7 @@
       sweepDelta.push(d);
     }
 
-    /* ---- Sweep machine. sweep in -1..5. -1 = blank, 5 = converged recap. ---- */
+    /*, Sweep machine. sweep in -1..5. -1 = blank, 5 = converged recap., */
     const TOTAL_SWEEPS = NM;                            // 5 column sweeps
     let sweep = -1;
 

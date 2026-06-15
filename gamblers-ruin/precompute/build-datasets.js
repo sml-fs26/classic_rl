@@ -38,7 +38,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/* ---------------- Load the verified engine via a window shim ---------------- */
+/*, Load the verified engine via a window shim, */
 const sandbox = { window: {}, console, Math, Float64Array, Float32Array, Int32Array, Array, Map, Set, JSON };
 sandbox.window.window = sandbox.window;
 const ctx = vm.createContext(sandbox);
@@ -61,7 +61,7 @@ const GAMMA = 1.0;
 
 Gambler.setWinProb(P_WIN);
 
-/* ---------------- Value iteration (gamma = 1) ---------------- */
+/*, Value iteration (gamma = 1), */
 const TOL = 1e-12;
 const MAX_ITERS = 400;
 const vi = Bellman.valueIteration(GAMMA, { tol: TOL, maxIters: MAX_ITERS, recordHistory: true });
@@ -69,7 +69,7 @@ const V = vi.V;                             // Float64Array[9], index = capital 
 const policy = vi.policy;                   // [9] stake-id strings
 const Qstar = Bellman.qFromV(V, GAMMA);     // Float64Array[9*A], index stateIndex*A + stakeIdx
 
-/* ---------------- Helpers ---------------- */
+/*, Helpers, */
 function vAt(c) { return V[c - 1]; }
 function qRow(c) {
   const base = (c - 1) * A;
@@ -80,19 +80,19 @@ function qRow(c) {
 function betOfPolicy(c) { return Stakes.betOf(policy[c - 1]); }
 function round3(x) { return Math.round(x * 1000) / 1000; }
 function round4(x) { return Math.round(x * 10000) / 10000; }
-function fmt(x) { return Number.isFinite(x) ? x.toFixed(4) : '  --  '; }
+function fmt(x) { return Number.isFinite(x) ? x.toFixed(4) : ', '; }
 
-/* ---------------- Assertions ---------------- */
+/*, Assertions, */
 function assert(name, ok, info) {
   if (ok) { console.log('  [OK]   ' + name); return; }
-  console.error('  [FAIL] ' + name + (info ? ' -- ' + info : ''));
+  console.error('  [FAIL] ' + name + (info ? ', ' + info : ''));
   process.exit(1);
 }
 
-console.log("Gambler's Ruin precompute -- 11-rung cash ladder, 3 stakes, p = " + P_WIN + ', gamma = ' + GAMMA);
+console.log("Gambler's Ruin precompute, 11-rung cash ladder, 3 stakes, p = " + P_WIN + ', gamma = ' + GAMMA);
 console.log('  ' + N + ' playable interior rungs (capital $1..$9); terminals $0 (RUIN=0), $10 (GOAL=1)');
 console.log('');
-console.log('Phase 1 -- Value iteration');
+console.log('Phase 1, Value iteration');
 const lastSweep = vi.history[vi.history.length - 1];
 console.log('  converged in ' + vi.iters + ' sweeps, final maxDelta = ' + lastSweep.maxDelta.toExponential(2));
 
@@ -176,7 +176,7 @@ assert('hand backup Q*($1,$1) = 0.4*V*($2) reproduces V*($1)',
 assert('hand backup Q*($9,$1) = 0.4 + 0.6*V*($8) reproduces V*($9)',
   Math.abs(q9_1 - vAt(9)) < 1e-12, 'q=' + q9_1 + ' vs V=' + vAt(9));
 
-/* ---------------- Per-sweep policy snapshots for the DP scene ----------------
+/*, Per-sweep policy snapshots for the DP scene ----------------
    The ladder fills "from the goal outward": early sweeps only light rungs that
    can reach $10 in one flip; later sweeps push value down toward ruin. We
    record the (V, Q, solvedMask) after each of the first ~24 sweeps so the DP
@@ -214,7 +214,7 @@ console.log('');
 console.log('  DP fill recorded over ' + sweepSnapshots.length + ' sweep-frames ' +
             '(value reaches 3dp stability by ~sweep ' + sweepsToStable + ')');
 
-/* ---------------- Phase 2 -- model-free TD control: TWO learners ----------------
+/*, Phase 2, model-free TD control: TWO learners ----------------
    We learn Q from experience (flip, outcome, adjust) with no model of the coin,
    and run BOTH classic TD-control updates side by side on the SAME kind of
    experience, to teach the on-policy / off-policy split honestly:
@@ -402,7 +402,7 @@ function summariseLearner(learner, evalSeed) {
 }
 
 console.log('');
-console.log('Phase 2 -- model-free TD control: OFF-POLICY Q-learning vs ON-POLICY SARSA');
+console.log('Phase 2, model-free TD control: OFF-POLICY Q-learning vs ON-POLICY SARSA');
 console.log('  Q-learning: ' + QL_CFG.episodes + ' eps, alpha=1/(1+n)^' + QL_CFG.alphaPower +
             ', eps ' + QL_CFG.epsilon + '->' + QL_CFG.epsilonMin + ' (off-policy max bootstrap)');
 console.log('  SARSA:      ' + SARSA_CFG.episodes + ' eps, alpha=' + SARSA_CFG.constAlpha +
@@ -460,7 +460,7 @@ const agreement = qlSum.agreed / N;
 const agreed = qlSum.agreed;
 const disagreements = qlSum.disagreements;
 
-/* ---------------- A fixed illustrative trajectory ----------------
+/*, A fixed illustrative trajectory ----------------
    One short, deterministic demo episode from a $5 start under the OPTIMAL
    policy, pinned seed, for the tutorial / trajectory / return scenes. Seed
    chosen so the run is varied (a swing or two) and ends at the GOAL. */
@@ -510,7 +510,7 @@ console.log('');
 console.log('Demo trajectory (optimal policy from $5, seed ' + demoTrajectory.seedUsed + '): ' +
             demoTrajectory.flips + ' flips, ' + (demoTrajectory.won ? 'reached GOAL' : 'hit RUIN'));
 
-/* ---------------- Return-distribution bars for the Return scene ----------------
+/*, Return-distribution bars for the Return scene ----------------
    Fix the $5 start and one chosen FIRST stake, then play OPTIMALLY afterward;
    estimate the win-probability (= expected 0/1 return) by enumeration via the
    exact Q*. Q*($5, a) IS that probability. We also Monte-Carlo a stack of
@@ -543,7 +543,7 @@ const returnBars = {
 console.log('  return from $5: start BOLD win-prob ~ ' + returnBars.bold.exact +
             ' , start TIMID ~ ' + returnBars.timid.exact);
 
-/* ---------------- The two named spot-Q rows the Q* scene calls out ---------------- */
+/*, The two named spot-Q rows the Q* scene calls out, */
 function spotRow(c) {
   const r = qRow(c);
   const ids = Gambler.availableStakeIds(c);
@@ -553,7 +553,7 @@ function spotRow(c) {
 }
 const spotQ = { c3: spotRow(3), c5: spotRow(5), c8: spotRow(8), c9: spotRow(9) };
 
-/* ---------------- Favorable-coin contrast for the slider scene ----------------
+/*, Favorable-coin contrast for the slider scene ----------------
    Drag p to 0.55: the whole pattern collapses to "always bet $1". Recompute a
    fresh policy at p = 0.55 to prove it (then restore p = 0.4). */
 function policyAtP(p) {
@@ -570,7 +570,7 @@ console.log('  contrast: optimal stakes at p=0.55 (favorable) = [' + favorableBe
 assert('at favorable odds p=0.55 the optimal policy collapses to all bet $1',
   favorableBets.every(b => b === 1), '[' + favorableBets.join(',') + ']');
 
-/* ---------------- Recap cards (ladder voice) ---------------- */
+/*, Recap cards (ladder voice), */
 const recap = [
   { key: 'mdp', badge: 'MDP', scene: 3, title: 'THE FOUR-PART FRAME',
     text: 'The situation is your CAPITAL (the rung you sit on). The lever is your STAKE ($1/$2/$3). The part you do not control is the rigged COIN. The payoff is binary: +1 the instant you reach $10, 0 if you go broke first.',
@@ -592,10 +592,10 @@ const recap = [
     tex: 'q[s,a] \\;\\mathrel{+}=\\; \\alpha\\,(\\, r + q[s\',a\'] - q[s,a] \\,)' },
 ];
 
-/* ---------------- Stakes for display ---------------- */
+/*, Stakes for display, */
 const stakesDisplay = Stakes.STAKES.map(s => ({ id: s.id, name: s.name, bet: s.bet, role: s.role }));
 
-/* ---------------- Assemble + round payloads ---------------- */
+/*, Assemble + round payloads, */
 function roundArr(arr, places) { const f = Math.pow(10, places); return Array.from(arr, v => (Number.isFinite(v) ? Math.round(v * f) / f : null)); }
 
 const DATA = {
@@ -704,11 +704,11 @@ const DATA = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(ROOT, 'data', 'datasets.js');
 const payload = JSON.stringify(DATA);
 const fileContent =
-  "/* Gambler's Ruin -- static MDP solution plus value-iteration fill frames\n" +
+  "/* Gambler's Ruin, static MDP solution plus value-iteration fill frames\n" +
   " * and SARSA training trajectories.\n" +
   " *\n" +
   " * Regenerate with `node precompute/build-datasets.js`. The build script\n" +

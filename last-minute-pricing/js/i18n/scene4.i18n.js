@@ -1,4 +1,4 @@
-/* scene4 i18n fragment -- "A policy is a playbook" (the Policy scene).
+/* scene4 i18n fragment, "A policy is a playbook" (the Policy scene).
    English is the source of truth; the Japanese mirror gives full parity.
    KaTeX formulas stay in pure math form (symbols cross languages). */
 (function () {

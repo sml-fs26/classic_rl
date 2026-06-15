@@ -31,13 +31,13 @@
     const Churn = window.Churn;
     const Levers = window.Levers;
 
-    /* ---------- Header ---------- */
+    /*, Header, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title';
     header.textContent = T('play.section_title');
     root.appendChild(header);
 
-    /* ---------- Main row: card+dice (left) | ledger (right) ---------- */
+    /*, Main row: card+dice (left) | ledger (right), */
     const row = document.createElement('div');
     row.className = 'play-row';
     root.appendChild(row);
@@ -87,7 +87,7 @@
     ledgerHost.className = 'margin-ledger play-ledger';
     rightCol.appendChild(ledgerHost);
 
-    /* ---------- Action menu: the three levers + restart ---------- */
+    /*, Action menu: the three levers + restart, */
     const menu = document.createElement('div');
     menu.className = 'play-menu';
     root.appendChild(menu);
@@ -117,7 +117,7 @@
     caption.textContent = T('play.caption');
     root.appendChild(caption);
 
-    /* ---------- Episode state ---------- */
+    /*, Episode state, */
     let state = Churn.initialState();
     let balance = 0;
     let month = 0;                 /* months elapsed (for ledger row labels) */
@@ -128,7 +128,7 @@
        aborts cleanly. */
     let episode = 0;
 
-    /* ---- Ledger rendering. Entries accrue as the learner plays. ---- */
+    /*, Ledger rendering. Entries accrue as the learner plays., */
     const entries = [];           /* { label, amt, kind:'debit'|'credit' } */
     function renderLedger() {
       const rows = entries.map(e =>
@@ -174,9 +174,9 @@
     function leverName(id) { return T('lever.' + id); }
     function tierName(idx) { return T('tier.' + Churn.TIERS[idx]); }
 
-    /* ---- One month: pull a lever, animate coin then die, update ledger.
+    /*, One month: pull a lever, animate coin then die, update ledger.
        The whole month is sampled up-front from the engine; the animation
-       just replays the log so what the learner SEES matches the model. ---- */
+       just replays the log so what the learner SEES matches the model., */
     async function applyMonth(leverId) {
       const myEp = episode;
       const out = Churn.sample(state, leverId, rng);
@@ -252,9 +252,9 @@
       applyMonth(leverId);
     }
 
-    /* ---- Reset to a fresh episode. `reseed` true draws a new random seed
+    /*, Reset to a fresh episode. `reseed` true draws a new random seed
        (manual restart); false keeps the current rng (used by &run with a
-       pinned seed). ---- */
+       pinned seed)., */
     function resetEpisode(reseed) {
       episode++;
       if (reseed) rng = Churn.makeRng((Date.now() ^ (Math.random() * 1e9)) >>> 0);
@@ -271,8 +271,8 @@
 
     resetEpisode(false);
 
-    /* ---- &run: pinned-seed auto-play of CHECK-INs to a renewal, so the
-       headless screenshot shows a full ledger ending in a gold renewal. ---- */
+    /*, &run: pinned-seed auto-play of CHECK-INs to a renewal, so the
+       headless screenshot shows a full ledger ending in a gold renewal., */
     let autoTimer = null;
     function stopAuto() { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } }
     function maybeRun() {

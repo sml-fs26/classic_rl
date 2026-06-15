@@ -1,4 +1,4 @@
-/* Scene 11 -- SARSA vs Q-learning, side by side (the honest, model-free scene).
+/* Scene 11, SARSA vs Q-learning, side by side (the honest, model-free scene).
  *   Step 1: derive model-free TD control from Bellman by replacing the
  *     expectation with one observed step, then split into the TWO update rules
  *     that differ only in how they bootstrap the next heading:

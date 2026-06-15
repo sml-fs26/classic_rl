@@ -1,4 +1,4 @@
-/* Scene 1 — Roll a die.
+/* Scene 1, Roll a die.
  *
  *   The board, with a small red token at square 1. Three big die buttons below.
  *   Click a die → roll animation, token slides along the board to the new
@@ -6,7 +6,7 @@
  *   HUD shows turn count, current square, total reward (-turn).
  *
  *   Step engine: arrow keys rewind/replay via the History module. State is
- *   the source of truth — replays use captured seeds for determinism. Each
+ *   the source of truth, replays use captured seeds for determinism. Each
  *   click uses a fresh Mulberry32 RNG so the same recorded action produces
  *   the same roll.
  *
@@ -59,7 +59,7 @@
       '<div class="hud-item"><span class="hud-label">turn</span><span class="hud-val" id="hud-turn">0</span></div>' +
       '<div class="hud-item"><span class="hud-label">square</span><span class="hud-val" id="hud-square">1</span></div>' +
       '<div class="hud-item"><span class="hud-label">reward R</span><span class="hud-val" id="hud-reward">0</span></div>' +
-      '<div class="hud-item"><span class="hud-label">last roll</span><span class="hud-val" id="hud-roll">—</span></div>';
+      '<div class="hud-item"><span class="hud-label">last roll</span><span class="hud-val" id="hud-roll">, </span></div>';
     wrap.appendChild(hud);
 
     /* Die buttons */
@@ -90,7 +90,7 @@
     cap.className = 'caption';
     cap.textContent =
       'The reward is −1 per turn. Reach 100 in as few turns as possible. ' +
-      'For now, just feel the variance — the answer is in scene 2.';
+      'For now, just feel the variance, the answer is in scene 2.';
     wrap.appendChild(cap);
 
     /* Footnote */
@@ -99,7 +99,7 @@
     foot.innerHTML = 'Press <kbd>←</kbd>/<kbd>→</kbd> to step through your rolls.';
     wrap.appendChild(foot);
 
-    /* --------- State ---------- */
+    /*, State, */
     const history = window.History.create();
     let busy = false;     /* during animation */
     let square = 1;
@@ -113,7 +113,7 @@
     }
     function setLastRoll(d, r) {
       const el = document.getElementById('hud-roll');
-      if (r == null) { el.textContent = '—'; return; }
+      if (r == null) { el.textContent = ', '; return; }
       el.textContent = d + ' = ' + r;
     }
 

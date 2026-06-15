@@ -1,4 +1,4 @@
-/* Scene 10 -- Why DP does not scale. Two-reason card, each with a bakery face.
+/* Scene 10, Why DP does not scale. Two-reason card, each with a bakery face.
    (a) You rarely know the dice: the posted buy-meter was a gift; real demand
    shifts with weather, a competitor, a TikTok. (b) The board explodes: add real
    stock (0..40), 24 hourly ticks, three product lines, a weekend flag, a weather

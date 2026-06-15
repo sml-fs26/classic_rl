@@ -1,4 +1,4 @@
-/* Scene 5 — "You've trained PIKACHU."
+/* Scene 5, "You've trained PIKACHU."
  *
  * Hall of Fame recap.  One card per badge (MDP, RETURN, Q*, DP, SARSA);
  * each card carries a distinctive Gen-1 styled glyph that recalls the
@@ -22,11 +22,11 @@
 
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
-  /* ---------- Per-badge visual glyphs ----------
+  /*, Per-badge visual glyphs ----------
      Each builder returns an HTML string for the .sc5-card-visual slot.
      Glyphs are deliberately small (≤ ~150 px tall) and use Press Start
      2P + retro chips so they read as "miniature reminders" of the
-     full visuals from earlier scenes — not as new content. */
+     full visuals from earlier scenes, not as new content. */
 
   function visualMdp() {
     /* 4-tile strip: S / A / P / R. Each tile pairs the letter with a
@@ -168,7 +168,7 @@
 
     const isChampion = earned === TRAINER_BADGE_META.length;
     const titleSuffix = isChampion ? T('recap.trainer.champion') : T('recap.trainer.in_progress');
-    const title = name + ' — ' + titleSuffix;
+    const title = name + ', ' + titleSuffix;
     const stats =
       T('recap.trainer.stats_base', { earned: earned, total: TRAINER_BADGE_META.length }) +
       (firstTs  ? T('recap.trainer.stats_since', { date: fmtDate(firstTs) })  : '') +
@@ -192,14 +192,14 @@
     root.classList.add('scene-pad', 'sc5-scene');
     root.innerHTML = '';
 
-    /* Pokemon-League HALL OF FAME banner — sits above the trainer
+    /* Pokemon-League HALL OF FAME banner, sits above the trainer
        card.  Frames the scene as a victory screen. */
     const banner = document.createElement('div');
     banner.className = 'sc5-hof-banner';
     banner.innerHTML = '<span class="sc5-star">★</span> ' + T('recap.hof') + ' <span class="sc5-star">★</span>';
     root.appendChild(banner);
 
-    /* Trainer card — name + badge row + lifetime stats.  Replaces
+    /* Trainer card, name + badge row + lifetime stats.  Replaces
        the static "YOU'VE TRAINED PIKACHU." heading so the page
        speaks to *this* student. */
     const tc = document.createElement('div');
@@ -218,7 +218,7 @@
 
     /* Five badge recaps.  Each entry maps to a trainer-badge key
        (mdp, return, qstar, dp, sarsa) so the card header re-uses the
-       same colour as the topbar pip — visual continuity between
+       same colour as the topbar pip, visual continuity between
        "you earned this" and "here is what it meant".  The visual()
        builder returns the distinctive glyph for that concept. */
     const BADGE_RECAPS = [
@@ -262,7 +262,7 @@
     footnote.innerHTML = T('recap.footnote');
     root.appendChild(footnote);
 
-    /* Victory fanfare — 4-note ascending arpeggio. Defer so the
+    /* Victory fanfare, 4-note ascending arpeggio. Defer so the
        sound lands while the cards are still animating in, not
        before the scene has rendered.  Plays on first build AND on
        revisits (onEnter).  First-visit-ever (across all sessions)
@@ -273,7 +273,7 @@
       }, 180);
       if (firstEver) {
         setTimeout(() => spawnConfetti(root), 220);
-        /* Second SFX hit a bit later — feels more ceremonial. */
+        /* Second SFX hit a bit later, feels more ceremonial. */
         setTimeout(() => {
           if (window.SFX && window.SFX.play) window.SFX.play('win');
         }, 900);

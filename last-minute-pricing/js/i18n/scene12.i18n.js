@@ -1,4 +1,4 @@
-/* scene12 i18n fragment -- Recap ("You have learned the bones").
+/* scene12 i18n fragment, Recap ("You have learned the bones").
    Six concept cards in the shelf-card voice. English mirrors
    window.DATA.recap (the authoritative source for the numbers/blurbs);
    the Japanese mirror gives parity. The scene falls back to DATA.recap

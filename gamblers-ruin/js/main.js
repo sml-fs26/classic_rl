@@ -150,7 +150,7 @@
   }
 
   function init() {
-    if (!window.DATA) console.error('DATA missing -- did data/datasets.js load?');
+    if (!window.DATA) console.error('DATA missing, did data/datasets.js load?');
 
     function cursorBlip() { if (window.SFX) window.SFX.play('cursor'); }
 
@@ -186,7 +186,7 @@
       if (!handled) goTo(current + 1);
     });
 
-    /* ---- Concept badges ---- */
+    /*, Concept badges, */
     function renderBadgeRow() {
       const row = document.getElementById('concept-badges');
       if (!row) return;
@@ -214,7 +214,7 @@
       maybeAwardBadge(idx);
     });
 
-    /* ---- Speaker-notes overlay (lecturer crib), toggled by `n`. ---- */
+    /*, Speaker-notes overlay (lecturer crib), toggled by `n`., */
     const snOverlay = document.createElement('div');
     snOverlay.id = 'speaker-notes-overlay';
     snOverlay.className = 'speaker-notes-overlay';
@@ -238,7 +238,7 @@
       else snOverlay.hidden = true;
     }
 
-    /* ---- Keyboard ---- */
+    /*, Keyboard, */
     window.addEventListener('keydown', (e) => {
       if (e.target && /input|textarea|select/i.test(e.target.tagName || '')) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -265,8 +265,8 @@
 
     window.addEventListener('hashchange', () => { const n = readHashScene(); if (n != null) goTo(n); });
 
-    /* ---- Language toggle: re-render badge labels + rebuild every cached
-       scene so new strings take effect. Unvisited scenes rebuild lazily. ---- */
+    /*, Language toggle: re-render badge labels + rebuild every cached
+       scene so new strings take effect. Unvisited scenes rebuild lazily., */
     if (window.I18N && typeof window.I18N.onChange === 'function') {
       window.I18N.onChange(() => { renderBadgeRow(); updateTitle(current); rebuildAll(); });
     }

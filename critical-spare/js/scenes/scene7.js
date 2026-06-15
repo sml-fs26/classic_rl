@@ -1,4 +1,4 @@
-/* Scene 7 -- Optimal action-value Q*. For a chosen situation, show the machine
+/* Scene 7, Optimal action-value Q*. For a chosen situation, show the machine
    icon beside a clean two-column table (lever a | Q*(s,a)) with the best row
    starred + clamped levers greyed. Step the picker across (HEALTHY,0)->RUN,
    (AGING,0)->ORDER, (FAILING,0)->ORDER, (FAILING,1)->REPLACE: the star moves,

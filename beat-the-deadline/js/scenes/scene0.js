@@ -1,4 +1,4 @@
-/* Scene 0 -- Title / hook.
+/* Scene 0, Title / hook.
  *   A loading-dock tile at dusk (2 pallets, 4 hours), the truck waiting, and a
  *   PRESS START prompt. START reveals the manager framing + a BEGIN button that
  *   yields to the engine (-> scene 1). Cold-entry safe; honours &run. */

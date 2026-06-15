@@ -1,4 +1,4 @@
-/* scene11 i18n fragment -- "Learn the playbook with SARSA" (the capstone).
+/* scene11 i18n fragment, "Learn the playbook with SARSA" (the capstone).
    Three-step pager: DERIVE the update from Bellman, name EPSILON, then watch
    it LEARN the board live with no demand model. English is the source of
    truth; the Japanese mirror gives parity. */
@@ -16,7 +16,7 @@
       'scene11.reset':  'RESET',
       'scene11.status': 'STEP {i} / {n}',
 
-      /* ---- STEP 1: derive the update ---- */
+      /*, STEP 1: derive the update, */
       'scene11.s1.tag':   'STEP 1 / 3',
       'scene11.s1.title': 'NO DEMAND MODEL? LEARN FROM ONE SALE.',
       'scene11.s1.lead':
@@ -35,7 +35,7 @@
       'scene11.s1.alphaName': 'learning rate',
       'scene11.s1.alphaNote': 'alpha = step size: how hard one sale moves the estimate. Fixed here.',
 
-      /* ---- STEP 2: epsilon, the explore/exploit dial ---- */
+      /*, STEP 2: epsilon, the explore/exploit dial, */
       'scene11.s2.tag':   'STEP 2 / 3',
       'scene11.s2.title': 'EPSILON: THE EXPLORE / EXPLOIT DIAL',
       'scene11.s2.lead':
@@ -63,7 +63,7 @@
       'scene11.s2.tupleAn':  'a′ = {lever}',
       'scene11.s2.tupleAnTerm': 'a′ = (deadline, no next lever)',
 
-      /* ---- STEP 3: live run ---- */
+      /*, STEP 3: live run, */
       'scene11.s3.tag':   'STEP 3 / 3',
       'scene11.s3.title': 'WATCH IT LEARN THE BOARD',
       'scene11.s3.lead':

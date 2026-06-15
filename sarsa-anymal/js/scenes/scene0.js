@@ -1,10 +1,10 @@
-/* Scene 0 — Putting it together.
+/* Scene 0, Putting it together.
  *
  *   Title + four-card recap of the four prior viz, each card colour-keyed to
  *   the SARSA-update component it will become in scene 1. KaTeX teaser line at
  *   the bottom: "Today they fuse into one update."
  *
- *   Static — no step engine. Cold-entry safe — built entirely from
+ *   Static, no step engine. Cold-entry safe, built entirely from
  *   DATA.components (which is always present whether or not training data
  *   has been precomputed).
  */
@@ -23,10 +23,10 @@
       '<h1>Putting it together.</h1>' +
       '<p class="subtitle">Four pieces. One update.</p>' +
       '<p class="lede">Each viz so far gave you one ingredient. SARSA is the recipe ' +
-      'that combines them — the agent learns from its own actions.</p>';
+      'that combines them, the agent learns from its own actions.</p>';
     wrap.appendChild(hero);
 
-    /* Component recap row — four cards, one per prior viz. */
+    /* Component recap row, four cards, one per prior viz. */
     const row = document.createElement('div');
     row.className = 'component-row';
     wrap.appendChild(row);
@@ -64,7 +64,7 @@
       row.appendChild(card);
     }
 
-    /* Closing teaser — full SARSA update. */
+    /* Closing teaser, full SARSA update. */
     const teaser = document.createElement('div');
     teaser.className = 'scene0-teaser';
     window.Katex.render(

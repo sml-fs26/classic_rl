@@ -80,7 +80,7 @@
     root.classList.add('scene-pad', 'concept-scene', 'scene5-scene');
     root.innerHTML = '';
 
-    /* ---- heading + manager hook ---- */
+    /*, heading + manager hook, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = T('scene.title5');
@@ -91,8 +91,8 @@
     hook.innerHTML = T('scene5.manager');
     root.appendChild(hook);
 
-    /* ---- formula card: tau as a sequence of random variables; the foot
-       adds the tree reframe "one trajectory = one path." ---- */
+    /*, formula card: tau as a sequence of random variables; the foot
+       adds the tree reframe "one trajectory = one path.", */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene5.formula.label') + '</div>';
@@ -109,7 +109,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- tree caption: names the fixed root + lever (chance-only tree) ---- */
+    /*, tree caption: names the fixed root + lever (chance-only tree), */
     const caption = document.createElement('div');
     caption.className = 'traj-tree-caption';
     caption.innerHTML = T('scene5.tree.caption', {
@@ -118,7 +118,7 @@
     });
     root.appendChild(caption);
 
-    /* ---- tree host: TrajTree mounts the tree + the E[G_t] ledger here ---- */
+    /*, tree host: TrajTree mounts the tree + the E[G_t] ledger here, */
     const treeHost = document.createElement('div');
     treeHost.className = 'traj-tree-host';
     root.appendChild(treeHost);
@@ -159,7 +159,7 @@
       assertTol: 1e-6,
     });
 
-    /* ---- derived tape strip: the lit path AS THE OLD (S,A,R) tape ----
+    /*, derived tape strip: the lit path AS THE OLD (S,A,R) tape ----
        This makes the flat tape a *derived* view of one path through the tree,
        not the primary object. Empty until a path is sampled / walked. */
     const tapeWrap = document.createElement('div');
@@ -170,7 +170,7 @@
     root.appendChild(tapeWrap);
     const tapeEl = tapeWrap.querySelector('#traj-derived-tape');
 
-    /* ---- controls + replay tally ---- */
+    /*, controls + replay tally, */
     const ctrls = document.createElement('div');
     ctrls.className = 'traj-controls';
     ctrls.innerHTML =
@@ -180,13 +180,13 @@
       '<div class="traj-tally" id="traj-tally"></div>';
     root.appendChild(ctrls);
 
-    /* ---- punchline ---- */
+    /*, punchline, */
     const punch = document.createElement('div');
     punch.className = 'concept-key-question';
     punch.innerHTML = T('scene5.punch');
     root.appendChild(punch);
 
-    /* ---- walk state ----
+    /*, walk state ----
        A "current path" is a fixed list of edges from root to a leaf, chosen
        by sampling (engine-faithful). STEP reveals it one ply at a time and
        lights the prefix; RUN draws a fresh path and lights it whole. */

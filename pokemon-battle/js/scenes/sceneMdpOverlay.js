@@ -1,4 +1,4 @@
-/* Scene — "What makes this an MDP?"
+/* Scene, "What makes this an MDP?"
  *
  *   Explicit definitions of the three MDP ingredients, one click at a
  *   time. Reward is folded into the transition function's output.
@@ -8,7 +8,7 @@
  *     1: HP bars + S tag.  State = pair of non-negative integers (h_p, h_o).
  *     2: Move menu + A tag. Action = any move from { QUICK, BOLT, THUN }.
  *     3: Attack animation + P tag.  Transition probability function
- *        P(s, a) → (s', r) — probabilistic.
+ *        P(s, a) → (s', r), probabilistic.
  */
 (function () {
   window.scenes = window.scenes || {};
@@ -54,7 +54,7 @@
       <div class="sprite-host player"><img class="poke-sprite" src="assets/pikachu-back.png" alt="PIKACHU (player)"/></div>
     `;
 
-    /* HP boxes — gated container so we can fade them in at step 1. */
+    /* HP boxes, gated container so we can fade them in at step 1. */
     const hpWrap = document.createElement('div');
     hpWrap.className = 'sc0-hp-wrap';
     const oppHpBox = document.createElement('div');
@@ -67,7 +67,7 @@
     hpWrap.appendChild(playerHpBox);
     stage.appendChild(hpWrap);
 
-    /* Progressive MDP overlay — every tag has a step-gate class. */
+    /* Progressive MDP overlay, every tag has a step-gate class. */
     const overlay = document.createElement('div');
     overlay.className = 'mdp-overlay';
     overlay.innerHTML = `
@@ -77,7 +77,7 @@
     `;
     stage.appendChild(overlay);
 
-    /* Side-by-side layout — stage on the left, control column (menu +
+    /* Side-by-side layout, stage on the left, control column (menu +
        caption + step controls) on the right.  Lets the whole scene fit
        in one viewport without scrolling, which matters because the
        step ladder asks the student to compare the tag positions on
@@ -92,7 +92,7 @@
     rightCol.className = 'sc0-mdp-right';
     row.appendChild(rightCol);
 
-    /* Static move menu (disabled) — appears at step 2. Uses the same
+    /* Static move menu (disabled), appears at step 2. Uses the same
        Moves.moveSubHtml renderer as scene 1 so the layout matches what
        students saw when they reached the actual battle. */
     const menuWrap = document.createElement('div');
@@ -128,7 +128,7 @@
     hint.innerHTML = T('mdp.hint');
     wrap.appendChild(hint);
 
-    /* ---------- Step state machine ---------- */
+    /*, Step state machine, */
     function fireAttackAnimation() {
       stage.classList.remove('sc0-attacking');
       void stage.offsetWidth;

@@ -1,4 +1,4 @@
-/* Trial Clock precompute -- the rigor gate.
+/* Trial Clock precompute, the rigor gate.
  *
  *   Runs value iteration (= backward induction, since the clock counts down) on
  *   the Trial Clock MDP and emits V* / Q* / the optimal policy plus an on-policy
@@ -32,7 +32,7 @@
  *     4) The time-axis flip on tier 2: NUDGE is the star on days 5-4 and PUSH
  *        overtakes from day 3 on (and stays best).
  *     5) All THREE levers are optimal somewhere, and DO NOTHING wins in EXACTLY
- *        one cell -- (tier 0, day 1) -- where value 0 beats nudge -1 and push -2.5.
+ *        one cell, (tier 0, day 1), where value 0 beats nudge -1 and push -2.5.
  *     6) Two hand-computable last-day (days = 1) backups reproduce Q* exactly:
  *        Q*((0,1),push) = 1/2*(-5) = -2.5 ; Q*((3,1),push) = 0.6*20 = 12.
  *     7) ON-POLICY SARSA's learned greedy policy reproduces the DP optimum on
@@ -46,7 +46,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-/* ---------------- Load the verified engine via a window shim ---------------- */
+/*, Load the verified engine via a window shim, */
 const sandbox = { window: {}, console, Math, Float64Array, Float32Array, Int32Array, Array, Map, Set, JSON };
 sandbox.window.window = sandbox.window;
 const ctx = vm.createContext(sandbox);
@@ -67,7 +67,7 @@ const N_TIERS = Trial.N_TIERS;              // 5
 const N_DAYS = Trial.N_DAYS;                // 5
 const GAMMA = 1.0;
 
-/* ---------------- Value iteration (gamma = 1, finite horizon) ---------------- */
+/*, Value iteration (gamma = 1, finite horizon), */
 const TOL = 1e-12;
 const MAX_ITERS = 50;
 const vi = Bellman.valueIteration(GAMMA, { tol: TOL, maxIters: MAX_ITERS, recordHistory: true });
@@ -75,7 +75,7 @@ const V = vi.V;                             // Float64Array[25], index = tier*5 
 const policy = vi.policy;                   // [25] lever-id strings
 const Qstar = Bellman.qFromV(V, GAMMA);     // Float64Array[25*A]
 
-/* ---------------- Helpers ---------------- */
+/*, Helpers, */
 function siOf(tier, days) { return tier * N_DAYS + (days - 1); }
 function vAt(tier, days) { return V[siOf(tier, days)]; }
 function qRow(tier, days) {
@@ -87,20 +87,20 @@ function qRow(tier, days) {
 function leverAt(tier, days) { return policy[siOf(tier, days)]; }
 function round3(x) { return Math.round(x * 1000) / 1000; }
 function round4(x) { return Math.round(x * 10000) / 10000; }
-function fmt(x) { return Number.isFinite(x) ? (x >= 0 ? ' ' : '') + x.toFixed(3) : '  --  '; }
+function fmt(x) { return Number.isFinite(x) ? (x >= 0 ? ' ' : '') + x.toFixed(3) : ', '; }
 function up(id) { return (id || '').toUpperCase(); }
 
-/* ---------------- Assertions ---------------- */
+/*, Assertions, */
 function assert(name, ok, info) {
   if (ok) { console.log('  [OK]   ' + name); return; }
-  console.error('  [FAIL] ' + name + (info ? ' -- ' + info : ''));
+  console.error('  [FAIL] ' + name + (info ? ', ' + info : ''));
   process.exit(1);
 }
 
-console.log('Trial Clock precompute -- 5 tiers x 5 days = 25 cells, 3 levers, gamma = ' + GAMMA);
+console.log('Trial Clock precompute, 5 tiers x 5 days = 25 cells, 3 levers, gamma = ' + GAMMA);
 console.log('  Adoption Coin p = ' + Trial.P_ADOPT + '; Conversion Wheel by tier; +20 convert / -1 nudge / -5 abandon / 0 else');
 console.log('');
-console.log('Phase 1 -- Value iteration (backward induction)');
+console.log('Phase 1, Value iteration (backward induction)');
 const lastSweep = vi.history[vi.history.length - 1];
 console.log('  converged in ' + vi.iters + ' sweeps, final maxDelta = ' + lastSweep.maxDelta.toExponential(2));
 
@@ -184,7 +184,7 @@ console.log('  lever counts across the board: NUDGE=' + counts.nudge + ' DO-NOTH
 console.log('  DO-NOTHING is optimal only at: ' + nothingCells.join(', '));
 assert('all three levers are optimal somewhere',
   counts.nudge > 0 && counts.nothing > 0 && counts.push > 0, JSON.stringify(counts));
-assert('DO NOTHING wins EXACTLY one cell -- (tier 0, day 1)',
+assert('DO NOTHING wins EXACTLY one cell, (tier 0, day 1)',
   counts.nothing === 1 && nothingCells.length === 1 && nothingCells[0] === '(t0,d1)',
   nothingCells.join(','));
 const q01 = qRow(0, 1);
@@ -200,9 +200,9 @@ assert('hand backup Q*((0,1),push) = 0.5*(-5) = -2.5 reproduces Q*',
 assert('hand backup Q*((3,1),push) = 0.6*20 = 12 reproduces Q*',
   Math.abs(handPush31 - qRow(3, 1).push) < 1e-12, 'hand=' + handPush31 + ' q=' + qRow(3, 1).push);
 
-/* ---------------- Per-sweep snapshots for the DP scene ----------------
+/*, Per-sweep snapshots for the DP scene ----------------
    Because the deadline counts down, value iteration settles the day-1 column
-   first, then day-2 from it, and so on -- the staircase fills column by column,
+   first, then day-2 from it, and so on, the staircase fills column by column,
    right to left. We record (V, Q, solvedMask) after each sweep so the DP scene
    can animate it. A cell is "solved" once its V matches V* to 3 decimals (which
    happens on the sweep that reaches its days-left). */
@@ -231,7 +231,7 @@ const sweepsToStable = sweepSnapshots.length - 1;
 console.log('');
 console.log('  DP fill recorded over ' + sweepSnapshots.length + ' sweep-frames (column-by-column, day 1 -> day 5)');
 
-/* ---------------- Phase 2 -- model-free TD control: ON-POLICY SARSA ----------------
+/*, Phase 2, model-free TD control: ON-POLICY SARSA ----------------
    We learn Q from experience (pull a lever, see the dice, see the reward and the
    next situation + next lever, nudge q) with NO model of the coin or the wheel.
    Because days-left is part of the state, the finite horizon is fully observed,
@@ -316,7 +316,7 @@ function trainSarsa(cfg) {
   const visitCounts = new Int32Array(N);
   const snapshots = [];
   const valueCurve = [];            // [{episode, value}] greedy mean return from a reference cell
-  const REF_TIER = 0, REF_DAYS = 5; // a cold day-5 user -- where NUDGE must win
+  const REF_TIER = 0, REF_DAYS = 5; // a cold day-5 user, where NUDGE must win
   if (cfg.snapshotEpisodes.includes(0)) snapshots.push({ episode: 0, Q: Array.from(Q) });
   valueCurve.push({ episode: 0, value: Number(greedyValueFrom(Q, REF_TIER, REF_DAYS, 2000, evalRng).toFixed(4)) });
   for (let ep = 1; ep <= cfg.episodes; ep++) {
@@ -332,7 +332,7 @@ function trainSarsa(cfg) {
 }
 
 console.log('');
-console.log('Phase 2 -- model-free TD control: ON-POLICY SARSA');
+console.log('Phase 2, model-free TD control: ON-POLICY SARSA');
 console.log('  ' + SARSA_CFG.episodes + ' episodes, alpha = 1/(1+n)^' + SARSA_CFG.alphaPower +
   ', eps ' + SARSA_CFG.epsilon + ' -> ' + SARSA_CFG.epsilonMin + ', exploring starts (on-policy a\' bootstrap)');
 const t0 = Date.now();
@@ -358,11 +358,11 @@ function summarise(learner) {
 const sum = summarise(sarsa);
 console.log('');
 console.log('  SARSA greedy policy vs DP: ' + sum.agreed + '/' + N + ' cells agree' +
-  (sum.diffs.length ? ('  -- diffs: ' + sum.diffs.join('; ')) : '  (PERFECT)'));
+  (sum.diffs.length ? (', diffs: ' + sum.diffs.join('; ')) : '  (PERFECT)'));
 console.log('  SARSA greedy value from (tier0, day5): ' + sum.earlyValueRef.toFixed(3) +
   ' -> ' + sum.finalValueRef.toFixed(3) + '   (V* = ' + vAt(0, 5).toFixed(3) + ')');
 
-/* (7) the SARSA assertions -- the model-free path matches DP exactly. */
+/* (7) the SARSA assertions, the model-free path matches DP exactly. */
 assert('SARSA greedy policy reproduces the DP optimum on ALL 25 cells',
   sum.agreed === N, 'agreed=' + sum.agreed + '/' + N + ' diffs=[' + sum.diffs.join(' | ') + ']');
 assert('SARSA greedy value from (tier0,day5) is within 0.6 of V*',
@@ -370,7 +370,7 @@ assert('SARSA greedy value from (tier0,day5) is within 0.6 of V*',
 assert('SARSA greedy value from (tier0,day5) improved over training',
   sum.finalValueRef >= sum.earlyValueRef, 'early ' + sum.earlyValueRef + ' final ' + sum.finalValueRef);
 
-/* ---------------- A fixed illustrative trajectory ----------------
+/*, A fixed illustrative trajectory ----------------
    One short, deterministic demo episode under the OPTIMAL policy, pinned seed,
    for the tutorial / trajectory / return scenes. Chosen so the run is varied (a
    nudge that lands, maybe one that does not) and ends in CONVERT. */
@@ -421,7 +421,7 @@ console.log('');
 console.log('  demo trajectory (optimal policy from a cold day-5 user, seed ' + demoTrajectory.seedUsed + '): ' +
   demoTrajectory.len + ' days, ended in ' + demoTrajectory.outcome.toUpperCase());
 
-/* ---------------- Return-distribution bars for the Return scene ----------------
+/*, Return-distribution bars for the Return scene ----------------
    Fix a mid-adoption user (tier 2, day 4) and a chosen FIRST lever, then play
    OPTIMALLY afterward; Monte-Carlo the RETURN (sum of rewards) into buckets so
    the spread is visible: PUSH spikes at +20 (BUY), clusters near 0 (IGNORE then
@@ -465,7 +465,7 @@ console.log('  return from (tier2,day4): start PUSH mean ~ ' + returnBars.push.e
   ' (buckets ' + JSON.stringify(returnBars.push.buckets) + ')');
 console.log('                            start NUDGE mean ~ ' + returnBars.nudge.exact);
 
-/* ---------------- The named spot-Q cells the Q* scene calls out ---------------- */
+/*, The named spot-Q cells the Q* scene calls out, */
 function spotCell(tier, days) {
   const r = qRow(tier, days);
   const obj = {};
@@ -481,7 +481,7 @@ const spotQ = {
   dead:      spotCell(0, 1),
 };
 
-/* ---------------- Worked Bellman backup (scene 8): (tier 3, day 2), PUSH ----------------
+/*, Worked Bellman backup (scene 8): (tier 3, day 2), PUSH ----------------
    Q*((3,2),push) = 0.6*20 + 0.4*V*((3,1)) + 0*(-5). V*((3,1)) is the value of
    playing best at the last day from tier 3. */
 const bellmanWorked = {
@@ -493,34 +493,34 @@ const bellmanWorked = {
   matchesV: Number(vAt(3, 2).toFixed(4)),
 };
 
-/* ---------------- Recap cards (trial voice) ---------------- */
+/*, Recap cards (trial voice), */
 const recap = [
   { key: 'mdp', badge: 'MDP', scene: 3, title: 'THE FOUR-PART FRAME',
     text: 'The situation is the TRIAL CARD: how far up the adoption ladder, how many days left. The lever is NUDGE / DO NOTHING / PUSH. The part you do not control is the Adoption Coin and the Conversion Wheel. The payoff is +20 if they convert, with costs along the way.',
     tex: '\\langle\\, S,\\; A,\\; P,\\; R \\,\\rangle' },
   { key: 'policy', badge: 'POLICY', scene: 4, title: 'YOUR GROWTH PLAYBOOK',
-    text: 'A policy assigns one lever to EVERY situation -- the SOP a new growth hire could run without you. When you played by gut you already were a policy; you just had not written it down.',
+    text: 'A policy assigns one lever to EVERY situation, the SOP a new growth hire could run without you. When you played by gut you already were a policy; you just had not written it down.',
     tex: '\\pi : S \\rightarrow A' },
   { key: 'return', badge: 'RETURN', scene: 6, title: 'ROI AS A DISTRIBUTION',
-    text: 'The return is the payoff summed over the whole trial, lifetime value minus costs. It is a distribution across customers, not one number -- a good lever wins on average, and you must respect the downside (the ABANDON tail).',
+    text: 'The return is the payoff summed over the whole trial, lifetime value minus costs. It is a distribution across customers, not one number, a good lever wins on average, and you must respect the downside (the ABANDON tail).',
     tex: 'G_i \\;=\\; \\textstyle\\sum_{j \\ge i} r_j' },
   { key: 'qstar', badge: 'Q*', scene: 7, title: 'THE HONEST VALUE OF A LEVER',
-    text: 'Q*(s, a) is the true long-run value of pulling lever a in situation s, assuming you play smart afterward. The best lever is the argmax -- and the star FLIPS across the board: NUDGE while cold and early, PUSH once hooked or out of runway.',
+    text: 'Q*(s, a) is the true long-run value of pulling lever a in situation s, assuming you play smart afterward. The best lever is the argmax, and the star FLIPS across the board: NUDGE while cold and early, PUSH once hooked or out of runway.',
     tex: 'Q^{*}(s,a) \\;=\\; \\max_{\\pi}\\, \\mathbb{E}\\,[\\,G_i \\mid s, a\\,]' },
   { key: 'dp', badge: 'DP', scene: 9, title: 'EXACT PLAYBOOK IF YOU KNEW THE WORLD',
     text: 'With the dice odds known, Q* solves its own Bellman equation: the worth of a move = its immediate payoff plus the worth of the position it leaves you in. The hard deadline lets you solve it right to left and watch the staircase build.',
     tex: 'Q^{*}(s,a) \\;=\\; \\mathbb{E}\\,[\\, R + \\max_{a\'} Q^{*}(S\',a\') \\,]' },
   { key: 'sarsa', badge: 'TD', scene: 11, title: 'LEARN THE PLAYBOOK BY PLAYING',
-    text: 'No model of how customers respond? Replace the expectation with one observed attempt: pull a lever, see what converts, nudge the estimate, repeat -- with a little exploration to keep improving. It converges to the same staircase DP would give, never told the odds.',
+    text: 'No model of how customers respond? Replace the expectation with one observed attempt: pull a lever, see what converts, nudge the estimate, repeat, with a little exploration to keep improving. It converges to the same staircase DP would give, never told the odds.',
     tex: 'q[s,a] \\;\\mathrel{+}=\\; \\alpha\\,(\\, r + q[s\',a\'] - q[s,a] \\,)' },
 ];
 
-/* ---------------- Levers + wheel for display ---------------- */
+/*, Levers + wheel for display, */
 const leversDisplay = Levers.LEVERS.map(l => ({ id: l.id, name: l.name, role: l.role, short: l.short }));
 const wheelByTier = {};
 for (let t = 0; t < N_TIERS; t++) wheelByTier[t] = Trial.wheel(t);
 
-/* ---------------- Assemble + round payloads ---------------- */
+/*, Assemble + round payloads, */
 function roundArr(arr, places) { const f = Math.pow(10, places); return Array.from(arr, v => (Number.isFinite(v) ? Math.round(v * f) / f : null)); }
 
 const DATA = {
@@ -579,11 +579,11 @@ const DATA = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(ROOT, 'data', 'datasets.js');
 const payload = JSON.stringify(DATA);
 const fileContent =
-  "/* Trial Clock -- static MDP solution plus value-iteration fill frames and an\n" +
+  "/* Trial Clock, static MDP solution plus value-iteration fill frames and an\n" +
   " * on-policy SARSA training trajectory.\n" +
   " *\n" +
   " * Regenerate with `node precompute/build-datasets.js`. The build script loads\n" +

@@ -1,4 +1,4 @@
-/* Scene 4 -- Policy. Two hand-policies painted on the 5x5 board (Always-SEND,
+/* Scene 4, Policy. Two hand-policies painted on the 5x5 board (Always-SEND,
    Always-WAIT-until-forced), toggled, each with its mean window payoff from
    (2,4). The board recolours; the punchline is that neither flat rule is good.
    Cold-entry safe. */

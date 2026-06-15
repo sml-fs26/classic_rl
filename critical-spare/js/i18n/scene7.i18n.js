@@ -1,4 +1,4 @@
-/* scene7 i18n -- optimal action-value Q*. */
+/* scene7 i18n, optimal action-value Q*. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -12,12 +12,12 @@
       'scene7.at':    'Situation: <b>{state}</b>',
       'scene7.best':  'best',
       'scene7.clamped': 'not available (no spare)',
-      'scene7.note':  'Watch the star MOVE as you step the picker. Same gauge reading, opposite call -- decided entirely by the bin.',
-      'scene7.framing': 'Q* is the lever\'s lifetime value, not its this-turn cash. The argmax (the star) is the optimal lever -- and it <b>flips with the situation</b>. That flip is the whole lesson.',
+      'scene7.note':  'Watch the star MOVE as you step the picker. Same gauge reading, opposite call, decided entirely by the bin.',
+      'scene7.framing': 'Q* is the lever\'s lifetime value, not its this-turn cash. The argmax (the star) is the optimal lever, and it <b>flips with the situation</b>. That flip is the whole lesson.',
 
       'scene7.read.h0s0': '<b>HEALTHY, empty bin → RUN.</b> Don\'t waste cash stocking spares while the machine is fine. Just run it (Q* ≈ 9.1, the cell\'s best).',
       'scene7.read.h1s0': '<b>AGING, empty bin → ORDER.</b> Paying -2 now to stock a spare (Q* ≈ 4.5) beats running into a 30%-and-rising failure with no protection (RUN ≈ 3.8). Pre-position the part before the risk peaks.',
-      'scene7.read.h2s0': '<b>FAILING, empty bin → ORDER.</b> Same call as AGING with an empty bin: get protection in place. RUNNING here risks a 70% breakdown with no spare -- a -8 hit.',
+      'scene7.read.h2s0': '<b>FAILING, empty bin → ORDER.</b> Same call as AGING with an empty bin: get protection in place. RUNNING here risks a 70% breakdown with no spare, a -8 hit.',
       'scene7.read.h2s1': '<b>FAILING, one spare → REPLACE.</b> With a 70% breakdown looming, a planned swap (refresh to HEALTHY, cost 0; Q* ≈ 7.2) beats gambling on a rushed -3 emergency swap (RUN ≈ 5.5). Once you hold the protection and it\'s on its last legs, use it.',
     },
     jp: {

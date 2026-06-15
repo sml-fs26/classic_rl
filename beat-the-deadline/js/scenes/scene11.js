@@ -1,4 +1,4 @@
-/* Scene 11 -- SARSA vs Q-learning, side by side (the honest TD split).
+/* Scene 11, SARSA vs Q-learning, side by side (the honest TD split).
  *   Step 1: derive model-free TD control from Bellman by replacing the
  *     expectation with one observed dispatch, then split into the TWO update
  *     rules that differ only in how they bootstrap the next lever:
@@ -10,7 +10,7 @@
  *   Step 2: a live replay of both learners' precomputed Q snapshots into two
  *     dock boards, with the exact DP oracle (window.DATA.Qstar) beside them.
  *     Q-learning's frontier converges to the exact diagonal (matches DP);
- *     SARSA settles one cell more conservative -- it ships the thin (2,3) order
+ *     SARSA settles one cell more conservative, it ships the thin (2,3) order
  *     an hour early. A per-board DP-agreement bar + mean-return readout track
  *     each. Cold-entry safe; honours &run (auto-plays the run). */
 (function () {

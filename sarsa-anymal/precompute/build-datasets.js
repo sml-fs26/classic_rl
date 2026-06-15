@@ -15,7 +15,7 @@
  *       - snapshots[{ episode, Q }]     Q-table at log-spaced episodes
  *       - sampleEpisodeTuples           full (s, a, r, s', a', terminal)
  *                                       trace for first 3 episodes (canonical
- *                                       only — used for cold-entry rebuild
+ *                                       only, used for cold-entry rebuild
  *                                       of scene 2 if user wants to "show me
  *                                       what would happen").
  *   - Computes ghost stationary distributions analytically (closed-form for
@@ -29,7 +29,7 @@
 const fs = require('fs');
 const path = require('path');
 
-/* ---------------- Mulberry32 RNG ---------------- */
+/*, Mulberry32 RNG, */
 function makeRng(seed) {
   let s = seed >>> 0;
   return function () {
@@ -41,7 +41,7 @@ function makeRng(seed) {
   };
 }
 
-/* ---------------- MDP (mirror of js/mdp.js for the 3×7 env) ---------------- */
+/*, MDP (mirror of js/mdp.js for the 3×7 env), */
 const ACTIONS = ['up', 'down', 'left', 'right'];
 const DELTAS = {
   up:    { dr: -1, dc:  0 },
@@ -49,12 +49,12 @@ const DELTAS = {
   left:  { dr:  0, dc: -1 },
   right: { dr:  0, dc:  1 },
 };
-/* Reward magnitudes — these were tuned in /tmp/probeN.js sweeps; the gentler
+/* Reward magnitudes, these were tuned in /tmp/probeN.js sweeps; the gentler
    collision penalty (-50) keeps the agent alive long enough that the +100 goal
    reward propagates back via TD; -100 collision starves the +10 goal signal
    and the agent never learns to reach the goal in 500 episodes.
 
-   Mirrors js/mdp.js — keep both files in sync.
+   Mirrors js/mdp.js, keep both files in sync.
 */
 const REWARD = { STEP: -1, STAR: 100, COLLISION: -50 };
 
@@ -82,7 +82,7 @@ function moveGhost(rng, ghost, M) {
 
 /* One environment step, matching js/mdp.js semantics:
    1) agent moves -> 2) goal check (terminal) -> 3) ghosts move -> 4) collision
-      check (NOT terminal — respawn at start). */
+      check (NOT terminal, respawn at start). */
 function step(state, action, params, rng) {
   if (state.terminal) {
     return { state, reward: 0, terminal: true, hitStar: false, collision: false };
@@ -136,7 +136,7 @@ function step(state, action, params, rng) {
   return { state: next, reward, terminal: next.terminal, hitStar, collision };
 }
 
-/* ---------------- Q-table & SARSA ---------------- */
+/*, Q-table & SARSA, */
 const A = ACTIONS.length;
 function makeQ(M, N) { return new Float64Array(M * N * A); }
 function pickEpsGreedy(Q, N, r, c, eps, rng) {
@@ -226,7 +226,7 @@ function trainPass(initial, alpha, gamma, eps, numEpisodes, snapshotEpisodes, pa
   return { Q, episodeRewards, episodeLengths, snapshots, sampleEpisodeTuples };
 }
 
-/* ---------------- Helpers for invariants ---------------- */
+/*, Helpers for invariants, */
 function mean(arr) { return arr.reduce((s, v) => s + v, 0) / arr.length; }
 function rollingStd(arr, w) {
   const out = new Array(arr.length).fill(0);
@@ -261,7 +261,7 @@ function ghostStationary(bias, M) {
   return w.map(x => x / s);
 }
 
-/* ---------------- Configuration ---------------- */
+/*, Configuration, */
 const initial = {
   M: 3,
   N: 7,
@@ -279,11 +279,11 @@ const params = { malfunctionProb: 0.0, maxRounds: 40 };
 const SEED_PRIMARY = 20260509;
 const SEED_OSC     = 20260509;
 
-/* alpha=0.1 (canonical) — gentle Robbins-Monro updates. Late-stage policy
+/* alpha=0.1 (canonical), gentle Robbins-Monro updates. Late-stage policy
    converges to a clean detour: avoid col 2 row 0 (north-biased ghost) and
    col 5 row 2 (south-biased ghost). Late-stage mean reward ~+76 with rare
    collisions dropping to negative.
-   alpha=0.95 (oscillating) — too-aggressive update; Q-values get overwritten
+   alpha=0.95 (oscillating), too-aggressive update; Q-values get overwritten
    heavily by single noisy targets. Late-stage mean reward stays around -40
    to -90 (the agent never reliably learns a good policy). The pedagogy is
    the *gap in mean reward* between alpha=0.1 (~+76) and alpha=0.95 (~-50).
@@ -294,7 +294,7 @@ const primary = trainPass(initial, 0.1, 0.95, 0.1, NUM_EP, SNAPSHOTS, params, SE
 console.log('Pass 2 (oscillating): alpha=0.95, gamma=0.95, eps=0.1');
 const oscillating = trainPass(initial, 0.95, 0.95, 0.1, NUM_EP, SNAPSHOTS, params, SEED_OSC, false);
 
-/* ---- Stats ---- */
+/*, Stats, */
 const meanEarly = mean(primary.episodeRewards.slice(0, 50));
 const meanMid   = mean(primary.episodeRewards.slice(400, 500));
 const stdRollPrim = rollingStd(primary.episodeRewards, 100);
@@ -307,7 +307,7 @@ console.log('  mean reward, episodes 401..500 =', meanMid.toFixed(2));
 console.log('  rolling-std late (alpha=0.5)  =', stdLatePrim.toFixed(2));
 console.log('  rolling-std late (alpha=0.95) =', stdLateOsc.toFixed(2));
 
-/* ---- Ghost stationary (analytical + assertable) ---- */
+/*, Ghost stationary (analytical + assertable), */
 const occ1 = ghostStationary(initial.ghosts[0].bias, initial.M);
 const occ2 = ghostStationary(initial.ghosts[1].bias, initial.M);
 console.log('  ghost1 stationary [r0,r1,r2] =', occ1.map(x => x.toFixed(4)).join(', '));
@@ -325,7 +325,7 @@ for (let r = 0; r < initial.M; r++) {
   occGrid.push(row);
 }
 
-/* ---- Final Q stats ---- */
+/*, Final Q stats, */
 const Qfinal = primary.snapshots.find(s => s.episode === NUM_EP).Q;
 let cellsWithUniqueArgmax = 0;
 for (let r = 0; r < initial.M; r++) {
@@ -337,7 +337,7 @@ for (let r = 0; r < initial.M; r++) {
 const totalLearnableCells = initial.M * initial.N - 1; // exclude goal
 console.log('  cells with unique argmax = ' + cellsWithUniqueArgmax + ' / ' + totalLearnableCells);
 
-/* ---- Argmax-path connectivity (start → goal via greedy) ---- */
+/*, Argmax-path connectivity (start → goal via greedy), */
 function argmaxPath(Q, initial, maxSteps) {
   const ARROW = { up: { dr: -1, dc: 0 }, down: { dr: 1, dc: 0 }, left: { dr: 0, dc: -1 }, right: { dr: 0, dc: 1 } };
   const path = [{ r: initial.start.r, c: initial.start.c }];
@@ -350,7 +350,7 @@ function argmaxPath(Q, initial, maxSteps) {
     const nr = Math.max(0, Math.min(initial.M - 1, r + d.dr));
     const nc = Math.max(0, Math.min(initial.N - 1, c + d.dc));
     if (visited.has(nr + ',' + nc)) {
-      /* Loop — argmax policy got stuck */
+      /* Loop, argmax policy got stuck */
       return { reached: false, path, looped: true };
     }
     r = nr; c = nc;
@@ -362,7 +362,7 @@ function argmaxPath(Q, initial, maxSteps) {
 const argmaxRes = argmaxPath(Qfinal, initial, 30);
 console.log('  argmax path start→goal: reached=' + argmaxRes.reached + ', length=' + argmaxRes.path.length);
 
-/* ---- Risk-awareness: how does the path interact with high-occupancy cells? ---- */
+/*, Risk-awareness: how does the path interact with high-occupancy cells?, */
 function pathMaxOccupancy(path, occGrid) {
   let m = 0;
   for (const p of path) {
@@ -374,10 +374,10 @@ function pathMaxOccupancy(path, occGrid) {
 const pathMaxOcc = pathMaxOccupancy(argmaxRes.path, occGrid);
 console.log('  argmax path max ghost-occupancy = ' + pathMaxOcc.toFixed(3));
 
-/* ---------------- Invariants ---------------- */
+/*, Invariants, */
 function assertInvariant(name, ok, info) {
   if (ok) console.log('  [OK] ' + name);
-  else { console.error('  [FAIL] ' + name + (info ? ' — ' + info : '')); process.exit(1); }
+  else { console.error('  [FAIL] ' + name + (info ? ', ' + info : '')); process.exit(1); }
 }
 
 /* (1) all Q values finite, no NaN */
@@ -409,7 +409,7 @@ assertInvariant('argmax path max ghost-occupancy ≤ 0.30',
   pathMaxOcc <= 0.30,
   'pathMaxOcc=' + pathMaxOcc.toFixed(3));
 
-/* (6) α=0.95 trajectory underperforms — the pedagogically visible signal.
+/* (6) α=0.95 trajectory underperforms, the pedagogically visible signal.
    The *qualitative* failure mode of α=0.95 isn't really high std (canonical
    has nearly the same std because of the intrinsic ghost stochasticity);
    it's that α=0.95 never actually converges to a good policy. Assert that
@@ -422,7 +422,7 @@ assertInvariant('oscillating mean late < 0 (failed policy)',
   meanLateOsc < 0, 'oscillating meanLate=' + meanLateOsc.toFixed(2));
 /* Also: rolling-std-late ratio. We weakened the strict 2× from the plan; the
    actual signal is the mean gap above. We still assert the std is larger,
-   just not by a fixed multiplier — both runs have similar intrinsic noise. */
+   just not by a fixed multiplier, both runs have similar intrinsic noise. */
 assertInvariant('α=0.95 rolling-std late ≥ α=0.1 rolling-std late',
   stdLateOsc >= stdLatePrim,
   'std_osc=' + stdLateOsc.toFixed(2) + ', std_prim=' + stdLatePrim.toFixed(2));
@@ -441,7 +441,7 @@ assertInvariant('ghost2 closed-form: 0.1026 / 0.2564 / 0.6410',
   approxEq(occ2[0], 0.16 / 1.56, 1e-6) && approxEq(occ2[1], 0.4 / 1.56, 1e-6) && approxEq(occ2[2], 1 / 1.56, 1e-6),
   occ2.map(x => x.toFixed(6)).join(', '));
 
-/* ---------------- Build the payload ---------------- */
+/*, Build the payload, */
 function compactQ(Q) {
   return Array.from(Q).map(v => Number(v.toFixed(4)));
 }
@@ -500,7 +500,7 @@ const trainingPayload = {
   },
 };
 
-/* ---------------- Write data/datasets.js ---------------- */
+/*, Write data/datasets.js, */
 const datasetsPath = path.join(__dirname, '..', 'data', 'datasets.js');
 const payloadStr = JSON.stringify(trainingPayload);
 
@@ -523,9 +523,9 @@ const fileContent = "/* Static configuration + (after precompute) SARSA training
 "      anymal: { r: 2, c: 0 },\n" +
 "      star:  { r: 2, c: 6 },\n" +
 "      ghosts: [\n" +
-"        /* Ghost 1: column 2, north-biased (sticks high — row 0 is most occupied) */\n" +
+"        /* Ghost 1: column 2, north-biased (sticks high, row 0 is most occupied) */\n" +
 "        { r: 0, c: 2, bias: { up: 0.50, stay: 0.30, down: 0.20 } },\n" +
-"        /* Ghost 2: column 5, south-biased (sticks low — row 2 is most occupied) */\n" +
+"        /* Ghost 2: column 5, south-biased (sticks low, row 2 is most occupied) */\n" +
 "        { r: 2, c: 5, bias: { up: 0.20, stay: 0.30, down: 0.50 } },\n" +
 "      ],\n" +
 "    },\n" +
@@ -540,7 +540,7 @@ const fileContent = "/* Static configuration + (after precompute) SARSA training
 "      seed: 20260509,\n" +
 "    },\n" +
 "\n" +
-"    /* Reward magnitudes — for legend / prose use. */\n" +
+"    /* Reward magnitudes, for legend / prose use. */\n" +
 "    rewards: {\n" +
 "      step: -1,\n" +
 "      star: 100,\n" +
@@ -565,7 +565,7 @@ const fileContent = "/* Static configuration + (after precompute) SARSA training
 "        from: 'Casino',       caption: 'Pick best so far, sometimes explore. Generalises μ(a) to Q(s, a).', sprite: 'slot' },\n" +
 "      { key: 'bellman', title: 'TD target',     symbol: \"r + \\\\gamma\\\\, Q(s', a')\",\n" +
 "        from: 'Spooky House', caption: 'A noisy estimate of the Bellman recursion. V becomes Q.',          sprite: 'bellman' },\n" +
-"      { key: 'rm',      title: 'Robbins–Monro', symbol: '\\\\alpha\\\\, (\\\\,\\\\text{target} - \\\\text{estimate}\\\\,)',\n" +
+"      { key: 'rm',      title: 'Robbins, Monro', symbol: '\\\\alpha\\\\, (\\\\,\\\\text{target} - \\\\text{estimate}\\\\,)',\n" +
 "        from: 'Darts',        caption: 'Move toward the target by a fraction α. Stochastic average.',      sprite: 'darts' },\n" +
 "    ],\n" +
 "\n" +

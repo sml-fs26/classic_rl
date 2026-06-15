@@ -1,4 +1,4 @@
-/* scene7 i18n -- optimal action-value Q*. */
+/* scene7 i18n, optimal action-value Q*. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

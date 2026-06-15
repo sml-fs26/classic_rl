@@ -17,9 +17,9 @@
       anymal: { r: 2, c: 0 },
       star:  { r: 2, c: 6 },
       ghosts: [
-        /* Ghost 1: column 2, north-biased (sticks high — row 0 is most occupied) */
+        /* Ghost 1: column 2, north-biased (sticks high, row 0 is most occupied) */
         { r: 0, c: 2, bias: { up: 0.50, stay: 0.30, down: 0.20 } },
-        /* Ghost 2: column 5, south-biased (sticks low — row 2 is most occupied) */
+        /* Ghost 2: column 5, south-biased (sticks low, row 2 is most occupied) */
         { r: 2, c: 5, bias: { up: 0.20, stay: 0.30, down: 0.50 } },
       ],
     },
@@ -34,7 +34,7 @@
       seed: 20260509,
     },
 
-    /* Reward magnitudes — for legend / prose use. */
+    /* Reward magnitudes, for legend / prose use. */
     rewards: {
       step: -1,
       star: 100,
@@ -59,7 +59,7 @@
         from: 'Casino',       caption: 'Pick best so far, sometimes explore. Generalises μ(a) to Q(s, a).', sprite: 'slot' },
       { key: 'bellman', title: 'TD target',     symbol: "r + \\gamma\\, Q(s', a')",
         from: 'Spooky House', caption: 'A noisy estimate of the Bellman recursion. V becomes Q.',          sprite: 'bellman' },
-      { key: 'rm',      title: 'Robbins–Monro', symbol: '\\alpha\\, (\\,\\text{target} - \\text{estimate}\\,)',
+      { key: 'rm',      title: 'Robbins, Monro', symbol: '\\alpha\\, (\\,\\text{target} - \\text{estimate}\\,)',
         from: 'Darts',        caption: 'Move toward the target by a fraction α. Stochastic average.',      sprite: 'darts' },
     ],
 

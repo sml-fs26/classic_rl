@@ -1,7 +1,7 @@
-/* Scene 3 — The backward sweep.
+/* Scene 3, The backward sweep.
 
    The student watches V get filled in cell-by-cell. Order: reverse
-   row-major — bottom-right first, then leftward across the bottom row,
+   row-major, bottom-right first, then leftward across the bottom row,
    then upward row-by-row. At each cell the side panel shows the
    per-cell arithmetic
      V(r,c) = R(r,c) + max(V(r+1,c), V(r,c+1)) = …
@@ -43,7 +43,7 @@
       return {};
     }
 
-    /* ---------- DOM ---------- */
+    /*, DOM, */
     root.innerHTML = '';
     const wrap = document.createElement('div');
     wrap.className = 's3-wrap';
@@ -69,7 +69,7 @@
     side.className = 's3-side';
     row.appendChild(side);
 
-    /* --- Side: arithmetic block --- */
+    /*, Side: arithmetic block, */
     const ah2 = document.createElement('h2');
     ah2.textContent = 'This step.';
     side.appendChild(ah2);
@@ -79,7 +79,7 @@
     arithBlock.innerHTML = '<div class="arith-empty">Press Run to start the sweep.</div>';
     side.appendChild(arithBlock);
 
-    /* --- Progress --- */
+    /*, Progress, */
     const progress = document.createElement('div');
     progress.className = 's3-progress';
     progress.innerHTML =
@@ -88,7 +88,7 @@
       '<span class="progress-text">0 / ' + (D.M * D.N) + '</span>';
     side.appendChild(progress);
 
-    /* --- Controls --- */
+    /*, Controls, */
     const controls = document.createElement('div');
     controls.className = 'controls s3-controls';
     side.appendChild(controls);
@@ -129,12 +129,12 @@
     grpB.appendChild(speedOut);
     controls.appendChild(grpB);
 
-    /* --- Caption --- */
+    /*, Caption, */
     const caption = document.createElement('p');
     caption.className = 'caption';
     caption.textContent =
       'Each cell needs only the two it points to. ' +
-      'No iteration, no guessing — one sweep is exact.';
+      'No iteration, no guessing, one sweep is exact.';
     wrap.appendChild(caption);
 
     const foot = document.createElement('p');
@@ -142,7 +142,7 @@
     foot.textContent = 'Press → to continue once the sweep is done.';
     wrap.appendChild(foot);
 
-    /* ---------- Mount the grid ---------- */
+    /*, Mount the grid, */
     const grid = window.Grid.mount(gridHost, {
       M: D.M,
       N: D.N,
@@ -154,7 +154,7 @@
     grid.setCellClass(D.start.r, D.start.c, 'start-cell', true);
     grid.setCellClass(D.goal.r,  D.goal.c,  'goal-cell',  true);
 
-    /* ---------- Step-engine state ---------- */
+    /*, Step-engine state, */
     const ORDER = reverseRowMajor(D.M, D.N);
     const TOTAL = ORDER.length;
     const GAMMA = 1.0;
@@ -162,7 +162,7 @@
     let cursor = 0;
     let animTimer = null;
 
-    /* Side panel arithmetic history — last few cells filled, in order. */
+    /* Side panel arithmetic history, last few cells filled, in order. */
     const history = []; /* [{ r, c, text }] */
 
     function clearAnim() {
@@ -294,7 +294,7 @@
       }
     });
 
-    /* ---------- &run / &instant hooks ---------- */
+    /*, &run / &instant hooks, */
     function shouldAutoRun() {
       return /[#&?]run\b/.test(window.location.hash);
     }
@@ -302,7 +302,7 @@
       return /[#&?]instant\b/.test(window.location.hash);
     }
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       resetState();
       render(false);

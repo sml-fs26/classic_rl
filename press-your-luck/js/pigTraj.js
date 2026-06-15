@@ -1,4 +1,4 @@
-/* window.PigTraj -- the engine adapter that lets window.TrajTree draw the
+/* window.PigTraj, the engine adapter that lets window.TrajTree draw the
  * Press Your Luck (Pig) MDP as a chance tree.
  *
  *   TrajTree is engine-agnostic: it asks the host for
@@ -22,7 +22,7 @@
  *
  *   THE RIVAL-TURN COUPLING (important, and stated on-screen). A bust or a
  *   non-winning HOLD hands the dice to the fixed rival ("holds at 20"). That
- *   child is "rival to move" -- not my decision and not terminal. We treat such
+ *   child is "rival to move", not my decision and not terminal. We treat such
  *   a child as a BOOTSTRAPPED LEAF: its G_t is the win probability of that
  *   rival-turn state, Pig.rivalTurnValue(my, riv) (the turn passes; the part you
  *   do not control). With a depth-1 tree under ROLL, the grown-pot children are

@@ -34,7 +34,7 @@
     return r;
   }
 
-  /* Legal action INDICES at a state -- all three levers, always. */
+  /* Legal action INDICES at a state, all three levers, always. */
   function legalIdxs(_stateIdx) { return [0, 1, 2]; }
 
   /* Greedy over the legal levers. During LEARNING this uses a random tie-break

@@ -1,4 +1,4 @@
-/* Scene 5 — Recap → Next.
+/* Scene 5, Recap → Next.
  *
  *   Five-card layout: Q(s,a) (the central object), TD target r + γ Q', TD
  *   error δ, α (the update size), ε-greedy (the policy). Each card uses the
@@ -8,7 +8,7 @@
  *   Below the cards: a forward-pointer ("function approximation, deep RL").
  *   At the bottom, a muted aside teasing scene 3's α=0.95 oscillation.
  *
- *   Static — no step engine. Cold-entry safe.
+ *   Static, no step engine. Cold-entry safe.
  */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -35,13 +35,13 @@
       { key: 'mdp',     glyph: 'Q(s, a)',                    title: 'The Q-table',
         body: 'One number per (state, action). The agent stores its current best estimate of long-run return.' },
       { key: 'bellman', glyph: "r + \\gamma\\, Q(s', a')",     title: 'TD target',
-        body: 'A noisy, bootstrapped sample of the Bellman recursion — what return we now think we will get.' },
+        body: 'A noisy, bootstrapped sample of the Bellman recursion, what return we now think we will get.' },
       { key: 'bellman', glyph: '\\delta = \\text{target} - Q', title: 'TD error',
         body: 'How far off our current estimate was from what we just observed. Drives every update.' },
       { key: 'rm',      glyph: '\\alpha',                    title: 'Learning rate',
-        body: 'How much weight we give to today’s evidence. Robbins–Monro under noise — small α, slow trust.' },
+        body: 'How much weight we give to today’s evidence. Robbins, Monro under noise, small α, slow trust.' },
       { key: 'eps',     glyph: "\\varepsilon\\text{-greedy}", title: 'The policy',
-        body: 'Pick the current best action; explore with probability ε. SARSA is on-policy — it learns this same exploration.' },
+        body: 'Pick the current best action; explore with probability ε. SARSA is on-policy, it learns this same exploration.' },
     ];
     for (const card of CARDS) {
       const c = document.createElement('div');
@@ -71,11 +71,11 @@
     fwdP.className = 's5-forward-body';
     fwdP.textContent =
       'A 21-state Q-table fits on screen. Real environments have millions of states. ' +
-      'The next step — function approximation, deep reinforcement learning — lives beyond this course.';
+      'The next step, function approximation, deep reinforcement learning, lives beyond this course.';
     fwd.appendChild(fwdP);
     wrap.appendChild(fwd);
 
-    /* Muted aside — α=0.95 oscillation teaser. */
+    /* Muted aside, α=0.95 oscillation teaser. */
     const aside = document.createElement('p');
     aside.className = 's5-aside';
     aside.innerHTML =

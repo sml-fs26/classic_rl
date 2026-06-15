@@ -7,7 +7,7 @@
    previous step; ArrowRight steps forward through the recorded actions until
    the head is reached, then yields to the scene driver to advance the scene.
 
-   The action vocabulary here is just {'right', 'down'} — Spooky House
+   The action vocabulary here is just {'right', 'down'}, Spooky House
    restricts the action set on purpose. The seed field is kept for symmetry
    with the ANYmal viz; all transitions in Spooky House are deterministic, so
    the seed isn't actually consulted on replay. */

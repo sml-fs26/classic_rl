@@ -118,7 +118,7 @@
 
   function init() {
     if (!window.DATA) {
-      console.error('DATA missing -- did data/datasets.js load?');
+      console.error('DATA missing, did data/datasets.js load?');
     }
 
     const pager = document.getElementById('dot-pager');

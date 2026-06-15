@@ -1,6 +1,6 @@
-/* Scene 6 -- Return G, the objective E[G], and the value of a lever.
+/* Scene 6, Return G, the objective E[G], and the value of a lever.
  *
- *   G_i(tau) = sum_{j >= i} r_j -- the total cash a run brings in from a
+ *   G_i(tau) = sum_{j >= i} r_j, the total cash a run brings in from a
  *   chosen point to the deadline. A lever is not one good night; its payoff is
  *   a DISTRIBUTION over runs, and E[G] averages that distribution into ONE
  *   honest number.
@@ -18,7 +18,7 @@
  *
  *   Below, the EMPIRICAL companion: sample whole runs from the same opening
  *   under the same playbook and stack their returns into a histogram. The
- *   running mean has a TARGET LINE -- the ledger's computed E[G] = $5.22 --
+ *   running mean has a TARGET LINE, the ledger's computed E[G] = $5.22 --
  *   so the learner watches the empirical mean walk toward the computed value.
  *
  *   Cold entry: rebuilds from window.Pricing / window.Levers / window.DATA.
@@ -81,7 +81,7 @@
     root.className = 'scene-pad concept-scene scene6';
     root.innerHTML = '';
 
-    /* ---- Heading + lede ---- */
+    /*, Heading + lede, */
     const h = document.createElement('h2');
     h.className = 'concept-heading';
     h.textContent = T('scene6.title');
@@ -92,7 +92,7 @@
     lede.innerHTML = T('scene6.lede');
     root.appendChild(lede);
 
-    /* ---- G formula card: G_i(tau) = sum r_j ---- */
+    /*, G formula card: G_i(tau) = sum r_j, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene6.formula.label') + '</div>';
@@ -109,7 +109,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- The trajectory tree + weighted-leaf ledger ---- */
+    /*, The trajectory tree + weighted-leaf ledger, */
     const egLabel = document.createElement('div');
     egLabel.className = 's6-eg-label';
     egLabel.innerHTML = T('scene6.eg.label', {
@@ -162,7 +162,7 @@
     });
     root.appendChild(egTie);
 
-    /* ---- Empirical companion: histogram of full-run returns ---- */
+    /*, Empirical companion: histogram of full-run returns, */
     const variance = document.createElement('div');
     variance.className = 's6-empirical collapsed';
     variance.innerHTML =

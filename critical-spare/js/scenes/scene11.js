@@ -1,11 +1,11 @@
-/* Scene 11 -- SARSA: learn Q* by playing.
+/* Scene 11, SARSA: learn Q* by playing.
  *   Step 1: derive model-free TD control from Bellman by replacing the unknown
  *     expectation with ONE observed turn: nudge Q(s,a) toward [r + gamma q(s',a')].
  *     Gloss epsilon as "every so often, deliberately try the unproven lever".
  *   Step 2: a live run replays the precomputed SARSA Q snapshots into a learning
  *     grid, side by side with the exact DP oracle. The learner's colours converge
  *     to the bold twist heat-map (== DP); a convergence bar (agreement with the
- *     oracle) and a value readout track it -- with NO model ever given.
+ *     oracle) and a value readout track it, with NO model ever given.
  *   On this MDP the optimal lever is decisive, so on-policy SARSA recovers the
  *   exact DP policy on all 9 states (verified in the precompute). Cold-entry
  *   safe; honours &run. */

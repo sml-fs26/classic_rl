@@ -1,11 +1,11 @@
-/* Scene 5 — recap, bridge to SARSA.
+/* Scene 5, recap, bridge to SARSA.
 
    Five cards: estimate, target, learning rate, decay, TD update (muted).
    One foreshadow line below: "Casino estimated one value. Spooky House
    propagated values backward. Darts kept estimates fresh under noise.
    Next: all three at once."
 
-   No interactivity. Cold-entry safe — built from DATA.recap. */
+   No interactivity. Cold-entry safe, built from DATA.recap. */
 (function () {
   if (!window.scenes) window.scenes = {};
 

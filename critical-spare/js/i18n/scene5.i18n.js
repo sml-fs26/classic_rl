@@ -1,4 +1,4 @@
-/* scene5 i18n -- trajectory. */
+/* scene5 i18n, trajectory. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
@@ -14,7 +14,7 @@
       'scene5.colReward': 'cash',
       'scene5.colNext':   'next',
       'scene5.note':  'Each Sᵢ, Aᵢ, Rᵢ is a random variable: the dice make the same policy produce a different tape every quarter.',
-      'scene5.framing': 'Run the same playbook twice and you get two different quarters -- <b>that is the randomness, not bad management</b>. This tape is the unit of experience SARSA will later learn from.',
+      'scene5.framing': 'Run the same playbook twice and you get two different quarters, <b>that is the randomness, not bad management</b>. This tape is the unit of experience SARSA will later learn from.',
     },
     jp: {
       'scene5.title': 'きせき',

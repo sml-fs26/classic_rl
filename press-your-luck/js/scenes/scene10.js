@@ -47,7 +47,7 @@
     const exact4 = Math.pow(scores, 4) * pots;        // 4-player race
     const factor = Math.round(exact2 / display);      // blow-up vs the board
 
-    /* ---- Heading + manager framing ---- */
+    /*, Heading + manager framing, */
     const h = document.createElement('h2');
     h.className = 's10-heading';
     h.textContent = T('s10.heading');
@@ -58,12 +58,12 @@
     mgr.textContent = T('s10.manager');
     root.appendChild(mgr);
 
-    /* ---- Two reason panels ---- */
+    /*, Two reason panels, */
     const panels = document.createElement('div');
     panels.className = 's10-panels';
     root.appendChild(panels);
 
-    /* -- Reason A: P unknown, including the rival -- */
+    /*, Reason A: P unknown, including the rival, */
     const a = document.createElement('div');
     a.className = 's10-panel s10-panel-a';
     a.innerHTML =
@@ -102,7 +102,7 @@
     a.appendChild(aFoot);
     panels.appendChild(a);
 
-    /* -- Reason B: the board explodes -- */
+    /*, Reason B: the board explodes, */
     const b = document.createElement('div');
     b.className = 's10-panel s10-panel-b';
     b.innerHTML =
@@ -137,7 +137,7 @@
     b.appendChild(grid);
     panels.appendChild(b);
 
-    /* ---- Bridge to SARSA ---- */
+    /*, Bridge to SARSA, */
     const bridge = document.createElement('div');
     bridge.className = 's10-bridge';
     bridge.textContent = T('s10.bridge');

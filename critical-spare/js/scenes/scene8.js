@@ -1,4 +1,4 @@
-/* Scene 8 -- Bellman optimality. The recursive definition as a formula card,
+/* Scene 8, Bellman optimality. The recursive definition as a formula card,
    read in plain English, plus two hand-computable DETERMINISTIC one-step backups
    (REPLACE and ORDER both have a single, certain next state, so they are clean
    to check by hand):

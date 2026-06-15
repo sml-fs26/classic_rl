@@ -30,7 +30,7 @@
      deep-merge their own keys via register(). */
   const STORE = {
     en: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · PRESS YOUR LUCK',
       'topbar.prev':  'PREV',
       'topbar.next':  'NEXT',
@@ -39,7 +39,7 @@
       'music.off':    '♪ MUSIC OFF',
       'lang.toggle':  '日本語',          /* what to switch TO */
 
-      /* ---- concept-badge labels (lit on reaching the relevant scene) ---- */
+      /*, concept-badge labels (lit on reaching the relevant scene), */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -47,16 +47,16 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'SAR',
 
-      /* ---- speaker notes / overlays ---- */
+      /*, speaker notes / overlays, */
       'speakerNotes.title': 'SPEAKER NOTES · press <kbd>n</kbd> to close',
       'speakerNotes.empty': '(No notes for this scene yet.)',
 
-      /* ---- one-time intro modal ("You are the player") ---- */
+      /*, one-time intro modal ("You are the player"), */
       'intro.title': 'YOU ARE THE PLAYER',
       'intro.body':  'You are on a streak that grows if you let it ride and vanishes on one bad roll. Decide each turn: ROLL for more, or BANK what you have. First to ' + 50 + ' wins.',
       'intro.ok':    'LET\'S PLAY',
 
-      /* ---- common Pig vocabulary (shared across scenes) ---- */
+      /*, common Pig vocabulary (shared across scenes), */
       'vocab.pot':        'POT',
       'vocab.standing':   'STANDING',
       'vocab.behind':     'BEHIND',
@@ -79,7 +79,7 @@
     },
 
     jp: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · プレス ユア ラック',
       'topbar.prev':  'まえ',
       'topbar.next':  'つぎ',
@@ -88,7 +88,7 @@
       'music.off':    '♪ おんがく オフ',
       'lang.toggle':  'ENGLISH',
 
-      /* ---- concept-badge labels ---- */
+      /*, concept-badge labels, */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -96,16 +96,16 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'SAR',
 
-      /* ---- speaker notes / overlays ---- */
+      /*, speaker notes / overlays, */
       'speakerNotes.title': 'スピーカー ノート · <kbd>n</kbd> で とじる',
       'speakerNotes.empty': '（この シーンの ノートは まだ ありません）',
 
-      /* ---- one-time intro modal ---- */
+      /*, one-time intro modal, */
       'intro.title': 'あなたが プレイヤー',
       'intro.body':  'いきおいに のれば のびる。 でも わるい めが ひとつ でれば きえる。 まいターン えらぶ： もっと ふるか、 いま バンクするか。 さきに 50で かち。',
       'intro.ok':    'プレイ かいし',
 
-      /* ---- common Pig vocabulary ---- */
+      /*, common Pig vocabulary, */
       'vocab.pot':        'ポット',
       'vocab.standing':   'たちば',
       'vocab.behind':     'おくれ',
@@ -128,7 +128,7 @@
     },
   };
 
-  /* ---- current language (persisted) ---- */
+  /*, current language (persisted), */
   let lang = 'en';
   try {
     const saved = localStorage.getItem(STORAGE_KEY);

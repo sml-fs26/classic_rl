@@ -82,13 +82,13 @@
 
     let step = hashStep(MAX_STEP);
 
-    /* ---- Heading ---- */
+    /*, Heading, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = 'Q*: the action scorecard';
     root.appendChild(heading);
 
-    /* ---- Panel: van icon | scorecard + bands ---- */
+    /*, Panel: van icon | scorecard + bands, */
     const panel = document.createElement('div');
     panel.className = 's7-panel';
     root.appendChild(panel);
@@ -146,7 +146,7 @@
     }
     tableRow.appendChild(bands);
 
-    /* ---- The formal line, hidden until the last step ---- */
+    /*, The formal line, hidden until the last step, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card s7-formula s7-hidden';
     fcard.innerHTML = '<div class="concept-formula-label">THE SCORE OF ONE CALL</div>';
@@ -161,7 +161,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Caption + hint + FILL ALL ---- */
+    /*, Caption + hint + FILL ALL, */
     const readEl = document.createElement('p');
     readEl.className = 's7-read';
     root.appendChild(readEl);
@@ -178,7 +178,7 @@
     hint.appendChild(fillBtn);
     root.appendChild(hint);
 
-    /* ---- One short caption per step, no numbers in prose ---- */
+    /*, One short caption per step, no numbers in prose, */
     const CAPTIONS = [
       'One number per cell: what is this call worth here, long run?',
       'Young van: drive her.',
@@ -190,7 +190,7 @@
     ];
     const WEAR_BY_STEP = [0, 0, 1, 2, 3, 2, 2];
 
-    /* ---- Reveal machinery ---- */
+    /*, Reveal machinery, */
     function maskedQ(rows) {
       const Q = new Float64Array(NUM_STATES * A);
       for (let s = 0; s < rows; s++) {

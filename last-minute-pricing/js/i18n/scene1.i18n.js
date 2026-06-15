@@ -1,6 +1,6 @@
-/* scene1 i18n fragment -- TUTORIAL ("How to read the flight").
+/* scene1 i18n fragment, TUTORIAL ("How to read the flight").
    English is the source of truth; the Japanese mirror gives full parity.
-   No RL theory here: pure vocabulary -- the cabin (seats), the departure
+   No RL theory here: pure vocabulary, the cabin (seats), the departure
    board (days to departure), the three price tags, the demand deck, one
    demo day. */
 (function () {
@@ -17,13 +17,13 @@
       'scene1.nav.next':  'NEXT',
       'scene1.nav.hint':  'Tap <b>BACK</b> / <b>NEXT</b> (or use <kbd>&larr;</kbd> <kbd>&rarr;</kbd>) to step. SKIP jumps to the playtest.',
 
-      /* step 1 -- welcome / the flight card */
+      /* step 1, welcome / the flight card */
       'scene1.welcome.title':  'The flight card',
       'scene1.welcome.big':    'ONE PICTURE, TWO NUMBERS',
       'scene1.welcome.small':  'How many seats you hold, and how little time is left.',
       'scene1.welcome.dialog': 'You sell something that expires: an airline seat, worth real money today and exactly $0 once the gate closes. This card is your whole situation at a glance. The SEATS on the left are your stock; the DEPARTURE BOARD on the right is your time. Read it, and you know where you stand.',
 
-      /* step 2 -- seats / the stock */
+      /* step 2, seats / the stock */
       'scene1.units.title':  'The cabin: seats left',
       'scene1.units.dialog': 'The stack on the left is your STOCK. Each lit seat is one you still have to sell. Sell one and it slides off; the stack empties from the top. Sell the last seat and it is a FULL FLIGHT, the best finish.',
       'scene1.units.cap.full':  'A FULL CABIN: 5 seats to sell',
@@ -31,7 +31,7 @@
       'scene1.units.cap.last':  'ALMOST GONE: 1 seat left',
       'scene1.units.note':      'Lit seat = one you can still sell. Greyed = already sold.',
 
-      /* step 3 -- days / the departure board */
+      /* step 3, days / the departure board */
       'scene1.days.title':  'The board: days to departure',
       'scene1.days.dialog': 'The tiles on the right are your TIME: days left before departure. Each day you price, one tile flips dark. When the last one flips it is GATE CLOSED, the deadline. Any seat still unsold then is worth nothing.',
       'scene1.days.cap.four': 'FOUR DAYS of runway',
@@ -39,7 +39,7 @@
       'scene1.days.cap.mid':  'GATE CLOSED: the deadline',
       'scene1.days.note':     'Time only ticks DOWN: one day per decision. Unsold seats fly empty for $0 once the gate closes.',
 
-      /* step 4 -- the two price tags */
+      /* step 4, the two price tags */
       'scene1.levers.title':  'Your two price tags',
       'scene1.levers.dialog': 'Each day you pull ONE price tag. A high price tends to sell few seats; a deep cut tends to clear the cabin. But how many buyers actually show up is hidden, the part you neither control nor get to see in advance.',
       'scene1.levers.premium.tag':  'HOLD OUT FOR THE HIGH PRICE',
@@ -49,7 +49,7 @@
       'scene1.levers.axis.r':       'more buyers',
       'scene1.levers.note':         'Cash you collect = price times seats sold. The odds are NOT printed: you only learn how a tag behaves by pulling it.',
 
-      /* step 5 -- one slow demo day */
+      /* step 5, one slow demo day */
       'scene1.demo.title':   'One day, start to finish',
       'scene1.demo.dialog':  'Watch one full day. We pull STANDARD ($2). The DEMAND DECK flips a card to decide how many buy. Here, one. A seat sells with a +$2, a day flips off the board, and the flight moves one day closer. That is the whole loop.',
       'scene1.demo.play':    'PLAY THE DAY',

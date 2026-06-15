@@ -3,7 +3,7 @@
  *   - Reads previous preference from localStorage('gamblers-viz.music').
  *   - If "on", the loop starts on the *first* user gesture anywhere in the
  *     page (Chrome / Safari refuse to let an AudioContext run before a user
- *     click -- we honour that).
+ *     click, we honour that).
  *   - If "off" (default), nothing happens until the user clicks the button.
  *     The first click on the button counts as the unlock gesture.
  *   - The MUSIC button also gates the page's SFX cues (one switch for all

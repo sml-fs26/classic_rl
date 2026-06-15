@@ -28,7 +28,7 @@
     { key: 'sarsa',  label: 'SAR', scene: 11, glyph: glyphSarsa },
   ];
 
-  /* ---- per-concept text lookup: i18n override, else DATA.recap ---- */
+  /*, per-concept text lookup: i18n override, else DATA.recap, */
   function recapEntry(key) {
     const list = (window.DATA && window.DATA.recap) || [];
     for (const e of list) if (e.key === key) return e;

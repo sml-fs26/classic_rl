@@ -6,13 +6,13 @@
      epsGreedyDecay(eps0, decay, rng)  -> (bandit, t) -> arm
 
    The closure-bound rng makes the policy itself a function of (bandit, t)
-   only — exactly the contract the notebook's strategy_func uses. Tie-breaking
+   only, exactly the contract the notebook's strategy_func uses. Tie-breaking
    matches the notebook's `random.choice(best_machines)`: among arms that share
    the maximum empirical probability, pick uniform-randomly.
 
    Note on tie-breaking on the very first pull (all empirical = 0): every arm
    ties, so greedy starts with a uniform-random choice. That's the right
-   behaviour — it matches the Python code and also avoids a deterministic
+   behaviour, it matches the Python code and also avoids a deterministic
    start that would mislead students about why early luck matters.
 
    `decisionMode` returned alongside the arm tells the scene whether the

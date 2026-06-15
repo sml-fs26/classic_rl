@@ -1,4 +1,4 @@
-/* Scene 2 — One step.
+/* Scene 2, One step.
  *
  *   Live 3×7 grid (ANYmal at start, two ghosts patrolling, star at goal). Side
  *   rail: the numerical Q-table (21 rows × 4 cols, all zeroes initially).
@@ -16,7 +16,7 @@
  *      not the state."
  *
  *   On-policy SARSA simplification: a' here is the same action the user just
- *   issued (the pedagogical compromise — actual SARSA waits one step for the
+ *   issued (the pedagogical compromise, actual SARSA waits one step for the
  *   user's *next* keypress, but giving the student instant per-keystroke
  *   feedback is more important than strict semantics for this scene). The
  *   precompute used in scene 3/4 *does* use the real next-step a'.
@@ -47,7 +47,7 @@
       '<p class="subtitle">Press an arrow. Watch one cell of the Q-table move.</p>';
     wrap.appendChild(hero);
 
-    /* Tutorial caption — names the state-simplification explicitly. */
+    /* Tutorial caption, names the state-simplification explicitly. */
     const tut = document.createElement('p');
     tut.className = 'tutorial-caption';
     tut.innerHTML =
@@ -86,7 +86,7 @@
     /* Right rail */
     const railTitle = document.createElement('div');
     railTitle.className = 'col-label';
-    railTitle.textContent = 'Q-table — 21 states × 4 actions';
+    railTitle.textContent = 'Q-table, 21 states × 4 actions';
     rail.appendChild(railTitle);
 
     const qHost = document.createElement('div');
@@ -99,7 +99,7 @@
     foot.innerHTML = 'Use <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> to step. <kbd>R</kbd> to reset Q-table and episode.';
     wrap.appendChild(foot);
 
-    /* ----- State (cold-entry safe) ----- */
+    /*, State (cold-entry safe), */
     const init = window.MDP.initialState();
     const M = init.M, N = init.N;
 
@@ -133,7 +133,7 @@
     }
     placeAll();
 
-    /* ----- Sliders ----- */
+    /*, Sliders, */
     function makeSlider(label, key, min, max, step, valFmt) {
       const grp = document.createElement('div');
       grp.className = 'control-group greek';
@@ -185,7 +185,7 @@
     }
     restartBtn.addEventListener('click', fullReset);
 
-    /* ----- Tuple / arithmetic floating overlays ----- */
+    /*, Tuple / arithmetic floating overlays, */
     const overlay = grid.overlay;
     let activeChips = [];
 
@@ -213,7 +213,7 @@
         ' <span class="t-glue">·</span> <span class="comp-mdp">' + ARROW[a] + '</span>' +
         ' <span class="t-glue">·</span> <span class="comp-bellman">' + (r >= 0 ? '+' : '') + r + '</span>' +
         ' <span class="t-glue">·</span> <span class="comp-mdp">(' + sNext.r + ',' + sNext.c + ')</span>' +
-        ' <span class="t-glue">·</span> <span class="comp-eps">' + (aNext ? ARROW[aNext] : '—') + '</span>';
+        ' <span class="t-glue">·</span> <span class="comp-eps">' + (aNext ? ARROW[aNext] : ', ') + '</span>';
       overlay.appendChild(chip);
       placeChipNearAgent(chip, agentRC, 'tuple');
       activeChips.push(chip);
@@ -244,7 +244,7 @@
       }, TIMING.fadeAt);
     }
 
-    /* ----- Single-step machinery ----- */
+    /*, Single-step machinery, */
     let busy = false; /* re-entrancy guard while overlays are mid-animation */
     function doStep(action) {
       if (busy) return;

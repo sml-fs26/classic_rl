@@ -108,7 +108,7 @@
     heading.textContent = T('obj.heading');
     root.appendChild(heading);
 
-    /* ---- G formula card ---- */
+    /*, G formula card, */
     const c1 = document.createElement('div');
     c1.className = 'concept-formula-card';
     c1.innerHTML = '<div class="concept-formula-label">' + T('obj.g.label') + '</div>';
@@ -121,7 +121,7 @@
     c1.appendChild(foot1);
     root.appendChild(c1);
 
-    /* ---- The trajectory tree + weighted-leaf ledger ---- */
+    /*, The trajectory tree + weighted-leaf ledger, */
     const egLabel = document.createElement('div');
     egLabel.className = 'obj-eg-label';
     egLabel.innerHTML = T('obj.eg.label', {
@@ -176,7 +176,7 @@
     });
     root.appendChild(egTie);
 
-    /* ---- Q* formula card ---- */
+    /*, Q* formula card, */
     const c2 = document.createElement('div');
     c2.className = 'concept-formula-card';
     c2.innerHTML = '<div class="concept-formula-label">' + T('obj.qstar.label') + '</div>';
@@ -189,7 +189,7 @@
     c2.appendChild(foot2);
     root.appendChild(c2);
 
-    /* ---- Variance illustration (empirical companion) ---- */
+    /*, Variance illustration (empirical companion), */
     const variance = document.createElement('div');
     variance.className = 'g-variance collapsed';
     variance.innerHTML =

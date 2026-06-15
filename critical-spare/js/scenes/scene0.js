@@ -1,4 +1,4 @@
-/* Scene 0 -- Title / hook.
+/* Scene 0, Title / hook.
  *   A lone factory machine hums on the shop floor, its health gauge slowly
  *   amber-ing, a spares bin glinting beside it, and the failure die showing its
  *   growing red slice. Title + START. START reveals the manager framing and a

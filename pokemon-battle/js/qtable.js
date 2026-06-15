@@ -1,4 +1,4 @@
-/* Scene-4 Q-table render — 5×5 state grid + per-cell battle thumbnail +
+/* Scene-4 Q-table render, 5×5 state grid + per-cell battle thumbnail +
  * per-move Q-bars + change-deltas + move-frequency strip.
  *
  * The bucket count is read from Battle.NUM_BUCKETS, so this code is the
@@ -17,11 +17,11 @@
   function bucketToPct(idx) { return Math.max(0, (NB - idx) * 100 / NB); }
   /* Color class for the HP-bar segment based on bucket index. */
   function bucketClass(idx) {
-    if (idx === 0) return '';            // bucket 0 (full) — default green
-    if (idx === 1) return 'b1';          // high — light green
-    if (idx === 2) return 'b2';          // mid — yellow
-    if (idx === 3) return 'b3';          // low — orange
-    return 'b4';                          // critical — red
+    if (idx === 0) return '';            // bucket 0 (full), default green
+    if (idx === 1) return 'b1';          // high, light green
+    if (idx === 2) return 'b2';          // mid, yellow
+    if (idx === 3) return 'b3';          // low, orange
+    return 'b4';                          // critical, red
   }
 
   function shortMoveLabel(id) {
@@ -74,7 +74,7 @@
       cell.style.gridRow = String(st.your + 1);
       cell.dataset.state = stateLabel(st);
 
-      /* Pokedex-style header — each Q-cell IS a Pokedex entry for its
+      /* Pokedex-style header, each Q-cell IS a Pokedex entry for its
          (state) species: a Nº NNN number, the state label as the
          "species name", and a SEEN/OWNED indicator that flips when
          the cell is first visited (any Q-value becomes non-zero).
@@ -90,7 +90,7 @@
 
       /* Battle thumbnail at the top. Opponent sprite is form-aware:
          CHARMANDER at FULL/HIGH, CHARMELEON at MID, CHARIZARD at
-         LOW/CRIT — set once at cell mount since each cell represents
+         LOW/CRIT, set once at cell mount since each cell represents
          a fixed (yourHP, oppHP) state. */
       const oppSprite = (window.Battle && window.Battle.spriteForOpp)
         ? window.Battle.spriteForOpp(st.opp)
@@ -127,7 +127,7 @@
         r.innerHTML =
           '<span class="q-mark"></span>' +
           '<span class="q-label">' + shortMoveLabel(aid) + '</span>' +
-          '<span class="q-val">—</span>';
+          '<span class="q-val">, </span>';
         bars.appendChild(r);
         barNodes[a] = {
           row: r,
@@ -171,7 +171,7 @@
     legend.innerHTML =
       '<span class="q-legend-item"><span class="q-legend-bar argmax"></span> ARGMAX MOVE (▶)</span>' +
       '<span class="q-legend-item"><span class="q-legend-bar"></span> OTHER MOVES</span>' +
-      '<span class="q-legend-item">— = STATE NEVER VISITED</span>';
+      '<span class="q-legend-item">, = STATE NEVER VISITED</span>';
     host.appendChild(legend);
 
     let prevQ = null;
@@ -197,7 +197,7 @@
           node.cell.classList.add('unvisited');
           for (let a = 0; a < A; a++) {
             const bar = node.bars[a];
-            bar.val.textContent = '—';
+            bar.val.textContent = ', ';
             bar.row.classList.remove('argmax');
             bar.mark.textContent = '';
           }
@@ -229,7 +229,7 @@
               void node.cell.offsetWidth;
               node.cell.classList.add('argmax-flip');
               setTimeout(() => node.cell.classList.remove('argmax-flip'), 1200);
-              /* Argmax-flip ding — debounced.  RUN-ALL on the DP scene
+              /* Argmax-flip ding, debounced.  RUN-ALL on the DP scene
                  can flip a dozen cells in one frame; instead of playing
                  a dozen cursor pips back-to-back, we collapse all
                  flips inside a 220 ms window down to a single ding
@@ -252,7 +252,7 @@
       prevQ = new Float32Array(Q);
     }
 
-    /* Argmax-flip ding debounce — one cursor blip per ~220 ms cluster
+    /* Argmax-flip ding debounce, one cursor blip per ~220 ms cluster
        so RUN-ALL doesn't unleash a cascade of pips. */
     let argmaxDingTimer = null;
     function scheduleArgmaxDing() {
@@ -291,7 +291,7 @@
         node.cell.classList.add('unvisited');
         node.cell.classList.remove('argmax-flip');
         for (let a = 0; a < A; a++) {
-          node.bars[a].val.textContent = '—';
+          node.bars[a].val.textContent = ', ';
           node.bars[a].row.classList.remove('argmax');
           node.bars[a].mark.textContent = '';
         }
@@ -315,7 +315,7 @@
     }
     const ALL_HEAT_CLASSES = ['heat-zero', 'heat-pos-strong', 'heat-pos-mid', 'heat-neutral', 'heat-neg-mid', 'heat-neg-strong'];
 
-    /* Wire click handlers on every cell — a single registered callback
+    /* Wire click handlers on every cell, a single registered callback
        receives the state index when clicked, plus the cell DOM node. The
        'clickable' affordance is only painted once a caller actually
        registers a handler, so cells don't lie when no one is listening. */

@@ -1,4 +1,4 @@
-/* Scene 9 -- Fill Q* by dynamic programming.
+/* Scene 9, Fill Q* by dynamic programming.
  *
  *   Because the demand odds are PRINTED on every lever, P is known, so we can
  *   compute Q* exactly by sweeping the Bellman backup. The 5x4 board fills
@@ -80,25 +80,25 @@
     root.className = 'scene-pad scene9';
     root.innerHTML = '';
 
-    /* ---- Heading ---- */
+    /*, Heading, */
     const h = document.createElement('h2');
     h.className = 's9-heading';
     h.textContent = T('scene9.title');
     root.appendChild(h);
 
-    /* ---- Manager lede ---- */
+    /*, Manager lede, */
     const lede = document.createElement('p');
     lede.className = 's9-lede';
     lede.innerHTML = T('scene9.lede');
     root.appendChild(lede);
 
-    /* ---- Premise (we know P) ---- */
+    /*, Premise (we know P), */
     const premise = document.createElement('p');
     premise.className = 's9-premise';
     premise.innerHTML = T('scene9.premise');
     root.appendChild(premise);
 
-    /* ---- Bellman card ---- */
+    /*, Bellman card, */
     const fcard = document.createElement('div');
     fcard.className = 's9-formula-card';
     const flabel = document.createElement('div');
@@ -112,7 +112,7 @@
     window.Katex.render(bellmanTex, fhost, true);
     root.appendChild(fcard);
 
-    /* ---- Controls + status (sticky bar) ---- */
+    /*, Controls + status (sticky bar), */
     const ctrls = document.createElement('div');
     ctrls.className = 's9-controls-row';
     ctrls.innerHTML =
@@ -127,7 +127,7 @@
       '</div>';
     root.appendChild(ctrls);
 
-    /* ---- Row: board + side panel ---- */
+    /*, Row: board + side panel, */
     const row = document.createElement('div');
     row.className = 's9-row';
     root.appendChild(row);
@@ -141,13 +141,13 @@
     panel.className = 's9-panel poke-box tight';
     row.appendChild(panel);
 
-    /* ---- Bridge footer ---- */
+    /*, Bridge footer, */
     const bridge = document.createElement('div');
     bridge.className = 's9-bridge';
     bridge.innerHTML = T('scene9.bridge');
     root.appendChild(bridge);
 
-    /* ---- Compute the column fills once ---- */
+    /*, Compute the column fills once, */
     const { fills, fullQ } = buildColumnFills();
     const D = fills.length;     // = NUM_DAYS = 4
 

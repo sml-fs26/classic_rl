@@ -32,7 +32,7 @@
     return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
-  /* ---------------- Arrival die (green) ---------------- */
+  /*, Arrival die (green), */
   function mountArrival(host, opts) {
     const o = opts || {};
     host.classList.add('btd-die', 'arrival-die');
@@ -82,7 +82,7 @@
     return { roll, set, el: host };
   }
 
-  /* ---------------- Deadline-risk die (red) ---------------- */
+  /*, Deadline-risk die (red), */
   function mountDeadline(host, opts) {
     const o = opts || {};
     host.classList.add('btd-die', 'deadline-die');
@@ -148,7 +148,7 @@
     return { setHours, roll, set, el: host };
   }
 
-  /* ---------------- Glyphs ---------------- */
+  /*, Glyphs, */
   function palletGlyph() {
     return '<svg viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">' +
       '<rect x="9" y="13" width="22" height="9" fill="var(--pallet)" stroke="var(--pallet-rule)" stroke-width="2"/>' +

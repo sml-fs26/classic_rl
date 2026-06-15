@@ -1,4 +1,4 @@
-/* Critical Spare -- static MDP solution plus value-iteration fill frames and
+/* Critical Spare, static MDP solution plus value-iteration fill frames and
  * an on-policy SARSA training trajectory.
  *
  * Regenerate with `node precompute/build-datasets.js`. The build script loads

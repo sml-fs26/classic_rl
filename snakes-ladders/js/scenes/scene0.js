@@ -1,10 +1,10 @@
-/* Scene 0 — A children's game is an MDP.
+/* Scene 0, A children's game is an MDP.
  *
  *   Title card. Full 10×10 board with snakes and ladders drawn on top.
- *   Below the board: a 5-row mapping table — each row names one tuple element
+ *   Below the board: a 5-row mapping table, each row names one tuple element
  *   of the MDP and points at where it lives on the board.
  *
- *   Static — no step engine. Cold-entry safe.
+ *   Static, no step engine. Cold-entry safe.
  */
 (function () {
   if (!window.scenes) window.scenes = {};
@@ -21,8 +21,8 @@
       '<h1>A children’s game is an MDP.</h1>' +
       '<p class="subtitle">Snakes &amp; Ladders. The whole curriculum, on one board.</p>' +
       '<p class="lede">A 10×10 board, three dice to choose from, the goal at square 100. ' +
-      'Every piece of the language we built — states, actions, transitions, rewards, ' +
-      'discount — has a place here.</p>';
+      'Every piece of the language we built, states, actions, transitions, rewards, ' +
+      'discount, has a place here.</p>';
     wrap.appendChild(hero);
 
     const layout = document.createElement('div');
@@ -36,7 +36,7 @@
     const board = window.Board.mount(boardHost);
     const cfg = (window.DATA && window.DATA.board) || { ladders: [], snakes: [] };
     board.drawJumps(cfg.snakes, cfg.ladders);
-    /* Hide the token in scene 0 — there is no player yet. */
+    /* Hide the token in scene 0, there is no player yet. */
     board.setTokenVisible(false);
 
     /* Mapping table on the right. */
@@ -52,7 +52,7 @@
 
     const rows = [
       { sym: 'S', name: 'states',     desc: 'one per square: <span class="mono">1, 2, …, 100</span>' },
-      { sym: 'A', name: 'actions',    desc: 'three dice — ' +
+      { sym: 'A', name: 'actions',    desc: 'three dice, ' +
                                        '<span class="die-pill die-d4">d4</span> ' +
                                        '<span class="die-pill die-d6">d6</span> ' +
                                        '<span class="die-pill die-d8">d8</span>' },

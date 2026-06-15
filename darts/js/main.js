@@ -2,7 +2,7 @@
 
    5 scenes, 0-indexed throughout (hash, array, builders). The original
    "sample mean fails" scene 2 was retired with the bullseye-oscillation
-   change — its `key: 'scene3'` etc are unchanged so deep links survive.
+   change, its `key: 'scene3'` etc are unchanged so deep links survive.
 
    Pattern lifted from the course-viz skill (kmeans-deepdive) and the sibling
    anymal-mdp viz. Each scene file at js/scenes/sceneN.js registers
@@ -106,7 +106,7 @@
 
     current = idx;
     /* `&instant` in the hash bypasses the opacity transition. Dev affordance
-       for headless screenshots — CSS transitions run on the compositor and
+       for headless screenshots, CSS transitions run on the compositor and
        don't follow --virtual-time-budget, so screenshots otherwise capture
        mid-fade. The button-driven flow stays the canonical interaction. */
     const instant = /[#&?]instant\b/.test(window.location.hash);
@@ -124,7 +124,7 @@
 
   function init() {
     if (!window.DATA) {
-      console.error('DATA missing -- did data/datasets.js load?');
+      console.error('DATA missing, did data/datasets.js load?');
     }
 
     const pager = document.getElementById('dot-pager');

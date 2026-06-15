@@ -78,7 +78,7 @@
   if (QSTAR) { for (let i = 0; i < QSTAR.length; i++) QSTAR_L1 += Math.abs(QSTAR[i]); }
   if (!QSTAR_L1) QSTAR_L1 = 1;
 
-  /* ---------- small format helpers ---------- */
+  /*, small format helpers, */
   function fmt(v) {
     if (v === 0 || Math.abs(v) < 0.005) return '+0.00';
     return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2);
@@ -121,7 +121,7 @@
     return { tier, m, terminal: false };
   }
 
-  /* ---------- sample one episode under eps-greedy on Q (no model used
+  /*, sample one episode under eps-greedy on Q (no model used
      beyond window.Churn.sample, which is the world we are LEARNING) ----------
      Returns the list of SARSA tuples (s, a, r, s', a') for the episode.
      exploringStart: begin from a random state (live trainer) vs the
@@ -204,13 +204,13 @@
     root.classList.add('scene-pad', 's11-scene');
     root.innerHTML = '';
 
-    /* ---- heading ---- */
+    /*, heading, */
     const heading = document.createElement('h2');
     heading.className = 's11-heading';
     heading.textContent = T('scene.title11');
     root.appendChild(heading);
 
-    /* ---- step controls ---- */
+    /*, step controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 's11-controls';
     ctrls.innerHTML =
@@ -220,7 +220,7 @@
         '<span class="s11-step-id" id="s11-step-id"></span></div>';
     root.appendChild(ctrls);
 
-    /* ---- 2-column row: left = card / step-detail, right = illustration ---- */
+    /*, 2-column row: left = card / step-detail, right = illustration, */
     const row = document.createElement('div');
     row.className = 's11-row';
     root.appendChild(row);
@@ -420,7 +420,7 @@
         '</div>';
     }
 
-    /* ---- per-step illustration renderers (A-D) ---- */
+    /*, per-step illustration renderers (A-D), */
     function illusBlank(capKey) {
       qtbl.update(window.SARSA.makeQ(), { suppressFlash: true });
       qHost.querySelectorAll('.rm-val').forEach(v => { v.textContent = T('retmap.empty'); });
@@ -652,7 +652,7 @@
       renderLiveDetail();
     }
 
-    /* ---- PLAY loop ---- */
+    /*, PLAY loop, */
     function setPlayLabel() {
       const b = document.getElementById('s11-play');
       if (b) {
@@ -768,7 +768,7 @@
       }
     }
 
-    /* ---- events ---- */
+    /*, events, */
     document.getElementById('s11-prev').addEventListener('click', () => {
       if (cursor > 0) { cursor--; applyCursor(); }
     });

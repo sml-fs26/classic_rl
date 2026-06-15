@@ -28,7 +28,7 @@ const path = require('path');
 
 function round(x, places) { const f = Math.pow(10, places); return Math.round(x * f) / f; }
 
-/* ---- Load the engine with a minimal window shim. ---- */
+/*, Load the engine with a minimal window shim., */
 global.window = global.window || {};
 require(path.join(__dirname, '..', 'js', 'actions.js'));
 require(path.join(__dirname, '..', 'js', 'pig.js'));
@@ -39,7 +39,7 @@ const LEVER_IDS = Levers.LEVER_IDS;              // ['roll','hold']
 const TARGET = Pig.TARGET;
 const RIVAL_HOLD = Pig.RIVAL_HOLD;
 
-/* ---- Solve the exact-state DP. ---- */
+/*, Solve the exact-state DP., */
 console.log('Press Your Luck precompute - exact-state win-prob DP');
 console.log('  TARGET = ' + TARGET + ', rival holds at ' + RIVAL_HOLD + ', gamma = 1');
 const t0 = Date.now();
@@ -48,7 +48,7 @@ console.log('  converged in ' + solveInfo.sweeps + ' sweeps (' + (Date.now() - t
 console.log('  winProb at start (0, 0) = ' + Pig.winProb(0, 0, 0).toFixed(4));
 console.log('');
 
-/* ---- Project the exact optimal action onto the 18-cell display grid. ----
+/*, Project the exact optimal action onto the 18-cell display grid. ----
    For each cell (pot bucket, standing) we use the standing's representative
    (my, riv) scores and the bucket's representative pot. oraclePolicy holds
    18 lever ids; oracleQ holds 18 * 2 win-prob values laid out as
@@ -64,8 +64,8 @@ for (let i = 0; i < NCELLS; i++) {
   oraclePolicy[i] = (q.roll >= q.hold) ? 'roll' : 'hold';
 }
 
-/* ---- The twist at pot = 18, projected on the three representative
-   standings (BEHIND / EVEN / AHEAD). ---- */
+/*, The twist at pot = 18, projected on the three representative
+   standings (BEHIND / EVEN / AHEAD)., */
 const REP = Pig.STANDING_REP;   // [{my,riv} BEHIND, EVEN, AHEAD]
 function qAt(rep, pot) {
   const q = Pig.Q(rep.my, rep.riv, pot);
@@ -78,7 +78,7 @@ const twist = {
   ahead:  Object.assign({ my: REP[2].my, riv: REP[2].riv }, qAt(REP[2], 18)),
 };
 
-/* ---- Hold-threshold staircase (smallest pot where HOLD beats ROLL). ----
+/*, Hold-threshold staircase (smallest pot where HOLD beats ROLL). ----
    Computed for each representative standing, plus a small ladder of own
    scores so a scene can draw the climbing frontier. Infinity is serialised
    as null (the "rolls on past TARGET" case). */
@@ -100,7 +100,7 @@ const staircase = {
   breakEven: 20,
 };
 
-/* ---- DP-fill snapshots for the DP scene. ----
+/*, DP-fill snapshots for the DP scene. ----
    We project the partially-converged exact Q onto the 18-cell policy at a
    handful of sweep counts. Each capped re-solve runs the value iteration
    from scratch for `k` sweeps, so the projected policy reflects the state
@@ -124,7 +124,7 @@ for (const k of SNAPSHOT_SWEEPS) {
 /* Re-solve to the true fixed point so post-build accessors are exact. */
 Pig.solve({ maxSweeps: 80, tol: 1e-11, force: true });
 
-/* ---- One fixed illustrative game (demoTrajectory). ----
+/*, One fixed illustrative game (demoTrajectory). ----
    A single seeded rollout of MY decisions vs the rival, following the exact
    optimal policy, recorded turn by turn so the trajectory scene can replay
    it deterministically. */
@@ -180,7 +180,7 @@ function buildDemoTrajectory(seed) {
 }
 const demoTrajectory = buildDemoTrajectory(DEMO_SEED);
 
-/* ---- Recap: six concept cards in the table-card voice. ---- */
+/*, Recap: six concept cards in the table-card voice., */
 const recap = [
   {
     key: 'mdp', label: 'MDP', scene: 3, title: 'THE FOUR-PART FRAME',

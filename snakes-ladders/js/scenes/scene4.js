@@ -1,13 +1,13 @@
-/* Scene 4 — SARSA learns it from scratch.
+/* Scene 4, SARSA learns it from scratch.
  *
- *   Board + side panel. The agent has no access to V — only the SARSA update
+ *   Board + side panel. The agent has no access to V, only the SARSA update
  *   with ε-greedy on Q. Autoplay scrubber over precomputed snapshots.
  *   At each snapshot: per-square argmax-die badges from current Q.
  *   Click any square → side panel shows that square's three Q-values as bars.
  *   Bottom: learning curve (turns-per-episode), current snapshot highlighted.
  *
  *   The α and ε for the training run are pinned in DATA.params.sarsa and
- *   rendered as readouts (not interactive sliders) — retraining 2000 episodes
+ *   rendered as readouts (not interactive sliders), retraining 2000 episodes
  *   in the browser on every slider tick would freeze the page. Students see
  *   what's being trained, not a knob that does nothing.
  *
@@ -30,7 +30,7 @@
     hero.className = 'hero';
     hero.innerHTML =
       '<h1>SARSA learns it from scratch.</h1>' +
-      '<p class="subtitle">Same algorithm as the cliff-walk. No V, no model — only samples.</p>';
+      '<p class="subtitle">Same algorithm as the cliff-walk. No V, no model, only samples.</p>';
     wrap.appendChild(hero);
 
     /* SARSA equation */
@@ -44,7 +44,7 @@
       const empty = document.createElement('div');
       empty.className = 'card';
       empty.innerHTML =
-        '<p class="caption">SARSA training data is missing — run ' +
+        '<p class="caption">SARSA training data is missing, run ' +
         '<code>node precompute/build-datasets.js</code> from the viz folder.</p>';
       wrap.appendChild(empty);
       return {};
@@ -103,7 +103,7 @@
       snapEls.push(el);
     }
 
-    /* Play button below — autoplay through snapshots. */
+    /* Play button below, autoplay through snapshots. */
     const ctrl = document.createElement('div');
     ctrl.className = 'controls';
     left.appendChild(ctrl);
@@ -121,17 +121,17 @@
     mixStrip.className = 'policy-mix-strip';
     mixStrip.innerHTML =
       '<span class="pm-label">current Q-policy mix</span>' +
-      '<span class="pm-die"><span class="die-pill die-d4">d4</span><span id="s4-pm-d4">—</span></span>' +
-      '<span class="pm-die"><span class="die-pill die-d6">d6</span><span id="s4-pm-d6">—</span></span>' +
-      '<span class="pm-die"><span class="die-pill die-d8">d8</span><span id="s4-pm-d8">—</span></span>' +
-      '<span class="pm-die"><span class="pm-label">unvisited</span><span id="s4-pm-zero">—</span></span>';
+      '<span class="pm-die"><span class="die-pill die-d4">d4</span><span id="s4-pm-d4">, </span></span>' +
+      '<span class="pm-die"><span class="die-pill die-d6">d6</span><span id="s4-pm-d6">, </span></span>' +
+      '<span class="pm-die"><span class="die-pill die-d8">d8</span><span id="s4-pm-d8">, </span></span>' +
+      '<span class="pm-die"><span class="pm-label">unvisited</span><span id="s4-pm-zero">, </span></span>';
     left.appendChild(mixStrip);
 
     /* Caption */
     const cap = document.createElement('p');
     cap.className = 'caption';
     cap.textContent =
-      'Click any square to see its three Q-values as bars. The highlighted bar is the argmax — the die SARSA currently prefers there.';
+      'Click any square to see its three Q-values as bars. The highlighted bar is the argmax, the die SARSA currently prefers there.';
     left.appendChild(cap);
 
     /* Rail: Q-bar panel + learning curve + training config. */
@@ -170,7 +170,7 @@
     rail.appendChild(curveHost);
     const curve = window.LearningCurve.mount(curveHost, { W: 320, H: 140, window: 50 });
 
-    /* --------- State ---------- */
+    /*, State, */
     let selectedSquare = 1;
 
     function snapAt(idx) {
@@ -190,7 +190,7 @@
       /* Re-render badges. */
       window.QTable.renderBadgesFromQ(board, Q);
 
-      /* Mix strip — count argmax over squares where row has any non-zero. */
+      /* Mix strip, count argmax over squares where row has any non-zero. */
       let d4 = 0, d6 = 0, d8 = 0, zero = 0;
       for (let s = 1; s <= 99; s++) {
         const r = window.SARSA.row(Q, s);
@@ -207,11 +207,11 @@
       document.getElementById('s4-pm-d8').textContent = d8;
       document.getElementById('s4-pm-zero').textContent = zero;
 
-      /* Q-bar panel — refresh selected. */
+      /* Q-bar panel, refresh selected. */
       qPanel.update(selectedSquare, Q);
       board.highlightCell(selectedSquare);
 
-      /* Learning curve — show full series, cursor at this episode. */
+      /* Learning curve, show full series, cursor at this episode. */
       curve.setData(S.turnsPerEpisode);
       curve.setCursor(Math.max(0, ep - 1));
     }

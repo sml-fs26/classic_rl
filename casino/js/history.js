@@ -1,6 +1,6 @@
 /* Per-scene step history.
 
-   Casino's records are { arm, reward, mode, eps, t } — one per pull. The
+   Casino's records are { arm, reward, mode, eps, t }, one per pull. The
    shape is opaque to History; scenes pass whatever record they need. SKILL §
    step-engine pattern: state-is-source-of-truth, prev = reset+replay, so we
    only need to remember *what was pulled* and replay it through the bandit
@@ -12,12 +12,12 @@
    to the scene driver to advance to the next scene. */
 (function () {
   function create() {
-    const records = [];   // arbitrary shape — scenes choose
+    const records = [];   // arbitrary shape, scenes choose
     let cursor = 0;       // 0..records.length; cursor === records.length means "at the head"
 
     return {
       /* Record a fresh entry. Truncates any "future" records left over from
-         a previous rewind — the user has overwritten history. */
+         a previous rewind, the user has overwritten history. */
       push(record) {
         records.length = cursor;
         records.push(record);

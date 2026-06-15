@@ -1,4 +1,4 @@
-/* i18n CORE for Stale by Sundown -- English (authoritative) + Japanese mirror.
+/* i18n CORE for Stale by Sundown, English (authoritative) + Japanese mirror.
  *
  *   The THIN core only: shared chrome strings (topbar, concept-badge labels,
  *   prev/next, theme/lang/music, the common shelf/lever/tier vocabulary, the
@@ -19,7 +19,7 @@
 
   const STORE = {
     en: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · STALE BY SUNDOWN',
       'topbar.prev':  'PREV',
       'topbar.next':  'NEXT',
@@ -28,7 +28,7 @@
       'music.off':    '♪ MUSIC OFF',
       'lang.toggle':  '日本語',
 
-      /* ---- concept-badge labels ---- */
+      /*, concept-badge labels, */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -36,7 +36,7 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'SAR',
 
-      /* ---- common shelf vocabulary ---- */
+      /*, common shelf vocabulary, */
       'vocab.shelf':    'shelf',
       'vocab.lever':    'lever',
       'vocab.customer': 'the customer',
@@ -45,7 +45,7 @@
       'vocab.spoiled':  'SPOILED',
       'vocab.till':     'till',
 
-      /* ---- the three levers (canonical labels) ---- */
+      /*, the three levers (canonical labels), */
       'lever.HOLD':       'HOLD',
       'lever.DISCOUNT':   'DISCOUNT',
       'lever.DUMP':       'DUMP',
@@ -56,14 +56,14 @@
       'lever.DISCOUNT.margin': '+2 sale',
       'lever.DUMP.margin': M + '3 now',
 
-      /* ---- freshness tiers ---- */
+      /*, freshness tiers, */
       'tier.FRESH': 'FRESH',
       'tier.OK':    'OK',
       'tier.AGING': 'AGING',
       'tier.OLD':   'OLD',
       'tier.STALE': 'STALE',
 
-      /* ---- board / display-case widget ---- */
+      /*, board / display-case widget, */
       'board.title':      'BEST LEVER ON EVERY SHELF',
       'board.bestLever':  'BEST LEVER',
       'board.units':      'units',
@@ -71,16 +71,16 @@
       'board.cleared':    'SOLD OUT',
       'board.spoiled':    'SPOILED',
 
-      /* ---- buy-meter ---- */
+      /*, buy-meter, */
       'meter.title':  'DID A CUSTOMER BUY?',
       'meter.bought': 'BOUGHT! cha-ching',
       'meter.nobuy':  'no buy, it ages',
 
-      /* ---- shared overlay chrome ---- */
+      /*, shared overlay chrome, */
       'speakerNotes.title': 'SPEAKER NOTES · press <kbd>n</kbd> to close',
       'speakerNotes.empty': '(No notes for this scene yet.)',
 
-      /* ---- lecturer speaker notes, keyed by scene ---- */
+      /*, lecturer speaker notes, keyed by scene, */
       'notes.scene0': '<h3>Hook</h3><p>The markdown decision: a depreciating asset on a clock. The whole lesson: <b>the right lever flips as the asset ages</b>. HOLD while fresh, DISCOUNT once aging, DUMP when stale. Airline seats, hotel rooms, end-of-season racks: all the same shape.</p>',
       'notes.scene1': '<h3>Tutorial</h3><p>Vocabulary only, no strategy. <b>Shelf</b> = the situation (units &times; freshness). <b>Lever</b> = your move (HOLD/DISCOUNT/DUMP). <b>The buy-meter</b> = the part you do not control. <b>The clock</b> = the batch ages each hour a customer does not buy.</p>',
       'notes.scene2': '<h3>Playtest</h3><p>Let them feel the trade-off. Most over-HOLD a premium tray, watch it drift to STALE, eat a ' + M + '6, or panic-DUMP too early. "You just ran the playbook by gut."</p>',
@@ -97,7 +97,7 @@
     },
 
     jp: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · ステイル バイ サンダウン',
       'topbar.prev':  'まえ',
       'topbar.next':  'つぎ',

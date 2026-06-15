@@ -1,4 +1,4 @@
-/* Scene 2 -- PLAYTEST: "You run the fleet".
+/* Scene 2, PLAYTEST: "You run the fleet".
  *
  *   The learner IS the fleet manager for one QUARTER of 12 weeks. Each week
  *   they make ONE call on OLD BESSIE (RUN / SERVICE / REPLACE); the engine
@@ -43,18 +43,18 @@
     const WEEKS = 12;
     function signed(n) { return (n > 0 ? '+' : '') + String(n); }
 
-    /* ---------- Header ---------- */
+    /*, Header, */
     const header = document.createElement('h2');
     header.className = 'poke-section-title s2-section-title';
     header.textContent = 'YOU RUN THE FLEET';
     root.appendChild(header);
 
-    /* ---------- Main row: board (HUD + van) | dialog + calls ---------- */
+    /*, Main row: board (HUD + van) | dialog + calls, */
     const row = document.createElement('div');
     row.className = 's2-row';
     root.appendChild(row);
 
-    /* --- left: the live board --- */
+    /*, left: the live board, */
     const board = document.createElement('div');
     board.className = 's2-board';
     row.appendChild(board);
@@ -79,7 +79,7 @@
     board.appendChild(cardHost);
     const card = window.VanCard.mount(cardHost, { wear: 0, size: 'lg', miles: 0 });
 
-    /* --- right: dialog + call menu + restart --- */
+    /*, right: dialog + call menu + restart, */
     const rightCol = document.createElement('div');
     rightCol.className = 's2-right';
     row.appendChild(rightCol);
@@ -134,7 +134,7 @@
     ctrlRow.appendChild(restartBtn);
     rightCol.appendChild(ctrlRow);
 
-    /* ---------- The money tape (one chip per week) ---------- */
+    /*, The money tape (one chip per week), */
     const tapeWrap = document.createElement('div');
     tapeWrap.className = 's2-tape-wrap';
     tapeWrap.innerHTML = '<div class="s2-tape-label">THE QUARTER, WEEK BY WEEK</div>';
@@ -143,7 +143,7 @@
     tapeWrap.appendChild(tape);
     root.appendChild(tapeWrap);
 
-    /* ---------- Caption ---------- */
+    /*, Caption, */
     const caption = document.createElement('div');
     caption.className = 'poke-caption s2-caption';
     caption.textContent =
@@ -152,7 +152,7 @@
       'running her. Every number on the tape is money that actually landed.';
     root.appendChild(caption);
 
-    /* ---------- State ---------- */
+    /*, State, */
     let state, week, bank, busy, episode, ended;
     let baseSeed = 0;            /* per-episode; per-week seeds derive from it */
     let stats = { road: 0, shop: 0, bought: 0, breakdowns: 0 };
@@ -204,7 +204,7 @@
       tape.scrollLeft = tape.scrollWidth;
     }
 
-    /* ---------- Narration (state names + money straight off the sample) --- */
+    /*, Narration (state names + money straight off the sample), */
     function announceLine(actionId) {
       if (actionId === 'run') return 'You send her out on the route...';
       if (actionId === 'service') return 'Into the shop she goes...';
@@ -241,7 +241,7 @@
       return 'Sticker shock: ' + money + '. A brand-new BESSIE rolls up Monday.';
     }
 
-    /* ---------- One week: announce -> sample -> animate -> book it ------- */
+    /*, One week: announce -> sample -> animate -> book it, */
     function onCall(actionId) {
       if (busy || ended) return;
       setBusy(true);
@@ -311,7 +311,7 @@
       }, A(700));
     }
 
-    /* ---------- Quarter close ---------- */
+    /*, Quarter close, */
     function finishQuarter(myEp) {
       ended = true;
       setBusy(true);
@@ -354,7 +354,7 @@
       sum.querySelector('.s2-again').addEventListener('click', () => resetRun());
     }
 
-    /* ---------- Reset to Monday, week 1, a fresh quarter ---------- */
+    /*, Reset to Monday, week 1, a fresh quarter, */
     function resetRun() {
       clearTimers();
       episode = (episode || 0) + 1;

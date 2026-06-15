@@ -8,7 +8,7 @@
  *
  *   This file is used by both the runtime (scene 4) and the precompute (which
  *   mirrors the algorithm in Node for offline training). Keeping them in sync
- *   is mandatory — the precompute writes the data that scene 4 reads back.
+ *   is mandatory, the precompute writes the data that scene 4 reads back.
  */
 (function () {
   const ACTIONS = (window.Dice && window.Dice.DIE_IDS) || ['d4', 'd6', 'd8'];

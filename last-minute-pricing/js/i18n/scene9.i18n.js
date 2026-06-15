@@ -1,4 +1,4 @@
-/* scene9 i18n fragment -- "Fill Q* by dynamic programming".
+/* scene9 i18n fragment, "Fill Q* by dynamic programming".
    Because the demand odds are known, we sweep the Bellman backup column by
    column, right (d=1) to left (d=4), converging in exactly 4 sweeps; the
    optimal-lever overlay paints the three coloured regions + the diagonal seam.

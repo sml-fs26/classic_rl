@@ -1,11 +1,11 @@
-/* Scene 0 — five unknown machines.
+/* Scene 0, five unknown machines.
 
    Title manifesto. Five cards in a row, each with a slot-machine sprite, the
    machine name, and `?` where the empirical mean would later go. The five
    true probabilities are NOT shown.
 
    Static, no interactive elements, no internal step engine. Cold-entry safe
-   — built entirely from DATA.bandit. */
+, built entirely from DATA.bandit. */
 (function () {
   if (!window.scenes) window.scenes = {};
 
@@ -49,12 +49,12 @@
     lede.className = 'lede';
     lede.textContent =
       'Each machine pays out with a fixed but hidden probability. You do not know them. ' +
-      'Every round you pick one machine and pull. You see one outcome — win or no-win — ' +
+      'Every round you pick one machine and pull. You see one outcome, win or no-win, ' +
       'and decide what to do next.';
     hero.appendChild(lede);
     wrap.appendChild(hero);
 
-    /* Machine row — five cards with `?` screens */
+    /* Machine row, five cards with `?` screens */
     const row = document.createElement('div');
     row.className = 'machine-row';
     for (let i = 0; i < cfg.K; i++) {
@@ -93,7 +93,7 @@
       'lesson over ' + horz.autoplay + ' rounds; before that, play freely.';
     wrap.appendChild(promise);
 
-    /* Footnote — keyboard hints */
+    /* Footnote, keyboard hints */
     const foot = document.createElement('p');
     foot.className = 'footnote';
     foot.innerHTML = 'Press <kbd>&rarr;</kbd> to begin.';

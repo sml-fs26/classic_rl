@@ -1,4 +1,4 @@
-/* scene10 i18n -- why DP does not scale. */
+/* scene10 i18n, why DP does not scale. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

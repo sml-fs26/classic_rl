@@ -1,4 +1,4 @@
-/* Scene 4 -- Policy. A policy is a complete growth playbook: one lever for every
+/* Scene 4, Policy. A policy is a complete growth playbook: one lever for every
    situation. Paint three hand-policies onto the 5x5 board as colour maps before
    anyone says which is better: Always-Push (all gold), Always-Nudge (all teal),
    and a sensible "nudge while cold, push once hooked" one. The learner sees a

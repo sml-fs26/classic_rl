@@ -1,4 +1,4 @@
-/* Scene 8 -- Bellman: today vs tomorrow.
+/* Scene 8, Bellman: today vs tomorrow.
  *
  *   The Bellman optimality equation
  *       Q*(s, a) = E[ R + max_{a'} Q*(S', a') ]
@@ -30,7 +30,7 @@
      used (2 units, 2 days, fixed STANDARD). One day left after the backup, so
      the frontier children are bootstrapped by V: leaf = r + V(s'). The
      weighted leaf sum is Q*(2u/2d, STANDARD) = $5.22, the very value the
-     trajectory/return scenes computed -- the backup IS the one-ply tree. */
+     trajectory/return scenes computed, the backup IS the one-ply tree. */
   const BACKUP_ROOT = { u: 2, d: 2, terminal: false };
   const BACKUP_LEVER = 'standard';
 
@@ -96,19 +96,19 @@
     root.className = 'scene-pad scene8';
     root.innerHTML = '';
 
-    /* ---- Heading ---- */
+    /*, Heading, */
     const h = document.createElement('h2');
     h.className = 's8-heading';
     h.textContent = T('scene8.title');
     root.appendChild(h);
 
-    /* ---- Manager-first lede ---- */
+    /*, Manager-first lede, */
     const lede = document.createElement('p');
     lede.className = 's8-lede';
     lede.innerHTML = T('scene8.lede');
     root.appendChild(lede);
 
-    /* ---- Bellman formula card ---- */
+    /*, Bellman formula card, */
     const fcard = document.createElement('div');
     fcard.className = 's8-formula-card';
     const flabel = document.createElement('div');
@@ -122,7 +122,7 @@
     window.Katex.render(bellmanTex, fhost, true);
     root.appendChild(fcard);
 
-    /* ---- The backup IS the depth-1 trajectory tree ----
+    /*, The backup IS the depth-1 trajectory tree ----
        A collapsible card holding a depth-1 TrajTree under (2u/2d, STANDARD)
        with each frontier child bootstrapped by V: leaf = r + V(s'). Its
        weighted leaf sum equals Q*(2u/2d, STANDARD) = $5.22, the same value the
@@ -198,12 +198,12 @@
       }
     })();
 
-    /* ---- Two-column body: the "read it" panel + the worked backup ---- */
+    /*, Two-column body: the "read it" panel + the worked backup, */
     const body = document.createElement('div');
     body.className = 's8-body';
     root.appendChild(body);
 
-    /* ---- Bridge footer to scene 9 (appended after the body below) ---- */
+    /*, Bridge footer to scene 9 (appended after the body below), */
     const bridge = document.createElement('div');
     bridge.className = 's8-bridge';
     bridge.innerHTML = T('scene8.bridge');
@@ -289,7 +289,7 @@
     verdict.className = 's8-verdict';
     worked.appendChild(verdict);
 
-    /* ---- State ---- */
+    /*, State, */
     const seen = {};                 // leverId -> computed total
     let activeLever = null;
 
@@ -335,7 +335,7 @@
 
     function maybeVerdict() {
       /* Reveal the verdict only once the learner has backed up all three
-         levers themselves -- no answer before the attempt. */
+         levers themselves, no answer before the attempt. */
       if (Object.keys(seen).length < LEVER_IDS.length) return;
       let bestId = LEVER_IDS[0], bestV = -Infinity;
       for (const id of LEVER_IDS) {

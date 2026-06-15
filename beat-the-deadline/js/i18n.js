@@ -1,4 +1,4 @@
-/* i18n CORE for Beat the Deadline -- English (authoritative) + Japanese mirror.
+/* i18n CORE for Beat the Deadline, English (authoritative) + Japanese mirror.
  *
  *   THIN core only: seeds the shared chrome strings (topbar, concept-badge
  *   labels, prev/next, theme/lang/music labels, the dock/lever/dice vocabulary,
@@ -18,7 +18,7 @@
 
   const STORE = {
     en: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · BEAT THE DEADLINE',
       'topbar.prev':  'PREV',
       'topbar.next':  'NEXT',
@@ -27,7 +27,7 @@
       'music.off':    '♪ MUSIC OFF',
       'lang.toggle':  '日本語',
 
-      /* ---- concept-badge labels (lit on reaching the relevant scene) ---- */
+      /*, concept-badge labels (lit on reaching the relevant scene), */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -35,14 +35,14 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'TD',
 
-      /* ---- dock vocabulary, reused across scenes ---- */
+      /*, dock vocabulary, reused across scenes, */
       'vocab.pallets':  'pallets',
       'vocab.hours':    'hours left',
       'vocab.dock':     'the dock',
       'vocab.deadline': 'the deadline',
       'vocab.truck':    'the truck',
 
-      /* ---- the two levers ---- */
+      /*, the two levers, */
       'action.wait':       'WAIT',
       'action.send':       'SEND',
       'action.wait.role':  'hold',
@@ -50,7 +50,7 @@
       'action.wait.gloss': 'hold one more hour to consolidate',
       'action.send.gloss': 'dispatch the load now, on time',
 
-      /* ---- dice ---- */
+      /*, dice, */
       'die.arrivalLabel':  'ARRIVAL DIE',
       'die.deadlineLabel': 'DEADLINE DIE',
       'die.arrivalBadge':  '60%',
@@ -59,7 +59,7 @@
       'die.blown':         'BLOWN!',
       'die.safe':          'SAFE',
 
-      /* ---- board labels ---- */
+      /*, board labels, */
       'board.pallets':   'pal',
       'board.hours':     'hrs',
       'board.bestLever': 'best lever',
@@ -68,28 +68,28 @@
       'board.send':      'SEND',
       'board.wait':      'WAIT',
 
-      /* ---- overlay chrome ---- */
+      /*, overlay chrome, */
       'speakerNotes.title': 'SPEAKER NOTES · press <kbd>n</kbd> to close',
       'speakerNotes.empty': '(No notes for this scene yet.)',
 
-      /* ---- lecturer speaker notes, keyed by scene ---- */
-      'notes.scene0': '<h3>Hook</h3><p>The half-empty-truck call, lived a hundred times. One hard deadline, a half-full truck. The whole lesson: <b>the right call is not a fixed rule</b> like "always ship at 80%" -- it flips with how full you are AND how much time is left.</p>',
+      /*, lecturer speaker notes, keyed by scene, */
+      'notes.scene0': '<h3>Hook</h3><p>The half-empty-truck call, lived a hundred times. One hard deadline, a half-full truck. The whole lesson: <b>the right call is not a fixed rule</b> like "always ship at 80%", it flips with how full you are AND how much time is left.</p>',
       'notes.scene1': '<h3>Tutorial</h3><p>Vocabulary only. <b>Pallets (p)</b> + <b>hours-left (h)</b> = the situation. <b>WAIT / SEND</b> = the two levers. WAIT rolls two dice: a green arrival die (a pallet, maybe) and a red deadline die that <em>gets nastier as the clock runs down</em>.</p>',
-      'notes.scene2': '<h3>Playtest</h3><p>Let them feel a WAIT pay off (a pallet arrives, fuller truck) or punish (the deadline blows, load stranded). "You already wait when there is time and ship when the clock is red -- that instinct is a policy."</p>',
+      'notes.scene2': '<h3>Playtest</h3><p>Let them feel a WAIT pay off (a pallet arrives, fuller truck) or punish (the deadline blows, load stranded). "You already wait when there is time and ship when the clock is red, that instinct is a policy."</p>',
       'notes.scene3': '<h3>Formalization</h3><p>Name the four parts over the dock: state s=(p,h), action a in {WAIT,SEND}, transition P (the two dice), reward r (+5 a pallet, -10 the truck, -5 a stranded pallet).</p>',
-      'notes.scene4': '<h3>Policy</h3><p>A policy is one lever for <em>every</em> one of the 25 dock states, the SOP your team follows without you. Show Always-SEND (all blue) vs Always-WAIT (mostly amber) before asking which is best -- and whether one flat rule is even good enough.</p>',
-      'notes.scene5': '<h3>Trajectory</h3><p>One window is a sequence of random variables. (2,4) -> WAIT -> (3,3) -> SEND -> +5. Same SOP, a different tape every time -- that is the dice.</p>',
+      'notes.scene4': '<h3>Policy</h3><p>A policy is one lever for <em>every</em> one of the 25 dock states, the SOP your team follows without you. Show Always-SEND (all blue) vs Always-WAIT (mostly amber) before asking which is best, and whether one flat rule is even good enough.</p>',
+      'notes.scene5': '<h3>Trajectory</h3><p>One window is a sequence of random variables. (2,4) -> WAIT -> (3,3) -> SEND -> +5. Same SOP, a different tape every time, that is the dice.</p>',
       'notes.scene6': '<h3>Return</h3><p>The return is the payoff over the whole window. From (2,4), WAIT gives a spread: mostly +5, sometimes 0, a few -10 (blown). SEND now is a certain 0. Judge by the average, not one window.</p>',
-      'notes.scene7': '<h3>Q*</h3><p>Q*(s,a) is the long-run value of a lever, played smart after. The star MOVES: at (2,3) WAIT (+0.40), one hour later at (2,2) SEND. Two near-identical situations, opposite calls -- the twist.</p>',
+      'notes.scene7': '<h3>Q*</h3><p>Q*(s,a) is the long-run value of a lever, played smart after. The star MOVES: at (2,3) WAIT (+0.40), one hour later at (2,2) SEND. Two near-identical situations, opposite calls, the twist.</p>',
       'notes.scene8': '<h3>Bellman</h3><p>Value is recursive: immediate payoff plus the best from wherever the dice land you. WAIT(2,3) = 0.2*(-10) + 0.8*[0.6*V*(3,2)+0.4*V*(2,2)] = +0.40. Hand-checkable.</p>',
       'notes.scene9': '<h3>DP</h3><p>The dice are known, so P is known and Q* is exact. Sweep the Bellman backup: the deadline wall locks first at -10, then the diagonal staircase (threshold 1->2->3->4) draws itself in six passes.</p>',
-      'notes.scene10': '<h3>Why DP fails</h3><p>(a) You rarely know the real arrival rate / carrier odds -- they drift by season and lane. (b) Add SKUs, trucks, lanes, a week-long horizon and 25 cells become millions. DP is the gold standard you usually cannot run.</p>',
-      'notes.scene11': '<h3>TD: SARSA vs Q-learning</h3><p>Replace the expectation with one observed dispatch. Off-policy <b>Q-learning</b> bootstraps on the best next lever and recovers the exact diagonal (== DP). On-policy <b>SARSA</b> learns the value of the cautious rule it follows and ships the thin (2,3) order one hour early. Cautious vs optimal -- the cliff-walking distinction, on the dock.</p>',
+      'notes.scene10': '<h3>Why DP fails</h3><p>(a) You rarely know the real arrival rate / carrier odds, they drift by season and lane. (b) Add SKUs, trucks, lanes, a week-long horizon and 25 cells become millions. DP is the gold standard you usually cannot run.</p>',
+      'notes.scene11': '<h3>TD: SARSA vs Q-learning</h3><p>Replace the expectation with one observed dispatch. Off-policy <b>Q-learning</b> bootstraps on the best next lever and recovers the exact diagonal (== DP). On-policy <b>SARSA</b> learns the value of the cautious rule it follows and ships the thin (2,3) order one hour early. Cautious vs optimal, the cliff-walking distinction, on the dock.</p>',
       'notes.scene12': '<h3>Recap</h3><p>Six cards: MDP, policy, return, Q*, DP, TD. Close: the half-empty-truck call has an exact answer, and you can learn it without ever knowing the odds.</p>',
     },
 
     jp: {
-      /* ---- topbar / chrome ---- */
+      /*, topbar / chrome, */
       'brand':        'SML · しめきりにまにあう',
       'topbar.prev':  'まえ',
       'topbar.next':  'つぎ',
@@ -98,7 +98,7 @@
       'music.off':    '♪ おんがく オフ',
       'lang.toggle':  'ENGLISH',
 
-      /* ---- concept-badge labels ---- */
+      /*, concept-badge labels, */
       'badge.mdp':    'MDP',
       'badge.policy': 'POL',
       'badge.return': 'RTN',
@@ -106,14 +106,14 @@
       'badge.dp':     'DP',
       'badge.sarsa':  'TD',
 
-      /* ---- dock vocabulary ---- */
+      /*, dock vocabulary, */
       'vocab.pallets':  'パレット',
       'vocab.hours':    'のこり時間',
       'vocab.dock':     'ドック',
       'vocab.deadline': 'しめきり',
       'vocab.truck':    'トラック',
 
-      /* ---- the two levers ---- */
+      /*, the two levers, */
       'action.wait':       'WAIT',
       'action.send':       'SEND',
       'action.wait.role':  'まつ',
@@ -121,7 +121,7 @@
       'action.wait.gloss': 'もう1じかん まって まとめる',
       'action.send.gloss': 'いま にもつを じかんないに おくる',
 
-      /* ---- dice ---- */
+      /*, dice, */
       'die.arrivalLabel':  'とうちゃくダイス',
       'die.deadlineLabel': 'しめきりダイス',
       'die.arrivalBadge':  '60%',
@@ -130,7 +130,7 @@
       'die.blown':         'しっぱい！',
       'die.safe':          'ぶじ',
 
-      /* ---- board labels ---- */
+      /*, board labels, */
       'board.pallets':   'パ',
       'board.hours':     '時',
       'board.bestLever': 'さいぜんのレバー',
@@ -139,11 +139,11 @@
       'board.send':      'SEND',
       'board.wait':      'WAIT',
 
-      /* ---- overlay chrome ---- */
+      /*, overlay chrome, */
       'speakerNotes.title': 'スピーカー ノート · <kbd>n</kbd> で とじる',
       'speakerNotes.empty': '（この シーンの ノートは まだ ありません）',
 
-      /* ---- lecturer speaker notes ---- */
+      /*, lecturer speaker notes, */
       'notes.scene0': '<h3>つかみ</h3><p>半分からのトラックをどうするか、何百回もした選択。 きょうのじゅぎょう： <b>ただしいこたえは「つねに80%で出す」のようなひとつのルールではない</b>。 どれだけ つんでいるかと、 どれだけ 時間がのこっているかで ひっくりかえる。</p>',
       'notes.scene1': '<h3>チュートリアル</h3><p>ことばだけ。 <b>パレット(p)</b> と <b>のこり時間(h)</b> ＝ じょうきょう。 <b>WAIT / SEND</b> ＝ 2つのレバー。 WAIT は 2つのダイスを ふる： みどりのとうちゃくダイスと、 <em>時間がのこるほど やばくなる</em> あかい しめきりダイス。</p>',
       'notes.scene2': '<h3>プレイテスト</h3><p>WAIT が むくわれる（パレットがきて、よりいっぱいのトラック）か、ばっする（しめきりがしっぱい）のを かんじて もらう。「あなたは すでに あるキマリに したがっていた」。</p>',

@@ -47,7 +47,7 @@
     let die = null;             // StageDie handle, mounted lazily on step 3
     let rollBusy = false;
 
-    /* ---------- Title + lede ---------- */
+    /*, Title + lede, */
     const head = document.createElement('div');
     head.className = 'sc3-head';
     head.innerHTML =
@@ -55,7 +55,7 @@
       '<p class="poke-caption sc3-lede">' + T('scene3.lede') + '</p>';
     root.appendChild(head);
 
-    /* ---------- Two-column body: stage (left) + panel (right) ---------- */
+    /*, Two-column body: stage (left) + panel (right), */
     const body = document.createElement('div');
     body.className = 'sc3-body';
     root.appendChild(body);
@@ -166,7 +166,7 @@
     foot.className = 'sc3-foot';
     panel.appendChild(foot);
 
-    /* ---------- Nav controls ---------- */
+    /*, Nav controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 'sc3-ctrls';
     ctrls.innerHTML =
@@ -184,7 +184,7 @@
     const nextBtn = ctrls.querySelector('#sc3-next');
     const stepofEl = ctrls.querySelector('#sc3-stepof');
 
-    /* ---------- STAGE DIE demo (step 3) ---------- */
+    /*, STAGE DIE demo (step 3), */
     function rollDie() {
       /* If a headless &run click arrives early, make sure we are on the
          transition step so the die row is on screen before it spins. */
@@ -211,7 +211,7 @@
     }
     rollBtn.addEventListener('click', rollDie);
 
-    /* ---------- Step state machine ---------- */
+    /*, Step state machine, */
     function renderFormula() {
       formula.innerHTML = '';
       if (step === 0) {

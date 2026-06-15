@@ -57,14 +57,14 @@
 
     let step = 0;
 
-    /* ---------- Title ---------- */
+    /*, Title, */
     const head = document.createElement('div');
     head.className = 's3-head';
     head.innerHTML =
       '<h2 class="poke-section-title s3-title">What makes this an MDP?</h2>';
     root.appendChild(head);
 
-    /* ---------- The assembling tuple rail ---------- */
+    /*, The assembling tuple rail, */
     const TUPLE = [
       { tex: 'S',       lab: 'STATE'    },
       { tex: 'A',       lab: 'ACTIONS'  },
@@ -110,7 +110,7 @@
     rail.appendChild(brkR);
     root.appendChild(rail);
 
-    /* ---------- Two-column body ---------- */
+    /*, Two-column body, */
     const body = document.createElement('div');
     body.className = 's3-body';
     root.appendChild(body);
@@ -126,7 +126,7 @@
     boardLabel.textContent = "OLD BESSIE'S WEEK";
     board.appendChild(boardLabel);
 
-    /* --- The wear strip (4 state chips + drift arrows + arc band) --- */
+    /*, The wear strip (4 state chips + drift arrows + arc band), */
     const secStrip = document.createElement('div');
     secStrip.className = 's3-sec s3-sec-strip';
     secStrip.innerHTML = '<div class="s3-sec-label">THE GAUGE: FOUR WEAR LEVELS</div>';
@@ -165,7 +165,7 @@
       chipEls.push(chip);
     }
 
-    /* --- Breakdown-arc band under the chips (drawn from measurements) --- */
+    /*, Breakdown-arc band under the chips (drawn from measurements), */
     const band = document.createElement('div');
     band.className = 's3-band';
     secStrip.appendChild(band);
@@ -236,7 +236,7 @@
       label(gl, c3 + 24, 52, pct(M.pBreakdown[NS - 1]) + '%', 'middle');
     }
 
-    /* --- The three calls --- */
+    /*, The three calls, */
     const secAct = document.createElement('div');
     secAct.className = 's3-sec s3-sec-actions';
     secAct.innerHTML = '<div class="s3-sec-label">THE THREE CALLS</div>';
@@ -255,7 +255,7 @@
       actRow.appendChild(el);
     });
 
-    /* --- The money row --- */
+    /*, The money row, */
     const secMoney = document.createElement('div');
     secMoney.className = 's3-sec s3-sec-money';
     secMoney.innerHTML = '<div class="s3-sec-label">THE MONEY</div>';
@@ -279,7 +279,7 @@
       moneyRow.appendChild(el);
     });
 
-    /* --- The patience coin stacks (gamma) --- */
+    /*, The patience coin stacks (gamma), */
     const secPat = document.createElement('div');
     secPat.className = 's3-sec s3-sec-pat';
     secPat.innerHTML = '<div class="s3-sec-label">THE PATIENCE DIAL</div>';
@@ -355,7 +355,7 @@
       'Press <kbd>n</kbd> for speaker notes.';
     root.appendChild(hint);
 
-    /* ---------- Per-step copy (formula chip + at most 2 short lines) ---------- */
+    /*, Per-step copy (formula chip + at most 2 short lines), */
     const STEPS = [
       {
         hot: 'none',
@@ -410,7 +410,7 @@
       },
     ];
 
-    /* ---------- Step state machine (pure function of `step`) ---------- */
+    /*, Step state machine (pure function of `step`), */
     function applyStep(k, animate) {
       step = Math.max(0, Math.min(STEP_COUNT - 1, k));
       const s = STEPS[step];

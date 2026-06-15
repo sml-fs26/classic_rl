@@ -1,7 +1,7 @@
 /* The WIND DIE: a chunky pixel d10 that tumbles and lands on a face. Faces
    1-7 (p=0.7) = you go where you AIMED; 8-9 (p=0.15) = a gust shoves you to
    your LEFT; 10 (p=0.15) = a gust shoves you to your RIGHT. The bias is printed
-   on its face (a 70/15/15 badge) so the odds are visible -- this is the single
+   on its face (a 70/15/15 badge) so the odds are visible, this is the single
    visible die of the cave's MDP.
 
    API (mount-based):

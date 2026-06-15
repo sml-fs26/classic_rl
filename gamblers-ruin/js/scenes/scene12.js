@@ -1,4 +1,4 @@
-/* Scene 12 -- Recap. Six cards, one concept each (MDP, policy, return, Q*, DP,
+/* Scene 12, Recap. Six cards, one concept each (MDP, policy, return, Q*, DP,
    learning), in the cash-ladder visual language, from window.DATA.recap. A
    small glyph per card plus its formula. Closing line + replay. Cold-entry
    safe. */

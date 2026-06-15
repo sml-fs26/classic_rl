@@ -1,4 +1,4 @@
-/* Scene 0 — POKEMON title screen.
+/* Scene 0, POKEMON title screen.
  *
  *   First-visit ceremony: each letter of POKEMON drops in one at a
  *   time, a sparkle layer fires around the Pikachu sprite, PRESS START

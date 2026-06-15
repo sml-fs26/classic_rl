@@ -48,7 +48,7 @@
       window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
-  /* ---------- Per-concept glyph builders ----------
+  /*, Per-concept glyph builders ----------
      Each returns an HTML string for the .sc12-card-visual slot. They are
      deliberately small reminders of the full scenes, not new content.
      Lever colours come from the .lever-{nothing|checkin|offer} token

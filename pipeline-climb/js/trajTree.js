@@ -1,4 +1,4 @@
-/* window.TrajTree -- the reusable trajectory-as-tree widget.
+/* window.TrajTree, the reusable trajectory-as-tree widget.
  *
  *   A trajectory tau = (S1, A1, R1, S2, A2, R2, ...) is one root-to-leaf
  *   PATH through a branching process. This widget draws the *set* of paths
@@ -38,7 +38,7 @@
  */
 (function () {
 
-  /* ---------- small helpers ---------- */
+  /*, small helpers, */
 
   function defaultStateKey(s) {
     if (!s) return '';
@@ -72,7 +72,7 @@
   }
 
   /* =====================================================================
-     PURE DATA -- build the chance tree.
+     PURE DATA, build the chance tree.
      =====================================================================
 
      Node shape:
@@ -250,7 +250,7 @@
     return kept;
   }
 
-  /* enumeratePaths -- walk root to leaf, collecting edges/P/G of each path.
+  /* enumeratePaths, walk root to leaf, collecting edges/P/G of each path.
      For merged DAGs this re-expands shared nodes, so a path is reported once
      per distinct route. The widget's E[G_t] uses the merged-leaf P from
      build(); enumeratePaths is a convenience for tests / tape derivation. */
@@ -274,7 +274,7 @@
   }
 
   /* =====================================================================
-     DOM -- render an indented vertical tree (mobile-first, no SVG).
+     DOM, render an indented vertical tree (mobile-first, no SVG).
      =====================================================================
 
      Each node is a row: [spine][a . p . r chips][compact state-icon]. Children
@@ -364,7 +364,7 @@
       return sumOk;
     }
 
-    /* ---- Render the indented vertical tree ---- */
+    /*, Render the indented vertical tree, */
     function renderTree() {
       treePanel.innerHTML = '';
       const seen = new Set();   // DAG: render a merged node once (first reach)
@@ -484,7 +484,7 @@
       return wrap;
     }
 
-    /* ---- Render the weighted-sum ledger ---- */
+    /*, Render the weighted-sum ledger, */
     function renderLedger() {
       ledgerPanel.innerHTML = '';
       leafRowEls = new Map();
@@ -542,7 +542,7 @@
       table.appendChild(sumRow);
     }
 
-    /* ---- path / leaf highlighting (instant class swap, never a transition) ---- */
+    /*, path / leaf highlighting (instant class swap, never a transition), */
     let litLeafId = null;
 
     function pathNodeIdsTo(leafId) {
@@ -588,7 +588,7 @@
       });
     }
 
-    /* ---- sample one path within the drawn tree (engine-faithful by p) ---- */
+    /*, sample one path within the drawn tree (engine-faithful by p), */
     function samplePath(rng) {
       rng = rng || Math.random;
       let node = tree.root;
@@ -607,7 +607,7 @@
       return { edges, leafState: node.state, leafId: node.id, G: node.G != null ? node.G : G };
     }
 
-    /* ---- public API ---- */
+    /*, public API, */
     rebuild(buildOpts.rootState);
 
     return {

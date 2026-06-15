@@ -1,11 +1,11 @@
-/* scene0 i18n -- title / hook. */
+/* scene0 i18n, title / hook. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({
     en: {
       'scene0.title':    'Critical Spare',
       'scene0.tagline':  'Your most important machine is getting old. Cash is tight. Run it, pre-order a part, or swap one in?',
-      'scene0.framing':  'A critical asset is aging and the spare-parts budget is a perennial fight. Hold too few spares and a failure idles the line for days; hold too many and you bleed working capital. Today you\'ll see why the right call is <b>not a slogan</b> -- it changes with the situation, exactly the intuition a reliability manager is paid to have.',
+      'scene0.framing':  'A critical asset is aging and the spare-parts budget is a perennial fight. Hold too few spares and a failure idles the line for days; hold too many and you bleed working capital. Today you\'ll see why the right call is <b>not a slogan</b>, it changes with the situation, exactly the intuition a reliability manager is paid to have.',
       'scene0.start':    'PRESS START',
       'scene0.hook':     'A reinforcement-learning walkthrough, one idea per screen. Use the arrow keys or the PREV / NEXT buttons.',
       'scene0.credits':  'SML · a manager\'s tour of maintenance decisions under uncertainty',

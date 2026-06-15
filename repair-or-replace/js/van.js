@@ -10,7 +10,7 @@
  *              the van BREAKS DOWN (-280 on top of the profit) and is dumped
  *              to FAILING; otherwise it degrades 0-2 levels (DEGR[s]).
  *     SERVICE  -50, a week in the shop (no profit); wear improves 0-2 levels
- *              (SERV_UP[s]) -- strong on a merely-worn van, weak on a
+ *              (SERV_UP[s]), strong on a merely-worn van, weak on a
  *              clapped-out one.
  *     REPLACE  -130, a week offline, condition resets to HEALTHY.
  *
@@ -30,7 +30,7 @@
  */
 (function () {
 
-  /* ---------- Wear levels (the 4 states) ---------- */
+  /*, Wear levels (the 4 states), */
   const NUM_STATES = 4;
   const STATES = ['healthy', 'worn', 'shaky', 'failing'];
   const STATE_IDX = { healthy: 0, worn: 1, shaky: 2, failing: 3 };
@@ -38,7 +38,7 @@
   const HEALTHY = 0;
   const FAILING = NUM_STATES - 1;   // 3
 
-  /* ---------- Dynamics & rewards (locked; mirrors value_iteration.py) ---- */
+  /*, Dynamics & rewards (locked; mirrors value_iteration.py), */
   /* RUN: weekly delivery profit by condition. The steep cliff WORN(72) ->
      SHAKY(40) is what makes the SERVICE|REPLACE frontier well-crossed. */
   const REV_RUN = [95, 72, 40, 16];
@@ -61,15 +61,15 @@
   const SERV_UP = [
     [1.00, 0.00, 0.00],   // HEALTHY (no need)
     [0.05, 0.70, 0.25],   // WORN
-    [0.45, 0.50, 0.05],   // SHAKY -- often fails to help: the cliff
-    [0.55, 0.42, 0.03],   // FAILING -- mostly stuck
+    [0.45, 0.50, 0.05],   // SHAKY, often fails to help: the cliff
+    [0.55, 0.42, 0.03],   // FAILING, mostly stuck
   ];
   /* REPLACE: a week offline, capital cost, resets to HEALTHY. */
   const C_REPLACE = 130;
 
   const GAMMA = 0.9;
 
-  /* ---------- States ---------- */
+  /*, States, */
   function initialState() { return { wear: HEALTHY, terminal: false }; }
 
   /* The 4 states, index order 0..3 (HEALTHY..FAILING). No terminals. */
@@ -92,7 +92,7 @@
     return STATE_DISPLAY[idx];
   }
 
-  /* ---------- successors(state, actionId): full enumeration ----------
+  /*, successors(state, actionId): full enumeration ----------
      Returns every branch with its probability and baked-in reward,
      mirroring trans() in precompute/value_iteration.py exactly. */
   function successors(state, actionId) {
@@ -128,7 +128,7 @@
   /* Alias name expected by the reused bellman.js. */
   function successorsFromBuckets(s, actionId) { return successors(s, actionId); }
 
-  /* ---------- sample(state, actionId, rng): one stochastic draw ----------
+  /*, sample(state, actionId, rng): one stochastic draw ----------
      Returns the transition plus a rich `log` the scenes use to narrate the
      week (breakdown flag, wear from/to, profit or cost, what the world did).
      log.face is one of:
@@ -193,7 +193,7 @@
              reward: log.reward, terminal: false, log };
   }
 
-  /* ---------- Mulberry32 (shared with the precompute) ---------- */
+  /*, Mulberry32 (shared with the precompute), */
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {

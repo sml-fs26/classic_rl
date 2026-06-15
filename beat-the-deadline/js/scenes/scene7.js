@@ -1,7 +1,7 @@
-/* Scene 7 -- Optimal action-value Q*. For a chosen tile, show the dock-tile
+/* Scene 7, Optimal action-value Q*. For a chosen tile, show the dock-tile
    icon beside a clean two-column table (lever a | Q*(s,a)) with the best row
-   starred and clamped levers greyed. Toggle between (2,3) -- where WAIT wins by
-   the razor-thin +0.40 -- and (2,2) one hour later, where the star JUMPS to
+   starred and clamped levers greyed. Toggle between (2,3), where WAIT wins by
+   the razor-thin +0.40, and (2,2) one hour later, where the star JUMPS to
    SEND. Reads Q* spot rows from window.DATA.spotQ. Cold-entry safe; honours
    &run (auto-advances to show the flip). */
 (function () {

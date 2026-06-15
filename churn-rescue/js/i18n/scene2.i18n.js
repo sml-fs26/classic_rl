@@ -13,14 +13,14 @@
       'play.caption':
         "Pull a lever each month. You pick the coin; you don't pick how it lands.",
 
-      /* ---- status / narration line ---- */
+      /*, status / narration line, */
       'play.status.start':    "LUKEWARM account, renewal coming up. Pull a lever.",
       'play.status.pulled':   "You pulled {lever}. Flipping the retention coin...",
       'play.status.advanced': "They stayed. Now {tier}, one month closer. Pull again.",
       'play.status.renewed':  "RENEWED! The contract is banked: +20.",
       'play.status.churned':  "CHURNED. They walked: -20.",
 
-      /* ---- margin-ledger rows ---- */
+      /*, margin-ledger rows, */
       'play.ledger.empty':       "(no moves yet)",
       'play.ledger.month_lever': "MO {m}  {lever}",
       'play.ledger.renew_lump':  "RENEWAL  ✓",

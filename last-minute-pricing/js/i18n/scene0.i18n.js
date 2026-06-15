@@ -1,4 +1,4 @@
-/* scene0 i18n fragment -- Title / hook.
+/* scene0 i18n fragment, Title / hook.
    Registers this scene's strings into the i18n core.
    English is the source of truth; the Japanese mirror gives parity. */
 (function () {

@@ -1,4 +1,4 @@
-/* die.js -- the FAILURE DIE: a pie-style die with a growing red "FAIL" slice
+/* die.js, the FAILURE DIE: a pie-style die with a growing red "FAIL" slice
    and a green "RUNS FINE" slice. The red wedge enlarges as the machine ages
    (0% HEALTHY, 30% AGING, 70% FAILING), so the odds are printed on its face.
    On a roll it spins and lands on FAIL or RUNS-FINE.

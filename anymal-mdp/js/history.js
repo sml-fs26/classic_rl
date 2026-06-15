@@ -8,12 +8,12 @@
    driver to advance to the next scene. */
 (function () {
   function create() {
-    const actions = [];   // [{ action, seed }] — seed is captured per-step so replays are deterministic
+    const actions = [];   // [{ action, seed }], seed is captured per-step so replays are deterministic
     let cursor = 0;       // 0..actions.length; cursor === actions.length means "at the head"
 
     return {
       /* Record a freshly performed action. Truncates any "future" actions
-         left over from a previous rewind — the user has overwritten history. */
+         left over from a previous rewind, the user has overwritten history. */
       push(action, seed) {
         actions.length = cursor;
         actions.push({ action, seed });

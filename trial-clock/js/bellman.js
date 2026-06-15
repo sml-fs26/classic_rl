@@ -88,7 +88,7 @@
   /* Greedy policy. MOVE_IDS is [nudge, nothing, push]; iterating with `>` keeps
      the FIRST (left-most) lever on an exact tie. There are NO exact Q ties in
      this MDP's optimal solution (verified in the precompute), so the tie-break
-     never actually fires -- the policy is uniquely determined. */
+     never actually fires, the policy is uniquely determined. */
   function greedyPolicy(V, gamma) {
     const out = new Array(N);
     for (let i = 0; i < N; i++) {

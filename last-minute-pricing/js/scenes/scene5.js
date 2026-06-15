@@ -1,7 +1,7 @@
-/* Scene 5 -- The trajectory, drawn as a TREE.
+/* Scene 5, The trajectory, drawn as a TREE.
  *
  *   tau = (S1, A1, R1, S2, A2, R2, ..., S_T) is usually drawn as a flat tape
- *   of random-variable boxes. But that tape is ONE realization -- one
+ *   of random-variable boxes. But that tape is ONE realization, one
  *   root-to-leaf PATH through a branching process. This scene draws the *set*
  *   of possible paths as a tree (window.TrajTree):
  *
@@ -18,7 +18,7 @@
  *   showing the runs not taken. A strip under the tree shows the lit path AS
  *   THE OLD TAPE (S, A, R, ...) so the tape becomes a *derived* view.
  *
- *   Hero root (engine-verified): 2 units, 2 days under STANDARD -- depth <= 2,
+ *   Hero root (engine-verified): 2 units, 2 days under STANDARD, depth <= 2,
  *   5 terminal leaves, Sigma p = 1, E[G_t] = $5.22 = Q*(2u/2d, STANDARD), and
  *   STANDARD is the optimal lever there. Every leaf is a real terminal with a
  *   PURE G_t (no bootstrap), so the G_t -> E[G_t] lesson is clean. We pass
@@ -89,7 +89,7 @@
     root.className = 'scene-pad concept-scene scene5';
     root.innerHTML = '';
 
-    /* ---- Heading + lede ---- */
+    /*, Heading + lede, */
     const h = document.createElement('h2');
     h.className = 'concept-heading';
     h.textContent = T('scene5.title');
@@ -100,7 +100,7 @@
     lede.innerHTML = T('scene5.lede');
     root.appendChild(lede);
 
-    /* ---- Formula card: tau = (S1, A1, R1, ...) ---- */
+    /*, Formula card: tau = (S1, A1, R1, ...), */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene5.formula.label') + '</div>';
@@ -118,7 +118,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- Tree caption: names the fixed opening + lever (chance-only tree) ---- */
+    /*, Tree caption: names the fixed opening + lever (chance-only tree), */
     const caption = document.createElement('div');
     caption.className = 's5-tree-caption';
     caption.innerHTML = T('scene5.tree.caption', {
@@ -126,7 +126,7 @@
     });
     root.appendChild(caption);
 
-    /* ---- Tree host -- TrajTree mounts the tree + the E[G_t] ledger here. ---- */
+    /*, Tree host, TrajTree mounts the tree + the E[G_t] ledger here., */
     const treeHost = document.createElement('div');
     treeHost.className = 's5-tree-host';
     root.appendChild(treeHost);
@@ -167,7 +167,7 @@
       assertTol: 1e-6,
     });
 
-    /* ---- Derived tape strip: the lit path AS THE OLD (S, A, R) tape ----
+    /*, Derived tape strip: the lit path AS THE OLD (S, A, R) tape ----
        Makes the flat tape a *derived* view of one path through the tree. */
     const tapeWrap = document.createElement('div');
     tapeWrap.className = 's5-derived';
@@ -177,7 +177,7 @@
     root.appendChild(tapeWrap);
     const tapeEl = tapeWrap.querySelector('#s5-derived-tape');
 
-    /* ---- Controls ---- */
+    /*, Controls, */
     const ctrls = document.createElement('div');
     ctrls.className = 's5-controls';
     ctrls.innerHTML =
@@ -187,7 +187,7 @@
       '<div class="s5-status" id="s5-status">' + T('scene5.status.hint') + '</div>';
     root.appendChild(ctrls);
 
-    /* ---- Punchline note ---- */
+    /*, Punchline note, */
     const note = document.createElement('p');
     note.className = 'concept-note';
     note.innerHTML = T('scene5.same.note');
@@ -241,7 +241,7 @@
       requestAnimationFrame(() => { tapeEl.scrollLeft = tapeEl.scrollWidth; });
     }
 
-    /* One (S, A, R) triple in the derived tape -- same vocabulary as the old
+    /* One (S, A, R) triple in the derived tape, same vocabulary as the old
        flat rollout, so the student literally sees "this path = that tape." */
     function appendTapeTriple(host, step, sBefore, leverId, reward, terminal, finalState) {
       const arrow = document.createElement('span');
@@ -305,7 +305,7 @@
 
     /* Reveal one more day of the sampled path. If there is no path yet, sample
        one and reveal its first day. Returns true while there is still a day
-       left to walk, false once the whole path is revealed -- the same contract
+       left to walk, false once the whole path is revealed, the same contract
        every stepped scene here uses, so the right arrow / topbar NEXT can fall
        through and advance the scene once the walk is done. */
     function walk() {

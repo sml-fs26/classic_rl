@@ -63,19 +63,19 @@
     root.classList.add('scene-pad', 'concept-scene', 'pc-scale-scene');
     root.innerHTML = '';
 
-    /* ---- Heading ---- */
+    /*, Heading, */
     const h = document.createElement('h2');
     h.className = 'concept-heading';
     h.textContent = T('scale.heading');
     root.appendChild(h);
 
-    /* ---- Lede ---- */
+    /*, Lede, */
     const lede = document.createElement('p');
     lede.className = 's10-lede';
     lede.innerHTML = T('scale.lede');
     root.appendChild(lede);
 
-    /* ---- Two-panel card ---- */
+    /*, Two-panel card, */
     const grid = document.createElement('div');
     grid.className = 's10-grid';
     root.appendChild(grid);
@@ -199,13 +199,13 @@
     panelB.appendChild(bFoot);
     grid.appendChild(panelB);
 
-    /* ---- Verdict banner ---- */
+    /*, Verdict banner, */
     const verdict = document.createElement('div');
     verdict.className = 's10-verdict';
     verdict.textContent = T('scale.verdict');
     root.appendChild(verdict);
 
-    /* ---- Bridge to SARSA ---- */
+    /*, Bridge to SARSA, */
     const bridge = document.createElement('p');
     bridge.className = 's10-bridge';
     bridge.innerHTML = T('scale.bridge');

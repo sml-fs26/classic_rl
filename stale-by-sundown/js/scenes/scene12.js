@@ -1,4 +1,4 @@
-/* Scene 12 -- Recap. Six cards, each a pastry-case panel pointing back at one
+/* Scene 12, Recap. Six cards, each a pastry-case panel pointing back at one
    concept: MDP, Policy, Return, Q*, DP, SARSA. Each carries its KaTeX one-liner,
    a plain-language gloss, and a jump-back button to the scene that taught it.
    Closing line: the croissant was tiny on purpose. Reads DATA.recap. */

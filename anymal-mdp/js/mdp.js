@@ -2,7 +2,7 @@
 
    Pure functions: callers pass `state` and `rng`, get back a new state. The
    only mutability is `MDP.makeRng(seed)`'s closure (Mulberry32). Scenes never
-   call Math.random directly — the rng is part of the action history so a
+   call Math.random directly, the rng is part of the action history so a
    reset+replay reproduces the trajectory the student just played. */
 (function () {
   const ACTIONS = ['up', 'down', 'left', 'right'];
@@ -69,7 +69,7 @@
 
   /* Apply one MDP step. `params.malfunctionProb` ∈ [0, 0.5] is the
      probability that the executed action diverges (uniformly) from the
-     commanded one. Ghosts move uniform-randomly each step — matching
+     commanded one. Ghosts move uniform-randomly each step, matching
      anymal_utils.py's move_ghost_randomly, not the original HTML's chase. */
   function step(state, action, params, rng) {
     if (state.terminal) return { state, executed: action, reward: 0, terminal: true, hitStar: false };
@@ -115,7 +115,7 @@
     return { state: next, executed, reward, terminal, hitStar };
   }
 
-  /* Build the canonical initial state from DATA. Pure function — every
+  /* Build the canonical initial state from DATA. Pure function, every
      scene's onEnter calls this so cold entry via the dot pager works. */
   function initialState() {
     const cfg = window.DATA && window.DATA.initial;

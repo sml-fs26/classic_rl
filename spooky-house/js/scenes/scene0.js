@@ -1,4 +1,4 @@
-/* Scene 0 — Many states, one value each.
+/* Scene 0, Many states, one value each.
 
    First contact. The student opens the page; before any keystroke, they
    read what the lesson is about and meet the 5×5 grid. The reward number
@@ -8,9 +8,9 @@
 
    This scene names the two vocabulary discontinuities the curriculum
    audit calls out: the action set is restricted to {right, down}, and
-   the state is just (r, c) — no moving ghosts. Both are honest about
+   the state is just (r, c), no moving ghosts. Both are honest about
    "we are not changing reinforcement learning, we are simplifying for
-   the lesson". Cold-entry safe — built entirely from DATA. */
+   the lesson". Cold-entry safe, built entirely from DATA. */
 (function () {
   if (!window.scenes) window.scenes = {};
 
@@ -26,7 +26,7 @@
     wrap.className = 's0-wrap';
     root.appendChild(wrap);
 
-    /* ---- Hero ---- */
+    /*, Hero, */
     const hero = document.createElement('div');
     hero.className = 'hero s0-hero';
     hero.innerHTML =
@@ -34,13 +34,13 @@
       '<p class="subtitle">A grid where every cell is worth something. ' +
       'What’s the most you can collect on the way out?</p>' +
       '<p class="lede">Five rows, five columns, twenty-five rooms. ' +
-      'Each room is haunted to a different degree — ' +
+      'Each room is haunted to a different degree, ' +
       'the number on every cell is its spookiness, from 1 (mildly bothersome) ' +
       'to 9 (full poltergeist). You start in the top-left, you need to reach ' +
       'the bottom-right, and you collect the spookiness of every room you visit.</p>';
     wrap.appendChild(hero);
 
-    /* ---- Grid + side notes ---- */
+    /*, Grid + side notes, */
     const row = document.createElement('div');
     row.className = 's0-grid-row';
     wrap.appendChild(row);
@@ -53,7 +53,7 @@
     side.className = 's0-side';
     row.appendChild(side);
 
-    /* ---- Side: rules + state/action vocabulary ---- */
+    /*, Side: rules + state/action vocabulary, */
     const h2a = document.createElement('h2');
     h2a.textContent = 'The rules.';
     side.appendChild(h2a);
@@ -75,7 +75,7 @@
     const stateInline = window.Katex.inline(window.DATA.tex.stateTuple);
     stateLine.appendChild(document.createTextNode('A state is just '));
     stateLine.appendChild(stateInline);
-    stateLine.appendChild(document.createTextNode(' — a coordinate. No moving ghosts; the spookiness is baked into the room.'));
+    stateLine.appendChild(document.createTextNode(', a coordinate. No moving ghosts; the spookiness is baked into the room.'));
     side.appendChild(stateLine);
 
     const actLine = document.createElement('p');
@@ -92,7 +92,7 @@
       'How hard could it be?';
     side.appendChild(muted);
 
-    /* ---- Mount the grid ---- */
+    /*, Mount the grid, */
     const grid = window.Grid.mount(gridHost, {
       M: D.M,
       N: D.N,
@@ -112,7 +112,7 @@
     grid.setCellClass(D.start.r, D.start.c, 'start-cell', true);
     grid.setCellClass(D.goal.r,  D.goal.c,  'goal-cell',  true);
 
-    /* ---- Footnote ---- */
+    /*, Footnote, */
     const foot = document.createElement('p');
     foot.className = 'footnote';
     foot.textContent = 'Press → to start picking a path.';

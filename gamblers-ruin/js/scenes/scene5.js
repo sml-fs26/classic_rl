@@ -1,4 +1,4 @@
-/* Scene 5 -- Trajectory. One full episode (the precomputed demo from a $5
+/* Scene 5, Trajectory. One full episode (the precomputed demo from a $5
    start under the optimal policy) replays as a tape of random variables
    tau = (S1,A1,R1, S2,A2,R2, ..., S_T): capital, stake, reward (0 until the
    end), next capital, with the ladder token marching along. Cold-entry safe. */

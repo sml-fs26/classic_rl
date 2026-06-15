@@ -1,6 +1,6 @@
-/* Scene 1 — Explore or exploit?
+/* Scene 1, Explore or exploit?
 
-   Merged from the original scenes 1 (manual play) and 2 (policy buttons) —
+   Merged from the original scenes 1 (manual play) and 2 (policy buttons), 
    they were structurally near-identical and the dilemma frames better as
    one scene. The student can pull manually (click a card or press 1..5)
    or invoke the two named policies via the EXPLORE / EXPLOIT buttons (or
@@ -66,7 +66,7 @@
     const caption = document.createElement('p');
     caption.className = 'caption';
     caption.innerHTML =
-      'Click any card or press <kbd>1</kbd>–<kbd>5</kbd> to pull manually. ' +
+      'Click any card or press <kbd>1</kbd>, <kbd>5</kbd> to pull manually. ' +
       'Or use <kbd>EXPLORE</kbd> / <kbd>EXPLOIT</kbd> (or <kbd>E</kbd> / <kbd>X</kbd>) to invoke a named policy.';
     leftCol.appendChild(caption);
 
@@ -104,7 +104,7 @@
       { key: 'exploit', label: 'exploit picks' },
     ]);
 
-    /* ---------- Bandit + History ----------
+    /*, Bandit + History ----------
        Two RNG streams so manual pulls don't perturb the policy stream.
        banditRng → Bernoulli reward sampling (consumed every pull).
        policyRng → uniform-random / tie-break (consumed only on explore
@@ -156,7 +156,7 @@
       hudRows.exploit.textContent = String(nExploit);
     }
 
-    /* ---------- Reset + replay ---------- */
+    /*, Reset + replay, */
     function rebuildToCursor(targetCursor) {
       banditRng = Bandit.makeRng(SEED);
       policyRng = Bandit.makeRng(SEED ^ 0x55555555);
@@ -192,7 +192,7 @@
       return true;
     }
 
-    /* ---------- Listeners ---------- */
+    /*, Listeners, */
     exploreBtn.addEventListener('click', () => { if (active) performPull('explore'); });
     exploitBtn.addEventListener('click', () => { if (active) performPull('exploit'); });
 
@@ -210,7 +210,7 @@
     }
     window.addEventListener('keydown', onKey);
 
-    /* ---------- Lifecycle ---------- */
+    /*, Lifecycle, */
     function onEnter() {
       history.reset();
       rebuildToCursor(0);
@@ -251,7 +251,7 @@
       lbl.textContent = spec.label;
       const val = document.createElement('span');
       val.className = 'hud-value';
-      val.textContent = '–';
+      val.textContent = ', ';
       r.appendChild(lbl);
       r.appendChild(val);
       host.appendChild(r);

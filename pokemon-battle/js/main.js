@@ -15,7 +15,7 @@
      builds without i18n loaded. */
   const SCENES = [
     { key: 'scene0',           titleKey: 'scene.title',       title: 'POKEMON',                      music: 'title'    },
-    { key: 'sceneHowToPlay',   titleKey: 'scene.tutorial',    title: 'Tutorial — how to play',       music: 'tutorial' },
+    { key: 'sceneHowToPlay',   titleKey: 'scene.tutorial',    title: 'Tutorial, how to play',       music: 'tutorial' },
     { key: 'scene1',           titleKey: 'scene.battle',      title: 'A wild CHARMANDER appeared!',  music: 'boss'     },
     { key: 'sceneMdpOverlay',  titleKey: 'scene.mdp',         title: 'What makes this an MDP?',      music: 'title'    },
     { key: 'sceneTrajectory',  titleKey: 'scene.trajectory',  title: 'The trajectory',               music: 'concept'  },
@@ -127,7 +127,7 @@
 
     current = idx;
     /* Cross-fade the soundtrack to this scene's mood. Safe if Music
-       isn't loaded yet or the AudioContext is suspended — setTrack
+       isn't loaded yet or the AudioContext is suspended, setTrack
        just updates the variable in that case. */
     if (window.Music && SCENES[idx].music) {
       try { window.Music.setTrack(SCENES[idx].music); } catch (e) {}
@@ -147,7 +147,7 @@
     window.dispatchEvent(new CustomEvent('scene-change', { detail: { idx: idx, key: SCENES[idx].key } }));
   }
 
-  /* Gen-1-style rotating-hex wipe — fires only on entries to the three
+  /* Gen-1-style rotating-hex wipe, fires only on entries to the three
      battle-flavored scenes so it lands as a moment, not a tax.  The
      overlay is pointer-events: none, so the underlying scene stays
      interactive during the ~700ms reveal.  prefers-reduced-motion
@@ -164,13 +164,13 @@
     }, { once: true });
   }
 
-  /* I18N helper used throughout init() — falls back to the literal key
+  /* I18N helper used throughout init(), falls back to the literal key
      when the i18n module hasn't loaded (defensive, shouldn't happen). */
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
 
   function init() {
     if (!window.DATA) {
-      console.error('DATA missing -- did data/datasets.js load?');
+      console.error('DATA missing, did data/datasets.js load?');
     }
 
     const pager = document.getElementById('dot-pager');
@@ -187,7 +187,7 @@
 
     function cursorBlip() { if (window.SFX) window.SFX.play('cursor'); }
 
-    /* Delegated cursor-blip for every scene control button (.poke-btn) —
+    /* Delegated cursor-blip for every scene control button (.poke-btn), 
        STEP / RUN ALL / RESET / NEXT TRANSITION / REROLL / CLEAR q / etc.
        The pager-btn/dot buttons fire cursorBlip directly above so they
        are not double-handled. */
@@ -203,7 +203,7 @@
     if (prev) prev.addEventListener('click', () => { cursorBlip(); goTo(current - 1); });
     if (next) next.addEventListener('click', () => { cursorBlip(); goTo(current + 1); });
 
-    /* Trainer badges — one slot per concept scene.  Light up on
+    /* Trainer badges, one slot per concept scene.  Light up on
        first visit; persisted to localStorage via window.Trainer.
        Badge order: MDP → RETURN → Q* → DP → SARSA. */
     const BADGE_SCENE_KEY = {
@@ -234,7 +234,7 @@
       const fresh = window.Trainer.awardBadge(badge);
       if (fresh) {
         renderBadgeRow();
-        /* Tiny fanfare on first earn — uses the cursor blip so we don't
+        /* Tiny fanfare on first earn, uses the cursor blip so we don't
            overload the audio mix. */
         if (window.SFX) window.SFX.play('cursor');
         /* Flash the just-earned chip. */
@@ -251,7 +251,7 @@
       maybeAwardBadge(key);
     });
 
-    /* Trainer-name modal — deferred from page load to the first scene
+    /* Trainer-name modal, deferred from page load to the first scene
        transition AWAY from the title screen.  The title impression
        shouldn't be interrupted by a prompt; once the student commits
        to NEXT, we ask their name.  Triggered exactly once. */
@@ -295,7 +295,7 @@
       if (idx > 0) maybeShowTrainerModal();
     });
 
-    /* Speaker-notes overlay — lecturer crib sheet, toggled by `n`.
+    /* Speaker-notes overlay, lecturer crib sheet, toggled by `n`.
        Lives outside the scene flow so it's available everywhere. */
     const snOverlay = document.createElement('div');
     snOverlay.id = 'speaker-notes-overlay';
@@ -358,7 +358,7 @@
       }
     });
 
-    /* ---- Slide mode: fullscreen-feel, no topbar ----
+    /*, Slide mode: fullscreen-feel, no topbar ----
        On entry we flash a brief toast in the bottom-right corner so
        the user (lecturer) doesn't wonder where the topbar went. */
     function toggleSlideMode() {
@@ -376,7 +376,7 @@
       setTimeout(() => { try { toast.remove(); } catch (_e) {} }, 2400);
     }
 
-    /* ---- Quick-jump dropdown: list every scene, number-key to jump ---- */
+    /*, Quick-jump dropdown: list every scene, number-key to jump, */
     const qjOverlay = document.createElement('div');
     qjOverlay.id = 'quick-jump-overlay';
     qjOverlay.className = 'centered-overlay';
@@ -427,7 +427,7 @@
       }
     });
 
-    /* ---- Help overlay: list every hotkey ---- */
+    /*, Help overlay: list every hotkey, */
     const helpOverlay = document.createElement('div');
     helpOverlay.id = 'help-overlay';
     helpOverlay.className = 'centered-overlay';
@@ -459,7 +459,7 @@
       helpOverlay.hidden = !helpVisible;
     }
 
-    /* Refresh notes content when the scene changes — only meaningful
+    /* Refresh notes content when the scene changes, only meaningful
        when the overlay is open. */
     window.addEventListener('scene-change', () => {
       if (snVisible) refreshSpeakerNotes();
@@ -470,7 +470,7 @@
       if (n != null) goTo(n);
     });
 
-    /* Boot-up animation — Game Boy "Nintendo" logo drop + chime on
+    /* Boot-up animation, Game Boy "Nintendo" logo drop + chime on
        the first page load of each browser tab (sessionStorage flag).
        Suppressed if the URL has &skipboot or &run. */
     function playBootAnimation() {
@@ -511,7 +511,7 @@
   /* Drop every cached scene DOM + state and re-build the current scene
      from scratch. Used by the language toggle. The cached scenes are
      in the wrong language and would surface stale text the next time
-     the user navigates to one — clearing them forces a fresh build. */
+     the user navigates to one, clearing them forces a fresh build. */
   function rebuildAll() {
     for (let i = 0; i < sceneNodes.length; i++) {
       const node = sceneNodes[i];

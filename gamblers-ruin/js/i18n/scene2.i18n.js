@@ -1,4 +1,4 @@
-/* scene2 i18n -- playtest. */
+/* scene2 i18n, playtest. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

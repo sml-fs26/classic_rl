@@ -1,16 +1,16 @@
-/* Scene 4 — ε-greedy.
+/* Scene 4, ε-greedy.
 
    Same five cards plus a regret panel with two traces:
-     1. Greedy (replayed at scene-3's seed) — always present, full T.
-     2. ε-greedy — driven by the slider ε ∈ [0, 0.5], grown step-by-step.
+     1. Greedy (replayed at scene-3's seed), always present, full T.
+     2. ε-greedy, driven by the slider ε ∈ [0, 0.5], grown step-by-step.
 
    The slider changes *future* steps only. Each ε-greedy step records its own
    ε in history; rewinding and changing ε does NOT revise past steps. The
    decision-badge under the latest card-pull tells the student whether the
    most-recent decision was an explore or exploit step.
 
-   Seed reuse: the greedy trace uses DATA.seeds.greedy — *exactly* the same
-   trajectory shown in scene 3 — so the comparison is honest. The ε-greedy
+   Seed reuse: the greedy trace uses DATA.seeds.greedy, *exactly* the same
+   trajectory shown in scene 3, so the comparison is honest. The ε-greedy
    stream uses DATA.seeds.epsGreedy + the policy's own RNG so its randomness
    is independent.
 
@@ -57,12 +57,12 @@
     badgeLabel.textContent = 'latest';
     const badge = document.createElement('span');
     badge.className = 'decision-badge';
-    badge.textContent = '—';
+    badge.textContent = ', ';
     badgeStrip.appendChild(badgeLabel);
     badgeStrip.appendChild(badge);
     wrap.appendChild(badgeStrip);
 
-    /* Controls — slider + play controls */
+    /* Controls, slider + play controls */
     const controls = document.createElement('div');
     controls.className = 'controls';
     wrap.appendChild(controls);
@@ -153,7 +153,7 @@
       'Drag ε to change future decisions. Past steps keep the ε they were sampled with.';
     wrap.appendChild(caption);
 
-    /* ---------- Pre-render the full greedy trajectory once. Reused across resets. */
+    /*, Pre-render the full greedy trajectory once. Reused across resets. */
     function buildGreedyTrace() {
       const banditRng = Bandit.makeRng(SEED_GREEDY_BAND);
       const policyRng = Bandit.makeRng(SEED_GREEDY_POL);
@@ -169,7 +169,7 @@
     }
     const greedyTrace = buildGreedyTrace();
 
-    /* ---------- ε-greedy state ---------- */
+    /*, ε-greedy state, */
     let banditRng, policyRng, bandit, regretPoints;
     /* historyEps stores per-step records: { arm, reward, mode, eps, t } so a
        reset+replay reproduces the trajectory and so we can render the latest
@@ -194,7 +194,7 @@
       chart.setTrace('eps',    regretPoints, 'regret-series-eps');
       tCounter.textContent = '0 / ' + T;
       badge.className = 'decision-badge';
-      badge.textContent = '—';
+      badge.textContent = ', ';
       hudGreedyRegret.textContent = 'greedy regret @ T: ' + greedyTrace[T].y.toFixed(2);
       hudEpsRegret.textContent    = 'ε-greedy regret: 0.00';
     }

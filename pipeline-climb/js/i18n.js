@@ -29,7 +29,7 @@
   /* The string store. Scene fragments merge into this via register(). */
   const STRINGS = {
     en: {
-      /* ---- topbar ---- */
+      /*, topbar, */
       'brand':            'SML · PIPELINE',
       'music.on':         '♪ MUSIC ON',
       'music.off':        '♪ MUSIC OFF',
@@ -38,7 +38,7 @@
       'topbar.next':      'NEXT',
       'topbar.theme':     'theme',
 
-      /* ---- scene titles (shown in the topbar) ---- */
+      /*, scene titles (shown in the topbar), */
       'scene.title0':     'PIPELINE CLIMB',
       'scene.title1':     'How it works',
       'scene.title2':     'You run the deal',
@@ -53,7 +53,7 @@
       'scene.title11':    'SARSA: learn by selling',
       'scene.title12':    'Recap',
 
-      /* ---- concept badges ---- */
+      /*, concept badges, */
       'badge.mdp':        'MDP',
       'badge.policy':     'POL',
       'badge.return':     'RTN',
@@ -67,7 +67,7 @@
       'badge.dp.full':      'DP',
       'badge.sarsa.full':   'SARSA',
 
-      /* ---- common MDP vocabulary ---- */
+      /*, common MDP vocabulary, */
       'rung.cold':        'COLD',
       'rung.curious':     'CURIOUS',
       'rung.engaged':     'ENGAGED',
@@ -94,16 +94,16 @@
       'die.stay':         'STAY',
       'die.down':         'DOWN',
 
-      /* ---- terminal markers ---- */
+      /*, terminal markers, */
       'terminal.signed':  '✓ SIGNED',
       'terminal.lost':    '✗ LOST',
       'terminal.mini':    '(terminal)',
 
-      /* ---- speaker notes overlay (main.js) ---- */
+      /*, speaker notes overlay (main.js), */
       'speakerNotes.title':   'SPEAKER NOTES',
       'speakerNotes.empty':   'No notes for this scene yet.',
 
-      /* ---- slide mode + quick jump + help (main.js) ---- */
+      /*, slide mode + quick jump + help (main.js), */
       'slide.toast':      'SLIDE MODE · press F to exit',
       'quickjump.title':  'JUMP TO SCENE',
       'help.title':       'KEYBOARD',
@@ -120,16 +120,16 @@
       'help.row.run':     'add &run to a URL to auto-play a gated scene',
       'help.row.qcell':   'click a Q-cell to inspect a rung',
 
-      /* ---- intro modal (main.js, optional, deferred off the title) ---- */
+      /*, intro modal (main.js, optional, deferred off the title), */
       'intro.title':      'PIPELINE CLIMB',
       'intro.body':       'A lead climbs from cold to signed across five rungs. Read the situation, pick a lever, watch the die. Use the arrow keys or NEXT to move; press ? for all shortcuts.',
       'intro.ok':         'LET\'S CLIMB',
 
-      /* ---- boot ---- */
+      /*, boot, */
       'boot.tag':         'CLASSIC RL',
     },
     jp: {
-      /* ---- topbar ---- */
+      /*, topbar, */
       'brand':            'SML · パイプライン',
       'music.on':         '♪ オン',
       'music.off':        '♪ オフ',
@@ -138,7 +138,7 @@
       'topbar.next':      'つぎ',
       'topbar.theme':     'テーマ',
 
-      /* ---- scene titles ---- */
+      /*, scene titles, */
       'scene.title0':     'パイプライン クライム',
       'scene.title1':     'あそびかた',
       'scene.title2':     'あなたが やる',
@@ -153,7 +153,7 @@
       'scene.title11':    'SARSA： うりながら まなぶ',
       'scene.title12':    'おさらい',
 
-      /* ---- concept badges ---- */
+      /*, concept badges, */
       'badge.mdp':        'MDP',
       'badge.policy':     'ポリ',
       'badge.return':     'リタ',
@@ -167,7 +167,7 @@
       'badge.dp.full':      'DP',
       'badge.sarsa.full':   'SARSA',
 
-      /* ---- common MDP vocabulary ---- */
+      /*, common MDP vocabulary, */
       'rung.cold':        'コールド',
       'rung.curious':     'きょうみ',
       'rung.engaged':     'エンゲージ',
@@ -194,16 +194,16 @@
       'die.stay':         'ステイ',
       'die.down':         'ダウン',
 
-      /* ---- terminal markers ---- */
+      /*, terminal markers, */
       'terminal.signed':  '✓ サイン',
       'terminal.lost':    '✗ ロスト',
       'terminal.mini':    '(しゅうたん)',
 
-      /* ---- speaker notes overlay ---- */
+      /*, speaker notes overlay, */
       'speakerNotes.title':   'スピーカー ノート',
       'speakerNotes.empty':   'この シーンの ノートは まだ ない。',
 
-      /* ---- slide mode + quick jump + help ---- */
+      /*, slide mode + quick jump + help, */
       'slide.toast':      'スライド モード · F で でる',
       'quickjump.title':  'シーンへ とぶ',
       'help.title':       'キーボード',
@@ -220,12 +220,12 @@
       'help.row.run':     'URLに &run で シーンを 自動再生',
       'help.row.qcell':   'Qセルを クリックして ステージを みる',
 
-      /* ---- intro modal ---- */
+      /*, intro modal, */
       'intro.title':      'パイプライン クライム',
       'intro.body':       'リードは 5つの ステージを コールドから サインへ のぼる。 じょうきょうを よみ、 レバーを えらび、 ダイを みる。 やじるし か つぎ で すすむ。 ? で ショートカット。',
       'intro.ok':         'のぼろう',
 
-      /* ---- boot ---- */
+      /*, boot, */
       'boot.tag':         'CLASSIC RL',
     },
   };

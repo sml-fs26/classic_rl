@@ -1,4 +1,4 @@
-/* scene0 i18n -- title / hook. */
+/* scene0 i18n, title / hook. */
 (function () {
   if (!window.I18N) return;
   window.I18N.register({

@@ -48,7 +48,7 @@
     const START = DRIFT[0];
     const END = DRIFT[DRIFT.length - 1];
 
-    /* ---- DOM skeleton ---- */
+    /*, DOM skeleton, */
     const wrap = document.createElement('div');
     wrap.className = 'sc0-title-wrap';
 
@@ -91,7 +91,7 @@
     wrap.appendChild(credits);
     root.appendChild(wrap);
 
-    /* ---- The hero account card ---- */
+    /*, The hero account card, */
     const firstVisit = isFirstVisit();
     const card = window.AccountCard.mount(cardHost, {
       tier: firstVisit ? START.tier : END.tier,
@@ -141,7 +141,7 @@
       driftTimer = setTimeout(driftStep, 1400);
     }
 
-    /* ---- START: dissolve the card into the empty retention map ---- */
+    /*, START: dissolve the card into the empty retention map, */
     let advancing = false;
     function advance() {
       if (advancing) return;

@@ -62,7 +62,7 @@
     root.classList.add('scene-pad', 'concept-scene', 'scene7-scene');
     root.innerHTML = '';
 
-    /* ---- heading + manager hook ---- */
+    /*, heading + manager hook, */
     const heading = document.createElement('h2');
     heading.className = 'concept-heading';
     heading.textContent = T('scene.title7');
@@ -73,7 +73,7 @@
     hook.innerHTML = T('scene7.manager');
     root.appendChild(hook);
 
-    /* ---- formula card ---- */
+    /*, formula card, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('scene7.formula.label') + '</div>';
@@ -89,7 +89,7 @@
     fcard.appendChild(ffoot);
     root.appendChild(fcard);
 
-    /* ---- the per-state panel: account card | guess+table ---- */
+    /*, the per-state panel: account card | guess+table, */
     const panel = document.createElement('div');
     panel.className = 'qstar-panel';
     panel.innerHTML =
@@ -101,7 +101,7 @@
       '<div class="qstar-right" id="qstar-right"></div>';
     root.appendChild(panel);
 
-    /* ---- tour stepper ---- */
+    /*, tour stepper, */
     const stepper = document.createElement('div');
     stepper.className = 'qstar-stepper';
     stepper.innerHTML =
@@ -110,13 +110,13 @@
       '<button class="poke-btn" id="qstar-next">NEXT ▶</button>';
     root.appendChild(stepper);
 
-    /* ---- bridge to DP ---- */
+    /*, bridge to DP, */
     const bridge = document.createElement('div');
     bridge.className = 'concept-key-question';
     bridge.innerHTML = T('scene7.bridge');
     root.appendChild(bridge);
 
-    /* ---- state ---- */
+    /*, state, */
     const cardHost = panel.querySelector('#qstar-card');
     const card = window.AccountCard.mount(cardHost, { tier: TOUR[0].tier, m: TOUR[0].m, size: 'full' });
     let idx = 0;

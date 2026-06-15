@@ -1,4 +1,4 @@
-/* Scene 0 -- Title / hook for Last-Minute Pricing.
+/* Scene 0, Title / hook for Last-Minute Pricing.
  *
  *   The retro-pixel title ceremony in the shelf-card visual language:
  *     - a wall CLOCK whose hand sweeps toward MIDNIGHT,
@@ -7,8 +7,8 @@
  *     - a single PRESS START prompt.
  *
  *   Pressing START dissolves the clock + shelf and reveals the empty
- *   5x4 board -- every situation (units left x days to deadline) the
- *   learner could be in -- with a dark MIDNIGHT gutter on the right.
+ *   5x4 board, every situation (units left x days to deadline) the
+ *   learner could be in, with a dark MIDNIGHT gutter on the right.
  *   A BEGIN button then yields to the scene engine (-> scene 1).
  *
  *   First-visit ceremony staggers the title drop; localStorage marks
@@ -74,7 +74,7 @@
 
   /* The empty 5x4 board reveal: rows = units (5 top .. 1 bottom),
      cols = days (d=4 left .. d=1 right) + a dark MIDNIGHT gutter.
-     Decorative only -- no Q values shown (the learner has not played
+     Decorative only, no Q values shown (the learner has not played
      yet). Mirrors qtable.css board geometry without QTable internals. */
   function buildBoard(host) {
     const P = window.Pricing;
@@ -143,7 +143,7 @@
 
     const firstVisit = isFirstVisit();
 
-    /* ---------------- PHASE 1: TITLE ---------------- */
+    /*, PHASE 1: TITLE, */
     const titleWrap = document.createElement('div');
     titleWrap.className = 'sc0-title-wrap' + (firstVisit ? ' sc0-first' : '');
 
@@ -181,7 +181,7 @@
 
     buildHeroShelf(titleWrap.querySelector('.sc0-shelf-host'));
 
-    /* ---------------- PHASE 2: BOARD (built lazily) ---------------- */
+    /*, PHASE 2: BOARD (built lazily), */
     let boardWrap = null;
     let phase = 1;
 

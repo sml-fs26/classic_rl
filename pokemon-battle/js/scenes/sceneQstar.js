@@ -1,4 +1,4 @@
-/* Scene — π* from Q.
+/* Scene, π* from Q.
  *
  *   Once Q* is known, the optimal policy is just argmax_a Q*(s, a). The
  *   abstract formula sits at the top. Below it, a looping demo battle
@@ -13,7 +13,7 @@
  *
  *   Q*(s, a) is computed once on mount via plain value iteration.
  *   Transitions in the demo are deterministic (lower-bound damage and
- *   middle Ember roll) so the loop always plays out the same battle —
+ *   middle Ember roll) so the loop always plays out the same battle, 
  *   pedagogy beats variance here.
  */
 (function () {
@@ -39,7 +39,7 @@
   const A       = ACTIONS.length;                      // 3 after the iron_tail drop
   const STATES  = window.Bellman.STATES;
   const N       = STATES.length;                       // 25
-  const GAMMA   = 1;     // Undiscounted — every trajectory terminates (win/loss).
+  const GAMMA   = 1;     // Undiscounted, every trajectory terminates (win/loss).
 
   const T = (k, vars) => (window.I18N ? window.I18N.t(k, vars) : k);
   function bucketName(b) { return b >= NB ? T('hp.bucket.faint_short') : T('hp.bucket.' + BUCKETS[b]); }
@@ -112,7 +112,7 @@
     premise.innerHTML = T('qstar.premise');
     root.appendChild(premise);
 
-    /* ---- Optimal-policy formula card ---- */
+    /*, Optimal-policy formula card, */
     const fcard = document.createElement('div');
     fcard.className = 'concept-formula-card';
     fcard.innerHTML = '<div class="concept-formula-label">' + T('qstar.formula.label') + '</div>';
@@ -128,13 +128,13 @@
     fcard.appendChild(foot);
     root.appendChild(fcard);
 
-    /* ---- Demo battle ---- */
+    /*, Demo battle, */
     const demoWrap = document.createElement('div');
     demoWrap.className = 'qstar-demo';
     root.appendChild(demoWrap);
 
     /* Battle stage on the left. The opponent sprite swaps when its HP
-       crosses a form threshold — referenced via oppSpriteEl below. */
+       crosses a form threshold, referenced via oppSpriteEl below. */
     const stage = document.createElement('div');
     stage.className = 'battle-stage qstar-stage';
     stage.innerHTML =
@@ -173,13 +173,13 @@
     status.className = 'qstar-status';
     root.appendChild(status);
 
-    /* ---- Closing question (bridge to sceneDp) ---- */
+    /*, Closing question (bridge to sceneDp), */
     const q = document.createElement('div');
     q.className = 'concept-key-question';
     q.textContent = T('qstar.bridge_q');
     root.appendChild(q);
 
-    /* ---- Demo state machine ---- */
+    /*, Demo state machine, */
     const qStar = computeQstar();
     let pikaBucket = 0;
     let charmBucket = 0;
@@ -221,7 +221,7 @@
       const oppSprite = window.Battle.spriteForOpp(oppB);
       const oppName   = window.Battle.displayNameForOpp(oppB);
 
-      /* Top of panel: state icon — two Pokemon sprites stacked under
+      /* Top of panel: state icon, two Pokemon sprites stacked under
          segmented HP bars, labelled "state s".  Mirrors the q-cell
          thumb used in scenes 7 and 9 so students see the same visual
          vocabulary for "this is the state". */
@@ -244,7 +244,7 @@
 
       /* Below the icon: a 2-column table with action a on the left
          and Q*(s, a) on the right.  Same column structure students
-         will see in scene 7 and 9 — establishing the visual
+         will see in scene 7 and 9, establishing the visual
          vocabulary here pays off there. */
       let tableRows = '';
       for (let k = 0; k < A; k++) {

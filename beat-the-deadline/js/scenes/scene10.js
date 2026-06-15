@@ -1,7 +1,7 @@
-/* Scene 10 -- Why DP does not scale. A two-reason card:
-   (a) you rarely know the dice -- the real arrival rate and carrier no-show
+/* Scene 10, Why DP does not scale. A two-reason card:
+   (a) you rarely know the dice, the real arrival rate and carrier no-show
        odds drift by season, lane, weather, and DP needs them exactly;
-   (b) the grid explodes -- add SKUs, trucks, destinations, a week-long horizon
+   (b) the grid explodes, add SKUs, trucks, destinations, a week-long horizon
        and 25 tiles become millions, too many to enumerate or fill by hand.
    The second card shows the jump from a 5x5 = 25-tile grid (this dock) to a
    wall of cells (realistic scale). Static, cold-entry safe. */
