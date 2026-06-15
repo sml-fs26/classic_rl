@@ -46,7 +46,7 @@
   const NH = D.NH;                                    // 5
   const T = (k, v) => (window.I18N ? window.I18N.t(k, v) : k);
   const EMPTY = '·';                  // middle dot placeholder
-  const DASH = '—';                   // em dash (muted edge marker)
+  const DASH = '-';                   // em dash (muted edge marker)
   const STAR = '★';                   // black star (argmax)
 
   /* ---------- The dock-tile icon (pallets + clock + truck) ---------- */
