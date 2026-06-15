@@ -11,6 +11,8 @@
 % so the layout never jumps between overlay steps
 \newcommand{\formulaslot}[2]{\begin{minipage}[c][#1][c]{\linewidth}\centering #2\end{minipage}}
 
+\input{roadmap} % the arcade roadmap (hybrid of last semester's map + native spotlight)
+
 \title{Reinforcement Learning}
 \subtitle{from one delivery van to the Bellman equation}
 \author{Carlos Cotrini, ETH Zurich}
@@ -21,6 +23,9 @@
 \begin{frame}[plain]
   \titlepage
 \end{frame}
+
+% the course roadmap, overview: the whole arcade, every ride lit
+\roadmap
 
 % ===================== 1. Motivation =====================
 \section{Motivation}
@@ -49,6 +54,7 @@
 
 % ===================== 2. Markov decision processes =====================
 \section{Markov decision processes}
+\roadmapmdp
 
 \begin{frame}{The model: four ingredients}
   \centering
@@ -234,6 +240,7 @@
 
 % ===================== 5. The Q-function and the Bellman equation =====================
 \section{The $Q$-function and the Bellman equation}
+\roadmapbellman
 
 \begin{frame}{The scorecard $Q^\star$}
   \formulaslot{1.6cm}{%
@@ -305,6 +312,7 @@
 
 % ===================== 6. SARSA: learning from the logbook =====================
 \section{SARSA: learning from the logbook}
+\roadmapsarsa
 
 \begin{frame}{Three bookkeepers, one bad week}
   \centering
@@ -623,6 +631,7 @@
 
 % ===================== Appendix =====================
 \section{Appendix: why the nudge works}
+\roadmapdarts
 
 \begin{frame}{The Robbins-Monro iteration}
   \formulaslot{0.8cm}{%
