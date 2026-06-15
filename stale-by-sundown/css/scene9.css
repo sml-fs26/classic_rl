@@ -1,0 +1,11 @@
+/* scene9 -- DP fill. */
+.sc9-formula { display: inline-block; margin: 6px 0 12px; }
+.sc9-ctrls { align-items: center; }
+.sc9-status b { color: var(--ink); }
+.sc9-row { gap: 18px; align-items: flex-start; }
+.sc9-board-host { flex: 0 0 auto; }
+.sc9-panel { min-width: 220px; font-size: 9px; }
+.sc9-panel-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--accent-2); margin-bottom: 8px; }
+.sc9-panel-body { font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.8; color: var(--ink); }
+.sc9-framing { font-size: 10px; }
+@media (max-width: 980px) { .sc9-row { flex-direction: column; } .sc9-panel { width: 100%; } }

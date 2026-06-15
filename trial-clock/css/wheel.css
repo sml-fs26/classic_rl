@@ -1,0 +1,38 @@
+/* wheel.css -- the Conversion Wheel (pixel skin). Spins on a PUSH and ratchets
+   into one of three wedges: BUY (green) / IGNORE (grey) / ABANDON (red), sized
+   by adoption tier. The pointer sits at 12 o'clock; the disc rotates under it.
+   The big red ABANDON wedge on a cold user makes the early-push danger visible. */
+
+.conv-wheel { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; }
+.conv-wheel-compact .cw-svg { width: 120px; height: 120px; }
+
+.cw-stage { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.cw-svg { display: block; }
+.cw-disc { transform-origin: 72px 72px; }
+
+/* the wedges: explicit fills set inline from CSS tokens (see wheel.js). */
+.cw-wedge { stroke-linejoin: round; }
+.cw-wlab  { fill: #ffffff; font-family: 'Press Start 2P', monospace; paint-order: stroke; stroke: rgba(0,0,0,0.35); stroke-width: 0.6; }
+.cw-wname { fill: #ffffff; font-family: 'Press Start 2P', monospace; letter-spacing: 0.02em; paint-order: stroke; stroke: rgba(0,0,0,0.35); stroke-width: 0.5; }
+
+/* pointer (a downward triangle at the top, pointing into the wheel). */
+.cw-pointer {
+  position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; z-index: 3;
+  border-left: 9px solid transparent; border-right: 9px solid transparent;
+  border-top: 16px solid var(--accent);
+  filter: drop-shadow(0 1px 0 var(--rule));
+}
+
+.cw-result {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.05em;
+  text-transform: uppercase; min-height: 1.2em; color: var(--ink-secondary);
+}
+.conv-wheel.res-buy     .cw-result { color: var(--buy-rule); }
+.conv-wheel.res-ignore  .cw-result { color: var(--ink-secondary); }
+.conv-wheel.res-abandon .cw-result { color: var(--abandon-rule); }
+
+/* a settled result subtly highlights the landed wedge via the result text glow;
+   the spin transition is applied inline on .cw-disc by wheel.js. */
+.conv-wheel.cw-spinning .cw-result { color: var(--ink-faint); }
+@media (prefers-reduced-motion: reduce) { .cw-disc { transition: none !important; } }

@@ -1,0 +1,15 @@
+/* scene8.css -- Bellman optimality. */
+.sc8-formula { text-align: center; }
+.sc8-row { gap: 28px; align-items: flex-start; }
+.sc8-left { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.sc8-right { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.sc8-read { font-size: 9px; line-height: 1.8; }
+.sc8-worked { display: flex; flex-direction: column; gap: 10px; }
+.sc8-worked-title { font-family: 'Press Start 2P', monospace; font-size: 10px; letter-spacing: 0.04em; color: var(--accent); text-transform: uppercase; }
+.sc8-calc { font-size: 9px; line-height: 1.7; }
+.sc8-calc-lead { margin: 0 0 8px; }
+.sc8-calc-tex { text-align: center; }
+.sc8-calc-match { margin-top: 8px; font-size: 9px; color: var(--pos); }
+.sc8-check { color: var(--pos); font-size: 11px; }
+.sc8-framing { margin-top: 12px; }
+@media (max-width: 760px) { .sc8-row { gap: 16px; } }

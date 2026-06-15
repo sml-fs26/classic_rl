@@ -1,0 +1,21 @@
+/* scene3.css -- formalization. */
+.sc3-row { gap: 28px; align-items: flex-start; }
+.sc3-panel { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sc3-rail { display: flex; gap: 8px; margin-bottom: 4px; }
+.sc3-chip {
+  width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--ink-secondary);
+  box-shadow: inset -2px -2px 0 0 var(--rule-soft);
+}
+.sc3-chip.active { background: var(--accent); color: #fff; box-shadow: inset 0 0 0 2px var(--inner-highlight); }
+.sc3-tag { font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.sc3-h { font-family: 'Press Start 2P', monospace; font-size: 14px; margin: 2px 0 6px; }
+.sc3-formula { margin: 6px 0; }
+.sc3-body { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; color: var(--ink-on-box); }
+.sc3-body b { color: var(--accent); }
+.sc3-nav { align-items: center; margin-top: 6px; }
+.sc3-stepcount { margin-right: auto; font-size: 9px; }
+.sc3-emph-state { box-shadow: inset 0 0 0 2px var(--accent), 3px 3px 0 var(--shadow) !important; }
+.sc3-framing { margin-top: 12px; }
+@media (max-width: 760px) { .sc3-row { gap: 16px; } }

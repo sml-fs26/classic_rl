@@ -1,0 +1,21 @@
+/* scene6.css -- return histogram. */
+.sc6-formula { text-align: center; }
+.sc6-tex .katex { font-size: 1.2em; }
+.sc6-grid { display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch; margin: 8px 0 12px; }
+.sc6-chart-host { flex: 1 1 460px; min-width: 0; padding: 12px; }
+.sc6-svg { width: 100%; height: auto; display: block; }
+.sc6-axis { stroke: var(--rule); stroke-width: 1.5; }
+.sc6-zero { stroke: var(--ink-secondary); stroke-width: 1; stroke-dasharray: 3 3; }
+.sc6-bar.pos { fill: var(--pos); stroke: var(--rule); stroke-width: 1; }
+.sc6-bar.neg { fill: var(--neg); stroke: var(--rule); stroke-width: 1; }
+.sc6-bar-lab { fill: var(--ink-on-box); font-size: 9px; font-family: 'Press Start 2P', monospace; text-anchor: middle; }
+.sc6-bar-pct { fill: var(--ink-secondary); font-size: 8px; font-family: 'Press Start 2P', monospace; text-anchor: middle; }
+.sc6-axis-title { fill: var(--ink-secondary); font-size: 8px; font-family: 'Press Start 2P', monospace; text-anchor: middle; }
+.sc6-side { display: flex; flex-direction: column; gap: 12px; flex: 1 1 240px; min-width: 0; }
+.sc6-stats { display: flex; flex-direction: column; gap: 10px; }
+.sc6-stat { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.sc6-stat-lab { font-size: 8px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-secondary); }
+.sc6-stat-val { font-size: 18px; font-variant-numeric: tabular-nums; color: var(--ink-on-box); }
+.sc6-stat-val.neg { color: var(--neg); }
+.sc6-say { font-size: 9px; line-height: 1.8; }
+@media (max-width: 720px) { .sc6-side { flex-basis: 100%; } }

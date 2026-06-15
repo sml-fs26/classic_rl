@@ -1,0 +1,21 @@
+/* scene10.css -- why DP does not scale (two stat cards). */
+.sc10-cards { display: flex; gap: 20px; flex-wrap: wrap; margin: 8px 0 16px; }
+.sc10-card { flex: 1 1 340px; min-width: 280px; position: relative; padding: 18px 18px 16px; }
+.sc10-card-num {
+  position: absolute; top: -12px; left: -12px;
+  width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+  background: var(--accent); color: #fff; border: 3px solid var(--rule);
+  font-family: 'Press Start 2P', monospace; font-size: 14px;
+}
+.sc10-card-title { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--ink); margin-bottom: 12px; letter-spacing: 0.04em; }
+.sc10-card-body { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.85; color: var(--ink-secondary); }
+.sc10-card-body b { color: var(--accent); }
+.sc10-card-body em { font-style: normal; color: var(--bet1); }
+.sc10-die-host { margin-top: 16px; display: flex; justify-content: center; }
+.sc10-scale { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.sc10-scale-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 2px solid var(--rule-soft); padding-top: 8px; }
+.sc10-scale-lab { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink-secondary); }
+.sc10-scale-val { font-family: 'Press Start 2P', monospace; font-size: 16px; }
+#sc10-big { color: var(--neg); }
+.sc10-framing { margin-top: 6px; font-size: 9px; line-height: 1.8; }
+@media (max-width: 760px) { .sc10-cards { flex-direction: column; } }

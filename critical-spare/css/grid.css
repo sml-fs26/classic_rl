@@ -1,0 +1,232 @@
+/* grid.css -- the 3x3 maintenance grid (board + Q-table) AND the machine-icon
+   sprite (they share this stylesheet). Pixel skin: hard black borders, inset
+   highlights, Press Start 2P. Health rows (HEALTHY top), spares columns. */
+
+/* =====================================================================
+   MACHINE ICON (the recurring state-icon: machine sprite + spares bin)
+   ===================================================================== */
+.machine-icon {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 4px;
+  font-family: 'Press Start 2P', monospace; color: var(--ink);
+}
+.mi-machine { position: relative; line-height: 0; }
+.mi-svg { display: block; }
+
+/* sizes */
+.mi-lg .mi-machine { width: 120px; height: 105px; }
+.mi-md .mi-machine { width: 84px; height: 74px; }
+.mi-sm .mi-machine { width: 56px; height: 49px; }
+.mi-xs .mi-machine { width: 38px; height: 33px; }
+
+/* health body tint via currentColor */
+.machine-icon.mi-healthy .mi-machine { color: var(--mi-healthy); }
+.machine-icon.mi-aging   .mi-machine { color: var(--mi-aging); }
+.machine-icon.mi-failing .mi-machine { color: var(--mi-failing); }
+
+/* gauge dot colour by health */
+.machine-icon.mi-healthy .mi-gauge-dot { fill: var(--mi-gauge-healthy); }
+.machine-icon.mi-aging   .mi-gauge-dot { fill: var(--mi-gauge-aging); }
+.machine-icon.mi-failing .mi-gauge-dot { fill: var(--mi-gauge-failing); }
+
+/* piston bob: a subtle idle on HEALTHY (humming), faster jitter on FAILING */
+.mi-piston { transform-box: fill-box; transform-origin: center; }
+.machine-icon.mi-healthy .mi-piston { animation: mi-bob 1.6s ease-in-out infinite; }
+.machine-icon.mi-aging   .mi-piston { animation: mi-bob 2.4s ease-in-out infinite; }
+.machine-icon.mi-failing .mi-piston { animation: mi-jitter 0.5s steps(3) infinite; }
+@keyframes mi-bob    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes mi-jitter { 0%,100% { transform: translate(0,0); } 33% { transform: translate(1px,1px); } 66% { transform: translate(-1px,0); } }
+@media (prefers-reduced-motion: reduce) { .mi-piston { animation: none !important; } }
+
+/* steam wisp: AGING only */
+.mi-steam { fill: var(--ink-secondary); opacity: 0; }
+.machine-icon.mi-aging .mi-steam { opacity: 0.6; animation: mi-steam 2.2s ease-in-out infinite; }
+@keyframes mi-steam { 0% { opacity: 0; transform: translateY(2px); } 50% { opacity: 0.7; } 100% { opacity: 0; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .mi-steam { animation: none; } .machine-icon.mi-aging .mi-steam { opacity: 0.5; } }
+
+/* sparks: FAILING only */
+.mi-sparks { fill: var(--highlight); stroke: var(--mi-failing); stroke-width: 0.5; opacity: 0; }
+.machine-icon.mi-failing .mi-sparks { opacity: 1; animation: mi-spark 0.6s steps(2) infinite; }
+@keyframes mi-spark { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+@media (prefers-reduced-motion: reduce) { .mi-sparks { animation: none; } .machine-icon.mi-failing .mi-sparks { opacity: 0.9; } }
+
+.mi-health-label {
+  font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink);
+}
+.mi-md .mi-health-label { font-size: 9px; }
+.mi-lg .mi-health-label { font-size: 10px; }
+
+/* spares bin */
+.mi-bin { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.mi-bin-slots { display: flex; gap: 4px; }
+.mi-slot {
+  width: 20px; height: 20px; line-height: 0;
+  border: 2px dashed var(--rule-soft);
+  background: var(--bg-sunk);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.mi-slot .mi-gear { opacity: 0; }
+.mi-slot.filled { border-style: solid; border-color: var(--rule); background: var(--bg-strong); }
+.mi-slot.filled .mi-gear { opacity: 1; }
+.mi-lg .mi-slot { width: 26px; height: 26px; }
+.mi-sm .mi-slot { width: 16px; height: 16px; }
+.mi-xs .mi-slot { width: 12px; height: 12px; border-width: 1.5px; }
+.mi-bin-label { font-size: 7px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-secondary); }
+.mi-xs .mi-bin-label { display: none; }
+.mi-bin-count { color: var(--ink-on-box); }
+
+/* emphasis / event flashes */
+.mi-machine.mi-pulse { animation: mi-pulse 0.7s ease-out; }
+@keyframes mi-pulse { 0% { filter: brightness(1.5); transform: scale(1.05); } 100% { filter: brightness(1); transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .mi-machine.mi-pulse { animation: none; } }
+
+.machine-icon.mi-downtime .mi-machine { animation: mi-downtime 1.3s ease-out; }
+@keyframes mi-downtime { 0%,100% { filter: none; } 20% { filter: brightness(0.35) saturate(0.3); } 60% { filter: brightness(0.35) saturate(0.3); } }
+@media (prefers-reduced-motion: reduce) { .machine-icon.mi-downtime .mi-machine { animation: none; } }
+
+.machine-icon.mi-replace { animation: mi-replace 0.9s ease-out; }
+@keyframes mi-replace { 0% { filter: drop-shadow(0 0 0 var(--replace)); } 30% { filter: drop-shadow(0 0 8px var(--replace)) brightness(1.4); } 100% { filter: none; } }
+@media (prefers-reduced-motion: reduce) { .machine-icon.mi-replace { animation: none; } }
+
+.machine-icon.mi-order .mi-bin { animation: mi-order 0.9s ease-out; }
+@keyframes mi-order { 0% { filter: drop-shadow(0 0 0 var(--order)); } 30% { filter: drop-shadow(0 0 6px var(--order)) brightness(1.3); } 100% { filter: none; } }
+@media (prefers-reduced-motion: reduce) { .machine-icon.mi-order .mi-bin { animation: none; } }
+
+/* =====================================================================
+   THE 3x3 BOARD
+   ===================================================================== */
+.cs-grid { display: inline-flex; flex-direction: column; gap: 8px; font-family: 'Press Start 2P', monospace; }
+
+.csg-board {
+  display: grid;
+  grid-template-columns: 78px repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  padding: 8px;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow);
+}
+
+/* corner + headers */
+.csg-corner {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font-size: 7px; color: var(--ink-secondary); text-align: center; line-height: 1.3;
+}
+.csg-corner-h { color: var(--ink); }
+.csg-colhead {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  color: var(--ink); padding-bottom: 2px;
+}
+.csg-colhead-n { font-size: 13px; }
+.csg-colhead-sp { font-size: 7px; color: var(--ink-secondary); text-transform: uppercase; }
+
+/* row headers (health band colour) */
+.csg-rowhead {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font-size: 8px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink);
+  border: 2px solid var(--rule);
+  padding: 4px 2px;
+  text-align: center; line-height: 1.3;
+}
+.csg-rowhead-dot { width: 12px; height: 12px; border: 2px solid var(--rule); }
+.csg-row-healthy { background: var(--run-tint); }
+.csg-row-healthy .csg-rowhead-dot { background: var(--mi-healthy); }
+.csg-row-aging   { background: var(--replace-tint); }
+.csg-row-aging   .csg-rowhead-dot { background: var(--mi-aging); }
+.csg-row-failing { background: var(--neg-tint); }
+.csg-row-failing .csg-rowhead-dot { background: var(--mi-failing); }
+
+/* interior cells */
+.csg-cell {
+  position: relative;
+  border: 3px solid var(--rule);
+  background: var(--bg);
+  display: flex; flex-direction: column; align-items: stretch; gap: 4px;
+  padding: 6px 5px;
+  min-height: 92px;
+  box-shadow: inset 0 0 0 1px var(--bg-strong);
+  transition: background 200ms;
+}
+.cs-grid-icon .csg-cell { min-height: 86px; align-items: center; justify-content: flex-start; }
+.csg-cell-icon { display: flex; align-items: center; justify-content: center; }
+
+/* lever-chip rows inside a qtable cell */
+.csg-rows { display: flex; flex-direction: column; gap: 2px; }
+.csg-row {
+  display: grid;
+  grid-template-columns: 12px 11px 1fr auto;
+  align-items: center; gap: 4px;
+  font-size: 8px; font-variant-numeric: tabular-nums;
+  padding: 1px 2px;
+}
+.csg-row.clamped { opacity: 0.34; }
+.csg-row.argmax {
+  background: rgba(0,0,0,0.10);
+  box-shadow: inset 0 0 0 1.5px var(--rule);
+}
+:root[data-theme="crt"] .csg-row.argmax { background: rgba(255,180,80,0.16); }
+.csg-mark { width: 12px; text-align: center; color: var(--accent); font-size: 9px; }
+.csg-swatch { width: 10px; height: 10px; border: 1.5px solid var(--rule); image-rendering: pixelated; }
+.csg-row-label { color: var(--ink-secondary); }
+.csg-row.argmax .csg-row-label { color: var(--ink-on-box); }
+.csg-val { text-align: right; color: var(--ink-on-box); }
+
+/* best-lever tag (icon variant) */
+.csg-best-tag { display: flex; justify-content: center; min-height: 16px; }
+.csg-best {
+  display: inline-block; font-size: 7px; padding: 2px 5px;
+  border: 2px solid var(--rule); color: var(--lever-ink); letter-spacing: 0.03em;
+}
+
+/* lever-region tint: the winning lever colours the whole cell -> the optimal
+   policy reads as a 2D heat-map. */
+.cs-grid-qtable .csg-cell.tint-run     { background: var(--run-tint); }
+.cs-grid-qtable .csg-cell.tint-order   { background: var(--order-tint); }
+.cs-grid-qtable .csg-cell.tint-replace { background: var(--replace-tint); }
+.cs-grid-icon   .csg-cell.tint-run     { background: var(--run-tint); }
+.cs-grid-icon   .csg-cell.tint-order   { background: var(--order-tint); }
+.cs-grid-icon   .csg-cell.tint-replace { background: var(--replace-tint); }
+.csg-cell.unsolved { background: var(--bg); }
+.csg-cell.pending  { opacity: 0.4; }
+
+/* the current-state marker (icon variant) */
+.csg-cell.has-token { box-shadow: inset 0 0 0 3px var(--accent), inset 0 0 0 1px var(--bg-strong); }
+.csg-cell.token-pulse { animation: csg-token-pulse 0.7s ease-out; }
+@keyframes csg-token-pulse { 0% { box-shadow: 0 0 0 4px var(--highlight), inset 0 0 0 3px var(--accent); } 100% { box-shadow: inset 0 0 0 3px var(--accent); } }
+@media (prefers-reduced-motion: reduce) { .csg-cell.token-pulse { animation: none; } }
+
+.csg-cell.just-locked { box-shadow: inset 0 0 0 3px var(--highlight); }
+.csg-cell.cell-flip { animation: csg-cell-flip 0.9s ease-out; }
+@keyframes csg-cell-flip { 0% { box-shadow: inset 0 0 0 3px var(--highlight); } 100% { box-shadow: inset 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .csg-cell.cell-flip { animation: none; } }
+
+.csg-cell.clickable { cursor: pointer; }
+.csg-cell.clickable:hover { background: var(--accent-soft); }
+
+/* legend */
+.csg-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 14px;
+  font-size: 8px; line-height: 1.6; color: var(--ink-secondary);
+  padding: 2px 4px;
+}
+.csg-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.csg-legend-swatch { width: 12px; height: 12px; border: 2px solid var(--rule); image-rendering: pixelated; }
+
+/* responsive: the board is the one big element. Shrink fonts + cell height. */
+@media (max-width: 760px) {
+  .csg-board { grid-template-columns: 50px repeat(3, minmax(0, 1fr)); gap: 3px; padding: 5px; }
+  .csg-rowhead { font-size: 6.5px; padding: 4px 1px; gap: 3px; line-height: 1.25; }
+  .csg-rowhead-dot { width: 10px; height: 10px; }
+  .csg-corner { font-size: 6px; }
+  .csg-cell { min-height: 78px; padding: 4px 3px; }
+  .cs-grid-qtable .csg-row { font-size: 7px; grid-template-columns: 9px 8px 1fr auto; gap: 2px; }
+  .csg-swatch { width: 8px; height: 8px; }
+  .csg-colhead-n { font-size: 11px; }
+  /* the cell machine icon eats vertical room on a phone; trim it a touch */
+  .cs-grid-qtable .csg-cell-icon .mi-xs .mi-machine { width: 30px; height: 26px; }
+}
+@media (max-width: 400px) {
+  .csg-board { grid-template-columns: 42px repeat(3, minmax(0, 1fr)); }
+  .csg-rowhead { font-size: 6px; }
+  .cs-grid-qtable .csg-row { font-size: 6px; }
+  .csg-cell { min-height: 72px; }
+}

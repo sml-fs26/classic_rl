@@ -1,0 +1,56 @@
+/* die.css -- the battery-drain die popup (pixel skin). A chunky cube that
+   tumbles and lands on -1 (most of the time) or -2 (a bad roll), with the
+   70/30 badge printed beside it. */
+
+.rr-die { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; }
+
+.rr-die-cube {
+  position: relative;
+  width: 58px; height: 58px;
+  display: flex; align-items: center; justify-content: center;
+  border: 4px solid var(--rule);
+  border-radius: 9px;
+  background: var(--die-face);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight), 3px 3px 0 var(--rule);
+}
+.rr-die-delta {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  color: var(--ink-on-box);
+  letter-spacing: 1px;
+}
+.rr-die-cube.rr-die-bad {
+  box-shadow: inset 0 0 0 2px var(--die-bad), 3px 3px 0 var(--die-bad);
+}
+.rr-die-cube.rr-die-bad .rr-die-delta { color: var(--die-bad); }
+
+.rr-die-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  border: 2px solid var(--rule); background: var(--bg-strong);
+  padding: 2px 6px;
+}
+
+.rr-die-cube.rr-die-leap { animation: rr-die-tumble 0.64s steps(8) 1; }
+@keyframes rr-die-tumble {
+  0%   { transform: translateY(0) rotate(0deg); }
+  25%  { transform: translateY(-22px) rotate(140deg); }
+  50%  { transform: translateY(-6px) rotate(260deg); }
+  75%  { transform: translateY(-14px) rotate(350deg); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) { .rr-die-cube.rr-die-leap { animation: none; } }
+
+/* Screen-shake helper: scenes add this to a target on a -2 strand. */
+.rr-screen-shake { animation: rr-screen-shake 0.42s steps(2, end); }
+@keyframes rr-screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  12% { transform: translate(-5px, 1px); }
+  28% { transform: translate(5px, -1px); }
+  44% { transform: translate(-4px, 2px); }
+  60% { transform: translate(4px, -1px); }
+  76% { transform: translate(-2px, 1px); }
+  88% { transform: translate(2px, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .rr-screen-shake { animation: none; } }

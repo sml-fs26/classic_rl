@@ -1,0 +1,28 @@
+/* scene12.css -- recap. */
+.sc12-gauge-host { display: flex; justify-content: center; margin: 4px 0 14px; }
+.sc12-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 6px 0 16px; }
+.sc12-card {
+  text-align: left; cursor: pointer;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 2px 2px 0 var(--shadow);
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;
+  font-family: 'Press Start 2P', monospace; color: var(--ink-on-box);
+}
+.sc12-card:hover { background: var(--highlight); }
+.sc12-card:hover .sc12-card-text, .sc12-card:hover .sc12-card-title { color: var(--rule); }
+.sc12-badge {
+  align-self: flex-start; font-size: 9px; color: #fff;
+  border: 2px solid var(--rule); padding: 3px 8px; letter-spacing: 0.04em;
+}
+.sc12-badge-mdp    { background: var(--hue-mdp); }
+.sc12-badge-policy { background: var(--hue-policy); }
+.sc12-badge-return { background: var(--hue-return); }
+.sc12-badge-qstar  { background: var(--hue-qstar); color: #181818; }
+.sc12-badge-dp     { background: var(--hue-dp); }
+.sc12-badge-sarsa  { background: var(--hue-sarsa); }
+.sc12-card-title { font-size: 10px; letter-spacing: 0.03em; color: var(--ink-on-box); }
+.sc12-card-tex { padding: 4px 0; }
+.sc12-card-tex .katex { font-size: 0.95em; }
+.sc12-card-text { font-size: 8px; line-height: 1.85; color: var(--ink-secondary); }
+.sc12-close { text-align: center; font-size: 10px; line-height: 1.8; }
+.sc12-by { text-align: center; font-family: 'Press Start 2P', monospace; font-size: 7px; letter-spacing: 1px; color: var(--accent); margin-top: 14px; }

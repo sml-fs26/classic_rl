@@ -1,0 +1,23 @@
+/* scene8.css -- Bellman. */
+.sc8-main { text-align: center; }
+.sc8-tex .katex { font-size: 1.25em; }
+.sc8-main .formula-note { text-align: left; }
+.sc8-work { margin: 12px 0; }
+.sc8-work-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-on-box); margin-bottom: 12px; }
+.sc8-work-icon-host { margin-bottom: 12px; }
+.sc8-steps { display: flex; flex-direction: column; gap: 8px; }
+.sc8-step {
+  display: flex; align-items: center; gap: 12px;
+  border: 2px solid var(--rule); background: var(--bg-strong); padding: 9px 12px;
+  font-size: 9px; line-height: 1.7; color: var(--ink-on-box);
+}
+.sc8-step[hidden] { display: none; }
+.sc8-step-n {
+  flex: 0 0 auto; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  background: var(--hue-dp); color: #fff; border: 2px solid var(--rule); font-size: 10px;
+}
+.sc8-result { justify-content: center; background: var(--neg-tint); border-color: var(--neg); }
+.sc8-result-tex .katex { font-size: 1.05em; }
+.sc8-step.sc8-pop { animation: sc8-pop 0.3s cubic-bezier(.3,1.5,.5,1); }
+@keyframes sc8-pop { 0% { transform: translateX(-8px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sc8-step.sc8-pop { animation: none; } }

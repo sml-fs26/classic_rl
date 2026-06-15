@@ -1,0 +1,30 @@
+/* scene6.css -- return distribution histogram. */
+.sc6-formula { text-align: center; }
+.sc6-setup { font-size: 9px; line-height: 1.7; }
+.sc6-ctrls { gap: 8px; align-items: center; flex-wrap: wrap; }
+.sc6-gap { flex: 0 0 16px; }
+.sc6-board { margin: 12px 0; display: flex; flex-direction: column; gap: 14px; }
+.sc6-stats { gap: 26px; }
+
+.sc6-hist {
+  display: flex; gap: 14px; align-items: flex-end; justify-content: center;
+  height: 180px; padding: 10px 14px;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.sc6-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1 1 0; max-width: 110px; height: 100%; justify-content: flex-end; }
+.sc6-bar-col { width: 100%; height: 100%; display: flex; align-items: flex-end; background: var(--bg-sunk); border: 2px solid var(--rule-soft); }
+.sc6-bar-fill { width: 100%; height: 0; transition: height 220ms ease-out; border-top: 2px solid var(--rule); }
+.sc6-bar-fill.bar-convert { background: var(--buy); }
+.sc6-bar-fill.bar-zero    { background: var(--ignore); }
+.sc6-bar-fill.bar-cost    { background: var(--push); }
+.sc6-bar-fill.bar-abandon { background: var(--abandon); }
+.sc6-bar-count { font-family: 'Press Start 2P', monospace; font-size: 8px; font-variant-numeric: tabular-nums; }
+.sc6-bar-lab { font-family: 'Press Start 2P', monospace; font-size: 7px; text-align: center; color: var(--ink-secondary); text-transform: uppercase; line-height: 1.3; }
+.sc6-note { font-size: 8px; line-height: 1.7; }
+.sc6-framing { margin-top: 6px; }
+@media (max-width: 760px) {
+  .sc6-stats { gap: 18px; }
+  .sc6-hist { gap: 8px; height: 150px; }
+  .sc6-bar-lab { font-size: 6px; }
+}

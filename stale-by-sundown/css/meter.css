@@ -1,0 +1,65 @@
+/* meter.css -- the "did a customer buy?" buy-meter (the visible dice). A green
+   fill bar whose width is the buy probability, a needle, and a little walking
+   customer who buys (cha-ching, coin pops) or shrugs. Uses --meter-* tokens. */
+
+.buymeter {
+  font-family: 'Press Start 2P', monospace; color: var(--ink);
+  border: 4px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px 12px; min-width: 220px;
+}
+.bm-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.bm-title { font-size: 8px; letter-spacing: 0.04em; color: var(--ink-secondary); text-transform: uppercase; }
+.bm-pct { font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.bm-track {
+  position: relative; height: 20px; border: 3px solid var(--rule);
+  background: var(--meter-track); overflow: visible;
+}
+.bm-fill {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(180deg, var(--meter-fill-hi), var(--meter-fill));
+  transition: width 0.4s steps(10);
+}
+.bm-needle {
+  position: absolute; top: -4px; bottom: -4px; left: 0%; width: 3px; background: var(--rule);
+  transition: left 0.4s steps(10);
+}
+.bm-needle::after {
+  content: ''; position: absolute; top: -6px; left: -3px; width: 0; height: 0;
+  border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid var(--rule);
+}
+/* the walking customer: a small pixel figure that slides in from the right */
+.bm-customer {
+  position: absolute; right: 4px; top: 50%; width: 10px; height: 14px;
+  transform: translateY(-50%); opacity: 0;
+  background:
+    radial-gradient(circle at 50% 22%, var(--ink) 0 3px, transparent 4px),  /* head */
+    linear-gradient(var(--ink), var(--ink));                                 /* body */
+  background-repeat: no-repeat;
+  background-size: 10px 6px, 6px 8px;
+  background-position: top center, bottom center;
+}
+.bm-walk-in { animation: bm-walk-in 0.42s ease-out forwards; }
+.bm-walk-out { animation: bm-walk-out 0.36s ease-in forwards; }
+@keyframes bm-walk-in { 0% { opacity: 0; transform: translate(20px, -50%); } 100% { opacity: 1; transform: translate(0, -50%); } }
+@keyframes bm-walk-out { 0% { opacity: 1; transform: translate(0, -50%); } 100% { opacity: 0; transform: translate(-16px, -50%); } }
+@media (prefers-reduced-motion: reduce) { .bm-walk-in, .bm-walk-out { animation: none; opacity: 0; } }
+
+/* coin pop on a sale */
+.bm-coin {
+  position: absolute; right: 8px; top: 2px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--rule); pointer-events: none;
+  animation: bm-coin-pop 0.6s ease-out forwards;
+}
+@keyframes bm-coin-pop { 0% { opacity: 0; transform: translateY(4px) scale(0.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-22px) scale(1.1); } }
+@media (prefers-reduced-motion: reduce) { .bm-coin { animation: none; opacity: 0; } }
+
+.bm-foot { margin-top: 8px; min-height: 12px; }
+.bm-result { font-size: 8px; letter-spacing: 0.04em; }
+.buymeter.bm-bought .bm-result { color: var(--lever-hold); }
+.buymeter.bm-nobuy .bm-result { color: var(--lever-dump); }
+.buymeter.bm-bought .bm-track { box-shadow: 0 0 0 2px var(--lever-hold); }
+.buymeter.bm-nobuy .bm-track { box-shadow: 0 0 0 2px var(--lever-dump); }
+
+@media (max-width: 720px) { .buymeter { min-width: 0; width: 100%; } }

@@ -1,0 +1,235 @@
+/* gauge.css -- the ROBOT + 5-segment battery gauge, and its single-column
+   Q-table (pixel skin). Two variants: .rr-gauge-icon (compact robot + gauge)
+   and .rr-gauge-qtable (the wide Q-table, three lever rows per rung, the
+   optimal-policy stripe). Hard black borders + inset highlights to match the
+   gallery pixel theme. */
+
+.rr-gauge { display: inline-flex; flex-direction: column; gap: 8px; font-family: 'Press Start 2P', monospace; }
+
+/* ============================================================
+   The robot + gauge icon
+   ============================================================ */
+.rr-icon {
+  display: inline-flex; align-items: flex-end; gap: 12px;
+  padding: 12px 14px;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow);
+}
+.rr-icon-mini { padding: 6px 8px; gap: 8px; box-shadow: none; border: 3px solid var(--rule); background: var(--bg-strong); }
+
+/* ---- the little pixel robot ---- */
+.rr-robot { position: relative; width: 46px; display: flex; flex-direction: column; align-items: center; transition: transform 220ms; }
+.rr-icon-mini .rr-robot { width: 34px; }
+.rr-bot-head {
+  position: relative;
+  width: 30px; height: 22px;
+  background: var(--robot);
+  border: 3px solid var(--robot-rule);
+  border-radius: 3px 3px 0 0;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.rr-icon-mini .rr-bot-head { width: 22px; height: 16px; border-width: 2px; gap: 3px; }
+.rr-bot-head::before {  /* antenna */
+  content: ''; position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 6px; background: var(--robot-rule);
+}
+.rr-bot-head::after {  /* antenna bulb */
+  content: ''; position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  width: 6px; height: 6px; border-radius: 50%; background: var(--pip-high); border: 1px solid var(--rule);
+}
+.rr-eye { width: 6px; height: 6px; background: var(--robot-eye); border-radius: 50%; }
+.rr-icon-mini .rr-eye { width: 4px; height: 4px; }
+.rr-bot-body {
+  width: 36px; height: 16px;
+  background: var(--robot);
+  border: 3px solid var(--robot-rule);
+  border-top: none;
+  margin-top: -1px;
+}
+.rr-icon-mini .rr-bot-body { width: 26px; height: 12px; border-width: 2px; }
+.rr-bot-tread {
+  width: 40px; height: 7px;
+  background: var(--robot-rule);
+  border-radius: 0 0 3px 3px;
+  margin-top: 1px;
+}
+.rr-icon-mini .rr-bot-tread { width: 30px; height: 5px; }
+.rr-bot-sos {
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  font-size: 8px; color: #fff; background: var(--neg); border: 2px solid var(--rule);
+  padding: 1px 4px; letter-spacing: 0.06em; opacity: 0; transition: opacity 200ms;
+}
+
+/* robot pose / brightness by level */
+.rr-icon.lvl-full  .rr-robot { transform: translateY(0) rotate(0deg); }
+.rr-icon.lvl-high  .rr-robot { transform: translateY(0) rotate(0deg); }
+.rr-icon.lvl-mid   .rr-robot { transform: translateY(1px) rotate(-3deg); }
+.rr-icon.lvl-low   .rr-robot { transform: translateY(2px) rotate(-7deg); }
+.rr-icon.lvl-empty .rr-robot { transform: translateY(4px) rotate(-14deg); filter: grayscale(1) brightness(0.7); }
+.rr-icon.lvl-empty .rr-bot-head::after { background: var(--pip-off); }
+.rr-icon.lvl-empty .rr-eye { background: var(--neg); }
+.rr-robot.stranded .rr-bot-sos { opacity: 1; }
+
+/* ---- the vertical 5-segment gauge ---- */
+.rr-gauge-tube {
+  display: flex; flex-direction: column; align-items: stretch;
+  width: 26px;
+  border: 3px solid var(--pip-rule);
+  background: var(--gauge-tube);
+  padding: 3px;
+  position: relative;
+}
+.rr-icon-mini .rr-gauge-tube { width: 18px; border-width: 2px; padding: 2px; }
+.rr-gauge-tube::before {  /* the little + terminal nub at the top */
+  content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+  width: 10px; height: 4px; background: var(--pip-rule);
+}
+.rr-gauge-pips { display: flex; flex-direction: column; gap: 3px; }
+.rr-pip {
+  height: 16px;
+  background: var(--pip-off);
+  border: 2px solid var(--rule);
+  image-rendering: pixelated;
+  transition: background 160ms, filter 160ms;
+}
+.rr-icon-mini .rr-pip { height: 10px; border-width: 1px; }
+.rr-pip.on.lvl1 { background: var(--pip-low); }
+.rr-pip.on.lvl2 { background: var(--pip-mid); }
+.rr-pip.on.lvl3 { background: var(--pip-high); }
+.rr-pip.on.lvl4 { background: var(--pip-full); }
+.rr-gauge-base { height: 4px; }
+.rr-pip.rr-spark { animation: rr-spark 0.5s ease-out; }
+@keyframes rr-spark {
+  0% { filter: brightness(2.4); box-shadow: 0 0 8px var(--highlight); }
+  100% { filter: brightness(1); box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) { .rr-pip.rr-spark { animation: none; } }
+
+.rr-icon-label {
+  font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-on-box);
+  align-self: center; padding-bottom: 4px;
+}
+
+.rr-icon.rr-pulse { animation: rr-pulse 0.7s ease-out; }
+@keyframes rr-pulse {
+  0% { box-shadow: 0 0 0 3px var(--highlight), inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight); }
+  100% { box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow); }
+}
+.rr-icon.rr-strand-anim { animation: rr-shake 0.42s steps(2,end); }
+@keyframes rr-shake {
+  0%,100% { transform: translate(0,0); }
+  20% { transform: translate(-4px,1px); }
+  40% { transform: translate(4px,-1px); }
+  60% { transform: translate(-3px,1px); }
+  80% { transform: translate(3px,0); }
+}
+@media (prefers-reduced-motion: reduce) { .rr-icon.rr-strand-anim { animation: none; } }
+
+/* ============================================================
+   The Q-table panel (qtable variant)
+   ============================================================ */
+.rr-panel {
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow);
+  min-width: 360px;
+}
+.rr-panel-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 10px;
+  border-bottom: 3px solid var(--rule);
+  background: var(--bg);
+}
+.rr-panel-title { font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-on-box); }
+
+.rr-table { display: flex; flex-direction: column; }
+
+/* ---- interior rungs (full top .. low bottom) ---- */
+.rr-rung {
+  display: flex; align-items: stretch;
+  border-top: 2px solid var(--rule-soft);
+  padding: 6px 10px; gap: 10px;
+  min-height: 58px;
+  transition: background 200ms;
+}
+.rr-rung:first-of-type { border-top: none; }
+.rr-rung-left {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 58px; gap: 5px;
+  border-right: 2px solid var(--rule-soft);
+}
+.rr-rung-name { font-size: 9px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-on-box); }
+.rr-rung-mini-gauge { display: flex; flex-direction: column-reverse; gap: 2px; }
+.rr-mini-pip { width: 18px; height: 4px; background: var(--pip-off); border: 1px solid var(--rule); }
+.rr-mini-pip.on.lvl1 { background: var(--pip-low); }
+.rr-mini-pip.on.lvl2 { background: var(--pip-mid); }
+.rr-mini-pip.on.lvl3 { background: var(--pip-high); }
+.rr-mini-pip.on.lvl4 { background: var(--pip-full); }
+
+.rr-rows { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; justify-content: center; }
+.rr-row {
+  display: grid;
+  grid-template-columns: 14px 12px 64px 1fr;
+  align-items: center; gap: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; font-variant-numeric: tabular-nums;
+  padding: 2px 2px;
+}
+.rr-row.argmax { background: rgba(0,0,0,0.10); }
+:root[data-theme="crt"] .rr-row.argmax { background: rgba(255,180,80,0.14); }
+.rr-mark { width: 14px; text-align: center; color: var(--accent); font-size: 11px; }
+.rr-swatch { width: 11px; height: 11px; border-radius: 0; border: 2px solid var(--rule); image-rendering: pixelated; }
+.rr-row-label { color: var(--ink-secondary); letter-spacing: 0.02em; }
+.rr-row.argmax .rr-row-label { color: var(--ink-on-box); }
+.rr-val { text-align: right; color: var(--ink-on-box); }
+
+.rr-vstar {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 56px; border-left: 2px solid var(--rule-soft); padding-left: 8px; gap: 3px;
+}
+.rr-vstar-lab { font-size: 7px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-secondary); }
+.rr-vstar-val { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink-on-box); }
+
+/* Lever-region tint: the winning lever colours the whole rung -> the optimal
+   policy reads as a stripe (green SEARCH top, blue RECHARGE bottom). */
+.rr-rung.tint-search   { background: var(--search-tint); }
+.rr-rung.tint-wait     { background: var(--wait-tint); }
+.rr-rung.tint-recharge { background: var(--recharge-tint); }
+.rr-rung.unsolved { background: transparent; }
+.rr-rung.pending { opacity: 0.42; }
+
+.rr-rung.just-locked { box-shadow: inset 0 0 0 3px var(--accent); }
+.rr-rung.rung-flip { animation: rr-rung-flip 0.9s ease-out; }
+@keyframes rr-rung-flip {
+  0% { box-shadow: inset 0 0 0 3px var(--highlight); }
+  100% { box-shadow: inset 0 0 0 0 transparent; }
+}
+@media (prefers-reduced-motion: reduce) { .rr-rung.rung-flip { animation: none; } }
+.rr-rung.clickable { cursor: pointer; }
+.rr-rung.clickable:hover { background: rgba(0,158,115,0.12); }
+
+/* STRANDED strip at the bottom */
+.rr-strand-strip {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--strand); color: #E8E2D4;
+  border-top: 3px solid var(--strand-rule);
+  font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 8px 10px;
+}
+
+/* ---- legend ---- */
+.rr-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; line-height: 1.6; color: var(--ink-secondary);
+  padding: 2px 4px;
+}
+.rr-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.rr-legend-swatch { width: 12px; height: 12px; border-radius: 0; border: 2px solid var(--rule); image-rendering: pixelated; }
+
+@media (max-width: 760px) {
+  .rr-panel { min-width: 0; width: 100%; }
+  .rr-row { font-size: 8px; grid-template-columns: 12px 10px 54px 1fr; }
+  .rr-rung-left { min-width: 48px; }
+}

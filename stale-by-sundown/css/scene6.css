@@ -1,0 +1,26 @@
+/* scene6 -- return histograms. */
+.sc6-formula { display: inline-block; margin: 6px 0 12px; }
+.sc6-setup { font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.8; color: var(--ink-secondary); max-width: 90ch; margin: 0 0 14px; }
+.sc6-hists { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
+.sc6-hist {
+  border: 3px solid var(--rule); background: var(--bg-strong); padding: 10px;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight); display: flex; flex-direction: column; gap: 6px;
+}
+.sc6-hist-title { font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.04em; }
+.lev-hold-text { color: var(--lever-hold); }
+.lev-discount-text { color: var(--lever-disc); }
+.lev-dump-text { color: var(--lever-dump); }
+.rd-svg { width: 100%; height: auto; display: block; background: var(--bg); border: 2px solid var(--rule); }
+.rd-bar.lev-hold { fill: var(--lever-hold); }
+.rd-bar.lev-discount { fill: var(--lever-disc); }
+.rd-bar.lev-dump { fill: var(--lever-dump); }
+.rd-zero { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 2; opacity: 0.7; }
+.rd-mean { stroke: var(--accent-2); stroke-width: 1.5; }
+.rd-tick { font-family: 'Press Start 2P', monospace; font-size: 6px; fill: var(--ink-secondary); }
+.sc6-stats { display: flex; justify-content: space-between; gap: 4px; }
+.sc6-stat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.sc6-stat-lab { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--ink-secondary); }
+.sc6-stat-val { font-family: 'Press Start 2P', monospace; font-size: 12px; color: var(--ink); }
+.sc6-hist-note { font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.6; color: var(--ink-secondary); }
+.sc6-framing { font-size: 10px; }
+@media (max-width: 720px) { .sc6-hists { grid-template-columns: 1fr; } }

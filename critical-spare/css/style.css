@@ -1,0 +1,568 @@
+/* Critical Spare -- global styles.
+ *
+ * House style: the SML reinforcement-learning gallery's LIGHT PIXEL theme
+ * (warm grey-cream NES "shell", hard black borders, Press Start 2P
+ * everywhere), matching the sibling cartridges gamblers-ruin/ and
+ * press-your-luck/ EXACTLY. A screen-only high-contrast CRT variant (amber
+ * phosphor) is the dark option (toggle / #theme=crt). Math lives in bordered
+ * .formula-block / .formula-card cards; KaTeX is vendored under vendor/katex.
+ *
+ * Lever colour identity (kept consistent everywhere so the optimal-policy
+ * heat-map reads as a 2D map of colours):
+ *   RUN      green        (produce / uptime)
+ *   ORDER    blue         (inventory / holding)
+ *   REPLACE  gold         (the planned "spend the protection" swap)
+ * Health colour identity: HEALTHY green, AGING amber, FAILING red.
+ */
+
+/* ---------- Press Start 2P (bundled, offline) ---------- */
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('../assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+  font-display: block;  /* pixel font: do NOT flash a fallback serif first */
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ---------- Tokens: light (default) ---------- */
+:root,
+:root[data-theme="light"] {
+  --bg:             #E8E0CC;     /* warm grey-cream, NES "shell" */
+  --bg-strong:      #F8F4E4;     /* lighter card paper */
+  --bg-sunk:        #DCD3BA;     /* recessed wells */
+  --ink:            #181818;
+  --ink-secondary:  #585858;
+  --ink-faint:      #8A8268;
+  --rule:           #181818;     /* hard black borders */
+  --rule-soft:      #BBB6A2;     /* hairlines / inner-highlight light */
+  --card-bg:        #FFFFFF;
+  --inner-highlight:#404040;     /* the secondary inner border line */
+  --accent:         #C2541E;     /* burnt-orange highlight */
+  --accent-soft:    #F2C9A8;
+  --highlight:      #F8D028;     /* pixel "select" yellow */
+  --highlight-cheek:#E84828;
+  --shadow:         rgba(24, 20, 12, 0.20);
+  --ink-on-box:     #181818;
+
+  /* Lever (action) colours: RUN green, ORDER blue, REPLACE gold */
+  --run:       #2E9E6B;   --run-rule: #1c6a47;   --run-tint: #C7E7D5;
+  --order:     #2f6cb1;   --order-rule: #1c4b82; --order-tint: #C9DBEE;
+  --replace:   #C8902C;   --replace-rule: #8c6224; --replace-tint: #EDDCB8;
+  --lever-ink: #ffffff;   /* text on a saturated chip */
+
+  /* Machine-icon health colours */
+  --mi-healthy:  #58C27D;   --mi-aging: #E0A53A;   --mi-failing: #D6432A;
+  --mi-window:   #1E2A22;   --mi-gauge-healthy: #8CF0AE;  --mi-gauge-aging: #FFD86A;  --mi-gauge-failing: #FF7A52;
+  --mi-piston:   #C9C2A8;   --mi-gear: #C8902C;     --mi-shadow: rgba(24,20,12,0.18);
+
+  /* Money / penalties (Okabe-Ito-ish) */
+  --pos:       #2E9E6B;   --pos-tint: #C7E7D5;
+  --neg:       #D6432A;   --neg-tint: #F2CFC9;
+  --coin-in:   #2E9E6B;   --coin-out: #D6432A;
+
+  /* Cross-viz hue identities (kept for the recap chips) */
+  --hue-mdp:     #B8323A;     /* red */
+  --hue-policy:  #2F6CB1;     /* blue */
+  --hue-return:  #2E9E6B;     /* green */
+  --hue-qstar:   #C8902C;     /* gold */
+  --hue-dp:      #7A5C8C;     /* purple */
+  --hue-sarsa:   #C2541E;     /* orange */
+}
+
+/* ---------- Tokens: CRT (screen-only dark option) ----------
+   Amber-phosphor terminal: dark background, warm-amber text. Pairs with the
+   scanline + vignette + phosphor-glow overlays below. */
+:root[data-theme="crt"] {
+  --bg:             #0a0500;
+  --bg-strong:      #1a0d05;
+  --bg-sunk:        #050200;
+  --ink:            #FFB350;
+  --ink-secondary:  #8B6030;
+  --ink-faint:      #6A4820;
+  --rule:           #FF9020;
+  --rule-soft:      #5A3010;
+  --card-bg:        #1a0d05;
+  --inner-highlight:#5A3010;
+  --accent:         #FF6A1E;
+  --accent-soft:    #5A3010;
+  --highlight:      #FFC060;
+  --highlight-cheek:#FF6020;
+  --shadow:         rgba(0, 0, 0, 0.5);
+  --ink-on-box:     #FFB350;
+
+  --run:     #6FE0A0; --run-rule: #3fb377; --run-tint: #08241A;
+  --order:   #6FB0F0; --order-rule: #3f78b3; --order-tint: #102030;
+  --replace: #FFC76E; --replace-rule: #a87f33; --replace-tint: #2A1808;
+  --lever-ink: #1a0d05;
+
+  --mi-healthy:  #6FE0A0;   --mi-aging: #FFC76E;   --mi-failing: #FF6020;
+  --mi-window:   #2A1808;   --mi-gauge-healthy: #9FF0C0;  --mi-gauge-aging: #FFD86A;  --mi-gauge-failing: #FF8A52;
+  --mi-piston:   #5A3010;   --mi-gear: #FFC76E;     --mi-shadow: rgba(0,0,0,0.5);
+
+  --pos: #6FE0A0; --pos-tint: #08241A;
+  --neg: #FF6020; --neg-tint: #2A1004;
+  --coin-in: #6FE0A0; --coin-out: #FF6020;
+
+  --hue-mdp:    #FF6020;
+  --hue-policy: #6FB0F0;
+  --hue-return: #6FE0A0;
+  --hue-qstar:  #FFC76E;
+  --hue-dp:     #FF9050;
+  --hue-sarsa:  #FF8A52;
+}
+
+/* CRT scanlines + vignette overlays (pointer-events:none so clicks pass). */
+:root[data-theme="crt"] body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 9991;
+  background: repeating-linear-gradient(to bottom,
+    rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+    rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px);
+  mix-blend-mode: multiply;
+}
+:root[data-theme="crt"] body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 9992;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+}
+:root[data-theme="crt"] body,
+:root[data-theme="crt"] .scene-title,
+:root[data-theme="crt"] .topbar,
+:root[data-theme="crt"] .scene-heading,
+:root[data-theme="crt"] .concept-heading {
+  text-shadow: 0 0 6px rgba(255, 180, 80, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Press Start 2P', "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  -webkit-font-smoothing: none;   /* keep the pixel font crisp */
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;             /* never let a wide child scroll the page + clip the topbar */
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg);
+  border-bottom: 4px solid var(--rule);
+  gap: 10px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.topbar .brand {
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.topbar .scene-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-secondary);
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 0 16px;
+}
+.topbar .right-cluster { display: flex; gap: 6px; align-items: center; }
+
+.theme-toggle, .pager-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  padding: 5px 8px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--rule-soft);
+}
+.theme-toggle:hover, .pager-btn:hover { background: var(--highlight); }
+.pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.pager-btn:disabled:hover { background: var(--bg-strong); }
+
+.music-toggle.active {
+  background: var(--highlight);
+  color: var(--ink);
+  box-shadow: inset 2px 2px 0 0 #B89020;
+}
+
+.dot-pager { display: flex; gap: 4px; align-items: center; }
+.dot-pager .dot {
+  width: 10px; height: 10px;
+  background: var(--ink-secondary);
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  padding: 0; cursor: pointer;
+}
+.dot-pager .dot.active { background: var(--highlight); }
+.dot-pager .dot:hover { background: var(--highlight-cheek); }
+
+/* ---------- Concept badges ---------- */
+.concept-badges { display: flex; gap: 4px; margin: 0 6px; align-items: center; }
+.concept-badge {
+  min-width: 30px; height: 22px; padding: 0 5px;
+  border: 2px solid var(--rule);
+  border-radius: 0;
+  background: var(--bg);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px; letter-spacing: 0.04em;
+  color: var(--ink-secondary);
+  opacity: 0.4;
+  transition: opacity 200ms, background 200ms, color 200ms;
+}
+.concept-badge.earned {
+  opacity: 1; color: var(--lever-ink);
+  box-shadow: inset 0 0 0 1px var(--inner-highlight);
+}
+.concept-badge.mdp.earned    { background: var(--hue-mdp);    color: #fff; }
+.concept-badge.policy.earned { background: var(--hue-policy); color: #fff; }
+.concept-badge.return.earned { background: var(--hue-return); color: #fff; }
+.concept-badge.qstar.earned  { background: var(--hue-qstar);  color: #181818; }
+.concept-badge.dp.earned     { background: var(--hue-dp);     color: #fff; }
+.concept-badge.sarsa.earned  { background: var(--hue-sarsa);  color: #fff; }
+@keyframes badge-flash {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 var(--highlight); }
+  40% { transform: scale(1.3); box-shadow: 0 0 0 8px var(--highlight); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 transparent; }
+}
+.concept-badge.flashing { animation: badge-flash 1s ease-out; position: relative; z-index: 4; }
+@media (prefers-reduced-motion: reduce) { .concept-badge.flashing { animation: none; } }
+
+/* ---------- Stage / scene engine ---------- */
+.stage {
+  position: relative;
+  max-width: 1100px;
+  margin: 16px auto 32px;
+  padding: 0 20px;
+  min-height: calc(100vh - 130px);
+}
+.scene {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0; left: 20px; right: 20px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active { opacity: 1; pointer-events: auto; position: relative; left: 0; right: 0; }
+.scene-pad { padding: 12px 4px 24px; }
+
+/* ---------- Headings + prose ---------- */
+h1, h2, h3 { font-family: 'Press Start 2P', monospace; font-weight: 400; }
+.scene-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px; line-height: 1.4; margin: 6px 0 12px; color: var(--ink);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.scene-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; line-height: 1.8; color: var(--ink); max-width: 92ch; margin: 0 0 14px;
+}
+.scene-lede b { color: var(--accent); }
+.scene-lede em { font-style: normal; color: var(--order); }
+.scene-sub { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; color: var(--ink-secondary); max-width: 92ch; }
+.muted { color: var(--ink-secondary); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* ---------- Generic card / panel ---------- */
+.card {
+  background: var(--card-bg);
+  border: 3px solid var(--rule);
+  border-radius: 0;
+  padding: 14px 16px;
+  box-shadow: inset 0 0 0 2px var(--card-bg), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow);
+}
+.poke-box, .dlg-box {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  border-radius: 0;
+  padding: 14px 16px;
+  position: relative;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  line-height: 1.8;
+}
+.poke-box b, .dlg-box b { color: var(--accent); }
+.poke-box em, .dlg-box em { font-style: normal; color: var(--order); }
+.dlg-box .triangle {
+  position: absolute; right: 14px; bottom: 10px;
+  width: 0; height: 0;
+  border-left: 6px solid transparent; border-right: 6px solid transparent;
+  border-top: 8px solid var(--ink);
+  animation: blink 0.9s steps(2, end) infinite;
+}
+@keyframes blink { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+@media (prefers-reduced-motion: reduce) { .dlg-box .triangle { animation: none; } }
+
+/* ---------- Formula cards (KaTeX) ---------- */
+.formula-block, .formula-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  border-radius: 0;
+  padding: 14px 18px;
+  margin: 12px 0;
+  max-width: 100%;
+  overflow-x: auto;        /* long formulas scroll inside the card, not the page */
+  -webkit-overflow-scrolling: touch;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink-on-box);
+}
+.formula-card .formula-label, .formula-block .formula-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-secondary); margin-bottom: 10px;
+}
+.formula-block .katex, .formula-card .katex {
+  font-family: "KaTeX_Main", "Iowan Old Style", Georgia, serif;
+  font-size: 1.2em; color: var(--ink-on-box);
+}
+.formula-block .katex-display, .formula-card .katex-display { margin: 0; }
+.formula-note {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; line-height: 1.8; color: var(--ink-secondary); margin-top: 10px;
+}
+.katex { color: var(--ink-on-box); }
+
+/* ---------- Buttons (the chunky pixel action button) ---------- */
+.cs-btn, .poke-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong);
+  color: var(--ink-on-box);
+  border: 3px solid var(--rule);
+  border-radius: 0;
+  padding: 9px 14px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight), 2px 2px 0 0 var(--shadow);
+}
+.cs-btn:hover, .poke-btn:hover { background: var(--highlight); color: var(--rule); }
+.cs-btn:active, .poke-btn:active { box-shadow: inset 2px 2px 0 0 var(--inner-highlight); transform: translate(1px, 1px); }
+.cs-btn:disabled, .poke-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.cs-btn:disabled:hover { background: var(--bg-strong); color: var(--ink-on-box); }
+.cs-btn.primary { background: var(--accent); color: var(--lever-ink); border-color: var(--rule); }
+.cs-btn.primary:hover { background: var(--highlight); color: var(--rule); }
+.cs-btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* ---------- Lever chips (the three levers) ---------- */
+.lever-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: 'Press Start 2P', monospace; font-size: 10px;
+  color: var(--lever-ink);
+  border: 3px solid var(--rule);
+  border-radius: 0;
+  padding: 9px 12px;
+  cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  box-shadow: inset -2px -2px 0 0 rgba(0,0,0,0.25), 2px 2px 0 0 var(--shadow);
+}
+.lever-chip:hover { filter: brightness(1.07); }
+.lever-chip:active { transform: translate(1px,1px); box-shadow: inset 2px 2px 0 0 rgba(0,0,0,0.25); }
+.lever-chip[data-lever="run"],     .lever-fill-run     { background: var(--run);     border-color: var(--run-rule); }
+.lever-chip[data-lever="order"],   .lever-fill-order   { background: var(--order);   border-color: var(--order-rule); }
+.lever-chip[data-lever="replace"], .lever-fill-replace { background: var(--replace); border-color: var(--replace-rule); }
+.lever-chip .chip-role { font-size: 7px; opacity: 0.92; text-transform: uppercase; letter-spacing: 0.05em; }
+.lever-chip:disabled, .lever-chip.clamped {
+  background: var(--bg-sunk); color: var(--ink-faint); border-color: var(--rule-soft);
+  cursor: not-allowed; box-shadow: none; filter: none;
+  text-decoration: line-through;
+}
+.lever-tag {
+  display: inline-block; font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--lever-ink);
+  border: 2px solid var(--rule); border-radius: 0; padding: 3px 7px;
+}
+.lever-tag[data-lever="run"]     { background: var(--run);     border-color: var(--run-rule); }
+.lever-tag[data-lever="order"]   { background: var(--order);   border-color: var(--order-rule); }
+.lever-tag[data-lever="replace"] { background: var(--replace); border-color: var(--replace-rule); }
+.lever-tag-run     { background: var(--run);     border-color: var(--run-rule); color: var(--lever-ink); }
+.lever-tag-order   { background: var(--order);   border-color: var(--order-rule); color: var(--lever-ink); }
+.lever-tag-replace { background: var(--replace); border-color: var(--replace-rule); color: var(--lever-ink); }
+
+/* health text spans */
+.h-healthy { color: var(--mi-healthy); }
+.h-aging   { color: var(--mi-aging); }
+.h-failing { color: var(--mi-failing); }
+
+/* ---------- HUD strip ---------- */
+.hud-strip {
+  display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+.hud-item { display: flex; flex-direction: column; gap: 3px; }
+.hud-label { font-size: 7px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary); }
+.hud-val { font-size: 14px; font-variant-numeric: tabular-nums; color: var(--ink-on-box); }
+.hud-val.pos { color: var(--pos); }
+.hud-val.neg { color: var(--neg); }
+
+/* ---------- Pinned penalty legend (the two-tier reminder) ---------- */
+.cost-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--ink-on-box);
+}
+.cost-legend .cl-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.cost-legend .cl-amt { font-variant-numeric: tabular-nums; }
+.cost-legend .cl-amt.pos { color: var(--pos); }
+.cost-legend .cl-amt.neg { color: var(--neg); }
+
+/* ---------- Layout helpers ---------- */
+.scene-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; margin-bottom: 14px; }
+.scene-row.center { justify-content: center; }
+.scene-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.grow { flex: 1 1 320px; min-width: 0; }
+
+/* ---------- Concept-scene chrome (KaTeX-heavy formula scenes) ---------- */
+.concept-scene { display: flex; flex-direction: column; gap: 14px; }
+.concept-heading {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px; letter-spacing: 0.08em; margin: 6px 0 2px; color: var(--ink); text-transform: uppercase;
+}
+.concept-lede {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.8; color: var(--ink-secondary); margin: 0 2px 4px; max-width: 92ch;
+}
+.concept-lede b { color: var(--ink-on-box); }
+
+/* ---------- Footnote ---------- */
+.footnote {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px; line-height: 1.7; color: var(--ink-secondary);
+  border-top: 2px solid var(--rule-soft);
+  padding-top: 8px; margin-top: 16px;
+}
+.footnote kbd {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px; border: 1px solid var(--rule); border-radius: 0;
+  padding: 0 4px; background: var(--bg-strong); color: var(--ink);
+}
+
+/* ---------- Cross-viz hue chip (recap) ---------- */
+.hue-chip {
+  display: inline-block; padding: 3px 8px;
+  border: 2px solid var(--rule); background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  color: var(--ink); letter-spacing: 0.5px; text-transform: uppercase;
+}
+
+/* ============================================================
+   Japanese "flavor mode" -- body.lang-jp swaps the primary font to
+   DotGothic16 (a bitmap-style Japanese font from Google Fonts) so the kana
+   glyphs match the chiptune pixel-art feel of the English Press-Start-2P
+   text. Press Start 2P stays a fallback for Latin glyphs nested inside
+   Japanese strings (e.g. "Q*", "SML"). DotGothic16 is also a tail fallback
+   in EN mode so the language toggle label renders cleanly.
+   ============================================================ */
+body.lang-jp,
+body.lang-jp button,
+body.lang-jp input,
+body.lang-jp .scene,
+body.lang-jp .topbar {
+  font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace;
+}
+body.lang-jp .scene { letter-spacing: 0.02em; }
+.theme-toggle, .pager-btn, .topbar .brand, .scene-title {
+  font-family: 'Press Start 2P', 'DotGothic16', 'Courier New', monospace;
+}
+
+/* ---------- Speaker-notes overlay (press `n`) ---------- */
+.speaker-notes-overlay[hidden] { display: none; }
+.speaker-notes-overlay {
+  position: fixed; right: 18px; bottom: 18px; z-index: 9990;
+  width: 480px; max-width: calc(100vw - 36px); pointer-events: none;
+}
+.speaker-notes-card {
+  background: var(--bg-strong);
+  border: 4px solid var(--rule);
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-strong),
+    inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong),
+    4px 4px 0 0 rgba(0, 0, 0, 0.20);
+  padding: 14px 18px 16px;
+  max-height: 75vh; overflow-y: auto;
+  pointer-events: auto;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; line-height: 1.7; color: var(--ink-on-box);
+}
+.speaker-notes-title {
+  font-size: 9px; letter-spacing: 0.06em;
+  color: var(--highlight-cheek); margin-bottom: 10px;
+  border-bottom: 2px solid var(--rule); padding-bottom: 6px;
+}
+.speaker-notes-title kbd {
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  border: 2px solid var(--rule); border-radius: 0; padding: 1px 5px; background: var(--bg); color: var(--ink-on-box);
+}
+.speaker-notes-content h3 { font-size: 11px; letter-spacing: 0.04em; color: var(--highlight-cheek); margin: 0 0 8px; }
+.speaker-notes-content p { margin: 4px 0 8px; }
+.speaker-notes-content b { color: var(--highlight-cheek); }
+.speaker-notes-content em { color: var(--order); font-style: normal; }
+
+/* ---------- Responsive (<= 720px) ----------
+   The pixel-font chrome packs brand + title + ~7 buttons into one flex row at
+   desktop; on a phone the row overflows. Below 720px the topbar collapses to
+   wrapping rows: brand / PREV+dots+NEXT / badges (full-width) / toggles. The
+   scene-title hides (every scene opens with its own H2). Per-scene responsive
+   rules live alongside their desktop rules in the scene CSS files. */
+@media (max-width: 720px) {
+  .topbar { flex-wrap: wrap; padding: 10px 12px; gap: 8px; row-gap: 10px; }
+  .topbar .scene-title { display: none; }
+  .topbar .brand { flex: 1 1 auto; font-size: 10px; }
+  .topbar .right-cluster { flex: 0 0 100%; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .topbar .right-cluster #prev-btn,
+  .topbar .right-cluster #next-btn { min-height: 36px; padding: 8px 12px; font-size: 10px; }
+  .topbar .right-cluster .dot-pager { flex: 1 1 auto; justify-content: center; }
+  .dot-pager .dot { width: 12px; height: 12px; }
+  .topbar .right-cluster .concept-badges { flex: 1 1 100%; margin: 0; justify-content: center; gap: 5px; }
+  .topbar .right-cluster #theme-toggle,
+  .topbar .right-cluster #music-toggle,
+  .topbar .right-cluster #lang-toggle { min-height: 30px; padding: 6px 10px; font-size: 8px; }
+
+  .stage { padding: 0 12px; margin: 12px auto 24px; min-height: calc(100dvh - 220px); }
+  .scene { left: 12px; right: 12px; }
+  .scene.active { left: 0; right: 0; }
+  .scene-heading { font-size: 15px; }
+  .scene-lede { font-size: 9px; }
+  .scene-row { gap: 12px; }
+  .scene-pad { padding: 8px 0 18px; }
+  .speaker-notes-overlay { right: 8px; bottom: 8px; left: 8px; width: auto; }
+  .cost-legend { font-size: 7px; }
+}

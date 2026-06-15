@@ -1,0 +1,18 @@
+/* scene1.css -- tutorial. */
+.sc1-row { gap: 28px; align-items: flex-start; }
+.sc1-right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.sc1-chips { display: flex; flex-wrap: wrap; gap: 10px; transition: opacity 200ms; }
+.sc1-dice { display: flex; gap: 28px; align-items: flex-start; transition: opacity 200ms; flex-wrap: wrap; }
+.sc1-die { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.sc1-die-lab { font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase; }
+.sc1-dim { opacity: 0.4; }
+.sc1-emph { box-shadow: inset 0 0 0 2px var(--accent), 3px 3px 0 var(--shadow) !important; }
+.sc1-dialog { min-height: 84px; }
+.sc1-chips .lever-chip.chip-hl { box-shadow: 0 0 0 3px var(--highlight), inset -2px -2px 0 0 rgba(0,0,0,0.25); }
+.sc1-demo { margin-top: 2px; }
+.sc1-nav { align-items: center; margin-top: 4px; }
+.sc1-stepcount { margin-right: auto; font-size: 9px; }
+@media (max-width: 760px) {
+  .sc1-row { gap: 16px; }
+  .sc1-dice { gap: 18px; }
+}

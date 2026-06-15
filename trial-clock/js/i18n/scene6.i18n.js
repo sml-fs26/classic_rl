@@ -1,0 +1,46 @@
+/* scene6 i18n -- return G_t. */
+(function () {
+  if (!window.I18N) return;
+  window.I18N.register({
+    en: {
+      'scene6.title':  'Return',
+      'scene6.lede':   'The <b>return</b> is the payoff summed over the rest of the trial, not just today. It’s a random number with a distribution -- and we care about its long-run average.',
+      'scene6.formulaLabel': 'return = rewards summed over the rest of the trial',
+      'scene6.setup':  'Fix a mid-adoption user (tier 2, day 4), choose the FIRST lever, then play optimally. Run it many times and watch the spread.',
+      'scene6.startPush': 'START WITH PUSH',
+      'scene6.startNudge':'START WITH NUDGE',
+      'scene6.run':    'RUN 300',
+      'scene6.run1':   'RUN 1',
+      'scene6.reset':  'RESET',
+      'scene6.attempts':'attempts',
+      'scene6.mean':   'mean return',
+      'scene6.exact':  'exact Q*',
+      'scene6.barAbandon':'ABANDON −5',
+      'scene6.barCost':   'cost <0',
+      'scene6.barZero':   'expire 0',
+      'scene6.barConvert':'CONVERT +20',
+      'scene6.note':   'The mean converges to Q*(s, first lever). PUSH here spikes at +20 but carries a real −5 tail; NUDGE is steadier. Judge a lever by the distribution, never one customer.',
+      'scene6.framing':'ROI isn’t one number -- it’s a distribution across customers. A good lever wins on average over time, and you must respect the downside tail (the ABANDON bar).',
+    },
+    jp: {
+      'scene6.title':  'リターン',
+      'scene6.lede':   '<b>リターン</b>は きょうだけでなく、 トライアルの のこり ぜんたいで たした ペイオフ。 ぶんぷを もつ かくりつへんすうで -- きにする のは その ちょうきの へいきん。',
+      'scene6.formulaLabel': 'リターン = トライアルの のこりで たした ほうしゅう',
+      'scene6.setup':  'ちゅうかんの ユーザー（レベル 2、 にっすう 4）を こてい、 さいしょの レバーを えらび、 あとは さいぜんに。 なんども まわして ばらつきを みよう。',
+      'scene6.startPush': 'プッシュ から',
+      'scene6.startNudge':'ナッジ から',
+      'scene6.run':    '300かい',
+      'scene6.run1':   '1かい',
+      'scene6.reset':  'リセット',
+      'scene6.attempts':'しこう かいすう',
+      'scene6.mean':   'へいきん リターン',
+      'scene6.exact':  'せいかくな Q*',
+      'scene6.barAbandon':'りだつ −5',
+      'scene6.barCost':   'コスト <0',
+      'scene6.barZero':   'しゅうりょう 0',
+      'scene6.barConvert':'こうにゅう +20',
+      'scene6.note':   'へいきんは Q*(s, さいしょの レバー) に しゅうそく。 ここの プッシュは +20 に スパイク するが ほんものの −5 の すそを もつ； ナッジは より あんてい。 1にんでなく ぶんぷで レバーを はんだん。',
+      'scene6.framing':'ROI は 1つの すうじ ではない -- おきゃくの あいだの ぶんぷ。 よい レバーは じかんを かけて へいきんで かち、 マイナスの すそ（りだつ バー）を そんちょう しなければ ならない。',
+    },
+  });
+})();

@@ -1,0 +1,30 @@
+/* scene8 -- Bellman. */
+.sc8-formula { display: block; margin: 6px 0 14px; }
+.sc8-anchor { margin-bottom: 14px; }
+.sc8-anchor-head { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--accent-2); margin-bottom: 10px; letter-spacing: 0.04em; }
+.sc8-anchor-row { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.shelf-icon.sc8-shelf { width: 100%; }
+.sc8-backups { display: flex; flex-direction: column; gap: 8px; }
+.sc8-backup {
+  display: grid; grid-template-columns: 90px 1fr auto; gap: 10px; align-items: center;
+  border: 2px solid var(--rule); background: var(--bg); padding: 7px 10px;
+  opacity: 0.2; transition: opacity 280ms;
+}
+.sc8-backup.shown { opacity: 1; }
+.sc8-backup.best { background: color-mix(in srgb, var(--lever-dump) 14%, var(--bg)); border-left: 6px solid var(--lever-dump); }
+.sc8-backup-lever { font-family: 'Press Start 2P', monospace; font-size: 9px; }
+.sc8-backup.lev-hold .sc8-backup-lever { color: var(--lever-hold); }
+.sc8-backup.lev-discount .sc8-backup-lever { color: var(--lever-disc); }
+.sc8-backup.lev-dump .sc8-backup-lever { color: var(--lever-dump); }
+.sc8-backup-expr { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink); line-height: 1.6; }
+.sc8-backup-calc { display: none; }
+.sc8-backup-val { font-family: 'Press Start 2P', monospace; font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sc8-backup.best .sc8-backup-val { color: var(--lever-dump); }
+.sc8-star { color: var(--accent-2); }
+.sc8-ctrls { margin: 4px 0 14px; }
+.sc8-framing { font-size: 10px; }
+@media (max-width: 720px) {
+  .sc8-anchor-row { grid-template-columns: 1fr; }
+  .sc8-backup { grid-template-columns: 1fr auto; }
+  .sc8-backup-expr { grid-column: 1 / -1; }
+}

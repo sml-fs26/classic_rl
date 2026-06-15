@@ -1,0 +1,34 @@
+/* scene5 -- trajectory tape. */
+.sc5-formula { display: inline-block; margin: 6px 0 12px; }
+.sc5-ctrls { align-items: center; }
+.sc5-tape {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; padding: 12px;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight); min-height: 80px; margin-bottom: 14px;
+}
+.sc5-empty { font-family: 'Press Start 2P', monospace; font-size: 9px; align-self: center; padding: 18px; }
+.sc5-step {
+  display: flex; align-items: center; gap: 4px; padding: 6px 8px;
+  border: 2px solid var(--rule); background: var(--bg);
+  animation: sc5-pop 0.3s ease-out backwards;
+}
+@keyframes sc5-pop { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .sc5-step { animation: none; } }
+.sc5-s { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.sc5-mini { line-height: 0; }
+.sc5-mini .croissant-svg { image-rendering: pixelated; }
+.sc5-s-lab { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--ink); text-align: center; line-height: 1.3; }
+.sc5-arrow { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink-secondary); }
+.sc5-a { font-family: 'Press Start 2P', monospace; font-size: 7px; padding: 4px 5px; border: 2px solid var(--rule); }
+.sc5-a.lev-hold     { background: var(--lever-hold); color: var(--lever-hold-ink); }
+.sc5-a.lev-discount { background: var(--lever-disc); color: var(--lever-disc-ink); }
+.sc5-a.lev-dump     { background: var(--lever-dump); color: var(--lever-dump-ink); }
+.sc5-r { font-family: 'Press Start 2P', monospace; font-size: 9px; min-width: 22px; text-align: center; }
+.sc5-r.pos { color: var(--lever-hold); }
+.sc5-r.neg { color: var(--lever-dump); }
+.sc5-r.zero { color: var(--ink-secondary); }
+.sc5-next { display: flex; align-items: center; }
+.sc5-term { font-family: 'Press Start 2P', monospace; font-size: 7px; padding: 3px 5px; border: 2px solid var(--rule); }
+.sc5-term.cleared { background: var(--lever-hold); color: var(--lever-hold-ink); }
+.sc5-term.spoiled { background: var(--lever-dump); color: var(--lever-dump-ink); }
+.sc5-framing { font-size: 10px; }

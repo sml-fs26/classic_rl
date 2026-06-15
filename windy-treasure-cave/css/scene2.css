@@ -1,0 +1,15 @@
+/* scene2.css -- playtest. HUD strip on top, board left, controls right. */
+.sc2-hud { margin-bottom: 14px; }
+.sc2-row { gap: 28px; align-items: flex-start; }
+.sc2-left { flex: 0 0 auto; }
+.sc2-right { flex: 1 1 320px; min-width: 280px; align-items: flex-start; gap: 14px; }
+.sc2-die-host { align-self: center; }
+.sc2-dlg { width: 100%; min-height: 4.6em; }
+.sc2-pad-wrap { display: flex; justify-content: center; width: 100%; }
+.sc2-ctrls { width: 100%; justify-content: center; }
+.sc2-framing { margin-top: 14px; font-size: 9px; line-height: 1.8; }
+@media (max-width: 760px) {
+  .sc2-row { flex-direction: column; align-items: center; }
+  .sc2-left { align-self: center; }
+  .sc2-right { width: 100%; align-items: center; }
+}

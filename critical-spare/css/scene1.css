@@ -1,0 +1,36 @@
+/* scene1.css -- tutorial. */
+.sc1-row { gap: 28px; align-items: flex-start; }
+.sc1-left { display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 0 0 auto; }
+.sc1-right { display: flex; flex-direction: column; gap: 12px; }
+.sc1-hud { align-self: stretch; }
+.sc1-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.sc1-dim { opacity: 0.4; transition: opacity 200ms; }
+.sc1-emph { filter: drop-shadow(0 0 6px var(--accent-soft)); }
+.lever-chip.chip-hl { box-shadow: 0 0 0 3px var(--highlight), inset -2px -2px 0 0 rgba(0,0,0,0.25); }
+
+.sc1-legend { margin-top: 14px; }
+
+/* the swap-rule contrast cards */
+.sc1-swaprule { margin-top: 4px; }
+.sc1-sr-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.04em; }
+.sc1-sr-cards { display: flex; gap: 12px; flex-wrap: wrap; }
+.sc1-sr-card {
+  flex: 1 1 220px; min-width: 0;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+  padding: 10px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.sc1-sr-good { border-color: var(--run-rule); }
+.sc1-sr-bad  { border-color: var(--neg); }
+.sc1-sr-head { font-size: 9px; letter-spacing: 0.04em; }
+.sc1-sr-good .sc1-sr-head { color: var(--run); }
+.sc1-sr-bad  .sc1-sr-head { color: var(--neg); }
+.sc1-sr-out { font-size: 8px; line-height: 1.7; }
+.sc1-sr-out.pos { color: var(--pos); }
+.sc1-sr-out.neg { color: var(--neg); }
+
+@media (max-width: 760px) {
+  .sc1-row { gap: 16px; }
+  .sc1-left { flex-direction: row; flex-wrap: wrap; justify-content: center; align-self: center; }
+}

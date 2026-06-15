@@ -1,0 +1,46 @@
+/* Scene 12 (recap) i18n fragment. */
+(function () {
+  if (!window.I18N) return;
+  window.I18N.register({
+    en: {
+      'scene12.title': 'RECAP',
+      'scene12.lede':  'Six ideas, one cave. The bones of decision-making when you do not fully control the outcome, and of reinforcement learning.',
+      'scene12.badge.mdp': 'MDP', 'scene12.badge.policy': 'POLICY', 'scene12.badge.return': 'RETURN',
+      'scene12.badge.qstar': 'Q*', 'scene12.badge.dp': 'DP', 'scene12.badge.sarsa': 'TD',
+      'scene12.card.mdp.title': 'THE FOUR-PART FRAME',
+      'scene12.card.mdp.text': 'The situation is your TILE. The lever is your HEADING. The part you do not control is the WIND DIE. The payoff is the torch you burn (-1 a step) plus +10 on the gold, -10 in the pit.',
+      'scene12.card.policy.title': 'A HEADING FOR EVERY TILE',
+      'scene12.card.policy.text': 'A policy assigns one heading to EVERY tile, the SOP your team could follow without you. When you walked by gut you already were a policy.',
+      'scene12.card.return.title': 'THE WHOLE JOURNEY, SUMMED',
+      'scene12.card.return.text': 'The return is every reward from here to the end. One heading gives a SPREAD of returns, because the wind differs. Manage the spread, not just the average.',
+      'scene12.card.qstar.title': 'THE SCORE OF EACH HEADING',
+      'scene12.card.qstar.text': 'Q*(s, a) is the best expected return if you aim a now and play smart after. The best heading BENDS around the pit: below it, aiming at the prize is the worst move.',
+      'scene12.card.dp.title': 'EXACT MAP IF YOU KNEW THE WIND',
+      'scene12.card.dp.text': 'With the wind odds known, sweep the Bellman backup and value floods out from the gold; the arrow field bends into place. Exact Q*, the optimal map.',
+      'scene12.card.sarsa.title': 'LEARN THE MAP BY WALKING',
+      'scene12.card.sarsa.text': 'No wind table? Replace the expectation with one step. SARSA learns the cautious route it walks; Q-learning recovers the optimal map. Same steps, two honest answers.',
+      'scene12.close': 'The safe heading depends on where you stand. Steer around your hazards even when it is the longer road; sprint for the payoff only where the ground is safe. Good strategy is a <b>map</b> of decisions, not a single bet.',
+      'scene12.credits': 'WINDY TREASURE CAVE · SML Reinforcement Learning gallery · BY CARLOS COTRINI',
+    },
+    jp: {
+      'scene12.title': 'まとめ',
+      'scene12.lede':  'むっつの かんがえ、 ひとつの どうくつ。 けっかを かんぜんには せいぎょできない ときの いしけってい、 そして きょうかがくしゅうの ほね。',
+      'scene12.badge.mdp': 'MDP', 'scene12.badge.policy': 'ポリシー', 'scene12.badge.return': 'リターン',
+      'scene12.badge.qstar': 'Q*', 'scene12.badge.dp': 'DP', 'scene12.badge.sarsa': 'TD',
+      'scene12.card.mdp.title': 'よっつの ぶぶんの わく',
+      'scene12.card.mdp.text': 'じょうきょうは あなたの マス。 レバーは むき。 せいぎょできない ぶぶんは かぜダイス。 みかえりは もやす たいまつ（1ぽ -1）＋ おたから +10、 あな -10。',
+      'scene12.card.policy.title': 'すべての マスへの むき',
+      'scene12.card.policy.text': 'ポリシーは すべての マスに ひとつの むきを わりあてる、 チームが あなた ぬきで したがう SOP。 かんで あるいた とき すでに ポリシー だった。',
+      'scene12.card.return.title': 'たびの ぜんたいの ごうけい',
+      'scene12.card.return.text': 'リターンは ここから さいごまでの すべての ほうしゅう。 1つの むき でも リターンは ばらつく、 かぜが ちがうから。 へいきん だけでなく ばらつきを かんり。',
+      'scene12.card.qstar.title': 'かく むきの スコア',
+      'scene12.card.qstar.text': 'Q*(s, a)は いま a を ねらい あとは じょうずに やった ときの さいぜんの きたい リターン。 さいぜんの むきは あなを よけて まがる： した では たからを ねらうのが さいあく。',
+      'scene12.card.dp.title': 'かぜを しれば せいかくな ちず',
+      'scene12.card.dp.text': 'かぜの オッズが きち なら ベルマンを くりかえし、 かちは たから から ひろがり やじるしばが まがる。 せいかくな Q*、 さいぜんの ちず。',
+      'scene12.card.sarsa.title': 'あるいて ちずを まなぶ',
+      'scene12.card.sarsa.text': 'かぜの ひょうが ない？ きたいちを 1かいの あゆみに。 SARSA は あるく しんちょうな みち、 Q-ラーニングは さいぜんの ちず。 おなじ あゆみ、 ふたつの しょうじきな こたえ。',
+      'scene12.close': 'あんぜんな むきは どこに いるかで かわる。 とおまわり でも きけんを よけ、 あんぜんな ところ だけ みかえりへ つっぱしれ。 よい せんりゃくは いしけっていの <b>ちず</b>、 ひとつの かけ では ない。',
+      'scene12.credits': 'かぜの たからどうくつ · SML きょうかがくしゅう ギャラリー · カルロス コトリニ せいさく',
+    },
+  });
+})();

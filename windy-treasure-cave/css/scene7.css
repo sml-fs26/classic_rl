@@ -1,0 +1,27 @@
+/* scene7.css -- Q* (state-icon + two-column table). */
+.sc7-formula { max-width: 520px; }
+.sc7-spots { margin: 4px 0 14px; }
+.sc7-spot { font-size: 8px; }
+.sc7-row { gap: 28px; align-items: flex-start; }
+.sc7-left { flex: 0 0 auto; }
+.sc7-right { flex: 1 1 320px; min-width: 280px; gap: 12px; }
+.sc7-table-card { padding: 12px 14px; }
+.sc7-table-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--accent); margin-bottom: 10px; letter-spacing: 0.04em; }
+.sc7-table { width: 100%; border-collapse: collapse; font-family: 'Press Start 2P', monospace; }
+.sc7-table th {
+  font-size: 8px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-secondary);
+  text-align: left; padding: 4px 6px; border-bottom: 2px solid var(--rule);
+}
+.sc7-table th:last-child { text-align: right; }
+.sc7-table td { padding: 6px 6px; border-bottom: 1px solid var(--rule-soft); font-size: 9px; }
+.sc7-q { text-align: right; font-variant-numeric: tabular-nums; font-size: 11px; }
+.sc7-table tr.sc7-arg { background: rgba(46,158,107,0.14); }
+.sc7-table tr.sc7-arg .sc7-q { color: var(--pos); }
+.sc7-table tr.sc7-bad .sc7-q { color: var(--neg); }
+.sc7-star { color: var(--accent); }
+.sc7-note { font-size: 9px; line-height: 1.8; }
+.sc7-framing { margin-top: 14px; font-size: 9px; line-height: 1.8; }
+@media (max-width: 760px) {
+  .sc7-row { flex-direction: column; align-items: center; }
+  .sc7-right { width: 100%; }
+}

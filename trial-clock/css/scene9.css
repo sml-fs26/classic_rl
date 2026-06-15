@@ -1,0 +1,20 @@
+/* scene9.css -- dynamic programming fill. */
+.sc9-formula { text-align: center; }
+.sc9-ctrls { align-items: center; gap: 10px; margin-bottom: 6px; }
+.sc9-status { font-size: 11px; margin-left: auto; }
+.sc9-row { align-items: flex-start; gap: 28px; }
+.sc9-board-host { flex: 0 0 auto; }
+.sc9-panel { max-width: 380px; min-height: 150px; flex: 1 1 300px; }
+.sc9-panel-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; color: var(--accent); }
+.sc9-panel-body { font-size: 10px; line-height: 1.7; }
+.sc9-panel-body b { color: var(--accent); }
+.sc9-framing { margin-top: 16px; }
+@media (max-width: 980px) {
+  .sc9-row { flex-direction: column; }
+  .sc9-board-host { width: 100%; }
+  .sc9-board-host .tc-board { display: flex; width: 100%; }
+  .sc9-board-host .tcb-grid { width: 100%; }
+}
+@media (max-width: 760px) {
+  .sc9-status { font-size: 9px; }
+}

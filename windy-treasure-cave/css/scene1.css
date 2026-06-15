@@ -1,0 +1,14 @@
+/* scene1.css -- tutorial. Board on the left, die + dialog + D-pad on the right. */
+.sc1-row { gap: 28px; align-items: flex-start; }
+.sc1-left { flex: 0 0 auto; }
+.sc1-right { flex: 1 1 320px; min-width: 280px; align-items: flex-start; gap: 14px; }
+.sc1-die-host { align-self: center; }
+.sc1-dlg { width: 100%; min-height: 4.6em; }
+.sc1-pad-wrap { display: flex; justify-content: center; width: 100%; }
+.sc1-ctrls { width: 100%; justify-content: center; }
+.sc1-legend { font-size: 9px; line-height: 1.8; }
+@media (max-width: 760px) {
+  .sc1-row { flex-direction: column; align-items: center; }
+  .sc1-left { align-self: center; }
+  .sc1-right { width: 100%; align-items: center; }
+}

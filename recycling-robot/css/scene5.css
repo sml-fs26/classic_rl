@@ -1,0 +1,19 @@
+/* scene5.css -- trajectory. */
+.sc5-formula { text-align: center; }
+.sc5-tex .katex { font-size: 1.15em; }
+.sc5-stage { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 6px 0 12px; }
+.sc5-tape { display: flex; gap: 5px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
+.sc5-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 56px; padding: 5px 6px; border: 2px solid var(--rule); background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace;
+}
+.sc5-cell .c-i { font-size: 7px; color: var(--ink-secondary); }
+.sc5-cell .c-lv { font-size: 8px; color: var(--ink-on-box); }
+.sc5-cell .c-lever { font-size: 7px; letter-spacing: 0.3px; }
+.sc5-cell .c-r { font-size: 9px; font-variant-numeric: tabular-nums; color: var(--ink-secondary); }
+.sc5-cell.tape-search .c-lever   { color: var(--search); }
+.sc5-cell.tape-wait .c-lever     { color: var(--wait); }
+.sc5-cell.tape-recharge .c-lever { color: var(--recharge); }
+.sc5-cell.tape-strand { background: var(--neg-tint); border-color: var(--neg); }
+.sc5-cell.tape-strand .c-r { color: var(--neg); font-weight: bold; }

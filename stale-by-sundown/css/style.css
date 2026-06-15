@@ -1,0 +1,423 @@
+/* Stale by Sundown -- the light Press Start 2P pixel house theme, the same
+   warm-cream NES look as press-your-luck / gamblers-ruin, re-skinned for a
+   pastry case. Light is the lecture default; a screen-only amber-phosphor CRT
+   variant ships alongside (data-theme="crt"). The bakery palette lives in the
+   --lever-* (HOLD green / DISCOUNT amber / DUMP red) and --tier-* (FRESH golden
+   .. STALE grey-green) tokens so the CRT theme retints automatically. */
+
+/* ---------- Press Start 2P ---------- */
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('../assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+  font-display: block;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ---------- Tokens (light) ---------- */
+:root,
+:root[data-theme="light"] {
+  --bg:             #E8E0CC;     /* warm grey-cream, NES "shell" */
+  --bg-strong:      #F8F4E4;     /* lighter, for dialog boxes */
+  --ink:            #181818;
+  --ink-secondary:  #585858;
+  --rule:           #181818;
+  --card-bg:        #FFFFFF;
+  --inner-highlight:#404040;
+  --accent:         #F8D028;     /* the "pikachu yellow" UI accent (kept as the chrome highlight) */
+  --accent-2:       #E84828;     /* the warm red accent (hover dots) */
+
+  /* Colour-blind-safe semantic palette (Okabe-Ito), used where colour carries
+     meaning; always paired with a label/icon for redundancy. */
+  --cb-blue:             #0072B2;
+  --cb-vermillion:       #D55E00;
+  --cb-bluish-green:     #009E73;
+  --cb-yellow:           #F0E442;
+  --cb-orange:           #E69F00;
+  --cb-purple:           #CC79A7;
+
+  /* ===== Lever tokens (the three markdown levers) ===== */
+  /* HOLD = premium, hold the line (green). */
+  --lever-hold:       #2E8B57;
+  --lever-hold-soft:  #BFE3CD;
+  --lever-hold-ink:   #FFFFFF;
+  /* DISCOUNT = act now, cut the price (amber). */
+  --lever-disc:       #D98A00;
+  --lever-disc-soft:  #F4DFB0;
+  --lever-disc-ink:   #2A1A00;
+  /* DUMP = write it off (red). */
+  --lever-dump:       #C0392B;
+  --lever-dump-soft:  #F2C9C4;
+  --lever-dump-ink:   #FFFFFF;
+
+  /* ===== Freshness-tier tokens (the croissant ripening) ===== */
+  --tier-fresh: #F2B544;    /* golden, steam */
+  --tier-ok:    #E6A23A;    /* golden, no steam */
+  --tier-aging: #C8923E;    /* matte tan */
+  --tier-old:   #B7A573;    /* pale, flat */
+  --tier-stale: #8A977E;    /* grey-green tint */
+  --tier-fresh-bg: #FCEFCF;
+  --tier-ok-bg:    #FAE7BE;
+  --tier-aging-bg: #EFDCB4;
+  --tier-old-bg:   #E6E0C8;
+  --tier-stale-bg: #DBDFCF;
+
+  /* terminals */
+  --cleared:   #2E8B57;
+  --spoiled:   #6E6B5A;
+
+  /* buy-meter fill */
+  --meter-fill:    #3FA34D;
+  --meter-fill-hi: #6FD17C;
+  --meter-track:   #D8CFB6;
+}
+
+/* ---------- CRT screen-only variant ---------- */
+:root[data-theme="crt"] {
+  --bg:             #0a0500;
+  --bg-strong:      #1a0d05;
+  --ink:            #FFB350;
+  --ink-secondary:  #8B6030;
+  --rule:           #FF9020;
+  --card-bg:        #1a0d05;
+  --inner-highlight:#5A3010;
+  --accent:         #FFC060;
+  --accent-2:       #FF6020;
+
+  --cb-blue:             #FFB350;
+  --cb-vermillion:       #FF6020;
+  --cb-bluish-green:     #FFB350;
+  --cb-yellow:           #FFC060;
+  --cb-orange:           #FF8030;
+  --cb-purple:           #FF9050;
+
+  --lever-hold:       #FFC76E;
+  --lever-hold-soft:  #3A2008;
+  --lever-hold-ink:   #1a0d05;
+  --lever-disc:       #FFA838;
+  --lever-disc-soft:  #3A2008;
+  --lever-disc-ink:   #1a0d05;
+  --lever-dump:       #FF5028;
+  --lever-dump-soft:  #5A1808;
+  --lever-dump-ink:   #1a0d05;
+
+  --tier-fresh: #FFC76E;
+  --tier-ok:    #FFB350;
+  --tier-aging: #E0913A;
+  --tier-old:   #B07A3A;
+  --tier-stale: #7A5C30;
+  --tier-fresh-bg: #2A1505;
+  --tier-ok-bg:    #241204;
+  --tier-aging-bg: #1f0f03;
+  --tier-old-bg:   #1a0d03;
+  --tier-stale-bg: #150a02;
+
+  --cleared:   #FFC76E;
+  --spoiled:   #8B6030;
+
+  --meter-fill:    #FFA838;
+  --meter-fill-hi: #FFD070;
+  --meter-track:   #3A2008;
+}
+
+/* CRT scanlines + vignette + phosphor glow (screen-only; pointer-events:none). */
+:root[data-theme="crt"] body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9991;
+  background: repeating-linear-gradient(to bottom,
+    rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px);
+  mix-blend-mode: multiply;
+}
+:root[data-theme="crt"] body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9992;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+}
+:root[data-theme="crt"] body,
+:root[data-theme="crt"] .scene-title,
+:root[data-theme="crt"] .topbar,
+:root[data-theme="crt"] .concept-heading,
+:root[data-theme="crt"] .scene-heading {
+  text-shadow: 0 0 6px rgba(255, 180, 80, 0.55);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Press Start 2P', "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--bg);
+  border-bottom: 4px solid var(--rule);
+  font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ink);
+}
+.topbar .brand { font-family: 'Press Start 2P', monospace; color: var(--ink); font-size: 9px; }
+.topbar .scene-title {
+  font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 0;
+  text-transform: none; color: var(--ink-secondary);
+  flex: 1 1 auto; text-align: center; padding: 0 20px;
+}
+.topbar .right-cluster { display: flex; gap: 6px; align-items: center; }
+
+.theme-toggle, .pager-btn {
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg-strong); color: var(--ink);
+  border: 2px solid var(--rule); border-radius: 0;
+  padding: 5px 8px; font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; box-shadow: inset -2px -2px 0 0 #BBB6A2;
+}
+.theme-toggle:hover, .pager-btn:hover { background: var(--accent); }
+.pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.music-toggle.active { background: var(--accent); color: var(--ink); box-shadow: inset 2px 2px 0 0 #B89020; }
+
+.dot-pager { display: flex; gap: 4px; align-items: center; }
+.dot-pager .dot {
+  width: 10px; height: 10px; background: var(--ink-secondary);
+  border: 2px solid var(--rule); padding: 0; cursor: pointer;
+}
+.dot-pager .dot.active { background: var(--accent); }
+.dot-pager .dot:hover { background: var(--accent-2); }
+
+/* ---------- Concept badges (MDP / POL / RTN / Q* / DP / SAR) ---------- */
+.concept-badges { display: flex; gap: 4px; margin: 0 6px; align-items: center; }
+.concept-badge {
+  height: 22px; min-width: 30px; padding: 0 5px;
+  border: 2px solid var(--rule); background: var(--bg);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace; font-size: 7px; letter-spacing: 0.04em;
+  color: var(--ink-secondary); opacity: 0.4;
+  transition: opacity 200ms, background 200ms, color 200ms;
+}
+.concept-badge.earned { opacity: 1; box-shadow: inset 0 0 0 1px var(--inner-highlight); }
+.concept-badge.mdp.earned    { background: var(--cb-vermillion); color: #fff; }
+.concept-badge.policy.earned { background: var(--cb-orange); color: #1a1a1a; }
+.concept-badge.return.earned { background: var(--cb-blue); color: #fff; }
+.concept-badge.qstar.earned  { background: var(--accent); color: #1a1a1a; }
+.concept-badge.dp.earned     { background: var(--cb-bluish-green); color: #fff; }
+.concept-badge.sarsa.earned  { background: var(--cb-purple); color: #fff; }
+@keyframes concept-badge-flash {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 var(--accent); }
+  40% { transform: scale(1.3); box-shadow: 0 0 0 8px var(--accent); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 transparent; }
+}
+.concept-badge.flashing { animation: concept-badge-flash 1.0s ease-out; z-index: 4; position: relative; }
+@media (prefers-reduced-motion: reduce) { .concept-badge.flashing { animation: none; } }
+
+/* ---------- Stage / scene engine ---------- */
+.stage {
+  position: relative; max-width: 1100px; margin: 16px auto 32px;
+  padding: 0 20px; min-height: calc(100vh - 130px);
+}
+.scene {
+  opacity: 0; pointer-events: none; position: absolute; top: 0; left: 20px; right: 20px;
+  transition: opacity 180ms ease-out;
+}
+.scene.active { opacity: 1; pointer-events: auto; position: relative; left: 0; right: 0; }
+
+/* ---------- Pokemon dialog box ---------- */
+.poke-box {
+  background: var(--bg-strong); border: 4px solid var(--rule); padding: 14px 16px; border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink); font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.7; position: relative;
+}
+.poke-box.tight { padding: 10px 12px; font-size: 10px; }
+.poke-box b { color: var(--accent-2); }
+.poke-box .triangle {
+  position: absolute; right: 14px; bottom: 10px; width: 0; height: 0;
+  border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--ink);
+  animation: blink 0.9s steps(2, end) infinite;
+}
+@keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+
+/* ---------- Headings ---------- */
+.poke-title {
+  font-family: 'Press Start 2P', monospace; font-size: 34px; color: var(--accent);
+  text-shadow: 2px 0 0 var(--ink), -2px 0 0 var(--ink), 0 2px 0 var(--ink), 0 -2px 0 var(--ink),
+    2px 2px 0 var(--ink), -2px -2px 0 var(--ink), -2px 2px 0 var(--ink), 2px -2px 0 var(--ink),
+    4px 4px 0 var(--lever-disc);
+  margin: 0 0 18px; letter-spacing: 4px; line-height: 1.25;
+}
+.scene-heading, .concept-heading {
+  font-family: 'Press Start 2P', monospace; font-size: 14px; letter-spacing: 0.06em;
+  margin: 6px 0 4px; color: var(--ink);
+}
+.scene-lede, .concept-lede {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8;
+  color: var(--ink-secondary); margin: 0 2px 6px; max-width: 92ch;
+}
+.scene-lede b, .concept-lede b { color: var(--ink); }
+.muted { color: var(--ink-secondary); }
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* ---------- Buttons (.poke-btn is the canonical; .gr-btn is an alias) ---------- */
+.poke-btn, .gr-btn {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ink); background: var(--bg-strong); border: 3px solid var(--rule); border-radius: 0;
+  padding: 8px 12px; cursor: pointer;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight), 2px 2px 0 0 rgba(0,0,0,0.18);
+}
+.poke-btn:hover, .gr-btn:hover { background: var(--accent); color: var(--rule); }
+.poke-btn:active, .gr-btn:active { box-shadow: inset 2px 2px 0 0 var(--inner-highlight); transform: translate(1px,1px); }
+.poke-btn:disabled, .gr-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.poke-btn.primary, .gr-btn.primary { background: var(--accent); color: var(--rule); }
+.poke-btn.primary:hover, .gr-btn.primary:hover { background: var(--lever-disc); color: #fff; }
+.gr-btn-row, .poke-btn-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+
+/* lever-tinted button variants (the three markdown levers as buttons) */
+.poke-btn.btn-hold, .gr-btn.btn-hold { background: var(--lever-hold); color: var(--lever-hold-ink); border-color: var(--rule); }
+.poke-btn.btn-hold:hover, .gr-btn.btn-hold:hover { background: var(--lever-hold-soft); color: var(--rule); }
+.poke-btn.btn-disc, .gr-btn.btn-disc { background: var(--lever-disc); color: var(--lever-disc-ink); border-color: var(--rule); }
+.poke-btn.btn-disc:hover, .gr-btn.btn-disc:hover { background: var(--lever-disc-soft); color: var(--rule); }
+.poke-btn.btn-dump, .gr-btn.btn-dump { background: var(--lever-dump); color: var(--lever-dump-ink); border-color: var(--rule); }
+.poke-btn.btn-dump:hover, .gr-btn.btn-dump:hover { background: var(--lever-dump-soft); color: var(--rule); }
+.poke-btn.selected, .gr-btn.selected { box-shadow: inset 0 0 0 3px var(--accent), 2px 2px 0 0 rgba(0,0,0,0.18); }
+
+/* ---------- KaTeX formula cards ---------- */
+.formula-card, .concept-formula-card {
+  background: var(--bg-strong); border: 4px solid var(--rule); padding: 14px 18px; margin: 6px 0;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), inset 0 0 0 6px var(--bg-strong);
+  color: var(--ink); text-align: center; max-width: 100%; overflow-x: auto;
+}
+.formula-card.compact { padding: 10px 14px; }
+.formula-card .katex, .concept-formula-card .katex { color: var(--ink); }
+.formula-card .katex-display { margin: 0; }
+.formula-label, .concept-formula-label {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.08em;
+  color: var(--ink-secondary); margin-bottom: 10px;
+}
+.formula-note, .concept-formula-foot {
+  font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.7;
+  color: var(--ink-secondary); margin-top: 10px;
+}
+.formula-note b { color: var(--ink); }
+
+/* ---------- Scene layout helpers ---------- */
+.scene-pad { padding: 12px 4px 24px; }
+.scene-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; margin-bottom: 14px; }
+.scene-row.center { justify-content: center; }
+.scene-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.grow { flex: 1 1 auto; min-width: 0; }
+
+/* ---------- HUD strip ---------- */
+.hud-strip {
+  display: flex; gap: 18px; align-items: center; padding: 8px 12px;
+  background: var(--bg-strong); border: 3px solid var(--rule);
+  font-family: 'Press Start 2P', monospace; font-size: 9px; flex-wrap: wrap;
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight); color: var(--ink);
+}
+.hud-strip .hud-item { display: flex; flex-direction: column; gap: 2px; }
+.hud-strip .hud-label { font-size: 7px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-secondary); }
+.hud-strip .hud-val { font-variant-numeric: tabular-nums; color: var(--ink); font-size: 13px; }
+.hud-strip .hud-val.pos { color: var(--lever-hold); }
+.hud-strip .hud-val.neg { color: var(--lever-dump); }
+
+/* ---------- Footnote ---------- */
+.footnote {
+  font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--ink-secondary);
+  border-top: 2px solid var(--rule); padding-top: 6px; margin-top: 14px; text-align: right; line-height: 1.7;
+}
+.footnote kbd {
+  font-family: 'Press Start 2P', monospace; font-size: 7px; border: 1px solid var(--rule);
+  padding: 0 4px; background: var(--bg-strong); color: var(--ink);
+}
+
+/* ---------- key-question banner ---------- */
+.concept-key-question {
+  font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.7; letter-spacing: 0.05em;
+  text-align: center; padding: 14px; color: var(--accent-2);
+  border: 3px solid var(--accent-2); background: var(--bg-strong);
+}
+
+/* ============================================================
+   Japanese flavor mode -- body.lang-jp swaps to DotGothic16
+   ============================================================ */
+body.lang-jp, body.lang-jp button, body.lang-jp input, body.lang-jp .scene, body.lang-jp .topbar {
+  font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace;
+}
+body.lang-jp .scene { letter-spacing: 0.02em; }
+.theme-toggle, .pager-btn, .topbar .brand, .scene-title {
+  font-family: 'Press Start 2P', 'DotGothic16', 'Courier New', monospace;
+}
+
+/* ============================================================
+   Speaker-notes overlay (press `n`)
+   ============================================================ */
+.speaker-notes-overlay[hidden] { display: none; }
+.speaker-notes-overlay {
+  position: fixed; right: 18px; bottom: 18px; z-index: 9990;
+  width: 500px; max-width: calc(100vw - 36px); pointer-events: none;
+}
+.speaker-notes-card {
+  background: var(--bg-strong); border: 4px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight),
+    inset 0 0 0 6px var(--bg-strong), 4px 4px 0 0 rgba(0,0,0,0.20);
+  font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.7; color: var(--ink);
+  padding: 14px 18px 16px; max-height: 75vh; overflow-y: auto; pointer-events: auto;
+}
+.speaker-notes-title {
+  font-size: 9px; letter-spacing: 0.06em; color: var(--accent-2); margin-bottom: 10px;
+  border-bottom: 2px solid var(--rule); padding-bottom: 6px;
+}
+.speaker-notes-title kbd {
+  font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 1px 5px;
+  border: 2px solid var(--rule); background: var(--bg); color: var(--ink);
+}
+.speaker-notes-content h3 { font-size: 11px; letter-spacing: 0.04em; color: var(--accent-2); margin: 0 0 8px; }
+.speaker-notes-content p { margin: 4px 0 8px; }
+.speaker-notes-content b { color: var(--accent-2); }
+.speaker-notes-content em { color: var(--cb-blue); font-style: normal; }
+
+/* ============================================================
+   Boot-up splash -- "SML" drop, once per session
+   ============================================================ */
+.boot-overlay {
+  position: fixed; inset: 0; z-index: 99999; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; pointer-events: none;
+}
+.boot-stack {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  animation: boot-drop 700ms cubic-bezier(.4,1.8,.6,1) 60ms backwards;
+}
+.boot-logo { font-family: 'Press Start 2P', monospace; font-size: 60px; letter-spacing: 0.14em; color: var(--ink); }
+.boot-tag {
+  font-family: 'Press Start 2P', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--ink-secondary);
+  animation: boot-tag-in 320ms ease-out 520ms backwards;
+}
+.boot-overlay.boot-fade { opacity: 0; transition: opacity 320ms ease-out; }
+@keyframes boot-drop { 0% { transform: translateY(-220px); opacity: 0; } 60% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes boot-tag-in { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .boot-stack, .boot-tag { animation: none; } }
+
+/* ============================================================
+   Mobile (<= 720px) -- collapse the chrome into wrapping rows
+   ============================================================ */
+@media (max-width: 720px) {
+  .topbar { flex-wrap: wrap; padding: 10px 12px; gap: 8px; row-gap: 10px; }
+  .topbar .scene-title { display: none; }
+  .topbar .brand { flex: 1 1 auto; font-size: 10px; }
+  .topbar .right-cluster { flex: 0 0 100%; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .topbar .right-cluster #prev-btn, .topbar .right-cluster #next-btn { min-height: 36px; padding: 8px 12px; font-size: 10px; }
+  .topbar .right-cluster .dot-pager { flex: 1 1 auto; justify-content: center; }
+  .dot-pager .dot { width: 12px; height: 12px; }
+  .topbar .right-cluster .concept-badges { flex: 1 1 100%; margin: 0; justify-content: center; gap: 5px; }
+  .topbar .right-cluster #theme-toggle, .topbar .right-cluster #music-toggle, .topbar .right-cluster #lang-toggle {
+    min-height: 30px; padding: 6px 10px; font-size: 8px;
+  }
+  .stage { padding: 0 12px; margin: 12px auto 24px; min-height: calc(100dvh - 220px); }
+  .scene { left: 12px; right: 12px; }
+  .scene.active { left: 0; right: 0; }
+  .scene-row { gap: 12px; }
+  .scene-pad { padding: 8px 0 18px; }
+  .poke-title { font-size: 24px; letter-spacing: 2px; }
+  .scene-heading, .concept-heading { font-size: 12px; }
+}

@@ -1,0 +1,29 @@
+/* scene7.css -- Q*. */
+.sc7-formula { text-align: center; }
+.sc7-tex .katex { font-size: 1.2em; }
+.sc7-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 10px; }
+.sc7-tab { font-size: 9px; padding: 7px 12px; text-transform: uppercase; }
+.sc7-grid { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin: 6px 0 12px; }
+.sc7-icon-host { flex: 0 0 auto; }
+.sc7-table-wrap { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.sc7-table {
+  width: 100%; border-collapse: collapse;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace; font-size: 10px;
+}
+.sc7-table th {
+  text-align: left; padding: 9px 12px; font-size: 8px; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--ink-secondary); border-bottom: 3px solid var(--rule); background: var(--bg);
+}
+.sc7-table td { padding: 10px 12px; border-bottom: 2px solid var(--rule-soft); color: var(--ink-on-box); }
+.sc7-table tr:last-child td { border-bottom: none; }
+.sc7-a { display: flex; align-items: center; gap: 8px; }
+.sc7-q { text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; }
+.lever-row.best { background: rgba(0,0,0,0.08); }
+:root[data-theme="crt"] .lever-row.best { background: rgba(255,180,80,0.14); }
+.lever-row.best td { color: var(--ink-on-box); }
+.lever-row.best .sc7-q { color: var(--accent); }
+.lever-row.neg .sc7-q { color: var(--neg); }
+.sc7-star { color: var(--accent); }
+.sc7-say { font-size: 9px; line-height: 1.8; }
+@media (max-width: 720px) { .sc7-grid { gap: 16px; } .sc7-icon-host { margin: 0 auto; } }

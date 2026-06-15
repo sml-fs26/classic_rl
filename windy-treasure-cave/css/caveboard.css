@@ -1,0 +1,182 @@
+/* caveboard.css -- the 5x5 cave floor plan widget (pixel skin).
+   Hard black borders + inset highlights to match the gallery pixel theme.
+   Three sizes (sm/md/lg). Per-tile arrow + value overlays, sprite art, the
+   explorer token, gust/leaf animation, win/loss flashes. */
+
+.caveboard {
+  display: inline-block;
+  font-family: 'Press Start 2P', monospace;
+  position: relative;
+}
+.cb-grid {
+  display: grid;
+  grid-template-columns: repeat(5, var(--cb-tile, 64px));
+  grid-template-rows: repeat(5, var(--cb-tile, 64px));
+  gap: 0;
+  border: 4px solid var(--rule);
+  background: var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), 3px 3px 0 var(--shadow);
+  image-rendering: pixelated;
+}
+.cb-sm { --cb-tile: 44px; }
+.cb-md { --cb-tile: 64px; }
+.cb-lg { --cb-tile: 84px; }
+
+/* ---- Tiles ---- */
+.cb-tile {
+  position: relative;
+  border: 1px solid var(--rule-soft);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  transition: background 220ms, opacity 180ms, box-shadow 160ms;
+}
+.cb-tile-a { background: var(--bg-strong); }
+.cb-tile-b { background: var(--bg-sunk); }
+
+/* When the value overlay is on, the heat ramp owns the tile fill. */
+.cb-show-values .cb-tile.heatn3 { background: var(--heatn3); }
+.cb-show-values .cb-tile.heatn2 { background: var(--heatn2); }
+.cb-show-values .cb-tile.heatn1 { background: var(--heatn1); }
+.cb-show-values .cb-tile.heat0  { background: var(--heat0); }
+.cb-show-values .cb-tile.heat1  { background: var(--heat1); }
+.cb-show-values .cb-tile.heat2  { background: var(--heat2); }
+.cb-show-values .cb-tile.heat3  { background: var(--heat3); }
+
+/* Terminals always keep their identity colour (over the heat ramp). */
+.cb-tile.cb-gold { background: var(--gold) !important; box-shadow: inset 0 0 14px var(--gold-glow); }
+.cb-tile.cb-pit  { background: var(--pit) !important; }
+.cb-tile.cb-start::after {
+  content: ''; position: absolute; inset: 3px; border: 2px dashed var(--flag); opacity: 0.5; pointer-events: none;
+}
+
+/* ---- Value numeral ---- */
+.cb-val {
+  position: absolute; top: 2px; left: 0; right: 0;
+  text-align: center;
+  font-size: 9px; font-variant-numeric: tabular-nums;
+  color: var(--ink-on-box);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+  pointer-events: none; z-index: 3;
+}
+.cb-sm .cb-val { font-size: 7px; }
+.cb-lg .cb-val { font-size: 11px; }
+.cb-show-values .cb-tile.heatn3 .cb-val { color: var(--heatn3-ink); text-shadow: none; }
+.cb-show-values .cb-tile.heatn2 .cb-val { color: var(--heatn2-ink); }
+.cb-tile.cb-gold .cb-val { color: #181818; font-weight: 700; text-shadow: none; }
+.cb-tile.cb-pit  .cb-val { color: #E8E2D4; text-shadow: none; }
+:root[data-theme="crt"] .cb-tile.cb-pit .cb-val { color: #FF8A52; }
+
+/* ---- Arrow overlay ---- */
+.cb-arrow {
+  position: absolute; left: 0; right: 0; bottom: 0; top: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.cb-arrow1 { font-size: 26px; line-height: 1; color: var(--ink); z-index: 2; text-shadow: 0 2px 0 rgba(255,255,255,0.3); }
+.cb-sm .cb-arrow1 { font-size: 18px; }
+.cb-lg .cb-arrow1 { font-size: 34px; }
+.cb-arrow1.dir-UP    { color: var(--dir-up); }
+.cb-arrow1.dir-DOWN  { color: var(--dir-down); }
+.cb-arrow1.dir-LEFT  { color: var(--dir-left); }
+.cb-arrow1.dir-RIGHT { color: var(--dir-right); }
+/* on a heat-painted tile, force a dark arrow for contrast */
+.cb-show-values .cb-arrow1 { color: #181818 !important; text-shadow: 0 1px 0 rgba(255,255,255,0.45); }
+:root[data-theme="crt"] .cb-show-values .cb-arrow1 { color: #1a0d05 !important; }
+
+/* the faint secondary (tie) arrow, offset so both read */
+.cb-arrow2 { font-size: 16px; color: var(--ink-secondary); opacity: 0.5; z-index: 1; transform: translate(8px, 8px); }
+.cb-sm .cb-arrow2 { font-size: 11px; }
+.cb-lg .cb-arrow2 { font-size: 20px; }
+.cb-tile.cb-tie .cb-arrow1 { transform: translate(-6px, -6px); }
+
+.cb-arrow-pop { animation: cb-arrow-pop 0.6s ease-out; }
+@keyframes cb-arrow-pop {
+  0% { transform: scale(0.2); opacity: 0; }
+  60% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .cb-arrow-pop { animation: none; } }
+
+/* ---- Sprite art (gold / pit / flag) ---- */
+.cb-sprite { position: absolute; inset: 14%; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 2; }
+.cb-art { width: 100%; height: 100%; image-rendering: pixelated; }
+.cb-show-arrows .cb-sprite, .cb-show-values .cb-sprite { z-index: 1; opacity: 0.92; }
+/* keep terminal sprites visible above overlays */
+.cb-tile.cb-gold .cb-sprite, .cb-tile.cb-pit .cb-sprite { z-index: 4; opacity: 1; }
+.cb-tile.cb-gold .cb-val, .cb-tile.cb-pit .cb-val { z-index: 5; }
+
+/* ---- Explorer token ---- */
+.cb-explorer {
+  position: absolute; inset: 8%;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 6; pointer-events: none;
+  filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.35));
+}
+.cb-explorer[hidden] { display: none; }
+.cb-tile.cb-has-explorer { box-shadow: inset 0 0 0 3px var(--token); }
+.cb-torch-flame { animation: cb-flicker 0.5s steps(2) infinite; transform-origin: center; }
+@keyframes cb-flicker { 0% { opacity: 1; } 50% { opacity: 0.55; } 100% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .cb-torch-flame { animation: none; } }
+
+/* ---- Leaves / gust ---- */
+.cb-leaves { position: absolute; inset: 0; pointer-events: none; z-index: 7; }
+.cb-leaf {
+  position: absolute; top: 42%; left: 42%;
+  font-size: 13px; color: var(--die-gust); opacity: 0;
+}
+.cb-leaves.cb-blowing .cb-leaf { animation: cb-blow 0.74s ease-out forwards; }
+.cb-leaves.cb-blowing .cb-leaf:nth-child(2) { animation-delay: 0.08s; left: 30%; top: 30%; }
+.cb-leaves.cb-blowing .cb-leaf:nth-child(3) { animation-delay: 0.16s; left: 54%; top: 52%; }
+@keyframes cb-blow {
+  0%   { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.6); }
+  25%  { opacity: 0.95; }
+  100% { opacity: 0; transform: translate(calc(var(--gx, 0) * 34px), calc(var(--gy, 0) * 34px)) rotate(220deg) scale(1.1); }
+}
+@media (prefers-reduced-motion: reduce) { .cb-leaves.cb-blowing .cb-leaf { animation: none; opacity: 0; } }
+
+/* ---- Tile states ---- */
+.cb-tile.cb-pending { opacity: 0.34; }
+.cb-tile.cb-highlight { box-shadow: inset 0 0 0 3px var(--accent); z-index: 5; }
+.cb-tile.cb-pulse { animation: cb-pulse 0.7s ease-out; }
+@keyframes cb-pulse { 0% { box-shadow: inset 0 0 0 4px var(--accent); } 100% { box-shadow: inset 0 0 0 0 transparent; } }
+.cb-tile.cb-term-flash { animation: cb-term-flash 1.1s ease-out; }
+@keyframes cb-term-flash { 0% { filter: brightness(2); } 100% { filter: brightness(1); } }
+@media (prefers-reduced-motion: reduce) { .cb-tile.cb-pulse, .cb-tile.cb-term-flash { animation: none; } }
+
+.cb-clickable .cb-tile { cursor: pointer; }
+.cb-clickable .cb-tile:hover { box-shadow: inset 0 0 0 3px var(--highlight); }
+
+/* ---- Whole-board flourishes ---- */
+.caveboard.cb-shake { animation: cb-shake 0.5s ease-in-out; }
+@keyframes cb-shake {
+  0%,100% { transform: translate(0,0); }
+  20% { transform: translate(-4px, 2px); }
+  40% { transform: translate(4px, -2px); }
+  60% { transform: translate(-3px, 3px); }
+  80% { transform: translate(3px, -1px); }
+}
+.caveboard.cb-sparkle::after {
+  content: ''; position: absolute; inset: -6px; pointer-events: none; z-index: 9;
+  background: radial-gradient(circle at 88% 8%, var(--gold-glow) 0%, transparent 45%);
+  animation: cb-sparkle 0.9s ease-out;
+}
+@keyframes cb-sparkle { 0% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .caveboard.cb-shake, .caveboard.cb-sparkle::after { animation: none; } }
+
+/* ---- Compact (icon) board, used in recap / side-by-side ---- */
+.caveboard.cb-compact .cb-arrow1 { font-size: 18px; }
+.caveboard.cb-compact .cb-val { font-size: 7px; }
+
+@media (max-width: 760px) {
+  .cb-md { --cb-tile: 54px; }
+  .cb-lg { --cb-tile: 60px; }
+  .cb-sm { --cb-tile: 38px; }
+  .cb-md .cb-arrow1, .cb-lg .cb-arrow1 { font-size: 22px; }
+}
+@media (max-width: 430px) {
+  .cb-md { --cb-tile: 46px; }
+  .cb-lg { --cb-tile: 50px; }
+  .cb-sm { --cb-tile: 32px; }
+  .cb-md .cb-arrow1, .cb-lg .cb-arrow1 { font-size: 18px; }
+  .cb-val { font-size: 6px; }
+}

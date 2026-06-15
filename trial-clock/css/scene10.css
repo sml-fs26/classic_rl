@@ -1,0 +1,20 @@
+/* scene10.css -- why DP does not scale. */
+.sc10-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 12px 0; }
+.sc10-card { display: flex; flex-direction: column; gap: 10px; }
+.sc10-tag { font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.sc10-h { font-family: 'Press Start 2P', monospace; font-size: 13px; margin: 0; }
+.sc10-glyph { display: flex; align-items: center; justify-content: center; min-height: 130px; padding: 8px; background: var(--bg-sunk); border: 2px solid var(--rule-soft); position: relative; }
+.sc10-glyph-wheel { overflow: hidden; }
+.sc10-wheel-q {
+  position: absolute; font-family: 'Press Start 2P', monospace; font-size: 48px; color: var(--ink);
+  text-shadow: 2px 2px 0 var(--bg-strong), -2px -2px 0 var(--bg-strong), 2px -2px 0 var(--bg-strong), -2px 2px 0 var(--bg-strong);
+}
+.sc10-glyph-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; align-content: center; }
+.sc10-cell { width: 100%; padding-bottom: 100%; background: var(--push-tint); border: 1px solid var(--rule-soft); }
+.sc10-body { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; color: var(--ink-on-box); }
+.sc10-framing { margin-top: 6px; }
+.sc10-bridge { font-size: 9px; line-height: 1.7; margin-top: 12px; }
+@media (max-width: 760px) {
+  .sc10-cards { grid-template-columns: 1fr; }
+  .sc10-glyph-grid { grid-template-columns: repeat(12, 1fr); }
+}

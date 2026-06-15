@@ -1,0 +1,46 @@
+/* scene2 i18n -- playtest. */
+(function () {
+  if (!window.I18N) return;
+  window.I18N.register({
+    en: {
+      'scene2.title':     'You run it',
+      'scene2.lede':     'You are the shop owner. 3 fresh croissants, a full day ahead. Pull a lever each hour; the meter rolls, units sell or the batch ages. Clear the shelf before it spoils.',
+      'scene2.hour':      'hour',
+      'scene2.units':     'units',
+      'scene2.fresh':     'freshness',
+      'scene2.till':      'till',
+      'scene2.reset':     'NEW DAY',
+      'scene2.again':     'PLAY AGAIN',
+      'scene2.shelfSub':  'pull a lever',
+      'scene2.clearedSub':'every unit sold',
+      'scene2.spoiledSub':'a unit aged out',
+      'scene2.dlg.start': 'A fresh tray of 3. HOLD for full margin, DISCOUNT to move them faster, or DUMP to cut losses. Your call, every hour.',
+      'scene2.dlg.sold':  'Sold one! The rest keep their freshness for now.',
+      'scene2.dlg.aged':  'No buyer. The whole batch slips from {from} to {to}.',
+      'scene2.dlg.dumped':'Dumped the batch (−3) and put out a FRESH tray of the same size.',
+      'scene2.dlg.cleared':'SOLD OUT! You cleared the shelf. Notice how much the result swung on the dice.',
+      'scene2.dlg.spoiled':'SPOILED. A stale unit aged out for −6. Holding a premium tray too long is its own risk.',
+      'scene2.framing':   'You just ran the playbook by gut, and the outcome was stochastic, the right call not obvious. Hold that feeling. Next we will find the playbook that beats it.',
+    },
+    jp: {
+      'scene2.title':     'あなたが うんえい',
+      'scene2.lede':     'あなたが てんしゅ。 しんせんな クロワッサン 3こ、 1にち まるまる。 1じかんごとに レバーを ひく。 メーターが まわり、 うれるか としを とる。 いたむ まえに うりきろう。',
+      'scene2.hour':      'じかん',
+      'scene2.units':     'こすう',
+      'scene2.fresh':     'しんせんど',
+      'scene2.till':      'レジ',
+      'scene2.reset':     'あたらしい ひ',
+      'scene2.again':     'もういちど',
+      'scene2.shelfSub':  'レバーを ひく',
+      'scene2.clearedSub':'ぜんぶ うれた',
+      'scene2.spoiledSub':'いたんで しまった',
+      'scene2.dlg.start': '3この しんせんな トレイ。 キープで まんマージン、 ねびきで はやく、 すてるで そんぎり。 まいじかん あなたの はんだん。',
+      'scene2.dlg.sold':  '1こ うれた！ のこりは いまの しんせんさを たもつ。',
+      'scene2.dlg.aged':  'かいてが いない。 バッチ ぜんたいが {from} から {to} へ。',
+      'scene2.dlg.dumped':'バッチを すてた（−3）。 おなじ こすうの しんせんな トレイを ならべた。',
+      'scene2.dlg.cleared':'うりきれ！ たなを からに できた。 けっかが さいころで どれだけ ゆれたか みて。',
+      'scene2.dlg.spoiled':'いたんだ。 いたんだ 1こが −6。 プレミアムを ながく もちすぎるのも リスク。',
+      'scene2.framing':   'いま かんで プレイブックを じっこう した。 けっかは かくりつてきで、 ただしい はんだんは あきらかでない。 この かんかくを おぼえて。 つぎは それを こえる プレイブックを みつける。',
+    },
+  });
+})();

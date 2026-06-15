@@ -1,0 +1,39 @@
+/* windDie.css -- the wind d10 widget (70/15/15 odds badge + tumble animation),
+   pixel skin: hard black border on the badge, Press Start 2P labels. */
+.wind-die { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; color: var(--ink); font-family: 'Press Start 2P', monospace; }
+.wd-disc { position: relative; width: 64px; height: 68px; }
+.wd-face {
+  width: 64px; height: 68px; display: flex; align-items: center; justify-content: center;
+  color: var(--ink-secondary);
+  filter: drop-shadow(2px 2px 0 var(--shadow));
+}
+.wind-die.is-aim   .wd-face { color: var(--die-aim); }
+.wind-die.is-left  .wd-face,
+.wind-die.is-right .wd-face { color: var(--die-gust); }
+
+.wd-badge {
+  position: absolute; right: -10px; bottom: -6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px; letter-spacing: 0.03em;
+  background: var(--ink); color: var(--bg);
+  border-radius: 0; padding: 3px 5px;
+  border: 2px solid var(--ink);
+  white-space: nowrap;
+}
+.wd-result {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px; letter-spacing: 0.04em; min-height: 1.4em; text-transform: uppercase;
+}
+.wind-die.is-aim   .wd-result { color: var(--die-aim); }
+.wind-die.is-left  .wd-result,
+.wind-die.is-right .wd-result { color: var(--die-gust); }
+
+/* Tumble: a quick multi-axis roll (the kite spins as it lands). */
+.wd-disc.rolling .wd-face { animation: wd-roll 0.64s cubic-bezier(.4,.1,.3,1); }
+@keyframes wd-roll {
+  0%   { transform: rotate(0deg)   scale(1); }
+  25%  { transform: rotate(220deg) scale(1.08); }
+  60%  { transform: rotate(540deg) scale(1.03); }
+  100% { transform: rotate(720deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .wd-disc.rolling .wd-face { animation: none; } }

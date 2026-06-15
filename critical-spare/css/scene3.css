@@ -1,0 +1,33 @@
+/* scene3.css -- formalization. */
+.sc3-row { gap: 28px; align-items: flex-start; }
+.sc3-left { display: flex; flex-direction: column; align-items: center; gap: 14px; flex: 0 0 auto; }
+.sc3-panel { display: flex; flex-direction: column; gap: 10px; }
+.sc3-emph { filter: drop-shadow(0 0 6px var(--accent-soft)); }
+
+.sc3-rail { display: flex; gap: 8px; }
+.sc3-chip {
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 2px solid var(--rule); background: var(--bg-strong);
+  font-family: 'Press Start 2P', monospace; font-size: 12px; color: var(--ink-secondary);
+}
+.sc3-chip.active { background: var(--highlight); color: var(--rule); box-shadow: inset 0 0 0 1px var(--inner-highlight); }
+
+.sc3-tag { font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; }
+.sc3-h { font-family: 'Press Start 2P', monospace; font-size: 13px; margin: 2px 0; color: var(--ink); }
+.sc3-body { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; color: var(--ink); max-width: 56ch; }
+.sc3-body em { font-style: normal; color: var(--accent); }
+
+.sc3-dice[hidden] { display: none; }
+.sc3-dice { display: flex; flex-direction: column; align-items: center; gap: 8px; border: 3px solid var(--rule); background: var(--bg-strong); padding: 10px; box-shadow: inset 0 0 0 2px var(--inner-highlight); }
+.sc3-dice-title { font-size: 8px; color: var(--ink-secondary); text-align: center; }
+.sc3-branch { display: flex; flex-direction: column; gap: 5px; }
+.sc3-br { font-size: 7px; line-height: 1.5; padding: 4px 6px; border: 2px solid var(--rule); }
+.sc3-br-fail { background: var(--neg-tint); color: var(--ink); }
+.sc3-br-fine { background: var(--run-tint); color: var(--ink); }
+.sc3-br-p { font-variant-numeric: tabular-nums; font-weight: bold; }
+
+@media (max-width: 760px) {
+  .sc3-row { gap: 16px; }
+  .sc3-left { flex-direction: row; flex-wrap: wrap; justify-content: center; align-self: center; }
+}

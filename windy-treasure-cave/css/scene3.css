@@ -1,0 +1,20 @@
+/* scene3.css -- formalization (S/A/P/R reveal). Board left, cards right. */
+.sc3-row { gap: 26px; align-items: flex-start; }
+.sc3-left { flex: 0 0 auto; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.sc3-right { flex: 1 1 360px; min-width: 300px; gap: 12px; }
+.sc3-cards { display: flex; flex-direction: column; gap: 12px; }
+.sc3-card { margin: 0; }
+.sc3-badge {
+  display: inline-block; min-width: 20px; text-align: center;
+  border: 2px solid var(--rule); padding: 1px 6px; margin-right: 4px;
+  font-size: 9px; color: #fff;
+}
+.sc3-badge-state { background: var(--hue-policy); }
+.sc3-badge-action { background: var(--hue-sarsa); }
+.sc3-badge-transition { background: var(--hue-dp); }
+.sc3-badge-reward { background: var(--hue-return); }
+.sc3-framing { margin-top: 14px; font-size: 9px; line-height: 1.8; }
+@media (max-width: 760px) {
+  .sc3-row { flex-direction: column; align-items: center; }
+  .sc3-right { width: 100%; }
+}

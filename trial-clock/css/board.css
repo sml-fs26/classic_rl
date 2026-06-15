@@ -1,0 +1,189 @@
+/* board.css -- the Trial Card (state icon) + the 5x5 Board / Q-table (pixel skin).
+   Hard black borders + inset highlights to match the gallery pixel theme. */
+
+/* ============================================================
+   (A) TRIAL CARD -- the recurring state icon
+   ============================================================ */
+.trial-card {
+  display: inline-flex; flex-direction: column; gap: 0;
+  font-family: 'Press Start 2P', monospace;
+  width: 196px;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow);
+  position: relative;
+}
+.trial-card-compact { width: 164px; }
+
+/* ---- clock head: 5 pips + days number ---- */
+.tc-head { border-bottom: 3px solid var(--rule); padding: 9px 10px 8px; background: var(--bg); }
+.tc-clock { display: flex; flex-direction: column; gap: 6px; }
+.tc-pips { display: flex; gap: 5px; justify-content: center; }
+.tc-pip {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--rule); background: var(--clock-calm);
+  image-rendering: pixelated;
+}
+.tc-clock.warn   .tc-pip:not(.spent) { background: var(--clock-warn); }
+.tc-clock.urgent .tc-pip:not(.spent) { background: var(--clock-urgent); }
+.tc-pip.spent { background: var(--bg-sunk); border-color: var(--rule-soft); opacity: 0.6; }
+.tc-days-lab { display: flex; align-items: baseline; justify-content: center; gap: 6px; }
+.tc-days-num { font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tc-clock.urgent .tc-days-num { color: var(--clock-urgent); }
+.tc-days-word { font-size: 7px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-secondary); }
+
+/* ---- body: avatar + adoption ladder ---- */
+.tc-body { display: flex; gap: 12px; padding: 12px 12px 14px; align-items: stretch; }
+.tc-avatar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 0; width: 34px; flex: 0 0 auto; }
+.tc-avatar-head { width: 20px; height: 20px; border-radius: 50%; background: var(--nudge); border: 2px solid var(--rule); }
+.tc-avatar-body { width: 30px; height: 22px; border-radius: 14px 14px 0 0; background: var(--nudge); border: 2px solid var(--rule); border-bottom: none; margin-top: -2px; }
+
+.tc-ladder { display: flex; flex-direction: column; gap: 3px; flex: 1 1 auto; justify-content: center; }
+.tc-rung {
+  display: flex; align-items: center; gap: 7px;
+  padding: 2px 4px; border: 2px solid var(--rule-soft);
+  background: var(--bg); position: relative;
+}
+.tc-rung-dot {
+  width: 12px; height: 12px; border-radius: 0;
+  border: 2px solid var(--rule); background: var(--bg-sunk); flex: 0 0 auto; image-rendering: pixelated;
+}
+.tc-rung-lab { font-size: 8px; letter-spacing: 0.02em; color: var(--ink-secondary); text-transform: uppercase; }
+.tc-rung.lit .tc-rung-dot { background: var(--rung-lit); border-color: var(--rung-lit-rule); }
+.tc-rung.lit .tc-rung-lab { color: var(--ink-on-box); }
+.tc-rung.current { border-color: var(--rule); box-shadow: inset 0 0 0 2px var(--accent); }
+.tc-rung.activated { background: var(--rung-lit-rule); }
+.tc-rung.activated .tc-rung-lab { color: #fff; }
+.tc-spark { position: absolute; right: 4px; font-size: 10px; color: var(--rung-spark); opacity: 0; }
+.tc-rung.activated .tc-spark { opacity: 1; animation: tc-spark 1.1s ease-in-out infinite; }
+@keyframes tc-spark { 0%,100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.3); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .tc-rung.activated .tc-spark { animation: none; opacity: 1; } }
+
+.trial-card.tc-pulse { animation: tc-pulse 0.6s ease-out; }
+@keyframes tc-pulse { 0% { box-shadow: inset 0 0 0 3px var(--accent), 3px 3px 0 var(--shadow); } 100% { box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow); } }
+@media (prefers-reduced-motion: reduce) { .trial-card.tc-pulse { animation: none; } }
+
+/* ---- terminal stamp overlay ---- */
+.tc-terminal[hidden] { display: none; }
+.tc-terminal {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px;
+  background: rgba(248,244,228,0.92);
+}
+:root[data-theme="crt"] .tc-terminal { background: rgba(26,13,5,0.92); }
+.tc-term-stamp {
+  font-size: 16px; letter-spacing: 0.08em; padding: 8px 14px; border: 4px solid var(--rule);
+  text-transform: uppercase; transform: rotate(-7deg);
+}
+.tc-term-r { font-size: 13px; font-variant-numeric: tabular-nums; }
+.tc-terminal.term-convert .tc-term-stamp { background: var(--convert); color: #fff; border-color: var(--convert-rule); }
+.tc-terminal.term-convert .tc-term-r { color: var(--convert-rule); }
+.tc-terminal.term-abandon .tc-term-stamp { background: var(--abandon-t); color: #fff; border-color: var(--abandon-t-rule); }
+.tc-terminal.term-abandon .tc-term-r { color: var(--abandon-t-rule); }
+.tc-terminal.term-expiry  .tc-term-stamp { background: var(--expiry); color: #fff; border-color: var(--expiry-rule); }
+.tc-terminal.term-expiry  .tc-term-r { color: var(--ink-secondary); }
+.tc-terminal.term-flash { animation: tc-term-in 0.5s ease-out; }
+@keyframes tc-term-in { 0% { opacity: 0; transform: scale(1.15); } 100% { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .tc-terminal.term-flash { animation: none; } }
+
+/* ============================================================
+   (B) BOARD -- the whole 5x5 grid / Q-table
+   ============================================================ */
+.tc-board { display: inline-flex; flex-direction: column; gap: 8px; font-family: 'Press Start 2P', monospace; }
+.tcb-grid {
+  display: grid;
+  grid-template-columns: auto repeat(5, 1fr);
+  gap: 3px;
+  border: 4px solid var(--rule);
+  background: var(--rule);
+  padding: 3px;
+  box-shadow: inset 0 0 0 2px var(--rule), 3px 3px 0 var(--shadow);
+}
+
+/* headers */
+.tcb-corner { background: var(--bg); }
+.tcb-colhead {
+  background: var(--bg); display: flex; align-items: center; justify-content: center;
+  padding: 5px 2px; font-size: 11px; color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.tcb-colhead.last-day { color: var(--clock-urgent); }
+.tcb-colhead-num::before { content: ''; }
+.tcb-rowhead {
+  background: var(--bg); display: flex; align-items: center; justify-content: center;
+  padding: 4px 7px; min-width: 56px;
+}
+.tcb-rowhead-tier { font-size: 8px; letter-spacing: 0.02em; color: var(--ink); text-transform: uppercase; text-align: center; line-height: 1.2; }
+.tcb-rowhead.top-tier .tcb-rowhead-tier { color: var(--push-rule); }
+
+/* cells */
+.tcb-cell {
+  background: var(--bg-strong);
+  display: flex; align-items: center; justify-content: center;
+  min-height: 30px; position: relative; transition: background 180ms;
+}
+.tcb-cell.unsolved { background: var(--bg-sunk); }
+.tcb-cell.pending { opacity: 0.32; }
+.tcb-cell.tint-nudge   { background: var(--nudge-tint); }
+.tcb-cell.tint-nothing { background: var(--nothing-tint); }
+.tcb-cell.tint-push    { background: var(--push-tint); }
+.tcb-cell.marked { box-shadow: inset 0 0 0 3px var(--accent); z-index: 2; }
+.tcb-cell.just-locked { box-shadow: inset 0 0 0 3px var(--highlight); }
+.tcb-cell.clickable { cursor: pointer; }
+.tcb-cell.clickable:hover { filter: brightness(1.06); box-shadow: inset 0 0 0 2px var(--accent); }
+.tcb-cell.cell-flip { animation: tcb-flip 0.8s ease-out; }
+@keyframes tcb-flip { 0% { box-shadow: inset 0 0 0 3px var(--accent); } 100% { box-shadow: inset 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .tcb-cell.cell-flip { animation: none; } }
+
+/* ---- policy variant: a single lever chip per cell ---- */
+.tc-board-policy .tcb-cell { min-height: 38px; padding: 4px; }
+.tcb-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 7px; letter-spacing: 0.02em; color: var(--lever-ink);
+  border: 2px solid var(--rule); padding: 3px 4px; text-transform: uppercase;
+  background: var(--bg-sunk);
+}
+.tcb-cell.unsolved .tcb-chip { color: var(--ink-faint); border-color: var(--rule-soft); background: transparent; }
+.tcb-chip-star { font-size: 8px; }
+.tc-board-policy .tcb-cell.tint-nudge   .tcb-chip { background: var(--nudge); border-color: var(--nudge-rule); }
+.tc-board-policy .tcb-cell.tint-nothing .tcb-chip { background: var(--nothing); border-color: var(--nothing-rule); }
+.tc-board-policy .tcb-cell.tint-push    .tcb-chip { background: var(--push); border-color: var(--push-rule); }
+
+/* ---- qtable variant: three lever Q-values per cell ---- */
+.tc-board-qtable .tcb-cell { min-height: 44px; padding: 3px 4px; align-items: stretch; }
+.tcb-qrows { display: flex; flex-direction: column; gap: 1px; flex: 1 1 auto; justify-content: center; width: 100%; }
+.tcb-qrow {
+  display: grid; grid-template-columns: 9px 8px 1fr; align-items: center; gap: 3px;
+  font-size: 7px; font-variant-numeric: tabular-nums; padding: 0 1px;
+}
+.tcb-qrow.argmax { background: rgba(0,0,0,0.10); }
+:root[data-theme="crt"] .tcb-qrow.argmax { background: rgba(255,180,80,0.16); }
+.tcb-qmark { width: 9px; text-align: center; color: var(--accent); font-size: 8px; }
+.tcb-qsw { width: 7px; height: 7px; border: 1px solid var(--rule); image-rendering: pixelated; }
+.tcb-qval { text-align: right; color: var(--ink-on-box); }
+.tcb-qrow.argmax .tcb-qval { color: var(--ink-on-box); font-weight: 700; }
+
+/* ---- axes captions ---- */
+.tcb-axes { position: relative; font-size: 7px; color: var(--ink-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+.tcb-axis-x { display: block; text-align: center; }
+.tcb-axis-y { display: none; }   /* the row-headers already label tier; keep it light */
+
+/* ---- legend ---- */
+.tcb-legend {
+  display: flex; flex-wrap: wrap; gap: 6px 12px;
+  font-size: 8px; line-height: 1.6; color: var(--ink-secondary); padding: 2px 2px;
+}
+.tcb-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.tcb-legend-sw { width: 12px; height: 12px; border: 2px solid var(--rule); image-rendering: pixelated; }
+
+@media (max-width: 760px) {
+  .tc-board-qtable .tcb-qrow { font-size: 6px; grid-template-columns: 8px 6px 1fr; }
+  .tcb-rowhead { min-width: 44px; padding: 4px 3px; }
+  .tcb-rowhead-tier { font-size: 7px; }
+  .tc-board-policy .tcb-chip { font-size: 6px; padding: 2px 3px; }
+  .trial-card { width: 168px; }
+}
+@media (max-width: 420px) {
+  .tcb-grid { gap: 2px; padding: 2px; }
+  .tc-board-qtable .tcb-cell { min-height: 40px; }
+  .tcb-rowhead { min-width: 38px; }
+}

@@ -1,0 +1,15 @@
+/* scene1.css -- tutorial. */
+.sc1-grid { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin: 8px 0 12px; }
+.sc1-left { display: flex; flex-direction: column; gap: 12px; }
+.sc1-right { display: flex; flex-direction: column; gap: 16px; align-items: center; flex: 1 1 280px; min-width: 0; }
+.sc1-die-host { margin-top: 6px; }
+.sc1-levers { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+.sc1-levers .lever-chip { flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; }
+.sc1-levers .chip-main { font-size: 11px; }
+.sc1-say { margin: 8px 0 12px; min-height: 56px; }
+.sc1-vocab { display: flex; flex-wrap: wrap; gap: 8px; }
+
+@media (max-width: 720px) {
+  .sc1-grid { gap: 16px; }
+  .sc1-right { flex-basis: 100%; }
+}

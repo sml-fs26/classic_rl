@@ -1,0 +1,33 @@
+/* scene5.css -- trajectory (board + ribbon of (S,A,R) chips). */
+.sc5-formula { max-width: 540px; }
+.sc5-ctrls { margin: 4px 0 14px; }
+.sc5-row { gap: 28px; align-items: flex-start; }
+.sc5-left { flex: 0 0 auto; }
+.sc5-right { flex: 1 1 360px; min-width: 300px; gap: 12px; }
+.sc5-ribbon-wrap {
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 10px; min-height: 96px; max-height: 220px; overflow-y: auto;
+}
+.sc5-ribbon { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.sc5-chip {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  border: 2px solid var(--rule); border-radius: 0; padding: 3px 6px; min-width: 34px;
+  font-family: 'Press Start 2P', monospace; font-size: 8px; gap: 2px;
+}
+.sc5-sub { font-size: 7px; color: var(--ink-secondary); }
+.sc5-chip-val { font-size: 9px; font-variant-numeric: tabular-nums; }
+.sc5-chip-state { background: var(--bg); }
+.sc5-chip-action { color: var(--dir-ink); }
+.sc5-chip-action .sc5-sub { color: rgba(255,255,255,0.8); }
+.sc5-chip-action .sc5-chip-val { font-size: 12px; }
+.sc5-chip-reward { background: var(--bg); cursor: pointer; }
+.sc5-chip-reward:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+.sc5-chip-reward.pos { background: var(--pos-tint); }
+.sc5-chip-reward.neg { background: var(--neg-tint); }
+.sc5-detail { font-size: 9px; line-height: 1.8; min-height: 4em; }
+.sc5-framing { margin-top: 14px; font-size: 9px; line-height: 1.8; }
+@media (max-width: 760px) {
+  .sc5-row { flex-direction: column; align-items: center; }
+  .sc5-right { width: 100%; }
+}

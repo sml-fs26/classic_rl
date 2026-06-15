@@ -1,0 +1,39 @@
+/* scene0.css -- title / hook (pixel skin). */
+.sc0-wrap { text-align: center; max-width: 820px; margin: 0 auto; padding-top: 10px; }
+.sc0-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 34px; line-height: 1.15; margin: 10px 0 14px; letter-spacing: 5px;
+  color: var(--highlight);
+  text-shadow:
+    2px 0 0 var(--ink), -2px 0 0 var(--ink),
+    0 2px 0 var(--ink), 0 -2px 0 var(--ink),
+    2px 2px 0 var(--ink), -2px -2px 0 var(--ink),
+    -2px 2px 0 var(--ink), 2px -2px 0 var(--ink),
+    4px 4px 0 var(--accent);
+}
+.sc0-tagline {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px; line-height: 1.8; color: var(--ink); margin: 0 auto 22px; max-width: 62ch;
+}
+.sc0-stage {
+  display: flex; align-items: center; justify-content: center; gap: 56px;
+  margin: 14px 0 24px; flex-wrap: wrap;
+}
+.sc0-start { font-size: 12px; padding: 12px 24px; letter-spacing: 0.06em; }
+.sc0-reveal[hidden] { display: none; }
+.sc0-reveal { margin: 18px auto 6px; max-width: 680px; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.sc0-framing { text-align: left; font-size: 10px; line-height: 1.8; }
+.sc0-hook { text-align: center; border-top: none; margin-top: 22px; font-size: 7px; }
+.sc0-credits {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px; letter-spacing: 1px; color: var(--ink-secondary); margin-top: 16px;
+}
+.sc0-credits.sc0-credits-by { margin-top: 6px; color: var(--accent); }
+@media (max-width: 760px) {
+  .sc0-title { font-size: 18px; letter-spacing: 2px; }
+  .sc0-tagline { font-size: 10px; }
+  .sc0-stage { gap: 28px; }
+}
+@media (max-width: 400px) {
+  .sc0-title { font-size: 15px; letter-spacing: 1px; }
+}

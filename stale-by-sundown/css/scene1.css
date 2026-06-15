@@ -1,0 +1,27 @@
+/* scene1 -- tutorial. */
+.sc1-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 10px 0 14px; align-items: start; }
+.sc1-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sc1-panel-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ink); letter-spacing: 0.04em; }
+.sc1-cap { font-family: 'Press Start 2P', monospace; font-size: 7px; line-height: 1.7; color: var(--ink-secondary); margin: 0; }
+.shelf-icon#sc1-shelf { align-self: flex-start; }
+
+.sc1-levers { display: flex; flex-direction: column; gap: 6px; }
+.sc1-lever {
+  border: 3px solid var(--rule); padding: 6px 8px; display: flex; flex-direction: column; gap: 2px;
+  box-shadow: inset -2px -2px 0 0 var(--inner-highlight);
+}
+.sc1-lever.lev-hold     { background: var(--lever-hold-soft); border-left: 6px solid var(--lever-hold); }
+.sc1-lever.lev-discount { background: var(--lever-disc-soft); border-left: 6px solid var(--lever-disc); }
+.sc1-lever.lev-dump     { background: var(--lever-dump-soft); border-left: 6px solid var(--lever-dump); }
+.sc1-lever-name { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--ink); }
+.sc1-lever-role { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--ink-secondary); }
+.sc1-lever-margin { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink); }
+
+.sc1-dlg { margin: 6px 0; font-size: 10px; min-height: 38px; }
+.sc1-ctrls { align-items: center; }
+.sc1-till b { color: var(--lever-hold); font-size: 13px; }
+.sc1-framing { font-size: 10px; }
+
+@media (max-width: 720px) {
+  .sc1-grid { grid-template-columns: 1fr; gap: 14px; }
+}

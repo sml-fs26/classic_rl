@@ -1,0 +1,11 @@
+/* scene4.css -- policy. */
+.sc4-formula { text-align: center; }
+.sc4-row { gap: 28px; align-items: flex-start; }
+.sc4-panel { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sc4-preset-label { font-size: 9px; }
+.sc4-presets { gap: 8px; }
+.sc4-preset { font-size: 8px; }
+.sc4-blurb { font-size: 9px; line-height: 1.8; min-height: 96px; }
+.sc4-note { font-size: 8px; line-height: 1.7; }
+.sc4-framing { margin-top: 12px; }
+@media (max-width: 760px) { .sc4-row { gap: 16px; } }

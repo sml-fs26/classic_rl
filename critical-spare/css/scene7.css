@@ -1,0 +1,24 @@
+/* scene7.css -- optimal action-value Q*. */
+.sc7-pick { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; font-size: 9px; }
+.sc7-pick-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.sc7-pickbtn { font-size: 8px; padding: 7px 10px; }
+.sc7-row { gap: 28px; align-items: flex-start; }
+.sc7-left { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; }
+.sc7-table-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sc7-at { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--ink); }
+.sc7-table { border-collapse: collapse; font-family: 'Press Start 2P', monospace; font-size: 10px; max-width: 420px; }
+.sc7-table th, .sc7-table td { border: 2px solid var(--rule); padding: 8px 12px; text-align: left; }
+.sc7-table th { background: var(--bg-strong); font-size: 8px; color: var(--ink-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+.sc7-tr.is-best { background: rgba(0,0,0,0.06); }
+:root[data-theme="crt"] .sc7-tr.is-best { background: rgba(255,180,80,0.12); }
+.sc7-tr.clamped { opacity: 0.5; }
+.sc7-q { font-variant-numeric: tabular-nums; }
+.sc7-qval { font-size: 13px; color: var(--ink-on-box); }
+.sc7-star { color: var(--accent); font-size: 12px; }
+.sc7-besttag { font-size: 7px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; margin-left: 4px; }
+.sc7-read { font-size: 9px; line-height: 1.8; }
+.sc7-note { font-size: 8px; line-height: 1.7; }
+@media (max-width: 760px) {
+  .sc7-row { gap: 16px; }
+  .sc7-left { align-self: center; }
+}

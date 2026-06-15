@@ -1,0 +1,34 @@
+/* scene3.css -- formalization. */
+.sc3-grid { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin: 8px 0 14px; }
+.sc3-icon-host { flex: 0 0 auto; }
+.sc3-cards { display: flex; flex-direction: column; gap: 10px; flex: 1 1 420px; min-width: 0; }
+.sc3-card {
+  display: flex; gap: 12px; align-items: flex-start;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight); padding: 10px 12px;
+}
+.sc3-card[hidden] { display: none; }
+.sc3-card-tag {
+  flex: 0 0 auto; width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace; font-size: 14px; color: #fff;
+  border: 2px solid var(--rule);
+}
+.sc3-card[data-card="state"]  .sc3-card-tag { background: var(--hue-mdp); }
+.sc3-card[data-card="action"] .sc3-card-tag { background: var(--hue-policy); }
+.sc3-card[data-card="trans"]  .sc3-card-tag { background: var(--hue-dp); }
+.sc3-card[data-card="reward"] .sc3-card-tag { background: var(--hue-return); }
+.sc3-card-h { font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-on-box); margin-bottom: 6px; }
+.sc3-card-b { font-size: 9px; line-height: 1.8; color: var(--ink-secondary); }
+.sc3-card-tex { margin-top: 8px; }
+.sc3-card-tex .katex { font-size: 0.95em; }
+.sc3-card.sc3-pop { animation: sc3-pop 0.34s cubic-bezier(.3,1.5,.5,1); }
+@keyframes sc3-pop { 0% { transform: scale(0.92); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sc3-card.sc3-pop { animation: none; } }
+.sc3-tuple { text-align: center; }
+.sc3-tuple-tex .katex { font-size: 1.3em; }
+
+@media (max-width: 720px) {
+  .sc3-grid { gap: 16px; }
+  .sc3-icon-host { margin: 0 auto; }
+}

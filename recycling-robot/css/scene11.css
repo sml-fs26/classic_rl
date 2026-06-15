@@ -1,0 +1,41 @@
+/* scene11.css -- SARSA vs Q-learning. */
+.sc11-formula { display: flex; flex-direction: column; gap: 8px; }
+.sc11-frow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sc11-flab { font-size: 8px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-secondary); flex: 1 1 240px; }
+.sc11-tex-sarsa .katex, .sc11-tex-ql .katex { font-size: 1.0em; }
+
+.sc11-boards { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; margin: 10px 0 12px; }
+.sc11-board { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.sc11-board-h {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 0.04em; text-align: center;
+  padding: 5px; border: 2px solid var(--rule); color: #fff;
+}
+.sc11-h-sarsa { background: var(--wait-rule); }
+.sc11-h-ql { background: var(--search-rule); }
+.sc11-h-dp { background: var(--hue-dp); }
+.sc11-board .rr-panel { min-width: 0; width: 100%; }
+/* compact the three side-by-side boards */
+.sc11-board .rr-row { font-size: 8px; grid-template-columns: 12px 10px 50px 1fr; padding: 1px 2px; }
+.sc11-board .rr-rung { min-height: 50px; padding: 4px 8px; }
+.sc11-board .rr-rung-left { min-width: 46px; }
+
+.sc11-controls { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 8px 0 12px; }
+.sc11-scrub { display: flex; align-items: center; gap: 10px; flex: 1 1 280px; min-width: 0; }
+.sc11-ep { font-size: 9px; min-width: 52px; color: var(--ink-on-box); font-variant-numeric: tabular-nums; }
+.sc11-range {
+  appearance: none; -webkit-appearance: none; flex: 1 1 auto; min-width: 120px; height: 8px;
+  background: var(--bg-strong); border: 2px solid var(--rule); margin: 0;
+}
+.sc11-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 18px; background: var(--highlight); border: 2px solid var(--rule); cursor: pointer; }
+.sc11-range::-moz-range-thumb { width: 14px; height: 18px; background: var(--highlight); border: 2px solid var(--rule); cursor: pointer; }
+.sc11-chart-host { flex: 1 1 360px; min-width: 0; padding: 8px; }
+.sc11-svg { width: 100%; height: auto; display: block; }
+.sc11-axis { stroke: var(--rule); stroke-width: 1.2; }
+.sc11-opt { stroke: var(--hue-dp); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.sc11-opt-lab { fill: var(--hue-dp); font-size: 7px; font-family: 'Press Start 2P', monospace; text-anchor: end; }
+.sc11-line-ql { fill: none; stroke: var(--search); stroke-width: 2; }
+.sc11-line-sarsa { fill: none; stroke: var(--wait); stroke-width: 2; }
+.sc11-axis-lab, .sc11-axis-yt { fill: var(--ink-secondary); font-size: 7px; font-family: 'Press Start 2P', monospace; }
+.sc11-verdict { font-size: 9px; line-height: 1.8; min-height: 56px; }
+
+@media (max-width: 900px) { .sc11-board { flex-basis: 100%; } }

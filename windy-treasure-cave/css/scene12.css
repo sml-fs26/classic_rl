@@ -1,0 +1,25 @@
+/* scene12.css -- recap (six concept cards + closing). */
+.sc12-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 8px 0 18px; }
+.sc12-card { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
+.sc12-card-head { display: flex; align-items: center; gap: 8px; }
+.sc12-chip {
+  font-family: 'Press Start 2P', monospace; font-size: 8px; color: #fff;
+  border: 2px solid var(--rule); padding: 3px 7px; letter-spacing: 0.04em;
+}
+.sc12-chip-mdp { background: var(--hue-mdp); }
+.sc12-chip-policy { background: var(--hue-policy); }
+.sc12-chip-return { background: var(--hue-return); }
+.sc12-chip-qstar { background: var(--hue-qstar); color: #181818; }
+.sc12-chip-dp { background: var(--hue-dp); }
+.sc12-chip-sarsa { background: var(--hue-sarsa); }
+.sc12-card-title { font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.03em; }
+.sc12-card-tex { font-size: 0.92em; overflow-x: auto; }
+.sc12-card-body { font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.85; color: var(--ink-secondary); }
+.sc12-close-row { gap: 24px; align-items: center; }
+.sc12-close { font-size: 10px; line-height: 1.9; }
+.sc12-credits { text-align: center; font-family: 'Press Start 2P', monospace; font-size: 7px; letter-spacing: 1px; color: var(--accent); margin-top: 18px; }
+@media (max-width: 960px) { .sc12-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 760px) {
+  .sc12-grid { grid-template-columns: 1fr; }
+  .sc12-close-row { flex-direction: column; align-items: center; }
+}

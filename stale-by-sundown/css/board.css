@@ -1,0 +1,189 @@
+/* board.css -- the 5x3 display-case widget (state board + Q-table). Warm NES
+   case: thick black borders, an inner highlight, croissant icons that ripen by
+   tier, and cells tinted by their best lever (HOLD green / DISCOUNT amber /
+   DUMP red) so the converged board reads as a green cap / amber middle / red
+   floor across the room. All colours resolve from --lever-* / --tier-* tokens. */
+
+.case { font-family: 'Press Start 2P', monospace; color: var(--ink); }
+
+.case-grid {
+  display: grid;
+  grid-template-columns: 58px repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 560px;
+}
+.case-qtable .case-grid { max-width: 760px; }
+.case-compact .case-grid { gap: 3px; max-width: 360px; grid-template-columns: 34px repeat(3, minmax(0, 1fr)); }
+
+/* headers */
+.case-corner { display: flex; align-items: center; justify-content: center; font-size: 7px; color: var(--ink-secondary); }
+.case-colhead {
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px;
+  padding-bottom: 3px;
+}
+.case-unit-pips { display: inline-flex; gap: 2px; }
+.case-unit-pips::before { content: ''; }
+.case-colhead .case-colnum { font-size: 9px; color: var(--ink); }
+.case-compact .case-colhead .case-colnum { font-size: 7px; }
+
+.case-rowhead {
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 6px;
+  font-size: 8px; letter-spacing: 0.04em; color: var(--ink); text-align: right;
+}
+.case-rowhead .case-tier-name { line-height: 1.2; }
+.case-compact .case-rowhead { font-size: 6px; padding-right: 3px; }
+
+/* per-tier row-head accent dot */
+.case-rowhead::before {
+  content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 5px;
+  border: 1px solid var(--rule); flex: 0 0 auto;
+}
+.case-rowhead.tier-fresh::before { background: var(--tier-fresh); }
+.case-rowhead.tier-ok::before    { background: var(--tier-ok); }
+.case-rowhead.tier-aging::before { background: var(--tier-aging); }
+.case-rowhead.tier-old::before   { background: var(--tier-old); }
+.case-rowhead.tier-stale::before { background: var(--tier-stale); }
+.case-compact .case-rowhead::before { width: 6px; height: 6px; margin-right: 3px; }
+
+/* cells */
+.case-cell {
+  position: relative;
+  background: var(--bg-strong);
+  border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight);
+  padding: 6px 4px 5px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-height: 70px;
+}
+.case-compact .case-cell { padding: 3px 2px; min-height: 40px; border-width: 2px; gap: 2px; }
+.case-icon .croissant-svg { display: block; image-rendering: pixelated; }
+.case-icon { line-height: 0; }
+
+/* per-tier cell background tint (subtle, so the lever tint still reads) */
+.case-cell.tier-fresh { background: var(--tier-fresh-bg); }
+.case-cell.tier-ok    { background: var(--tier-ok-bg); }
+.case-cell.tier-aging { background: var(--tier-aging-bg); }
+.case-cell.tier-old   { background: var(--tier-old-bg); }
+.case-cell.tier-stale { background: var(--tier-stale-bg); }
+
+/* tray dots */
+.case-tray { display: inline-flex; gap: 3px; }
+.tray-dot { width: 5px; height: 5px; border: 1px solid var(--rule); background: transparent; }
+.tray-dot.on { background: var(--ink); }
+.case-compact .tray-dot { width: 3px; height: 3px; }
+
+/* lever tint -- a thick coloured left bar + tinted background wash */
+.case-cell.tint-hold     { box-shadow: inset 6px 0 0 0 var(--lever-hold), inset 0 0 0 2px var(--inner-highlight); }
+.case-cell.tint-discount { box-shadow: inset 6px 0 0 0 var(--lever-disc), inset 0 0 0 2px var(--inner-highlight); }
+.case-cell.tint-dump     { box-shadow: inset 6px 0 0 0 var(--lever-dump), inset 0 0 0 2px var(--inner-highlight); }
+.case-cell.tint-hold     { background: color-mix(in srgb, var(--lever-hold) 14%, var(--bg-strong)); }
+.case-cell.tint-discount { background: color-mix(in srgb, var(--lever-disc) 16%, var(--bg-strong)); }
+.case-cell.tint-dump     { background: color-mix(in srgb, var(--lever-dump) 14%, var(--bg-strong)); }
+
+/* unsolved / pending (DP fill) */
+.case-cell.unsolved { opacity: 0.5; }
+.case-cell.pending  { opacity: 0.35; filter: grayscale(0.4); }
+
+/* the lever chip (policy variant) */
+.case-chip {
+  margin-top: 2px; padding: 3px 5px; font-size: 7px; letter-spacing: 0.04em;
+  border: 2px solid var(--rule); background: var(--bg); color: var(--ink); text-align: center;
+  min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.case-chip.lev-hold     { background: var(--lever-hold); color: var(--lever-hold-ink); }
+.case-chip.lev-discount { background: var(--lever-disc); color: var(--lever-disc-ink); }
+.case-chip.lev-dump     { background: var(--lever-dump); color: var(--lever-dump-ink); }
+
+/* Q rows (qtable variant) */
+.case-qrows { display: flex; flex-direction: column; gap: 2px; width: 100%; margin-top: 2px; }
+.case-qrow {
+  display: grid; grid-template-columns: 9px 8px 1fr auto; gap: 3px; align-items: center;
+  font-size: 7px; color: var(--ink); padding: 1px 2px;
+}
+.case-qmark { color: var(--accent-2); font-size: 8px; text-align: center; }
+.case-qswatch { width: 7px; height: 7px; border: 1px solid var(--rule); }
+.case-qswatch.lev-hold     { background: var(--lever-hold); }
+.case-qswatch.lev-discount { background: var(--lever-disc); }
+.case-qswatch.lev-dump     { background: var(--lever-dump); }
+.case-qlab { font-size: 6px; color: var(--ink-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.case-qval { font-size: 7px; font-variant-numeric: tabular-nums; color: var(--ink); justify-self: end; }
+.case-qrow.argmax { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+.case-qrow.argmax .case-qval { color: var(--ink); }
+.case-compact .case-qrow { grid-template-columns: 7px 1fr auto; font-size: 6px; }
+.case-compact .case-qswatch { display: none; }
+.case-compact .case-qlab { display: none; }
+
+/* V* star box */
+.case-vstar { margin-top: 2px; display: inline-flex; gap: 4px; align-items: baseline; }
+.case-vlab { font-size: 6px; color: var(--ink-secondary); }
+.case-vval { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.case-policy .case-vval { font-size: 12px; }
+.case-compact .case-vval { font-size: 8px; }
+
+/* token ring ("you are here") */
+.case-token-ring {
+  position: absolute; inset: -3px; border: 3px solid var(--accent-2); pointer-events: none;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.case-cell.has-token { z-index: 2; }
+
+/* animations */
+.case-cell.cell-pulse { animation: case-cell-pulse 0.7s ease-out; }
+@keyframes case-cell-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+.case-cell.cell-flash { animation: case-cell-flash 0.7s ease-out; }
+@keyframes case-cell-flash {
+  0% { box-shadow: 0 0 0 4px var(--accent), inset 0 0 0 2px var(--inner-highlight); }
+  100% { box-shadow: inset 0 0 0 2px var(--inner-highlight); }
+}
+.case-cell.cell-flip { animation: case-cell-flip 0.8s ease-out; }
+@keyframes case-cell-flip {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.1) rotate(-1deg); filter: brightness(1.3); }
+  100% { transform: scale(1) rotate(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-cell.cell-pulse, .case-cell.cell-flash, .case-cell.cell-flip { animation: none; }
+}
+
+/* clickable cells */
+.case-cell.clickable { cursor: pointer; }
+.case-cell.clickable:hover { box-shadow: inset 0 0 0 2px var(--accent-2); }
+
+/* FRESH steam gentle drift */
+@keyframes croissant-steam-rise { 0% { opacity: 0.2; transform: translateY(2px); } 50% { opacity: 0.7; transform: translateY(-1px); } 100% { opacity: 0.2; transform: translateY(2px); } }
+.croissant-steam { animation: croissant-steam-rise 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .croissant-steam { animation: none; } }
+
+/* legend */
+.case-legend {
+  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;
+  font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink);
+}
+.case-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.case-legend-swatch { width: 10px; height: 10px; border: 2px solid var(--rule); }
+.case-legend-swatch.lev-hold     { background: var(--lever-hold); }
+.case-legend-swatch.lev-discount { background: var(--lever-disc); }
+.case-legend-swatch.lev-dump     { background: var(--lever-dump); }
+
+/* big single-cell state-icon (used in scenes that show ONE shelf state) */
+.shelf-icon {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 12px 16px; border: 4px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  font-family: 'Press Start 2P', monospace;
+}
+.shelf-icon .shelf-tray { display: inline-flex; gap: 6px; align-items: flex-end; }
+.shelf-icon .shelf-label { font-size: 9px; color: var(--ink); letter-spacing: 0.04em; }
+.shelf-icon .shelf-sub { font-size: 7px; color: var(--ink-secondary); }
+.shelf-icon.term-cleared { border-color: var(--lever-hold); }
+.shelf-icon.term-spoiled { border-color: var(--lever-dump); filter: grayscale(0.3); }
+
+/* responsive: shrink case fonts/icons on phones */
+@media (max-width: 720px) {
+  .case-grid { grid-template-columns: 44px repeat(3, minmax(0, 1fr)); gap: 3px; }
+  .case-qtable .case-grid { max-width: 100%; }
+  .case-cell { min-height: 58px; padding: 4px 2px; }
+  .case-rowhead { font-size: 7px; }
+  .case-qrow { grid-template-columns: 8px 1fr auto; font-size: 6px; }
+  .case-qswatch, .case-qlab { display: none; }
+}

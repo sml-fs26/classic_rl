@@ -1,0 +1,35 @@
+/* scene11.css -- SARSA vs Q-learning (two learning boards + DP oracle). */
+.sc11-stage { min-height: 360px; }
+.sc11-tag { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 6px; }
+.sc11-h { font-family: 'Press Start 2P', monospace; font-size: 13px; margin: 0 0 12px; letter-spacing: 0.04em; }
+.sc11-split-cards { display: flex; gap: 16px; flex-wrap: wrap; }
+.sc11-split-cards .formula-card { flex: 1 1 320px; min-width: 280px; margin: 8px 0; }
+.sc11-card-sarsa { border-left: 6px solid var(--dir-down); }
+.sc11-card-qlearn { border-left: 6px solid var(--dir-right); }
+.sc11-eps { margin-top: 12px; font-size: 9px; line-height: 1.8; }
+.sc11-note { font-size: 8px; margin-top: 10px; }
+
+/* step 2 */
+.sc11-ctrls { margin: 4px 0 14px; align-items: center; }
+.sc11-ep-wrap { font-size: 9px; }
+.sc11-boards { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.sc11-board { flex: 1 1 240px; min-width: 220px; max-width: 320px; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.sc11-board-title { font-family: 'Press Start 2P', monospace; font-size: 10px; letter-spacing: 0.04em; }
+.sc11-board-sarsa .sc11-board-title { color: var(--dir-down); }
+.sc11-board-qlearn .sc11-board-title { color: var(--dir-right); }
+.sc11-board-oracle .sc11-board-title { color: var(--accent); }
+.sc11-board-sub { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--ink-secondary); }
+.sc11-board-host { margin: 2px 0; }
+.sc11-readout { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+.sc11-ro-row { display: flex; align-items: center; gap: 6px; font-family: 'Press Start 2P', monospace; font-size: 7px; }
+.sc11-ro-lab { color: var(--ink-secondary); min-width: 64px; }
+.sc11-ro-val { margin-left: auto; font-size: 9px; font-variant-numeric: tabular-nums; }
+.sc11-bar { flex: 1 1 auto; height: 10px; background: var(--bg-sunk); border: 2px solid var(--rule); }
+.sc11-bar-fill { display: block; height: 100%; width: 0; background: var(--pos); transition: width 400ms ease-out; }
+.sc11-board-sarsa .sc11-bar-fill { background: var(--dir-down); }
+.sc11-board-qlearn .sc11-bar-fill { background: var(--dir-right); }
+.sc11-framing { margin-top: 16px; font-size: 9px; line-height: 1.8; }
+.sc11-nav { margin-top: 16px; align-items: center; }
+.sc11-stepcount { margin-right: auto; font-size: 9px; }
+@media (max-width: 900px) { .sc11-boards { gap: 12px; } .sc11-board { min-width: 200px; } }
+@media (max-width: 760px) { .sc11-split-cards { flex-direction: column; } }

@@ -1,0 +1,30 @@
+/* scene5.css -- trajectory. */
+.sc5-formula { text-align: center; }
+.sc5-row { gap: 28px; align-items: flex-start; }
+.sc5-right { display: flex; flex-direction: column; gap: 12px; min-width: 0; flex: 1 1 420px; }
+.sc5-rollout { display: flex; flex-direction: column; gap: 3px; overflow-x: auto; }
+.sc5-step {
+  display: grid; grid-template-columns: 46px 64px 90px 96px 44px 78px; gap: 4px; align-items: center;
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+}
+.sc5-head { color: var(--ink-secondary); font-size: 7px; text-transform: uppercase; letter-spacing: 0.04em; padding-bottom: 2px; border-bottom: 2px solid var(--rule-soft); }
+.sc5-cell { padding: 4px 4px; }
+.sc5-step:not(.sc5-head) .sc5-cell { border: 2px solid var(--rule-soft); background: var(--bg-strong); text-align: center; }
+.sc5-step:not(.sc5-head) .sc5-cell.sc5-t { background: var(--bg); color: var(--ink-secondary); }
+.sc5-a .lever-tag { font-size: 7px; padding: 2px 3px; }
+.sc5-die.up { color: var(--nudge-rule); }
+.sc5-die.flat { color: var(--ink-secondary); }
+.sc5-die.convert, .sc5-next.convert { color: var(--convert-rule); }
+.sc5-die.abandon, .sc5-next.abandon { color: var(--abandon-t-rule); }
+.sc5-die.expiry, .sc5-next.expiry { color: var(--ink-secondary); }
+.sc5-r.pos { color: var(--pos); }
+.sc5-r.neg { color: var(--neg); }
+.sc5-step.sc5-in { animation: sc5-in 0.4s ease-out; }
+@keyframes sc5-in { 0% { opacity: 0; transform: translateX(-8px); } 100% { opacity: 1; transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .sc5-step.sc5-in { animation: none; } }
+.sc5-note { font-size: 8px; line-height: 1.7; }
+.sc5-framing { margin-top: 12px; }
+@media (max-width: 760px) {
+  .sc5-row { gap: 16px; }
+  .sc5-step { grid-template-columns: 38px 56px 70px 78px 38px 64px; font-size: 7px; }
+}

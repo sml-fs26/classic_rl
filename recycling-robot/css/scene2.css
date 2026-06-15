@@ -1,0 +1,37 @@
+/* scene2.css -- playtest. */
+.sc2-grid { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin: 8px 0 12px; }
+.sc2-left { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.sc2-mid { display: flex; flex-direction: column; gap: 14px; flex: 1 1 320px; min-width: 0; align-items: center; }
+.sc2-die-host { margin: 2px 0; }
+.sc2-levers { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.sc2-levers .lever-chip { min-width: 96px; justify-content: center; }
+.sc2-say { width: 100%; min-height: 50px; }
+
+.sc2-tape-wrap {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 8px 10px; border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+  margin: 6px 0 12px;
+}
+.sc2-tape-label { font-size: 7px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-secondary); }
+.sc2-tape { display: flex; gap: 4px; flex-wrap: wrap; }
+.sc2-tape-cell {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 38px; padding: 4px 5px; border: 2px solid var(--rule); background: var(--bg);
+  font-family: 'Press Start 2P', monospace;
+}
+.sc2-tape-cell .tc-lever { font-size: 7px; letter-spacing: 0.5px; }
+.sc2-tape-cell .tc-r { font-size: 9px; font-variant-numeric: tabular-nums; color: var(--ink-secondary); }
+.sc2-tape-cell.tape-search   { border-color: var(--search-rule); }
+.sc2-tape-cell.tape-search .tc-lever   { color: var(--search); }
+.sc2-tape-cell.tape-wait     { border-color: var(--wait-rule); }
+.sc2-tape-cell.tape-wait .tc-lever     { color: var(--wait); }
+.sc2-tape-cell.tape-recharge { border-color: var(--recharge-rule); }
+.sc2-tape-cell.tape-recharge .tc-lever { color: var(--recharge); }
+.sc2-tape-cell.tape-strand   { background: var(--neg-tint); border-color: var(--neg); }
+.sc2-tape-cell.tape-strand .tc-r { color: var(--neg); font-weight: bold; }
+
+@media (max-width: 720px) {
+  .sc2-grid { gap: 16px; }
+  .sc2-mid { flex-basis: 100%; }
+}

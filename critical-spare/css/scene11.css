@@ -1,0 +1,37 @@
+/* scene11.css -- SARSA. */
+.sc11-stage { display: flex; flex-direction: column; gap: 12px; }
+.sc11-tag { font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 0.08em; color: var(--accent); text-transform: uppercase; }
+.sc11-h { font-family: 'Press Start 2P', monospace; font-size: 14px; margin: 2px 0 4px; color: var(--ink); }
+.sc11-arrow-down { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ink-secondary); text-align: center; }
+.sc11-card-sarsa { border-color: var(--hue-sarsa); }
+.sc11-eps { font-size: 9px; line-height: 1.8; }
+.sc11-note { font-size: 8px; line-height: 1.7; }
+
+.sc11-ctrls { gap: 10px; align-items: center; }
+.sc11-ep-wrap { font-size: 9px; }
+
+.sc11-boards { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+.sc11-board {
+  flex: 1 1 360px; min-width: 0;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight); padding: 10px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.sc11-board-learn { border-color: var(--hue-sarsa); }
+.sc11-board-oracle { border-color: var(--hue-dp); }
+.sc11-board-title { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ink); letter-spacing: 0.03em; }
+.sc11-board-sub { font-size: 7px; color: var(--ink-secondary); }
+.sc11-grid-host { align-self: center; }
+
+.sc11-readout { display: flex; flex-direction: column; gap: 6px; }
+.sc11-ro-row { display: flex; align-items: center; gap: 8px; font-family: 'Press Start 2P', monospace; font-size: 8px; }
+.sc11-ro-lab { min-width: 96px; color: var(--ink-secondary); }
+.sc11-bar { flex: 1 1 auto; height: 10px; border: 2px solid var(--rule); background: var(--bg-sunk); }
+.sc11-bar-fill { display: block; height: 100%; width: 0%; background: var(--pos); transition: width 0.4s steps(8); }
+.sc11-ro-val { font-variant-numeric: tabular-nums; color: var(--ink-on-box); }
+.sc11-framing { font-size: 9px; line-height: 1.8; }
+
+@media (max-width: 760px) {
+  .sc11-boards { gap: 12px; }
+  .sc11-ro-lab { min-width: 80px; }
+}

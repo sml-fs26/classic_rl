@@ -1,0 +1,21 @@
+/* scene8.css -- Bellman (hand backup, term by term). */
+.sc8-formula { max-width: 560px; }
+.sc8-ctrls { margin: 4px 0 14px; }
+.sc8-row { gap: 28px; align-items: flex-start; }
+.sc8-left { flex: 0 0 auto; }
+.sc8-right { flex: 1 1 360px; min-width: 300px; }
+.sc8-work { padding: 14px 16px; }
+.sc8-work-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--accent); margin-bottom: 12px; letter-spacing: 0.04em; }
+.sc8-rows { display: flex; flex-direction: column; gap: 12px; }
+.sc8-wrow { display: flex; flex-direction: column; gap: 6px; border-left: 3px solid var(--rule-soft); padding-left: 10px; }
+.sc8-wrow.neg { border-left-color: var(--neg); }
+.sc8-wlab { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink-secondary); line-height: 1.6; }
+.sc8-wtex { font-size: 1.05em; }
+.sc8-sum { margin-top: 14px; border-top: 2px solid var(--rule); padding-top: 12px; }
+.sc8-sumtex { font-size: 1.1em; }
+.sc8-match { font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.7; color: var(--pos); margin-top: 8px; }
+.sc8-framing { margin-top: 14px; font-size: 9px; line-height: 1.8; }
+@media (max-width: 760px) {
+  .sc8-row { flex-direction: column; align-items: center; }
+  .sc8-right { width: 100%; }
+}

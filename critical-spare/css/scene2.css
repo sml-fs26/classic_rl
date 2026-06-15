@@ -1,0 +1,41 @@
+/* scene2.css -- playtest. */
+.sc2-row { gap: 28px; align-items: flex-start; }
+.sc2-left { display: flex; flex-direction: column; align-items: center; gap: 16px; flex: 0 0 auto; }
+.sc2-right { display: flex; flex-direction: column; gap: 12px; }
+.sc2-hud { align-self: stretch; }
+.sc2-prompt { font-size: 9px; }
+.sc2-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.sc2-tape-wrap { margin: 6px 0 4px; }
+.sc2-tape-title { font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px; }
+.sc2-tape {
+  display: flex; gap: 4px; overflow-x: auto; padding: 8px 10px;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight);
+  min-height: 56px;
+}
+.sc2-tape-step {
+  flex: 0 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  min-width: 40px; padding: 4px 5px;
+  border: 2px solid var(--rule); background: var(--bg);
+  font-family: 'Press Start 2P', monospace;
+}
+.sc2-tape-step .ts-t { font-size: 6px; color: var(--ink-secondary); }
+.sc2-tape-step .ts-lever { font-size: 6.5px; letter-spacing: 0.02em; }
+.sc2-tape-step.lever-run .ts-lever { color: var(--run); }
+.sc2-tape-step.lever-order .ts-lever { color: var(--order); }
+.sc2-tape-step.lever-replace .ts-lever, .sc2-tape-step.gold .ts-lever { color: var(--replace); }
+.sc2-tape-step .ts-out { font-size: 9px; }
+.sc2-tape-step .ts-r { font-size: 8px; font-variant-numeric: tabular-nums; }
+.sc2-tape-step .ts-r.pos { color: var(--pos); }
+.sc2-tape-step .ts-r.neg { color: var(--neg); }
+.sc2-tape-step.bad { border-color: var(--neg); background: var(--neg-tint); }
+.sc2-tape-step.warn { border-color: var(--replace-rule); }
+
+.sc2-legend { margin-bottom: 12px; }
+
+@media (max-width: 760px) {
+  .sc2-row { gap: 16px; }
+  .sc2-left { flex-direction: row; flex-wrap: wrap; justify-content: center; align-self: center; }
+}

@@ -1,0 +1,10 @@
+/* scene4 -- policy. */
+.sc4-formula { display: inline-block; margin: 6px 0 14px; }
+.sc4-boards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-bottom: 14px; justify-items: center; }
+.sc4-board { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.sc4-board-title { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--ink); letter-spacing: 0.04em; }
+.sc4-board-title.lev-hold-text { color: var(--lever-hold); }
+.sc4-board-sub { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--ink-secondary); margin-bottom: 4px; max-width: 32ch; text-align: center; }
+.sc4-note { font-size: 10px; }
+.sc4-framing { font-size: 10px; }
+@media (max-width: 720px) { .sc4-boards { grid-template-columns: 1fr; gap: 18px; } }

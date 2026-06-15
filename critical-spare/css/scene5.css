@@ -1,0 +1,38 @@
+/* scene5.css -- trajectory. */
+.sc5-row { gap: 28px; align-items: flex-start; }
+.sc5-left { display: flex; flex-direction: column; align-items: center; gap: 14px; flex: 0 0 auto; }
+.sc5-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+.sc5-rollout { display: flex; flex-direction: column; gap: 3px; overflow-x: auto; }
+.sc5-step[hidden] { display: none; }
+.sc5-step {
+  display: grid;
+  grid-template-columns: 44px 64px 70px 34px 44px 64px;
+  gap: 6px; align-items: center;
+  font-family: 'Press Start 2P', monospace; font-size: 8px;
+  padding: 4px 6px; border: 2px solid var(--rule); background: var(--bg-strong);
+}
+.sc5-step.sc5-head { background: var(--bg); color: var(--ink-secondary); font-size: 7px; border-color: var(--rule-soft); }
+.sc5-step.sc5-in { animation: sc5-in 0.3s ease-out; }
+@keyframes sc5-in { 0% { opacity: 0; transform: translateX(-8px); } 100% { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .sc5-step.sc5-in { animation: none; } }
+.sc5-step.bad { border-color: var(--neg); background: var(--neg-tint); }
+.sc5-step.warn { border-color: var(--replace-rule); }
+.sc5-cell { display: flex; align-items: center; gap: 3px; }
+.sc5-t { color: var(--ink-secondary); }
+.sc5-mini { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border: 2px solid var(--rule); font-size: 8px; color: var(--rule); }
+.mi-mini-healthy { background: var(--mi-healthy); }
+.mi-mini-aging   { background: var(--mi-aging); }
+.mi-mini-failing { background: var(--mi-failing); color: #fff; }
+.sc5-sp { font-size: 7px; color: var(--ink-secondary); }
+.sc5-out { font-size: 11px; justify-content: center; }
+.sc5-r { font-variant-numeric: tabular-nums; justify-content: flex-end; }
+.sc5-r.pos { color: var(--pos); }
+.sc5-r.neg { color: var(--neg); }
+.sc5-note { font-size: 8px; line-height: 1.7; }
+
+@media (max-width: 760px) {
+  .sc5-row { gap: 16px; }
+  .sc5-left { flex-direction: row; flex-wrap: wrap; justify-content: center; align-self: center; }
+  .sc5-step { grid-template-columns: 36px 54px 58px 28px 38px 54px; font-size: 7px; gap: 4px; }
+}

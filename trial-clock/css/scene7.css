@@ -1,0 +1,28 @@
+/* scene7.css -- optimal action-value Q*. */
+.sc7-formula { text-align: center; }
+.sc7-pick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0 12px; }
+.sc7-pick .muted { font-size: 9px; margin-right: 4px; }
+.sc7-pick-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.sc7-pickbtn { font-size: 8px; }
+.sc7-row { gap: 28px; align-items: flex-start; }
+.sc7-table-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; flex: 1 1 360px; }
+.sc7-at { font-family: 'Press Start 2P', monospace; font-size: 10px; }
+.sc7-at b { color: var(--accent); }
+.sc7-table {
+  border-collapse: collapse; width: 100%; max-width: 420px;
+  font-family: 'Press Start 2P', monospace; font-size: 9px;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+}
+.sc7-table th, .sc7-table td { border: 2px solid var(--rule-soft); padding: 8px 10px; text-align: left; }
+.sc7-table th { background: var(--bg); font-size: 8px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-secondary); }
+.sc7-q { font-variant-numeric: tabular-nums; }
+.sc7-tr.is-best { background: rgba(0,0,0,0.08); }
+:root[data-theme="crt"] .sc7-tr.is-best { background: rgba(255,180,80,0.16); }
+.sc7-tr.is-best .sc7-qval { color: var(--ink-on-box); font-weight: 700; }
+.sc7-tr.is-neg .sc7-qval { color: var(--neg); }
+.sc7-star { color: var(--accent); font-size: 11px; }
+.sc7-besttag { font-size: 7px; color: var(--accent); text-transform: uppercase; margin-left: 4px; }
+.sc7-read { font-size: 9px; line-height: 1.8; min-height: 96px; }
+.sc7-note { font-size: 8px; line-height: 1.7; }
+.sc7-framing { margin-top: 12px; }
+@media (max-width: 760px) { .sc7-row { gap: 16px; } .sc7-table { font-size: 8px; } }

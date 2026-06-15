@@ -1,0 +1,25 @@
+/* scene7 -- Q* per-state table. */
+.sc7-formula { display: inline-block; margin: 6px 0 12px; }
+.sc7-pick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.sc7-pick .muted { font-family: 'Press Start 2P', monospace; font-size: 8px; }
+.sc7-pick-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.sc7-pickbtn { font-size: 8px; padding: 6px 8px; }
+.sc7-row { gap: 22px; align-items: flex-start; }
+.sc7-shelf-col { flex: 0 0 auto; }
+.shelf-icon.sc7-shelf { min-width: 150px; }
+.sc7-table-col { display: flex; flex-direction: column; gap: 10px; }
+.sc7-at { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--ink); }
+.sc7-table { border-collapse: collapse; font-family: 'Press Start 2P', monospace; max-width: 380px; }
+.sc7-table th { font-size: 8px; color: var(--ink-secondary); text-align: left; padding: 6px 12px; border-bottom: 2px solid var(--rule); text-transform: uppercase; }
+.sc7-table td { padding: 8px 12px; border-bottom: 1px dashed rgba(0,0,0,0.15); font-size: 10px; }
+.sc7-tr.is-best { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+.sc7-lev { padding: 4px 7px; border: 2px solid var(--rule); font-size: 8px; }
+.sc7-lev.lev-hold     { background: var(--lever-hold); color: var(--lever-hold-ink); }
+.sc7-lev.lev-discount { background: var(--lever-disc); color: var(--lever-disc-ink); }
+.sc7-lev.lev-dump     { background: var(--lever-dump); color: var(--lever-dump-ink); }
+.sc7-qval { font-size: 13px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sc7-star { color: var(--accent-2); font-size: 12px; }
+.sc7-besttag { font-size: 7px; color: var(--accent-2); margin-left: 3px; }
+.sc7-read { font-size: 9px; }
+.sc7-framing { font-size: 10px; }
+@media (max-width: 720px) { .sc7-row { gap: 14px; } .shelf-icon.sc7-shelf { min-width: 0; width: 100%; } }
