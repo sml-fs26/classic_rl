@@ -362,8 +362,8 @@ if(!isNaN(startSel)) sel = Math.max(0, Math.min(curList().length - 1, startSel))
  *  the row backgrounds / number / chip / cursor; #names paints the names.
  * ===================================================================== */
 const LIST_TOP = 70;          // backbuffer y where the list viewport starts
-const ROW_H    = 16;          // backbuffer px per row
-const VISROWS  = 7;           // visible rows in the viewport
+const ROW_H    = 14;          // backbuffer px per row (14*8 == old 16*7, bottom layout unchanged)
+const VISROWS  = 8;           // visible rows in the viewport (fits 7 headliners + EXTRA)
 const LIST_X   = 16;          // left of the list area
 const LIST_W   = VW - 32;     // width of the list area
 const NUM_X    = LIST_X + 4;  // row number
