@@ -62,6 +62,7 @@ ctx.imageSmoothingEnabled = false;
 const cabinet = document.getElementById('cabinet');
 const glass   = document.getElementById('glass');
 const namesEl = document.getElementById('names');
+const padEl   = document.getElementById('pad');   // touch scroll controls (▲/▼)
 
 let SCALE = 3;                 // scene scale factor (recomputed on resize)
 function layout(){
@@ -394,11 +395,13 @@ function buildNames(){
     r.appendChild(t);
     // click/tap a row -> select; tap again -> boot (ported behaviour)
     r.addEventListener('click', () => {
+      if(tMoved) return;                 // ignore the tap that ended a scroll-drag
       if(i === sel){ boot(); }
       else { sel = i; clampScroll(); blip(); resetIdle(); }
     });
     namesEl.appendChild(r);
   });
+  updatePad();
   syncNames();
 }
 function syncNames(){
@@ -910,14 +913,32 @@ addEventListener('keydown', e => {
 /* ===================================================================== *
  *  TOUCH / SWIPE on the scene  (ported)
  * ===================================================================== */
-let ty = null;
-glass.addEventListener('touchstart', e => { ty = e.touches[0].clientY; ac(); }, { passive:true });
-glass.addEventListener('touchend', e => {
+let ty = null, tStartScroll = 0, tMoved = false;
+/* scroll the visible window by N rows (decoupled from selection), clamped */
+function scrollWindow(rows){
+  const n = curList().length; if(n <= VISROWS) return;
+  scroll = Math.max(0, Math.min(scroll + rows, n - VISROWS));
+  syncNames(); resetIdle();
+}
+/* show the ▲/▼ touch buttons only when the current list overflows the viewport */
+function updatePad(){ if(padEl) padEl.classList.toggle('show', curList().length > VISROWS); }
+glass.addEventListener('touchstart', e => { ty = e.touches[0].clientY; tStartScroll = scroll; tMoved = false; ac(); }, { passive:true });
+glass.addEventListener('touchmove', e => {
   if(ty === null) return;
-  const dy = e.changedTouches[0].clientY - ty;
-  if(Math.abs(dy) > 40) move(dy < 0 ? 1 : -1);
-  ty = null;
-}, { passive:true });
+  const dy = e.touches[0].clientY - ty;
+  if(Math.abs(dy) > 6){
+    tMoved = true;                                   // suppresses the tap-to-select on touchend
+    if(booted && !attract){
+      const n = curList().length;
+      if(n > VISROWS){
+        const ns = Math.max(0, Math.min(tStartScroll - Math.round(dy / (ROW_H * SCALE)), n - VISROWS));
+        if(ns !== scroll){ scroll = ns; syncNames(); }
+      }
+    }
+    e.preventDefault();                              // stop page rubber-banding
+  }
+}, { passive:false });
+glass.addEventListener('touchend', () => { ty = null; }, { passive:true });
 // tapping the (non-name) scene also wakes from attract / dismisses boot
 cabinet.addEventListener('pointerdown', () => { ac(); if(!booted){ dismissBoot(); return; } anyInputWake(); resetIdle(); });
 
@@ -975,6 +996,9 @@ function wire(){
   document.getElementById('music-btn').addEventListener('click', e => { e.preventDefault(); toggleMusic(); });
   document.getElementById('theme-btn').addEventListener('click', e => { e.preventDefault(); cycleTheme(); });
   document.getElementById('jp-btn').addEventListener('click', e => { e.preventDefault(); toggleJP(); });
+  const pu = document.getElementById('pad-up'), pd = document.getElementById('pad-dn');
+  if(pu) pu.addEventListener('click', e => { e.preventDefault(); ac(); anyInputWake(); scrollWindow(-(VISROWS-2)); });
+  if(pd) pd.addEventListener('click', e => { e.preventDefault(); ac(); anyInputWake(); scrollWindow(VISROWS-2); });
   bootEl.addEventListener('click', dismissBoot);
   bootEl.addEventListener('touchstart', e => { e.preventDefault(); dismissBoot(); }, { passive:false });
   ['keydown','pointerdown','touchstart','mousemove'].forEach(ev => addEventListener(ev, resetIdle, { passive:true }));
