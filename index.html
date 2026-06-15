@@ -1,531 +1,131 @@
 <!doctype html>
-<html lang="en" data-pal="nes">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0b0b2a">
-<title>CLASSIC RL · 12-IN-1 · SML reinforcement learning</title>
+<meta name="theme-color" content="#0a0a18">
+<title>CLASSIC RL · arcade · SML reinforcement learning</title>
 
 <!--
-  Arcade front door for the SML reinforcement-learning visualizations.
-  A retro Nintendo "multicart" game-select screen: all 12 viz as one
-  cartridge, navigate with the d-pad, press START to boot.  This page is the
-  attract layer that sits IN FRONT of the editorial pages; each viz keeps its
-  own styling inside.  The plain editorial list is preserved at list.html.
+  CLASSIC RL : the arcade front door for the SML reinforcement-learning
+  visualizations, rebuilt as an authentic 1980s ARCADE ATTRACT-MODE screen.
 
-  Self-contained, browser-only, no build step.  Only external asset is the
-  pixel font, vendored at assets/fonts/ (copied from the per-viz folders).
-  Cross-viz hue identities (anymal-red, casino-blue, ghost-purple, star-amber,
-  door-green …) are reused as per-cartridge accents for continuity.
+  The entire SCENE (starfield, pixel frame, color-cycling logo, high-score
+  list, marquee, sprites, prompts) is rendered on a 320x240 backbuffer
+  canvas and integer-scaled up with image-rendering:pixelated, so the pixels
+  are genuinely chunky.  The only thing NOT on the canvas is the selectable
+  game NAMES: those are a DOM overlay (#names) in Press Start 2P, positioned
+  pixel-exactly over the canvas rows so they stay crisp and high-contrast
+  (the "BALANCED" brief: true low-res scene, sharp readable names).
+
+  Content lives in cartridges.js (window.GAMES / SPRITES / PX / SPR / EXTRA /
+  VIEWS).  The engine + chrome live in js/arcade.css and js/arcade.js.
+  The plain editorial list is preserved at list.html.
 -->
 
-<style>
-@font-face{
-  font-family:'Press Start 2P';
-  src:url('assets/fonts/PressStart2P-Regular.woff2') format('woff2');
-  font-display:block;            /* pixel font: never flash a fallback serif */
-  font-weight:400; font-style:normal;
-}
-
-/* ---------- palettes (T cycles: NES colour / Game-Boy green / amber) ------- */
-:root{
-  --px:'Press Start 2P', monospace;
-  --mono:'SF Mono', ui-monospace, Menlo, Consolas, monospace;
-  --bg0:#070718; --bg1:#0b0b2a; --frame:#1b1b54;
-  --ink:#eef0ff; --dim:#8a93d8; --glow:#5ad0ff; --hot:#ff4d6d;
-  --row:#11113a; --phos:#5ad0ff; --acc:#5ad0ff;
-}
-:root[data-pal="green"]{
-  --bg0:#04140a; --bg1:#0a2010; --frame:#13361c;
-  --ink:#c6ffbf; --dim:#4f9a49; --glow:#9bff7a; --hot:#e8ff7a;
-  --row:#0c2613; --phos:#9bff7a;
-}
-:root[data-pal="amber"]{
-  --bg0:#170d02; --bg1:#221405; --frame:#3a260a;
-  --ink:#ffd789; --dim:#a9803a; --glow:#ffb84d; --hot:#ff7a3c;
-  --row:#241606; --phos:#ffb84d;
-}
-
-*{box-sizing:border-box;}
-html,body{margin:0;height:100%;}
-body{
-  background:radial-gradient(120% 120% at 50% 8%,var(--bg1),var(--bg0) 70%);
-  color:var(--ink);
-  font-family:var(--px);
-  -webkit-font-smoothing:none;
-  image-rendering:pixelated;
-  overflow:hidden;
-  user-select:none;
-  text-shadow:0 0 6px color-mix(in srgb,var(--glow) 35%,transparent);
-}
-
-/* CRT overlays (scanlines + vignette + flicker), above content, no clicks */
-.crt::before,.crt::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;}
-.crt::before{
-  background:repeating-linear-gradient(0deg,
-    rgba(0,0,0,.32) 0, rgba(0,0,0,.32) 1px, transparent 2px, transparent 3px);
-  mix-blend-mode:multiply;
-}
-.crt::after{
-  background:radial-gradient(130% 130% at 50% 50%,transparent 60%,rgba(0,0,0,.45) 100%);
-  animation:flick 5.5s infinite steps(60);
-}
-@keyframes flick{0%,97%{opacity:1}98%{opacity:.85}99%{opacity:.97}100%{opacity:1}}
-
-/* ---------- layout ---------- */
-#screen{
-  position:relative;z-index:5;height:100%;
-  display:flex;flex-direction:column;
-  max-width:760px;margin:0 auto;
-  padding:max(18px,env(safe-area-inset-top)) 20px max(14px,env(safe-area-inset-bottom));
-}
-
-/* top bar */
-.topbar{display:flex;justify-content:space-between;align-items:center;
-  font-size:9px;color:var(--dim);letter-spacing:.06em;}
-.topbar a{color:var(--glow);text-decoration:none;
-  border:1px solid color-mix(in srgb,var(--glow) 45%,transparent);
-  padding:5px 7px;border-radius:2px;}
-#backbtn{display:none;}
-body.in-extra #backbtn{display:inline-block;}
-body.in-extra #credit{display:none;}
-.extra-hint{display:none;}
-body.in-extra .extra-hint{display:inline;color:var(--hot);}
-.topbar a:hover{color:var(--ink);border-color:var(--glow);}
-
-/* marquee / title */
-header{text-align:center;margin:8px 0 6px;}
-.subA{font-size:9px;color:var(--dim);letter-spacing:.34em;margin-bottom:8px;}
-h1{margin:0;font-size:clamp(20px,7vw,40px);line-height:1.18;
-  color:var(--ink);letter-spacing:.02em;overflow-wrap:anywhere;
-  text-shadow:0 2px 0 var(--frame),0 0 16px color-mix(in srgb,var(--glow) 60%,transparent);}
-h1 .star{color:var(--glow);}
-.badge{display:inline-block;margin-top:8px;font-size:11px;color:var(--bg0);
-  background:var(--glow);padding:6px 12px;border-radius:2px;letter-spacing:.18em;
-  box-shadow:0 0 14px color-mix(in srgb,var(--glow) 70%,transparent);}
-
-/* the cartridge list */
-.list{flex:1;min-height:0;overflow:auto;margin:10px 0 8px;
-  display:flex;flex-direction:column;justify-content:safe center;
-  border-top:2px solid var(--frame);border-bottom:2px solid var(--frame);
-  padding:6px 0;scrollbar-width:thin;}
-.row{display:grid;grid-template-columns:28px 14px 24px 1fr auto;gap:9px;align-items:center;
-  padding:5px 10px;font-size:12px;color:var(--dim);cursor:pointer;
-  border-left:4px solid transparent;}
-.row .no{font-size:10px;color:var(--dim);}
-.row .cur{color:var(--glow);visibility:hidden;}
-.row .chip{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;
-  background:#05050f;border:1px solid rgba(255,255,255,.14);border-radius:3px;padding:2px;}
-.row .chip svg{display:block;}
-:root[data-pal="green"] .row .chip svg{filter:grayscale(1) sepia(1) hue-rotate(58deg) saturate(2.4) brightness(1.05);}
-:root[data-pal="amber"] .row .chip svg{filter:grayscale(1) sepia(1) saturate(2.6) brightness(1.02);}
-.row .nm{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.row .tag{font-size:8px;color:var(--dim);letter-spacing:.12em;white-space:nowrap;}
-.row:hover{color:var(--ink);background:color-mix(in srgb,var(--frame) 40%,transparent);}
-.row.sel{
-  background:var(--acc);border-left-color:#000;
-  color:#06061a;text-shadow:none;
-}
-:root[data-pal="green"] .row.sel,:root[data-pal="amber"] .row.sel{
-  background:var(--phos);                 /* monochrome CRT modes */
-}
-.row.sel .no,.row.sel .nm,.row.sel .tag{color:#06061a;}
-.row.sel .chip{border-color:rgba(0,0,0,.45);}
-.row.sel .cur{visibility:visible;color:#06061a;animation:blink 1s steps(2) infinite;}
-.row.bundle{border-left-color:color-mix(in srgb,var(--glow) 38%,transparent);}
-.row.bundle .nm{color:var(--glow);letter-spacing:.04em;}
-.row.bundle.sel .nm{color:#06061a;}
-@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-
-/* info strip: describes the highlighted cartridge */
-.info{min-height:52px;padding:10px 12px;border-left:5px solid var(--acc);
-  background:color-mix(in srgb,var(--frame) 34%,transparent);}
-:root[data-pal="green"] .info,:root[data-pal="amber"] .info{border-left-color:var(--phos);}
-.info .il{font-size:10px;color:var(--acc);letter-spacing:.1em;margin-bottom:6px;}
-:root[data-pal="green"] .info .il,:root[data-pal="amber"] .info .il{color:var(--phos);}
-.info .ib{font-family:var(--mono);font-size:13px;line-height:1.5;color:var(--ink);
-  text-shadow:none;letter-spacing:0;}
-
-/* footer hint bar */
-.hints{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;
-  font-size:9px;color:var(--dim);letter-spacing:.06em;}
-.hints b{color:var(--glow);}
-.start{margin-top:12px;text-align:center;}
-.start button{font-family:var(--px);font-size:12px;letter-spacing:.16em;
-  color:var(--bg0);background:var(--hot);border:0;padding:11px 22px;border-radius:3px;
-  cursor:pointer;box-shadow:0 0 16px color-mix(in srgb,var(--hot) 65%,transparent);
-  animation:pyl 1.4s ease-in-out infinite;}
-@keyframes pyl{50%{transform:scale(1.05)}}
-
-/* ---------- boot overlay ---------- */
-#boot{position:fixed;inset:0;z-index:80;background:#000;display:flex;
-  flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;}
-#boot .flash{position:absolute;inset:0;background:#fff;animation:poweron 1s ease-out forwards;}
-@keyframes poweron{0%{opacity:0}6%{opacity:.9}9%{transform:scaleY(.004);opacity:1}
-  16%{transform:scaleY(.004)}40%{transform:scaleY(1);opacity:.25}100%{opacity:0}}
-#boot h2{font-size:clamp(22px,8vw,48px);color:var(--ink);margin:0;opacity:0;
-  animation:rise .7s .85s ease-out forwards;
-  text-shadow:0 0 18px var(--glow);}
-@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.9)}to{opacity:1;transform:none}}
-#boot .pb{margin-top:26px;font-size:11px;color:var(--glow);opacity:0;
-  animation:fadein .4s 1.9s forwards,blink 1s 2.2s steps(2) infinite;letter-spacing:.2em;}
-#boot .cp{position:absolute;bottom:26px;font-size:8px;color:var(--dim);letter-spacing:.1em;}
-@keyframes fadein{to{opacity:1}}
-
-/* ---------- loading overlay ---------- */
-#load{position:fixed;inset:0;z-index:85;background:#000;display:none;
-  flex-direction:column;align-items:center;justify-content:center;gap:18px;}
-#load.on{display:flex;}
-#load .lt{font-size:13px;color:var(--glow);letter-spacing:.18em;}
-#load .ln{font-size:11px;color:var(--ink);}
-#load .bar{width:min(70vw,320px);height:16px;border:2px solid var(--glow);padding:2px;}
-#load .bar i{display:block;height:100%;width:0;background:var(--glow);
-  box-shadow:0 0 12px var(--glow);animation:fill .9s linear forwards;}
-@keyframes fill{to{width:100%}}
-
-/* falling-sprite easter egg layer */
-#fx{position:fixed;inset:0;z-index:70;pointer-events:none;overflow:hidden;}
-.spr{position:absolute;top:-30px;font-size:16px;color:var(--glow);
-  animation:fall linear forwards;}
-@keyframes fall{to{transform:translateY(112vh) rotate(360deg);opacity:.2}}
-
-/* attract-mode mascot: ANYmal trots across the screen when idle */
-#mascot{position:fixed;left:0;bottom:54px;z-index:6;width:58px;display:none;pointer-events:none;
-  filter:drop-shadow(0 0 6px color-mix(in srgb,var(--glow) 70%,transparent));}
-#mascot .mi{display:block;width:58px;height:34px;image-rendering:pixelated;}
-body.attract #mascot{display:block;animation:trot 9s linear infinite;}
-body.attract #mascot .mi{animation:bob .34s steps(2) infinite;}
-@keyframes trot{from{transform:translateX(-90px)}to{transform:translateX(calc(100vw + 90px))}}
-@keyframes bob{50%{transform:translateY(-3px)}}
-body.attract h1{animation:apulse 1.1s ease-in-out infinite;}
-@keyframes apulse{50%{text-shadow:0 2px 0 var(--frame),0 0 28px var(--glow);}}
-.demo-tag{display:none;}
-body.attract .demo-tag{display:inline;color:var(--hot);}
-
-/* responsive */
-@media (max-width:560px){
-  #screen{padding-left:12px;padding-right:12px;}
-  h1{font-size:clamp(16px,5.4vw,26px);letter-spacing:0;max-width:100%;}
-  h1 .star{display:none;}              /* stars push the line past the viewport */
-  .subA{letter-spacing:.14em;font-size:8px;}
-  .topbar{font-size:8px;}
-  .topbar a{padding:4px 6px;}
-  .row{grid-template-columns:22px 12px 22px 1fr;gap:7px;font-size:11px;padding:5px 6px;}
-  .row .chip{width:20px;height:20px;}
-  .row .tag{display:none;}
-  .info{min-height:46px;}
-  .info .ib{font-size:12px;}
-}
-@media (max-height:620px){ header{margin:8px 0 4px;} .badge{margin-top:8px;} }
-
-/* respect reduced motion */
-@media (prefers-reduced-motion:reduce){
-  .crt::after,.start button,#boot .flash,#boot h2,#boot .pb{animation:none!important;}
-  .row.sel .cur{animation:none;visibility:visible;}
-  #load .bar i{animation:none;width:100%;}
-  #mascot{display:none!important;}
-}
-</style>
+<link rel="stylesheet" href="css/arcade.css">
 </head>
 
-<body class="crt">
+<body>
 
-<div id="screen">
-  <div class="topbar">
-    <span id="credit">CREDIT&nbsp;01<span class="demo-tag">&nbsp;&middot;&nbsp;DEMO</span></span>
-    <a id="backbtn" href="#" title="Back to main menu">&#8617;&nbsp;BACK</a>
-    <a href="list.html" title="Plain editorial list">▤ PLAIN&nbsp;LIST</a>
+<!-- the black cabinet letterboxes the integer-scaled backbuffer -->
+<div id="cabinet">
+  <!-- curved glass holds the scaled canvas + crisp name overlay + CRT glass -->
+  <div id="glass">
+    <canvas id="scene" width="320" height="240" aria-label="CLASSIC RL arcade attract screen"></canvas>
+    <!-- crisp game-name overlay (Press Start 2P), positioned over the rows -->
+    <div id="names" role="listbox" aria-label="Select a visualization"></div>
+    <!-- CRT glass: scanlines + shadow-mask + vignette + flicker -->
+    <div id="crt"></div>
   </div>
-
-  <header>
-    <div class="subA" id="subA">SML · REINFORCEMENT LEARNING</div>
-    <h1><span class="star">★</span> CLASSIC RL <span class="star">★</span></h1>
-    <span class="badge" id="badge">19 - IN - 1</span>
-  </header>
-
-  <div class="list" id="list" role="listbox" aria-label="Select a visualization"></div>
-
-  <div class="info" id="info">
-    <div class="il" id="info-l">NO. 01 · ANYMAL MDP</div>
-    <div class="ib" id="info-b">Drive the robot dog by hand. Meet state, action, transition, reward.</div>
-  </div>
-
-  <div class="hints">
-    <span><b>↑↓</b> SELECT</span>
-    <span><b>⏎ / A</b> START</span>
-    <span><b>T</b> SCREEN</span>
-    <span class="extra-hint"><b>ESC</b> BACK</span>
-    <span><b>↑↑↓↓←→←→BA</b> ?</span>
-  </div>
-  <div class="start"><button id="startbtn">▶ PUSH START</button></div>
 </div>
 
-<!-- boot intro -->
+<!-- link bar: floats over the cabinet so it works on file:// and on Pages -->
+<div id="links">
+  <button id="music-btn" type="button" title="Toggle chiptune music">♪ MUSIC</button>
+  <button id="theme-btn" type="button" title="Cycle screen colour (NES / green / amber)">THEME:NES</button>
+  <button id="jp-btn" type="button" title="日本語?">日本語?</button>
+  <a href="list.html" title="Plain editorial list">▤ PLAIN LIST</a>
+</div>
+
+<!-- boot intro (power-on flourish), drawn over the canvas -->
 <div id="boot">
-  <div class="flash"></div>
-  <h2><span style="color:var(--glow)">★</span> CLASSIC&nbsp;RL</h2>
-  <div class="pb">PRESS ⏎ / TAP TO START</div>
-  <div class="cp">© 2026 NINTEN... ER, ETH ZÜRICH · SML</div>
+  <div class="boot-flash"></div>
+  <div class="boot-logo">★ CLASSIC RL ★</div>
+  <div class="boot-sub">SML · REINFORCEMENT LEARNING</div>
+  <div class="boot-press">PRESS ⏎ / TAP TO START</div>
+  <div class="boot-cp">© 2026 ETH ZÜRICH · SML</div>
 </div>
 
-<!-- boot-into-game loading -->
+<!-- boot-into-game loading overlay -->
 <div id="load">
-  <div class="lt">NOW LOADING</div>
-  <div class="ln" id="load-n">...</div>
-  <div class="bar"><i></i></div>
+  <div class="load-t">NOW LOADING</div>
+  <div class="load-n" id="load-n">...</div>
+  <div class="load-bar"><i id="load-bar"></i></div>
+  <div class="load-c">CREDIT 00 · 1 COIN 1 PLAY</div>
 </div>
 
-<div id="mascot"><div class="mi"></div></div>
-
+<!-- konami falling-sprite easter-egg layer -->
 <div id="fx"></div>
 
+<style>
+/* ---- overlays that sit ABOVE the cabinet (boot / loading / fx) ----
+   These are DOM (not canvas) because they cover the whole viewport, but
+   they keep the same flat-palette / pixel-font / hard-edge look.        */
+
+#boot{
+  position:fixed; inset:0; z-index:60; background:#0a0a18;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; cursor:pointer; gap:14px;
+  font-family:'Press Start 2P', monospace;
+}
+#boot .boot-flash{
+  position:absolute; inset:0; background:#f6f8ff;
+  animation:poweron 1s steps(8) forwards;
+}
+@keyframes poweron{
+  0%{opacity:0} 8%{opacity:.95} 12%{transform:scaleY(.01);opacity:1}
+  20%{transform:scaleY(.01)} 45%{transform:scaleY(1);opacity:.25} 100%{opacity:0}
+}
+#boot .boot-logo{
+  font-size:clamp(20px,7vw,40px); color:#ffd23f; letter-spacing:.04em;
+  opacity:0; animation:bootrise .5s .8s steps(6) forwards;
+}
+#boot .boot-sub{ font-size:10px; color:#9aa0c8; letter-spacing:.18em;
+  opacity:0; animation:bootrise .5s 1.0s steps(6) forwards; }
+#boot .boot-press{ margin-top:18px; font-size:11px; color:#5ad0ff; letter-spacing:.12em;
+  opacity:0; animation:bootfade .3s 1.6s steps(2) forwards, bootblink 1s 1.9s steps(2) infinite; }
+#boot .boot-cp{ position:absolute; bottom:24px; font-size:8px; color:#4a4f80; letter-spacing:.1em; }
+@keyframes bootrise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes bootfade{to{opacity:1}}
+@keyframes bootblink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+#load{
+  position:fixed; inset:0; z-index:70; background:#0a0a18; display:none;
+  flex-direction:column; align-items:center; justify-content:center; gap:16px;
+  font-family:'Press Start 2P', monospace;
+}
+#load.on{ display:flex; }
+#load .load-t{ font-size:13px; color:#5ad0ff; letter-spacing:.18em; }
+#load .load-n{ font-size:11px; color:#f6f8ff; letter-spacing:.06em; text-align:center; padding:0 16px; }
+#load .load-bar{ width:min(70vw,320px); height:16px; border:2px solid #5ad0ff; padding:2px; background:#0a0a18; }
+#load .load-bar i{ display:block; height:100%; width:0; background:#5ad0ff; }
+#load .load-c{ font-size:8px; color:#4a4f80; letter-spacing:.12em; }
+
+/* konami falling sprites */
+#fx{ position:fixed; inset:0; z-index:80; pointer-events:none; overflow:hidden; }
+#fx .spr{ position:absolute; top:-30px; font-size:18px; color:#5ad0ff;
+  animation:fxfall linear forwards; font-family:'Press Start 2P', monospace; }
+@keyframes fxfall{ to{ transform:translateY(112vh) rotate(360deg); opacity:.2 } }
+
+@media (prefers-reduced-motion:reduce){
+  #boot .boot-flash, #boot .boot-logo, #boot .boot-sub, #boot .boot-press{ animation:none !important; opacity:1 !important; }
+  #load .load-bar i{ width:100% !important; }
+}
+</style>
+
 <script src="cartridges.js"></script>
-<script>
-/* ------------------------------------------------------------------ *
- *  The registry (GAMES / SPRITES / PX / SPR / EXTRA / VIEWS) lives in *
- *  cartridges.js (loaded above) so content and chrome stay on         *
- *  separate files. Integrators edit cartridges.js; everything below   *
- *  is the chrome + engine.                                            *
- * ------------------------------------------------------------------ */
-const GAMES = window.GAMES, SPR = window.SPR, PX = window.PX,
-      SPRITES = window.SPRITES, EXTRA = window.EXTRA, VIEWS = window.VIEWS;
-
-/* ---- sprite rendering (the sprite DATA + palette live in cartridges.js) ---- */
-function spriteSVG(id){
-  const g=SPRITES[id]; if(!g) return '';
-  const w=g[0].length, h=g.length; let p='';
-  for(let y=0;y<h;y++){ const row=g[y]; for(let x=0;x<row.length;x++){ const c=PX[row[x]];
-    if(c) p+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+c+'"/>'; } }
-  return '<svg viewBox="0 0 '+w+' '+h+'" width="100%" height="100%" shape-rendering="crispEdges" aria-hidden="true">'+p+'</svg>';
-}
-
-/* (sprite attach + EXTRA + VIEWS are defined in cartridges.js; aliased above) */
-let view='main';
-function curList(){ return VIEWS[view]; }
-
-const $ = s => document.querySelector(s);
-const listEl = $('#list'), infoL = $('#info-l'), infoB = $('#info-b');
-let sel = 0, booted = false;
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/* ---- query params: ?boot=0 skips intro (used for screenshots) ---- */
-const qs = new URLSearchParams(location.search);
-if(qs.get('boot') === '0'){ booted = true; $('#boot').style.display='none'; }
-const startSel = parseInt(qs.get('i'),10);
-if(!isNaN(startSel)) sel = Math.max(0, Math.min(VIEWS.main.length-1, startSel));
-const palQ = qs.get('pal');
-if(['nes','green','amber'].includes(palQ)) document.documentElement.setAttribute('data-pal', palQ);
-const demo = qs.get('demo')==='1';
-if(qs.get('view')==='extra'){ view='extra'; sel=0; setExtraChrome(true); }
-
-/* ---- save file: which carts have been opened ---- */
-let visited = {};
-try{ visited = JSON.parse(localStorage.getItem('classicrl_visited') || '{}'); }catch(e){}
-
-/* ---- build the current list (main menu or the EXTRA bundle) ---- */
-function renderList(){
-  listEl.innerHTML='';
-  curList().forEach((g,i)=>{
-    const r = document.createElement('div');
-    r.className = 'row' + (g.isBundle?' bundle':''); r.dataset.i = i; r.style.setProperty('--acc', g.acc);
-    r.setAttribute('role','option');
-    const done = g.href && visited[g.href];
-    r.innerHTML =
-      `<span class="no">${g.isBundle?'EX':String(i+1).padStart(2,'0')}</span>`+
-      `<span class="cur">▶</span>`+
-      `<span class="chip">${spriteSVG(g.spr)}</span>`+
-      `<span class="nm">${g.name}</span>`+
-      `<span class="tag">${done?'✓ ':''}${g.tag}</span>`;
-    r.addEventListener('click', ()=>{ if(i===sel) boot(); else { sel=i; paint(); blip(); } });
-    listEl.appendChild(r);
-  });
-  paint();
-}
-
-function paint(){
-  const list = curList();
-  [...listEl.children].forEach((r,i)=>r.classList.toggle('sel', i===sel));
-  const g = list[sel]; if(!g) return;
-  document.documentElement.style.setProperty('--acc', g.acc);
-  infoL.textContent = g.isBundle ? ('EXTRA · ' + VIEWS.extra.length + ' BONUS CARTRIDGES')
-                                 : `NO. ${String(sel+1).padStart(2,'0')} · ${g.name}`;
-  infoB.textContent = g.blurb;
-  const r = listEl.children[sel];
-  if(r) r.scrollIntoView({block:'nearest'});
-}
-function move(d){ const n=curList().length; sel = (sel + d + n) % n; paint(); blip(); resetIdle(); }
-
-/* ---- boot a cartridge (or open the EXTRA bundle) ---- */
-function boot(){
-  const g = curList()[sel];
-  if(g.isBundle){ openExtra(); return; }
-  visited[g.href] = 1;
-  try{ localStorage.setItem('classicrl_visited', JSON.stringify(visited)); }catch(e){}
-  coin();
-  $('#load-n').textContent = g.name;
-  $('#load').classList.add('on');
-  // file:// shows a dir listing for "casino/"; target index.html so it works locally and on Pages
-  const dest = g.href + (g.href.endsWith('/') ? 'index.html' : '');
-  setTimeout(()=>{ location.href = dest; }, reduce ? 250 : 950);
-}
-
-/* ---- EXTRA bundle: an in-page sub-screen with the other 7 cartridges ---- */
-function setExtraChrome(on){
-  $('#badge').textContent = on ? ('EXTRA · ' + VIEWS.extra.length) : (GAMES.length + ' - IN - 1');
-  $('#subA').textContent  = on ? '▸ EXTRA GAMES' : 'SML · REINFORCEMENT LEARNING';
-  document.body.classList.toggle('in-extra', on);
-}
-function openExtra(){
-  exitAttract(); coin();
-  $('#load-n').textContent = 'EXTRA GAMES';
-  $('#load').classList.add('on');
-  setTimeout(()=>{ view='extra'; sel=0; setExtraChrome(true); renderList();
-    $('#load').classList.remove('on'); resetIdle(); }, reduce ? 150 : 650);
-}
-function backToMain(){
-  blip(); view='main'; setExtraChrome(false);
-  sel = VIEWS.main.findIndex(x=>x.isBundle); if(sel<0) sel=0;
-  renderList(); resetIdle();
-}
-
-/* ------------------------------ audio ----------------------------- *
- *  chiptune via Web Audio, no asset files. Unlocked on first gesture *
- * ------------------------------------------------------------------ */
-let actx=null, muted=false;
-function ac(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ muted=true; } } return actx; }
-function tone(f,d,t='square',when=0,g=0.05){
-  const c=ac(); if(!c||muted) return;
-  const o=c.createOscillator(), v=c.createGain(), now=c.currentTime+when;
-  o.type=t; o.frequency.setValueAtTime(f,now);
-  v.gain.setValueAtTime(0.0001,now);
-  v.gain.exponentialRampToValueAtTime(g,now+0.01);
-  v.gain.exponentialRampToValueAtTime(0.0001,now+d);
-  o.connect(v).connect(c.destination); o.start(now); o.stop(now+d+0.02);
-}
-const blip  =()=>tone(620,0.05,'square',0,0.04);
-const chime =()=>{tone(880,0.06);tone(1320,0.12,'square',0.05);};
-const coin  =()=>{tone(988,0.07,'square',0,0.05);tone(1319,0.32,'square',0.07,0.05);};
-const jingle=()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,0.14,'square',i*0.11,0.045));
-
-/* ---- palette cycle (T) ---- */
-const PALS=['nes','green','amber'];
-function cyclePal(){
-  const cur=document.documentElement.getAttribute('data-pal');
-  const next=PALS[(PALS.indexOf(cur)+1)%PALS.length];
-  document.documentElement.setAttribute('data-pal',next);
-  paint(); blip();
-}
-
-/* ---- idle attract / demo mode ---- */
-let idleT=null, attractTimer=null;
-function enterAttract(){
-  if(reduce || !booted || view!=='main') return;
-  document.body.classList.add('attract');
-  attractTimer=setInterval(()=>{ const n=curList().length; sel=(sel+1)%n; paint(); }, 1500);
-}
-function exitAttract(){
-  document.body.classList.remove('attract');
-  if(attractTimer){ clearInterval(attractTimer); attractTimer=null; }
-}
-function resetIdle(){
-  exitAttract(); clearTimeout(idleT);
-  if(!reduce) idleT=setTimeout(enterAttract, 18000);
-}
-
-/* ---- dismiss boot ---- */
-function dismissBoot(){
-  if(booted) return; booted=true;
-  ac(); jingle();
-  const b=$('#boot'); b.style.transition='opacity .35s'; b.style.opacity='0';
-  setTimeout(()=>b.style.display='none', 360);
-  resetIdle();
-}
-
-/* ---- keyboard ---- */
-const KO=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-let kbuf=[];
-addEventListener('keydown', e=>{
-  ac();
-  // konami tracking
-  kbuf.push(e.key.length===1?e.key.toLowerCase():e.key); kbuf=kbuf.slice(-KO.length);
-  if(KO.every((k,i)=>k===kbuf[i])){ secret(); kbuf=[]; }
-
-  if(!booted){
-    if(['Enter',' ','ArrowUp','ArrowDown'].includes(e.key)){ e.preventDefault(); dismissBoot(); }
-    return;
-  }
-  switch(e.key){
-    case 'ArrowUp': case 'k': case 'w': e.preventDefault(); move(-1); break;
-    case 'ArrowDown': case 'j': case 's': e.preventDefault(); move(1); break;
-    case 'Enter': case ' ': case 'x': e.preventDefault(); chime(); boot(); break;
-    case 'Escape': case 'Backspace': if(view==='extra'){ e.preventDefault(); backToMain(); } break;
-    case 't': case 'T': cyclePal(); break;
-    case 'Home': sel=0; paint(); blip(); break;
-    case 'End': sel=curList().length-1; paint(); blip(); break;
-  }
-});
-
-/* ---- touch / mouse start button + boot overlay ---- */
-$('#startbtn').addEventListener('click', ()=>{ ac(); chime(); boot(); });
-$('#boot').addEventListener('click', dismissBoot);
-$('#boot').addEventListener('touchstart', e=>{ e.preventDefault(); dismissBoot(); }, {passive:false});
-// swipe to move
-let ty=null;
-listEl.addEventListener('touchstart', e=>{ ty=e.touches[0].clientY; }, {passive:true});
-listEl.addEventListener('touchend', e=>{
-  if(ty===null) return; const dy=e.changedTouches[0].clientY-ty;
-  if(Math.abs(dy)>40) move(dy<0?1:-1); ty=null;
-}, {passive:true});
-
-/* ---- gamepad (real controller drives the menu) ---- */
-let gpPrev={}, gpAxis=0;
-addEventListener('gamepadconnected', ()=>{ requestAnimationFrame(pollGP); });
-function pollGP(){
-  const gp=(navigator.getGamepads&&navigator.getGamepads()[0]);
-  if(gp){
-    const up=gp.buttons[12]&&gp.buttons[12].pressed, dn=gp.buttons[13]&&gp.buttons[13].pressed;
-    const a=gp.buttons[0]&&gp.buttons[0].pressed, st=gp.buttons[9]&&gp.buttons[9].pressed;
-    const bb=gp.buttons[1]&&gp.buttons[1].pressed;
-    const ay=gp.axes[1]||0;
-    if(!booted){ if(a||st||up||dn) dismissBoot(); }
-    else{
-      if((up||ay<-0.6) && !gpAxis){ move(-1); gpAxis=1; }
-      else if((dn||ay>0.6) && !gpAxis){ move(1); gpAxis=1; }
-      else if(!up&&!dn&&Math.abs(ay)<0.4){ gpAxis=0; }
-      if(a && !gpPrev.a){ chime(); boot(); }
-      if(bb && !gpPrev.b && view==='extra'){ backToMain(); }
-    }
-    gpPrev={a,b:bb};
-  }
-  requestAnimationFrame(pollGP);
-}
-
-/* ---- konami easter egg: gamma=1, epsilon=0 "cheat", sprite rain ---- */
-function secret(){
-  jingle();
-  infoL.textContent='⚡ CHEAT ENABLED ⚡';
-  infoB.textContent='γ = 1.00 · ε = 0.00 · the agent now believes it is immortal and greedy. (You found the Konami code.)';
-  const fx=$('#fx'); const chars=['γ','ε','★','Q','π','▲','♥','$'];
-  for(let i=0;i<48;i++){
-    const s=document.createElement('div'); s.className='spr';
-    s.textContent=chars[i%chars.length];
-    s.style.left=(i/48*100)+'%';
-    s.style.color=GAMES[i%GAMES.length].acc;
-    s.style.animationDuration=(2+ (i%5)*0.6)+'s';
-    s.style.animationDelay=((i%9)*0.12)+'s';
-    fx.appendChild(s); setTimeout(()=>s.remove(), 7000);
-  }
-}
-
-/* ---- go ---- */
-$('#mascot .mi').innerHTML = spriteSVG('dog');
-$('#badge').textContent = GAMES.length + ' - IN - 1';
-$('#backbtn').addEventListener('click', e=>{ e.preventDefault(); ac(); backToMain(); });
-['keydown','pointerdown','touchstart','mousemove'].forEach(ev=>addEventListener(ev, resetIdle, {passive:true}));
-renderList();
-if(booted) resetIdle();
-if(demo){ booted=true; $('#boot').style.display='none'; enterAttract(); }
-</script>
+<script src="js/arcade.js"></script>
 </body>
 </html>

@@ -1,0 +1,129 @@
+/* ===================================================================== *
+ *  CLASSIC RL : 80s arcade attract-mode chrome.
+ *
+ *  The SCENE is drawn on a 320x240 backbuffer canvas (#scene), integer-
+ *  scaled up with image-rendering:pixelated so the pixels are genuinely
+ *  chunky.  The selectable game NAMES are NOT on the canvas: they are a
+ *  DOM text overlay (#names) positioned pixel-exactly over the canvas rows
+ *  and set in Press Start 2P, so they stay crisp and high-contrast (the
+ *  "BALANCED" requirement: true low-res scene, sharp readable names).
+ *
+ *  Flat fills only.  No CSS gradients / blur / drop-shadow on the scene:
+ *  shading is done with dithering inside the canvas.  border-radius:0
+ *  everywhere; hard right angles.
+ * ===================================================================== */
+@font-face{
+  font-family:'Press Start 2P';
+  src:url('../assets/fonts/PressStart2P-Regular.woff2') format('woff2');
+  font-display:block;            /* pixel font: never flash a fallback serif */
+  font-weight:400; font-style:normal;
+}
+
+*{box-sizing:border-box; border-radius:0 !important;}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;}
+body{
+  font-family:'Press Start 2P', monospace;
+  color:#fff;
+  -webkit-font-smoothing:none;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:manipulation;
+}
+
+/* the black "cabinet" : letterboxes the integer-scaled backbuffer */
+#cabinet{
+  position:fixed; inset:0; background:#000;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+
+/* the curved glass holds the scaled canvas + the crisp name overlay +
+   the CRT glass, and is what we apply the mild barrel curvature to. */
+#glass{
+  position:relative;
+  transform-origin:center center;
+  /* size set in JS to the integer-scaled backbuffer size */
+}
+body.curve #glass{
+  transform:perspective(1400px) rotateX(0.6deg) scale(1.002);
+}
+
+/* the low-res scene, blown up with NO smoothing */
+#scene{
+  display:block;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  background:#000;
+}
+
+/* crisp game-name overlay: absolutely-positioned text rows drawn OVER the
+   canvas list rows.  JS sets each row's top/left/height in device px. */
+#names{
+  position:absolute; inset:0; pointer-events:none;
+  font-family:'Press Start 2P', monospace;
+}
+#names .nrow{
+  position:absolute; display:flex; align-items:center;
+  white-space:nowrap; overflow:hidden;
+  pointer-events:auto; cursor:pointer;
+  text-shadow:none;
+}
+#names .nrow .ntxt{
+  overflow:hidden; text-overflow:clip; white-space:nowrap;
+  letter-spacing:0;
+}
+/* normal row: bright ink on the dark scene */
+#names .nrow{ color:#e9e9ff; }
+/* selected row: inverse video (dark text); the canvas paints the bright bar */
+#names .nrow.sel{ color:#0a0a18; }
+#names .nrow.bundle{ color:#ffd23f; }
+#names .nrow.bundle.sel{ color:#0a0a18; }
+
+/* CRT glass: scanlines + shadow-mask tint + vignette + flicker.
+   Kept subtle so names stay legible.  Sits above scene+names. */
+#crt{ position:absolute; inset:0; pointer-events:none; z-index:5; }
+#crt::before{                       /* scanlines + faint RGB shadow-mask */
+  content:""; position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(0,0,0,.30) 0, rgba(0,0,0,.30) 2px, transparent 2px, transparent 4px),
+    repeating-linear-gradient(90deg,
+      rgba(255,0,0,.05) 0, rgba(255,0,0,.05) 1px,
+      rgba(0,255,0,.05) 1px, rgba(0,255,0,.05) 2px,
+      rgba(0,0,255,.05) 2px, rgba(0,0,255,.05) 3px);
+  mix-blend-mode:multiply;
+}
+#crt::after{                        /* vignette + slow flicker */
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(130% 130% at 50% 50%,transparent 58%,rgba(0,0,0,.55) 100%);
+  animation:flick 6s steps(40) infinite;
+}
+@keyframes flick{0%,96%{opacity:1}97%{opacity:.86}98%{opacity:.97}100%{opacity:1}}
+
+/* the link bar (PLAIN LIST / MUSIC / THEME / JP) : small, top-right,
+   floats over the cabinet so it is clickable on file:// and Pages.        */
+#links{
+  position:fixed; top:6px; right:8px; z-index:20;
+  display:flex; gap:6px; align-items:center;
+  font-size:9px; line-height:1;
+}
+#links a, #links button{
+  font-family:'Press Start 2P', monospace; font-size:9px;
+  color:#7ad0ff; background:#08081c;
+  border:1px solid #2a2a66; padding:5px 6px;
+  text-decoration:none; cursor:pointer; letter-spacing:.02em;
+}
+#links a:hover, #links button:hover{ color:#fff; border-color:#7ad0ff; background:#101040; }
+#links button.on{ color:#0a0a18; background:#7ad0ff; border-color:#7ad0ff; }
+
+@media (max-width:560px){
+  #links{ top:4px; right:5px; gap:4px; }
+  #links a, #links button{ font-size:8px; padding:4px 5px; }
+}
+
+/* respect reduced motion: kill the flicker (color-cycling, starfield,
+   curvature, attract auto-motion are all gated in JS by the same flag). */
+@media (prefers-reduced-motion:reduce){
+  #crt::after{ animation:none !important; }
+  body.curve #glass{ transform:none !important; }
+}
