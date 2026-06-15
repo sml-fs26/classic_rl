@@ -102,7 +102,7 @@
         till += out.reward; if (window.SFX) window.SFX.play('dump');
         state = out.sNext; hour++;
         renderShelf(); syncHud(); setMeterFor('HOLD');
-        dlg.say(T('scene2.dlg.dumped'), { instant: true });
+        dlg.say(T('scene2.dlg.dumped', { n: state.units }), { instant: true });
         busy = false; setLeversEnabled(true);
         return;
       }
