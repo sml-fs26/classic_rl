@@ -4,8 +4,11 @@
 %   * arrows + why-ladder bubbles redrawn natively in TikZ + Libertinus
 %   * a "you are here" spotlight: current ride lit, the rest dimmed
 %
+% Layout follows the DECK's order, so the spotlight marches left-to-right as
+% the lecture advances:  MDP -> Bellman -> SARSA -> Bandit -> Darts.
+%
 %   \roadmap            overview: every ride lit, the full why-ladder
-%   \roadmap[bellman]   spotlight one ride: mdp | bandit | bellman | darts | sarsa
+%   \roadmapmdp \roadmapbellman \roadmapsarsa \roadmapbandit \roadmapdarts
 % ============================================================================
 \usetikzlibrary{shadows.blur}
 \definecolor{spot}{HTML}{F59E0B}   % bright amber glow for the current ride
@@ -13,72 +16,83 @@
 % --- one cartridge: #1 file  #2 x  #3 y  #4 lit(1)/dim(0) ---
 \newcommand{\rmcard}[4]{%
   \ifnum#4=1
-    \node[inner sep=0pt, draw=spot, line width=2.6pt, rounded corners=2.5pt]
-      (rmnode) at (#2,#3) {\includegraphics[height=3.15cm]{img/roadmap/#1}};%
+    \node[inner sep=0pt, draw=spot, line width=2.8pt, rounded corners=2.5pt]
+      at (#2,#3) {\includegraphics[height=3.15cm]{img/roadmap/#1}};%
   \else
     \begin{scope}[transparency group, opacity=0.26]
       \node[inner sep=0pt] at (#2,#3) {\includegraphics[height=2.95cm]{img/roadmap/#1}};%
     \end{scope}
   \fi
 }
-% --- a why-ladder bubble: #1 x  #2 y  #3 width(cm)  #4 fill  #5 textcolor  #6 text ---
+% --- a bubble: #1 x  #2 y  #3 width(cm)  #4 fill  #5 textcolor  #6 text ---
 \newcommand{\rmbubble}[6]{%
   \node[fill=#4, text=#5, rounded corners=3pt, align=center, font=\scriptsize,
         inner sep=4pt, text width=#3cm] at (#1,#2) {#6};%
 }
 
-% positions on a 16 x 9 canvas (cards on a U-shaped path, ladder on the right)
+% string constants for \ifx comparisons
+\def\rmall{all}\def\rmmdp{mdp}\def\rmbel{bellman}\def\rmsar{sarsa}\def\rmban{bandit}\def\rmdar{darts}
+
+% layout: cards on a U-path in deck order, why-ladder on the right
 \newcommand{\rmscene}[1]{% #1 = current key (or "all")
   \begin{frame}[plain]
   \centering
   \begin{tikzpicture}
     \useasboundingbox (0,0) rectangle (16,9);
-    % faint hand-drawn park backdrop
     \node[opacity=0.16, inner sep=0pt] at (5.6,4.5) {\includegraphics[height=9.2cm]{img/roadmap/park}};
-    % path arrows (drawn first, behind cards)
+    % path arrows (deck order: MDP -> Bellman -> SARSA -> Bandit -> Darts)
     \begin{scope}[draw=accent!75, line width=3pt, -{Stealth[length=4mm]}, opacity=0.9]
-      \draw (3.7,6.2) -- (4.1,6.2);
-      \draw (6.6,6.2) -- (7.0,6.2);
-      \draw (8.2,4.5) -- (8.2,4.1);     % BELLMAN down to DARTS
-      \draw (6.9,2.6) -- (6.5,2.6);     % DARTS left to SARSA
+      \draw (3.55,6.2) -- (4.25,6.2);   % MDP -> Bellman
+      \draw (6.55,6.2) -- (7.25,6.2);   % Bellman -> SARSA
+      \draw (8.4,4.55) -- (8.4,4.15);   % SARSA -> Bandit (down)
+      \draw (7.30,2.5) -- (6.85,2.5);   % Bandit -> Darts (left)
     \end{scope}
-    % the five cartridges (lit iff current; "all" lights every one)
     \def\cur{#1}
     \rmcard{mdp-maze}{2.4}{6.2}{\ifx\cur\rmmdp 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    \rmcard{bandit-arcade}{5.3}{6.2}{\ifx\cur\rmban 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    \rmcard{bellman-house}{8.2}{6.2}{\ifx\cur\rmbel 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    \rmcard{darts-dark}{8.2}{2.55}{\ifx\cur\rmdar 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    \rmcard{sarsa-maze}{5.3}{2.55}{\ifx\cur\rmsar 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    % ride labels under each card
+    \rmcard{bellman-house}{5.4}{6.2}{\ifx\cur\rmbel 1\else\ifx\cur\rmall 1\else0\fi\fi}
+    \rmcard{sarsa-maze}{8.4}{6.2}{\ifx\cur\rmsar 1\else\ifx\cur\rmall 1\else0\fi\fi}
+    \rmcard{bandit-arcade}{8.4}{2.5}{\ifx\cur\rmban 1\else\ifx\cur\rmall 1\else0\fi\fi}
+    \rmcard{darts-dark}{5.2}{2.5}{\ifx\cur\rmdar 1\else\ifx\cur\rmall 1\else0\fi\fi}
     \begin{scope}[font=\scriptsize\bfseries, text=black!70]
-      \node at (2.4,4.35) {MDP maze}; \node at (5.3,4.35) {bandit arcade};
-      \node at (8.2,4.35) {Bellman's house}; \node at (8.2,0.7) {darts in the dark};
-      \node at (5.3,0.7) {SARSA maze};
+      \node at (2.4,4.35) {MDP maze}; \node at (5.4,4.35) {Bellman's house};
+      \node at (8.4,4.35) {SARSA maze}; \node at (8.4,0.6) {bandit arcade};
+      \node at (5.2,0.6) {darts in the dark};
     \end{scope}
-    % the why-ladder (right column)
     \ifx\cur\rmall
-      \node[font=\large\bfseries, text=accent] at (12.5,8.4) {The plan};
-      \rmbubble{12.5}{7.3}{4.2}{accent}{white}{How do we find the optimal strategy?}
-      \rmbubble{12.5}{6.25}{3.9}{good!18!white}{black!80}{the call with the highest cumulative reward}
-      \rmbubble{12.5}{5.0}{4.2}{accent}{white}{How do we compute that reward?}
-      \rmbubble{12.5}{3.95}{3.9}{good!18!white}{black!80}{the Bellman equation}
-      \rmbubble{12.5}{2.7}{4.2}{accent}{white}{How do we solve Bellman without the odds?}
-      \rmbubble{12.5}{1.5}{3.9}{good!18!white}{black!80}{Robbins-Monro, i.e. SARSA}
+      \node[font=\large\bfseries, text=accent] at (12.5,8.55) {The plan};
+      \rmbubble{12.5}{7.55}{4.2}{accent}{white}{How do we pick the best call?}
+      \rmbubble{12.5}{6.5}{3.9}{good!18!white}{black!80}{the one with the largest long-run reward}
+      \rmbubble{12.5}{5.35}{4.2}{accent}{white}{How do we know that reward?}
+      \rmbubble{12.5}{4.3}{3.9}{good!18!white}{black!80}{the Bellman equation gives $Q^\star(s,a)$}
+      \rmbubble{12.5}{3.15}{4.2}{accent}{white}{And when the odds are hidden?}
+      \rmbubble{12.5}{2.1}{3.9}{good!18!white}{black!80}{learn it from experience: SARSA}
     \else
-      \node[font=\large\bfseries, text=spot, anchor=north] at (12.5,8.2) {you are here};
-      \rmbubble{12.5}{6.6}{4.3}{accent}{white}{\rmq}
-      \rmbubble{12.5}{5.0}{4.0}{good!18!white}{black!80}{\rma}
+      \node[font=\large\bfseries, text=spot, anchor=north] at (12.5,8.4) {you are here};
+      \rmbubble{12.5}{6.6}{4.4}{accent}{white}{\rmq}
+      \rmbubble{12.5}{4.7}{4.2}{good!18!white}{black!80}{\rma}
     \fi
   \end{tikzpicture}
   \end{frame}
 }
 
-% string constants for \ifx comparisons
-\def\rmall{all}\def\rmmdp{mdp}\def\rmban{bandit}\def\rmbel{bellman}\def\rmdar{darts}\def\rmsar{sarsa}
-
-% public macros: set the current ride's Q/A, then draw the scene
 \newcommand{\roadmap}{\def\rmq{}\def\rma{}\rmscene{all}}
-\newcommand{\roadmapmdp}{\def\rmq{What kind of problem is this?}\def\rma{a Markov decision process: states, actions, a random world}\rmscene{mdp}}
-\newcommand{\roadmapbellman}{\def\rmq{How do we score the best strategy?}\def\rma{the Bellman equation for $Q^\star$}\rmscene{bellman}}
-\newcommand{\roadmapdarts}{\def\rmq{How do we solve Bellman without the odds?}\def\rma{Robbins-Monro: average noisy evidence as it arrives}\rmscene{darts}}
-\newcommand{\roadmapsarsa}{\def\rmq{How does the agent learn from its own logbook?}\def\rma{SARSA: nudge one cell per lived week}\rmscene{sarsa}}
+\newcommand{\roadmapmdp}{%
+  \def\rmq{What are we deciding, and against what?}%
+  \def\rma{one call a week (run, service, replace) in a world that answers at random: a Markov decision process}%
+  \rmscene{mdp}}
+\newcommand{\roadmapbellman}{%
+  \def\rmq{Which call wins in the long run?}%
+  \def\rma{the one with the highest cumulative reward; the Bellman equation pins down its value $Q^\star(s,a)$}%
+  \rmscene{bellman}}
+\newcommand{\roadmapsarsa}{%
+  \def\rmq{What if nobody hands us the odds?}%
+  \def\rma{read the logbook: after each lived week, nudge one cell toward what it actually paid}%
+  \rmscene{sarsa}}
+\newcommand{\roadmapbandit}{%
+  \def\rmq{Which call do we try while still learning?}%
+  \def\rma{mostly the best one so far, but explore now and then, or you never learn what you skipped}%
+  \rmscene{bandit}}
+\newcommand{\roadmapdarts}{%
+  \def\rmq{Why does nudging ever settle down?}%
+  \def\rma{it is a running average of noisy evidence; Robbins and Monro proved small shrinking steps find the truth}%
+  \rmscene{darts}}
