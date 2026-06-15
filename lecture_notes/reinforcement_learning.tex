@@ -43,7 +43,7 @@ The concepts developed below map one-to-one onto its scenes.
 
 \medskip
 
-% 1: the hook -- sequential decisions under uncertainty.
+% 1: the hook, sequential decisions under uncertainty.
 \section{Motivation}
 
 Many decisions a manager faces are sequential. What is decided today changes what must be
@@ -60,12 +60,25 @@ Reinforcement learning is a framework for computing decision strategies that max
 reward accumulated over time in precisely such problems. One running example, the
 repair-or-replace problem of the visualization, carries everything.
 
+\paragraph{The plan.}
+These notes answer one practical question by climbing a short ladder of smaller ones. How do
+we pick the best call? The one with the largest long-run reward. How do we know that reward?
+The Bellman equation gives it, as a number $Q^\star(s, a)$ attached to every state and call.
+And when the odds are hidden, as they always are in real life? We learn it from experience,
+one lived week at a time; that learning rule is SARSA, and the reason it works is a result of
+Robbins and Monro about averaging noisy evidence. Sections~\ref{sec:qfunction}
+and~\ref{sec:sarsa}, and Appendix~\ref{app:rm}, are the three big rungs. The interactive
+\vizhref{visualization} draws this same ladder as a row of rides, the MDP maze, Bellman's
+house, the SARSA maze, the bandit arcade, and darts in the dark; if a picture helps, that is
+the order below.
+
 % 2: the model.
 \section{Markov decision processes}
 
-The first step is a precise model of the decision problem. The standard model is the
-\emph{Markov decision process}.\footnote{The name records that the next state depends only on
-the current state and action, not on the past.}
+We start with the first rung: what exactly are we deciding, and against what? The answer is a
+precise model of the decision problem, and the standard model is the \emph{Markov decision
+process}.\footnote{The name records that the next state depends only on the current state and
+action, not on the past.}
 
 \begin{definition}[Markov decision process]
 A \emph{Markov decision process} (MDP) is a quadruple, a package of four ingredients,
@@ -188,7 +201,8 @@ $s_2 = \sa{failing}$.
 % 4: scoring a trajectory, and what to maximize.
 \section{The goal: accumulating reward}
 
-A policy is good if it produces trajectories that accumulate as much reward as possible. The
+Which call wins in the long run? To answer that we first need a way to score a whole tape: a
+policy is good if it produces trajectories that accumulate as much reward as possible. The
 first task is to make ``accumulate'' precise.
 
 \begin{definition}[cumulative reward]
@@ -253,21 +267,17 @@ $\E[G_i]$ is \emph{not} random.
 % 5: the scorecard and the equation that pins it down.
 \section{The \texorpdfstring{$Q$}{Q}-function and the Bellman equation}\label{sec:qfunction}
 
-How can the best policy be discovered? The classical route goes through an auxiliary function
-that scores every pair of a state and an action.
+So: which call wins in the long run, and how do we know its value? The classical route goes
+through an auxiliary function that scores every pair of a state and an action, and the
+Bellman equation pins that score down.
 
 \begin{definition}[the $Q$-function]
 For a state $s$ and an action $a$, $Q^\star(s, a)$ is the cumulative reward one can expect
-when executing an optimal policy from state $s$, where the \emph{first} action taken there is
-$a$. In notation,
-\[
-Q^\star(s, a) \;=\; \E\bigl[\, G_i \bigm| s_i = s,\ a_i = a \,\bigr].
-\]
-In words: the expected value of $G_i$ conditioned on $s_i$ being $s$ and $a_i$ being $a$ (the
-vertical bar is read ``given that''); that is, the average of $G_i$ over many executions,
-counting only those executions that are in state $s$ at week $i$ and take action $a$ there as
-a one-off, even when an optimal policy would choose differently, acting optimally afterwards.
-(The star in $Q^\star$ marks optimality.)
+when executing an optimal policy from state $s$, except that the \emph{first} action taken
+there is forced to be $a$. In words: average $G_i$ over many executions, keeping only the
+executions that are in state $s$ at week $i$ and play action $a$ there as a one-off, even when
+an optimal policy would choose differently, and act optimally on every later week; that
+average is $Q^\star(s, a)$. (The star in $Q^\star$ marks optimality.)
 \end{definition}
 
 Which week $i$? It does not matter: the fleet has no final week, so it looks the same from
@@ -307,120 +317,213 @@ the same unknowns $Q^\star(s, a)$ as the left-hand side, so this is a system of 
 the entries of the table. The visualization solves it iteratively; its $Q^\star$-scorecard
 and Bellman-check scenes display the solution for the fleet at
 $\gamma = 0.9$.\footnote{Scenes ``$Q^\star$: the action scorecard'' and ``The Bellman
-equation,'' interactive in the \vizhref{visualization}.} Two entries tell the story:
-$Q^\star(\sa{shaky}, \sa{service}) = 126.4$, while
-$Q^\star(\sa{shaky}, \sa{replace}) = 149.9$. The optimal playbook replaces a van that still
+equation,'' interactive in the \vizhref{visualization}.} A few entries tell the story. At
+\sa{worn} the table crowns \sa{service} at $Q^\star(\sa{worn}, \sa{service}) = 226.1$; at
+\sa{shaky} it crowns \sa{replace}, since $Q^\star(\sa{shaky}, \sa{replace}) = 149.9$ beats
+$Q^\star(\sa{shaky}, \sa{service}) = 126.4$. The optimal playbook replaces a van that still
 starts every morning.
 
 % 6: when nobody prints the odds, learn the table from the lived weeks.
 \section{SARSA: learning from the logbook}\label{sec:sarsa}
 
-Solving the Bellman equations requires knowing the odds. The average
-in~\eqref{eq:bellman} runs over the randomness of the week, and computing an average over
-outcomes means knowing how likely each outcome is: the transition dynamics $T$ itself. In
-the visualization those odds are printed on the fleet sheet; in reality nobody hands them
-to you, because no manual lists the breakdown odds for \emph{your} van on \emph{your}
-routes. And for realistic fleets the table of states explodes anyway (count odometer
-readings, age, weeks since the last service, route load, then forty vans, and the
-visualization's illustrative tally reaches some four million states for a single van and
-half a billion scorecard cells for a modest fleet).\footnote{Scene ``Why DP doesn't
-scale'' of the interactive \vizhref{visualization} prices this out.} What the manager does
-have is the \emph{logbook}, week after week of lived experience: the state the van was
-in, the call made, the money booked, the state it landed in, and the call made there.
+This is the last rung: what if nobody hands us the odds? Solving the Bellman equations
+requires them. The average in~\eqref{eq:bellman} runs over the randomness of the week, and
+computing an average over outcomes means knowing how likely each outcome is, that is, the
+transition dynamics $T$ itself. In the visualization those odds are printed on the fleet
+sheet; in reality nobody hands them to you, because no manual lists the breakdown odds for
+\emph{your} van on \emph{your} routes. And for realistic fleets the table of states explodes
+anyway (count odometer readings, age, weeks since the last service, route load, then forty
+vans, and the visualization's illustrative tally reaches some four million states for a
+single van and half a billion scorecard cells for a modest fleet).\footnote{Scene ``Why DP
+doesn't scale'' of the interactive \vizhref{visualization} prices this out.} What the manager
+does have is the \emph{logbook}, week after week of lived experience: the state the van was
+in, the call made, the money booked, the state it landed in, and the call made there. SARSA
+needs nothing else. The answer to the rung, in one line: read the logbook, and after each
+lived week nudge one cell toward what it actually paid. The rest of this section earns that
+sentence.
 
-SARSA needs nothing else. Maintain a table $q(s, a)$ of \emph{estimates}, current best
-guesses of $Q^\star(s, a)$, one cell per state-action pair, twelve for the fleet, with
-every cell starting at $0$, as in the visualization. Then, after every lived week, improve
-the single cell just used.
+Maintain a table $q(s, a)$ of \emph{estimates}, current best guesses of $Q^\star(s, a)$, one
+cell per state-action pair, twelve for the fleet, with every cell starting at $0$, as in the
+visualization. After every lived week we will improve the single cell just used. The only
+question is how.
 
-For a moment, forget the future, and ask the simplest version of the question: what does
-\emph{one} week of a given pair pay on average, say $(\sa{worn}, \sa{run})$? The odds are
-unknown, but the logbook shows what those weeks actually paid: $+72$, $+72$, $+72$,
-$-208$, $+72$, \dots{} (an excerpt, mostly profits with the occasional breakdown).
-Averaging them is the manager's reflex, and there is a bookkeeping trick that needs no
-filing cabinet: keep one number per cell and, each time a new week arrives, nudge it
-toward what the week paid:
+\subsection*{Three bookkeepers, one bad week}
+
+Forget the future for a moment and ask the simplest version of the question: what does
+\emph{one} week of a given pair pay on average, say $(\sa{worn}, \sa{run})$? Nobody prints the
+odds, but the logbook shows what those weeks actually paid: $+72$, $+72$, $+72$, $-208$,
+$+72$, \dots{} (an excerpt, mostly profits with the occasional breakdown that books the $72$
+profit minus the $280$ repair). Picture three bookkeepers keeping the cell, each fed this same
+stream.
+
+The \emph{Overwriter} trusts only the latest week: the cell is whatever last week paid. Across
+the five weeks the cell reads $72$, $72$, $72$, then $-208$, then $72$ again. One breakdown and
+the cell screams that servicing a worn van loses money; the next ordinary week and it forgets
+the breakdown happened. Hysterical.
+
+The \emph{Filing cabinet} keeps the true running average of every week. Its cell reads $72$,
+$72$, $72$, then $(72+72+72-208)/4 = 2$ after the breakdown, then $(72+72+72-208+72)/5 = 16$.
+Calm and correct, the breakdown absorbed into a long record, one disaster among many good
+weeks. The price: it must store every card forever to recompute the average.
+
+The \emph{Nudger} keeps one number and, each week, moves it $15\%$ of the way toward what the
+week paid. Its cell reads $72$, $72$, $72$, then $72 + 0.15\,(-208 - 72) = 30$ after the
+breakdown, then $30 + 0.15\,(72 - 30) = 36.3$. It tracks the filing cabinet, $30$ then $36.3$
+against $2$ then $16$ (closer once a few more good weeks roll in), and it stores nothing but
+that single number. Calm, and no cabinet.
+
+The Nudger is the rule we want, and it has a tidy form. Writing $q(s_i, a_i)$ for the cell of
+the pair used in week $i$, $r_i$ for what the week paid, and $\alpha$ for the fraction of the
+gap to close ($\alpha$ is the Greek letter alpha, the \emph{learning rate}, $0.15$ here):
 \begin{equation}\label{eq:cashrule}
 q(s_i, a_i) \;\leftarrow\; q(s_i, a_i) \;+\; \alpha \bigl[\, r_i - q(s_i, a_i) \,\bigr].
 \end{equation}
-In words: the arrow is an instruction, not an equation; compute the right side and replace
-the left side by it, moving the estimate a fraction $\alpha$ of the way toward what the
-week actually paid. The number $\alpha$ is the \emph{learning rate}, $0.15$ in the
-visualization. ($\alpha$ is the Greek letter alpha.) If $\alpha$ shrinks like $1/n$ as
-the observations accumulate, $n$ counting the weeks of that pair seen so far, these
-nudges reproduce \emph{exactly} the average of those weeks (two lines of school algebra,
-deferred to Appendix~\ref{app:runavg}); held at a small constant such as $0.15$, they
-produce an average that gently favors recent weeks. Never overwrite, only nudge: one
-lucky or unlucky week must not erase a year of evidence.
+In words: the arrow is an instruction, not an equation; compute the right side and replace the
+left side by it, moving the estimate a fraction $\alpha$ of the way toward what the week
+actually paid. The bracket $r_i - q(s_i, a_i)$ is the \emph{surprise}: the gap between what
+the week paid and what the cell believed. The moral of the three bookkeepers is the design
+rule for everything that follows: nudge, never overwrite, so one bad week cannot erase a year.
 
-This formula is already on the manager's desk. It is \emph{exponential smoothing}, the
-standard forecast-revision update used in demand planning and spreadsheet forecasting:
-$\text{new forecast} = \text{old forecast} + \alpha\,(\text{actual} - \text{old forecast})$;
-revise the plan by a fraction of the miss, and never bet everything on the latest data
-point. SARSA forecasts the value of a decision the way a planner forecasts sales.
+\subsection*{The alpha knob}
 
-But $Q^\star(s_i, a_i)$, the number the table is after, is not the average of one week's
-cash alone: by the recurrence~\eqref{eq:recurrence}, a week is its cash \emph{plus}
-$\gamma$ times the value accumulated from the pair where the van lands, the new state
-and the call made there. So the week's true ``actual'' is
-$r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1})$. The future has not
-happened yet, and $Q^\star$ is exactly what we do not know, so the table's current best
-guess $q(s_{i+1}, a_{i+1})$ stands in for it: the same move as plugging a forecasted
-cash flow into an NPV calculation. One logbook line
-$(s_i,\, a_i,\, r_i,\, s_{i+1},\, a_{i+1})$ therefore reports the evidence
-$r_i + \gamma\, q(s_{i+1}, a_{i+1})$, and feeding that richer actual into the smoothing
-rule~\eqref{eq:cashrule} gives SARSA's update:
+How big should the nudge be? The fraction $\alpha$ is a knob, and the same five weeks settle
+very differently at three settings. At $\alpha = 0.9$ the cell lurches almost all the way to
+each week: when the breakdown lands it drops to $72 + 0.9\,(-208 - 72) = -180$, and the next
+ordinary week yanks it back to $-180 + 0.9\,(72 - (-180)) = 46.8$. Whiplash. At $\alpha = 0.05$
+the cell barely moves: the breakdown nudges it only to $58$, and the next week to $58.7$, so
+slow it would take an age to learn anything. At $\alpha = 0.15$ the cell lands at $30$ then
+$36.3$, the Nudger's calm middle from above: it registers the breakdown without being ruled by
+it. Small steady steps, never overwrite, is the lesson; $0.15$ is the visualization's choice.
+
+\subsection*{The planner's Monday}
+
+Formula~\eqref{eq:cashrule} is already on the manager's desk. A sales planner sets Monday's
+forecast at $100$; the week sells $80$; the miss is $80 - 100 = -20$; and next Monday's
+forecast becomes $100 + 0.15\,(-20) = 97$, the old forecast nudged by a fraction of the miss.
+That update,
+\[
+\text{new forecast} \;=\; \text{old forecast} \;+\; \alpha\,(\text{miss}),
+\]
+is exactly~\eqref{eq:cashrule} with the cell $q(s_i, a_i)$ playing the old forecast and
+$r_i - q(s_i, a_i)$ the miss. Its textbook name is \emph{exponential smoothing}, the standard
+forecast-revision rule of demand planning. SARSA forecasts the value of a call the way a
+planner forecasts sales.
+
+\subsection*{The cash-only ledger lies}
+
+Rule~\eqref{eq:cashrule} learns what a pair pays \emph{this week in cash}, and that is not yet
+the number we are after. Look back at the crowned cells of Section~\ref{sec:qfunction}. On the
+cash sheet, \sa{replace} pays $-130$ every single week, the worst line anywhere, and
+\sa{service} pays $-50$; yet the scorecard $Q^\star$ already crowned \sa{replace} at \sa{shaky}
+and \sa{failing} ($149.9$) and \sa{service} at \sa{worn} ($226.1$). A cash-only ledger, taking
+each call at its weekly money, would brand the two winning calls as losers.
+
+What does it miss? Two weeks can book the \emph{same} cash and yet leave you holding very
+different vans: the same week's money might leave a \sa{healthy} van in the lot or a
+\sa{failing} one. Same cash, different futures. So the real worth of a week is not its cash
+alone, and the question that forces the rest of the derivation is: what is the leftover van
+worth?
+
+\subsection*{Grade the week like a trade-in}
+
+One line of the logbook is $s_i,\, a_i,\, r_i,\, s_{i+1},\, a_{i+1}$: the state, the call, the
+cash, the state you land in, and the call you make there. (Read down the five letters: that
+spells \emph{SARSA}.) End the week and you are holding a new pair, the landing state
+$s_{i+1}$ and the call $a_{i+1}$ you will play in it. Grade it like a trade-in: its value is
+$q(s_{i+1}, a_{i+1})$, read from your own table, discounted by $\gamma$ because it is a future
+and not cash in hand, exactly the discounting of the return in~\eqref{eq:gi}. The week's worth
+is then the cash plus that trade-in,
+\[
+\text{the week's worth} \;=\; r_i + \gamma\, q(s_{i+1}, a_{i+1}),
+\]
+and this, not $r_i$ alone, is the ``actual'' the nudge should aim at. We have upgraded the
+target from cash alone to cash plus the van you keep. This is the recurrence
+$G_i = r_i + \gamma\, G_{i+1}$ of~\eqref{eq:recurrence} again, with the leftover return
+appraised from the table.
+
+\subsection*{Price it from your own book}
+
+There is a fair objection: the trade-in is priced with $q$, the very table we are still
+learning. Are we not using a number we do not yet know to learn that number? A used-vehicle
+dealer faces the same loop and shrugs: this month's price book is imperfect and still being
+revised, yet the dealer prices today's trade-in from it anyway, and nobody refuses to value a
+car because the book is not final. SARSA does the same. The cell $q(s_{i+1}, a_{i+1})$ stands
+in for the unknown $Q^\star(s_{i+1}, a_{i+1})$, the same move as plugging a forecasted cash
+flow into an NPV calculation. The book is wrong today, and that is fine: it starts at $0$
+everywhere and climbs toward the worth of the playbook you are running, every nudge a little
+less wrong than the last. Appendix~\ref{app:rm} is where this bootstrapping is made rigorous.
+
+\subsection*{Write the line yourself}
+
+Three pieces are now on the table, each one already named: the cash $r_i$; the value of where
+you land, $\gamma\, q(s_{i+1}, a_{i+1})$; and what you believed, $q(s_i, a_i)$. Drop the
+upgraded target into the smoothing rule~\eqref{eq:cashrule} in place of the cash-only actual,
+and the full SARSA update writes itself:
 \begin{equation}\label{eq:sarsa}
 q(s_i, a_i) \;\leftarrow\; q(s_i, a_i)
 \;+\; \alpha \bigl[\, r_i + \gamma\, q(s_{i+1}, a_{i+1}) - q(s_i, a_i) \,\bigr].
 \end{equation}
-In words: the same forecast revision as before, only the ``actual'' grew up; it is now
-this week's money plus the discounted value of where the week left you.
+In words: the same forecast revision as before, only the ``actual'' grew up; it is now this
+week's money plus the discounted value of where the week left you. The bracket is the surprise
+again (the planner's miss), but a richer one: the gap between what this week's evidence now
+says the pair is worth and what the table currently believes. Positive means the week beat the
+table's belief; negative means it fell short. You did not memorize this update; you wrote it
+from three pieces you had already built.
 
-Name the bracket: it is the \emph{surprise} (the planner's ``miss''), the gap between
-what this week's evidence says the pair is worth and what the table currently believes.
-A positive surprise means the week looked better than the table believed; a negative
-one, worse. To see one nudge land, feed in week one of Example~\ref{ex:trajectory} with
-the table still all zeros: the
-logbook line is $(\sa{healthy}, \sa{run}, +95, \sa{worn}, \sa{service})$; the evidence is
-$95 + 0.9 \cdot q(\sa{worn}, \sa{service}) = 95 + 0.9 \cdot 0 = 95$; the surprise is
-$95 - 0 = 95$; and the cell $q(\sa{healthy}, \sa{run})$ moves from $0$ to
-$0 + 0.15 \cdot 95 = 14.25$. One cell moves; the other eleven stay put. Now the
-punchline. The Bellman equation~\eqref{eq:bellman} says that $Q^\star(s_i, a_i)$ is the
-\emph{average} of that very evidence over many weeks, and an average over many executions
-is exactly how the expectation was defined in Definition~\ref{def:expectation}. SARSA
-computes that average the only way available without the odds: incrementally, with the
-smoothing recipe of~\eqref{eq:cashrule}. Set \eqref{eq:sarsa} beside~\eqref{eq:bellman}:
-the update rule is the Bellman equation with the expectation replaced by an arriving
-average and $Q^\star$ replaced by the current guess $q$. SARSA solves the Bellman
-equation by averaging evidence instead of computing expectations.
+\subsection*{Bellman becomes SARSA}
 
-\begin{remark}
-The name SARSA spells the five logbook entries each update consumes: State, Action,
-Reward, State, Action.
-\end{remark}
+Set the update~\eqref{eq:sarsa} beside the Bellman equation~\eqref{eq:bellman} and the kinship
+is exact, in four steps. \emph{First}, start from Bellman,
+$Q^\star(s_i, a_i) = \E[\, r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1}) \,]$, an average over all
+the weeks that could happen. \emph{Second}, erase the average and keep the single week that
+actually arrived: $Q^\star(s_i, a_i) \approx r_i + \gamma\, Q^\star(s_{i+1}, a_{i+1})$.
+\emph{Third}, erase the unknown truth $Q^\star$ and look the value up in your own book $q$:
+$q(s_i, a_i) \approx r_i + \gamma\, q(s_{i+1}, a_{i+1})$. \emph{Fourth}, do not jump to that
+target, nudge toward it by a fraction $\alpha$, which is exactly~\eqref{eq:sarsa}. SARSA is the
+Bellman equation with the expectation replaced by an arriving average and $Q^\star$ replaced by
+the current guess $q$. (Definition~\ref{def:expectation} defined the expectation as an average
+over many runs in the first place, which is why an arriving average is a faithful stand-in for
+it; the fully rigorous version is Appendix~\ref{app:rm}.)
 
-Which calls should be made while the table is still being learned? Mostly the one the
-table currently favors: at state $s$, play the action with the largest $q(s, a)$. But in a
-small random share of the weeks (a fraction $\varepsilon = 0.15$ in the visualization,
-held constant, like $\alpha$; $\varepsilon$ is the Greek letter epsilon) the call is
-instead drawn at random, because a cell that is never visited is never improved: you
-cannot learn the value of servicing if you never service. The $a_{i+1}$ in the update is
-the action \emph{actually} chosen at $s_{i+1}$ by
-this very playbook, so SARSA learns the value of what it really does, occasional
-experiments included.
+One honest subtlety about $a_{i+1}$. The next subsection will show that the playbook does not
+always take the call its table favors; $a_{i+1}$ is whatever it \emph{actually} plays next,
+not necessarily the largest-valued call. So the target $r_i + \gamma\, q(s_{i+1}, a_{i+1})$
+samples the Bellman equation of \emph{the policy SARSA is following}, not the version of
+\eqref{eq:bellman} that reads off the best call at every step. SARSA therefore settles at the
+worth of the policy it actually runs, which keeps an occasional deliberately-imperfect
+experiment in the mix and so sits a little below $Q^\star$. That is the gap the caveat below
+makes good on; the rankings, happily, still line up.
 
-Run this, week after week, on one endless stream of lived weeks: drive, get billed, nudge
-one cell. The table drifts toward $Q^\star$, and reading off the best action in each row
-recovers the playbook. In the visualization the same three bands as in the scorecard of
-Section~\ref{sec:qfunction} (\sa{run} when \sa{healthy}, \sa{service} when \sa{worn},
-\sa{replace} when \sa{shaky} or \sa{failing}) emerge within a few hundred weeks of raw
-experience, the odds never shown.\footnote{Scene ``SARSA: learn from the logbook'' of the
-interactive \vizhref{visualization}: watch one week nudge one cell.} One
-honest caveat: with $\alpha$ and $\varepsilon$ held constant, the twelve numbers
-themselves stay rough; the experiments cost money, so the cells settle below the
-$Q^\star$ values and keep jittering. But which call tops each row, and that is all the
-playbook reads, comes out right.
+\subsection*{Which call do we try while still learning?}
+
+Mostly the call the table currently favors: at state $s$, play the action whose $q(s, a)$ is
+largest. But in a small random share of the weeks, a fraction $\varepsilon = 0.15$ in the
+visualization, held constant like $\alpha$ ($\varepsilon$ is the Greek letter epsilon), the
+call is drawn at random instead, because a cell that is never visited is never improved: you
+cannot learn the value of servicing if you never service, and you never learn what you skip.
+Note that $a_{i+1}$ in the update~\eqref{eq:sarsa} is the call \emph{actually} made next by
+this very playbook, never the largest-valued call, so SARSA learns the value of what it really
+does, occasional experiments included.
+
+\subsection*{One week, one nudge}
+
+To see a single update land, feed in week one of Example~\ref{ex:trajectory} with the table
+still all zeros. The logbook line is $(\sa{healthy}, \sa{run}, +95, \sa{worn}, \sa{service})$;
+the evidence is $r_i + \gamma\, q(\sa{worn}, \sa{service}) = 95 + 0.9 \cdot 0 = 95$; the
+surprise is $95 - 0 = 95$; and the cell $q(\sa{healthy}, \sa{run})$ moves from $0$ to
+$0 + 0.15 \cdot 95 = 14.25$. One cell moves; the other eleven stay put. Run this week after
+week on one endless stream of lived experience, drive, get billed, nudge one cell, and the
+table drifts toward the worth of the playbook it is actually following. In the visualization
+the same three bands as in the scorecard of Section~\ref{sec:qfunction} (\sa{run} when
+\sa{healthy}, \sa{service} when \sa{worn}, \sa{replace} when \sa{shaky} or \sa{failing}) emerge
+within a few hundred weeks, the odds never shown.\footnote{Scene ``SARSA: learn from the
+logbook'' of the interactive \vizhref{visualization}: watch one week nudge one cell.} One
+honest caveat, in two parts. First, because $\varepsilon$ stays above $0$, the playbook keeps
+running the occasional deliberately-imperfect experiment, so the worth it settles at is the
+worth of \emph{that} slightly-imperfect playbook, which sits below the $Q^\star$ values rather
+than reaching them. Second, holding $\alpha$ constant leaves the twelve numbers jittering
+around that target instead of locking onto it. But which call tops each row, and that is all
+the playbook reads, comes out right.
 
 % Closing: recap and invitation.
 \section*{Closing}
@@ -436,11 +539,13 @@ $Q^\star$ scorecard fill in, scene by scene, in the same order as these notes.
 % Appendices: the averaging machinery behind the update rule.
 \appendix
 
-\section{The Robbins--Monro algorithm}\label{app:rm}
+\section{The Robbins-Monro algorithm}\label{app:rm}
 
-Strip the fleet away and a bare problem remains: find the number $x^\star$ that
+Why does the nudge ever settle down? Because it is a running average of noisy evidence, and
+Robbins and Monro proved that small shrinking steps find the truth. Strip the fleet away and a
+bare problem remains: find the number $x^\star$ that
 \emph{equals the average} of noisy evidence, when the average cannot be computed directly
-and the evidence arrives one sample at a time. The Robbins--Monro algorithm keeps a running
+and the evidence arrives one sample at a time. The Robbins-Monro algorithm keeps a running
 guess $x$ and, when the $n$-th sample arrives, nudges it:
 \[
 x \;\leftarrow\; x + \alpha_n\,(\text{sample} - x).
@@ -456,15 +561,16 @@ guess forever. The choice $\alpha_n = 1/n$ satisfies both demands: the running t
 $1 + 1/2 + 1/3 + \cdots$ climbs past any bound, just ever more slowly (a classical, if
 surprising, fact), while the squared total $1 + 1/4 + 1/9 + \cdots$ settles below $2$.
 
-The SARSA update~\eqref{eq:sarsa} is exactly a Robbins--Monro iteration applied cell by
-cell to the Bellman equation~\eqref{eq:bellman}: the guess is the cell $q(s_i, a_i)$, and
-the arriving sample is the evidence $r_i + \gamma\, q(s_{i+1}, a_{i+1})$. With one honest
-extra: that sample is itself measured with the current table $q$, so the algorithm pulls
-itself up by its own bootstraps, and making this rigorous took decades. And a second
-honest extra: Section~\ref{sec:sarsa} holds $\alpha$ constant at $0.15$, deliberately
-failing the second demand, so the noise never fully cancels; that is exactly the jitter
-conceded there, and Appendix~\ref{app:runavg} explains what the constant buys in
-exchange. The recipe is due to Herbert Robbins and Sutton Monro, who published it in 1951.
+The SARSA update~\eqref{eq:sarsa} is exactly a Robbins-Monro iteration applied cell by
+cell to the Bellman equation of the policy being followed: the guess is the cell
+$q(s_i, a_i)$, and the arriving sample is the evidence $r_i + \gamma\, q(s_{i+1}, a_{i+1})$
+collected as that playbook actually plays. With one honest extra: that sample is itself
+measured with the current table $q$, so the algorithm pulls itself up by its own
+bootstraps, and making this rigorous took decades. And a second honest extra:
+Section~\ref{sec:sarsa} holds $\alpha$ constant at $0.15$, deliberately failing the second
+demand, so the noise never fully cancels; that is exactly the jitter conceded there, and
+Appendix~\ref{app:runavg} explains what the constant buys in exchange. The recipe is due to
+Herbert Robbins and Sutton Monro, who published it in 1951.
 
 \section{The running average}\label{app:runavg}
 
