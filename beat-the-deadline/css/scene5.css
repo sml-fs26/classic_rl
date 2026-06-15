@@ -1,0 +1,31 @@
+/* scene5.css -- trajectory (the tape). */
+.sc5-tex { text-align: center; overflow-x: auto; }
+.sc5-row { gap: 24px; align-items: flex-start; }
+.sc5-tile-host { flex: 0 0 auto; }
+.sc5-right { display: flex; flex-direction: column; gap: 10px; flex: 1 1 380px; min-width: 0; }
+.sc5-tape-label { font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase; }
+.sc5-tape {
+  display: flex; gap: 8px; overflow-x: auto; padding: 8px 2px 12px; min-height: 64px;
+  -webkit-overflow-scrolling: touch;
+}
+.sc5-step {
+  flex: 0 0 auto; display: flex; flex-direction: column; gap: 3px; align-items: flex-start;
+  border: 2px solid var(--rule); background: var(--bg-strong); padding: 7px 9px;
+  font-family: 'Press Start 2P', monospace; font-size: 7px; min-width: 92px;
+}
+.sc5-step .sc5-sub { color: var(--ink-secondary); }
+.sc5-step .sc5-state { font-size: 9px; color: var(--ink-on-box); }
+.sc5-step .sc5-arrow { color: var(--ink-secondary); }
+.sc5-step .sc5-r { color: var(--ink-on-box); }
+.sc5-step.send { border-color: var(--send-rule); background: var(--send-tint); }
+.sc5-step.wait-arr { border-color: var(--arrival); background: var(--arrival-tint); }
+.sc5-step.wait { border-color: var(--wait-rule); background: var(--wait-tint); }
+.sc5-step.blown { border-color: var(--blown); background: var(--blown-tint); }
+.sc5-step.terminal { align-items: center; justify-content: center; min-width: 70px; }
+.sc5-step.terminal .sc5-term { font-size: 8px; }
+.sc5-step.terminal.send .sc5-term { color: var(--send-rule); }
+.sc5-step.terminal.blown .sc5-term { color: var(--blown); }
+.sc5-caps { font-size: 8px; }
+.sc5-framing { font-size: 10px; }
+
+@media (max-width: 720px) { .sc5-row { gap: 14px; } }

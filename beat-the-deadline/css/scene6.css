@@ -1,0 +1,35 @@
+/* scene6.css -- return G_t (the histogram). */
+.sc6-tex { text-align: center; overflow-x: auto; }
+.sc6-switch { gap: 10px; margin-bottom: 4px; }
+.sc6-first-wait.active, .sc6-first-send.active {
+  background: var(--highlight); color: var(--rule); box-shadow: inset 2px 2px 0 0 #b89020;
+}
+.sc6-hist-title { font-size: 8px; letter-spacing: 0.05em; text-transform: uppercase; margin: 6px 0; }
+.sc6-hist {
+  display: flex; gap: 16px; align-items: flex-end; justify-content: center;
+  height: 180px; padding: 8px 12px;
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+}
+.sc6-bar-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; min-width: 44px; height: 100%; }
+.sc6-bar-wrap { flex: 1 1 auto; display: flex; align-items: flex-end; width: 28px; }
+.sc6-bar { width: 100%; border: 2px solid var(--rule); transition: height 200ms ease-out; min-height: 2px; }
+.sc6-bar.neg { background: var(--neg); border-color: var(--blown); }
+.sc6-bar.pos { background: var(--pos); border-color: var(--arrival); }
+.sc6-bar.zero { background: var(--bg-sunk); border-color: var(--rule-soft); }
+.sc6-bar-count { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink-on-box); }
+.sc6-bar-label { font-family: 'Press Start 2P', monospace; font-size: 9px; }
+.sc6-bar-label.neg { color: var(--neg); }
+.sc6-bar-label.pos { color: var(--pos); }
+.sc6-bar-label.zero { color: var(--ink-secondary); }
+.sc6-controls { gap: 14px; margin-top: 12px; align-items: center; }
+.sc6-stats { margin-left: auto; }
+.sc6-note { font-size: 8px; }
+.sc6-framing { font-size: 10px; }
+
+@media (max-width: 720px) {
+  .sc6-hist { gap: 10px; height: 150px; }
+  .sc6-bar-col { min-width: 34px; }
+  .sc6-controls { gap: 10px; }
+  .sc6-stats { margin-left: 0; }
+}

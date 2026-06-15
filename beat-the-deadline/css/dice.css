@@ -1,0 +1,62 @@
+/* dice.css -- the arrival die (green) + the deadline-risk die (red). */
+.btd-die {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 5px;
+  font-family: 'Press Start 2P', monospace;
+}
+.die-cube {
+  position: relative;
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  border: 4px solid var(--rule);
+  background: var(--card-bg);
+  box-shadow: inset 0 0 0 2px var(--inner-highlight), 3px 3px 0 var(--rule);
+  image-rendering: pixelated;
+}
+.die-badge {
+  position: absolute; right: -6px; top: -8px;
+  font-size: 7px; padding: 2px 4px;
+  border: 2px solid var(--rule); background: var(--bg-strong); color: var(--ink-on-box);
+}
+.die-result { font-size: 8px; letter-spacing: 0.04em; min-height: 10px; color: var(--ink-secondary); }
+.die-caption { font-size: 7px; letter-spacing: 0.04em; color: var(--ink-secondary); text-transform: uppercase; }
+
+/* arrival die states */
+.arrival-die .die-badge { background: var(--arrival-tint); }
+.arrival-die.is-hit .die-result { color: var(--arrival); }
+.arrival-die.is-miss .die-result { color: var(--ink-faint); }
+.arrival-cube.tumbling { animation: die-tumble 0.56s steps(7) 1; }
+.arrival-die.is-hit .die-cube { box-shadow: inset 0 0 0 2px var(--arrival), 3px 3px 0 var(--arrival); }
+@keyframes die-tumble {
+  0% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-18px) rotate(120deg); }
+  50% { transform: translateY(-5px) rotate(240deg); }
+  75% { transform: translateY(-11px) rotate(330deg); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
+
+/* deadline-risk die: a strip of cells, lit (red) cells grow as h falls */
+.deadline-cube { flex-direction: column; gap: 3px; padding: 6px; }
+.risk-strip { display: flex; gap: 2px; }
+.risk-cell {
+  width: 7px; height: 18px; border: 2px solid var(--rule); background: var(--bg-sunk);
+}
+.risk-cell.on { background: var(--blown); }
+.deadline-die .die-badge { background: var(--blown-tint); color: var(--blown); }
+.deadline-die.risk-none .die-badge { color: var(--ink-faint); background: var(--bg-strong); }
+.deadline-die.is-blown .die-result { color: var(--blown); }
+.deadline-die.is-safe .die-result { color: var(--pos); }
+.deadline-die.is-blown .die-cube { box-shadow: inset 0 0 0 2px var(--blown), 3px 3px 0 var(--blown); }
+.deadline-cube.shaking { animation: die-shake 0.5s steps(2, end) 1; }
+@keyframes die-shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-4px, 1px); }
+  35% { transform: translate(4px, -1px); }
+  55% { transform: translate(-3px, 1px); }
+  75% { transform: translate(3px, -1px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arrival-cube.tumbling, .deadline-cube.shaking { animation: none; }
+}
+
+/* a pair of dice, side by side */
+.dice-pair { display: flex; gap: 22px; align-items: flex-start; }

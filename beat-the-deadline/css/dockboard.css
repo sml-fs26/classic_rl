@@ -1,0 +1,154 @@
+/* dockboard.css -- the dock-tile icon + the 5x5 policy / Q-table board. */
+
+/* ============================ ICON: the dock tile ============================ */
+.dock-tile {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border: 4px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow);
+}
+.dock-tile-art { line-height: 0; }
+.dock-tile-svg { image-rendering: pixelated; display: block; }
+.dock-tile-label {
+  display: inline-flex; gap: 4px; align-items: baseline;
+  font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--ink-on-box);
+  letter-spacing: 0.04em;
+}
+.dock-tile-label .dt-sep { color: var(--ink-secondary); }
+.dock-tile.dock-empty { opacity: 0.78; }
+.dock-tile.dock-wall { box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--blown), 3px 3px 0 var(--shadow); }
+
+.dock-tile.dt-pulse { animation: dt-pulse 0.6s ease-out; }
+@keyframes dt-pulse {
+  0% { box-shadow: 0 0 0 0 var(--highlight), inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight); }
+  100% { box-shadow: 0 0 0 6px transparent, inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow); }
+}
+.dock-tile.dt-flash-sent { animation: dt-flash-sent 0.9s ease-out; }
+@keyframes dt-flash-sent {
+  0%, 30% { background: var(--send-tint); box-shadow: 0 0 0 4px var(--send), inset 0 0 0 2px var(--bg-strong); }
+  100% { background: var(--bg-strong); box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow); }
+}
+.dock-tile.dt-flash-blown { animation: dt-flash-blown 0.9s ease-out; }
+@keyframes dt-flash-blown {
+  0%, 30% { background: var(--blown-tint); box-shadow: 0 0 0 4px var(--blown), inset 0 0 0 2px var(--bg-strong); }
+  100% { background: var(--bg-strong); box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dock-tile.dt-pulse, .dock-tile.dt-flash-sent, .dock-tile.dt-flash-blown { animation: none; }
+}
+
+/* ============================ BOARD: the 5x5 grid ============================ */
+.dockboard-board { display: inline-flex; flex-direction: column; gap: 8px; min-width: 0; max-width: 100%; }
+
+.db-grid {
+  display: grid;
+  grid-template-columns: 30px repeat(5, minmax(0, 1fr));
+  grid-template-rows: 26px repeat(5, auto);
+  gap: 4px;
+  font-family: 'Press Start 2P', monospace;
+  color: var(--ink-on-box);
+}
+
+.db-corner {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 6px; line-height: 1.2; color: var(--ink-secondary); text-align: center;
+}
+.db-corner-slash { color: var(--ink-faint); }
+
+.db-colhead, .db-rowhead {
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+  font-size: 9px; color: var(--ink); letter-spacing: 0.04em;
+}
+.db-colhead { flex-direction: row; }
+.db-colhead .db-h-unit, .db-rowhead .db-p-unit { font-size: 6px; color: var(--ink-secondary); }
+.db-rowhead { flex-direction: column; gap: 0; }
+.db-wall-head .db-h-num, .db-empty-head .db-p-num { color: var(--ink-faint); }
+
+.db-cell {
+  border: 3px solid var(--rule);
+  background: var(--bg-strong);
+  box-shadow: inset 0 0 0 1px var(--bg-strong), inset 0 0 0 2px var(--inner-highlight);
+  min-height: 52px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 4px 2px; position: relative;
+  transition: background 160ms, box-shadow 160ms;
+}
+
+/* decision cells tint by their winning lever */
+.db-cell.tint-send { background: var(--send-tint); }
+.db-cell.tint-wait { background: var(--wait-tint); }
+.db-cell.tint-send.db-decision { box-shadow: inset 0 0 0 2px var(--send), inset 0 0 0 3px var(--bg-strong); }
+.db-cell.tint-wait.db-decision { box-shadow: inset 0 0 0 2px var(--wait), inset 0 0 0 3px var(--bg-strong); }
+
+.db-cell.db-unsolved { background: var(--bg-sunk); }
+.db-cell.db-pending { opacity: 0.28; filter: grayscale(0.6); }
+
+/* the deadline wall (h=0, p>=1) and empty-dock row (p=0): muted edges */
+.db-cell.db-wall { background: var(--clock-dead); color: var(--bg-strong); border-color: var(--rule); }
+.db-cell.db-wall .db-cell-tag { color: var(--blown); font-size: 7px; letter-spacing: 0.04em; }
+.db-cell.db-empty { background: var(--bg); opacity: 0.6; }
+.db-edge-mark { color: var(--ink-faint); font-size: 12px; }
+
+/* current-state marker + flip flash */
+.db-cell.db-marked { box-shadow: 0 0 0 3px var(--highlight), inset 0 0 0 1px var(--bg-strong); z-index: 2; }
+.db-cell.db-clickable { cursor: pointer; }
+.db-cell.db-clickable:hover { filter: brightness(1.05); }
+.db-cell.db-flip { animation: db-flip 0.74s ease-out; }
+@keyframes db-flip {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.12); box-shadow: 0 0 0 4px var(--highlight), inset 0 0 0 1px var(--bg-strong); z-index: 3; }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .db-cell.db-flip { animation: none; } }
+
+/* Q rows inside a cell (showQ variant) */
+.db-qrows { display: flex; flex-direction: column; gap: 2px; width: 100%; align-items: stretch; }
+.db-qrow {
+  display: grid; grid-template-columns: 9px 12px 1fr; gap: 3px; align-items: center;
+  font-size: 8px; padding: 1px 3px; border: 1px solid transparent;
+}
+.db-qrow .db-qname { color: var(--ink-secondary); font-size: 7px; }
+.db-qrow.lever-wait .db-qname { color: var(--wait-rule); }
+.db-qrow.lever-send .db-qname { color: var(--send-rule); }
+.db-qrow .db-qval { font-size: 8px; text-align: right; color: var(--ink-on-box); font-variant-numeric: tabular-nums; }
+.db-qrow .db-qmark { font-size: 7px; color: var(--accent); }
+.db-qrow.argmax { border-color: var(--rule); background: rgba(248, 208, 40, 0.28); }
+.db-qrow.clamped { opacity: 0.32; text-decoration: line-through; }
+
+.db-cell-tag { font-size: 8px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-on-box); text-align: center; }
+
+.db-vbadge { display: none; }  /* compact mode hides V badge unless opted in */
+.dockboard-board.show-v .db-vbadge { display: flex; gap: 2px; align-items: baseline; margin-top: 1px; }
+.db-vlab { font-size: 6px; color: var(--ink-secondary); }
+.db-vval { font-size: 9px; color: var(--ink-on-box); font-variant-numeric: tabular-nums; }
+
+/* legend */
+.db-legend {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--ink-secondary);
+}
+.db-leg-item { display: inline-flex; align-items: center; gap: 5px; }
+.db-leg-sw { width: 12px; height: 12px; border: 2px solid var(--rule); display: inline-block; }
+
+/* compact board (used in side-by-side scenes) */
+.dockboard-board.db-compact .db-grid { grid-template-columns: 22px repeat(5, minmax(0, 1fr)); gap: 3px; }
+.dockboard-board.db-compact .db-cell { min-height: 34px; padding: 2px 1px; }
+.dockboard-board.db-compact .db-qrows { display: none; }
+.dockboard-board.db-compact .db-colhead, .dockboard-board.db-compact .db-rowhead { font-size: 7px; }
+
+/* ============================ Responsive ============================ */
+@media (max-width: 720px) {
+  .db-grid { grid-template-columns: 24px repeat(5, minmax(0, 1fr)); gap: 3px; }
+  .db-cell { min-height: 46px; }
+  .db-qrow { font-size: 7px; grid-template-columns: 8px 10px 1fr; }
+  .db-qrow .db-qval { font-size: 7px; }
+  .dock-tile-svg { width: 112px; height: auto; }
+}
+@media (max-width: 400px) {
+  .db-grid { gap: 2px; }
+  .db-cell { min-height: 40px; padding: 2px 1px; }
+}

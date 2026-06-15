@@ -1,0 +1,14 @@
+/* scene4.css -- policy (hand-policies painted on the board). */
+.sc4-row { gap: 28px; align-items: flex-start; }
+.sc4-board-host { flex: 0 0 auto; }
+.sc4-side { display: flex; flex-direction: column; gap: 14px; flex: 1 1 300px; min-width: 0; }
+.sc4-toggle { gap: 10px; }
+.sc4-send.active, .sc4-wait.active {
+  background: var(--highlight); color: var(--rule);
+  box-shadow: inset 2px 2px 0 0 #b89020;
+}
+.sc4-desc { font-size: 9px; min-height: 60px; }
+.sc4-avg { align-self: flex-start; }
+.sc4-framing { margin-top: 8px; font-size: 10px; }
+
+@media (max-width: 720px) { .sc4-row { gap: 16px; } }

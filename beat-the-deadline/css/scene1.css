@@ -1,0 +1,23 @@
+/* scene1.css -- tutorial / how to play. */
+.sc1-panels { display: flex; flex-direction: column; gap: 14px; margin: 8px 0 4px; }
+.sc1-panel {
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight), 3px 3px 0 var(--shadow);
+  padding: 12px 14px;
+}
+.sc1-panel-head {
+  font-family: 'Press Start 2P', monospace; font-size: 10px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+}
+.sc1-panel-row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.sc1-panel-body { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.8; color: var(--ink-on-box); margin: 0; flex: 1 1 320px; min-width: 0; }
+.sc1-levers { display: flex; gap: 10px; flex-wrap: wrap; }
+.sc1-dice { gap: 22px; }
+.sc1-demo-row { display: flex; gap: 14px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+.sc1-demo-out { font-size: 9px; flex: 1 1 260px; }
+.sc1-takeaway { margin-top: 6px; font-size: 10px; }
+
+@media (max-width: 720px) {
+  .sc1-panel-row { gap: 12px; }
+  .sc1-panel-body { font-size: 8px; }
+}

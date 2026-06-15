@@ -1,0 +1,29 @@
+/* scene2.css -- playtest. */
+.sc2-row { gap: 22px; align-items: flex-start; }
+.sc2-right { display: flex; flex-direction: column; gap: 12px; flex: 1 1 380px; min-width: 0; }
+.sc2-hud { gap: 18px; }
+.sc2-dice { gap: 22px; }
+.sc2-prompt { font-size: 9px; letter-spacing: 0.04em; }
+.sc2-levers { display: flex; gap: 12px; flex-wrap: wrap; }
+.sc2-dialog { font-size: 10px; min-height: 40px; }
+
+.sc2-tape-wrap { margin-top: 14px; }
+.sc2-tape-title { font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.sc2-tape {
+  display: flex; gap: 6px; overflow-x: auto; padding: 6px 2px 10px;
+  -webkit-overflow-scrolling: touch;
+}
+.sc2-tape-step {
+  flex: 0 0 auto; display: flex; flex-direction: column; gap: 2px; align-items: center;
+  border: 2px solid var(--rule); background: var(--bg-strong); padding: 6px 8px;
+  font-family: 'Press Start 2P', monospace; font-size: 7px; min-width: 64px;
+}
+.sc2-tape-step .tape-state { color: var(--ink-secondary); }
+.sc2-tape-step .tape-act { color: var(--ink-on-box); }
+.sc2-tape-step.send { border-color: var(--send-rule); background: var(--send-tint); }
+.sc2-tape-step.wait-arr { border-color: var(--arrival); background: var(--arrival-tint); }
+.sc2-tape-step.wait { border-color: var(--wait-rule); background: var(--wait-tint); }
+.sc2-tape-step.blown { border-color: var(--blown); background: var(--blown-tint); }
+.sc2-framing { margin-top: 10px; font-size: 10px; }
+
+@media (max-width: 720px) { .sc2-row { gap: 14px; } .sc2-hud { gap: 12px; } }

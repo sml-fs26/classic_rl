@@ -1,0 +1,24 @@
+/* scene3.css -- formalization (the four MDP parts). */
+.sc3-row { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; margin: 8px 0; }
+.sc3-tile-host { flex: 0 0 auto; }
+.sc3-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex: 1 1 460px; min-width: 0; }
+.sc3-card {
+  border: 3px solid var(--rule); background: var(--bg-strong);
+  box-shadow: inset 0 0 0 2px var(--bg-strong), inset 0 0 0 4px var(--inner-highlight);
+  padding: 11px 12px; display: flex; flex-direction: column; gap: 7px;
+  border-left-width: 6px;
+}
+.sc3-card.mdp-state  { border-left-color: var(--hue-mdp); }
+.sc3-card.mdp-action { border-left-color: var(--hue-policy); }
+.sc3-card.mdp-trans  { border-left-color: var(--hue-dp); }
+.sc3-card.mdp-reward { border-left-color: var(--hue-return); }
+.sc3-card-head {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--ink);
+}
+.sc3-card-tex { font-size: 0.92em; overflow-x: auto; }
+.sc3-card-body { font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.75; color: var(--ink-secondary); }
+.sc3-side { font-size: 9px; }
+.sc3-framing { font-size: 10px; }
+
+@media (max-width: 720px) { .sc3-cards { grid-template-columns: 1fr; } }

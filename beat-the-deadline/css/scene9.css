@@ -1,0 +1,13 @@
+/* scene9.css -- dynamic programming (the value-iteration fill). */
+.sc9-formula { text-align: center; }
+.sc9-tex { text-align: center; overflow-x: auto; }
+.sc9-ctrls { gap: 10px; align-items: center; margin-bottom: 4px; }
+.sc9-status { font-size: 9px; margin-left: auto; }
+.sc9-status b { color: var(--ink-on-box); }
+.sc9-row { margin-bottom: 8px; }
+.sc9-board-host { margin: 0 auto; }
+.sc9-wall { font-size: 8px; }
+.sc9-converged { font-size: 10px; border-color: var(--accent); }
+.sc9-framing { font-size: 10px; }
+
+@media (max-width: 720px) { .sc9-status { margin-left: 0; flex-basis: 100%; } }

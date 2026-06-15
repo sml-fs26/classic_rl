@@ -1,0 +1,41 @@
+/* scene10.css -- why DP does not scale (two-reason card). */
+.sc10-cards { display: flex; gap: 20px; flex-wrap: wrap; margin: 10px 0; }
+.sc10-card { flex: 1 1 380px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sc10-tag {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.1em;
+  width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--bet-ink); background: var(--accent); border: 2px solid var(--rule);
+}
+.sc10-h { font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 1.5; margin: 0; color: var(--ink); }
+.sc10-body { font-family: 'Press Start 2P', monospace; font-size: 9px; line-height: 1.75; color: var(--ink-secondary); margin: 0; }
+.sc10-glyph {
+  height: 110px; display: flex; align-items: center; justify-content: center; gap: 16px;
+  background: var(--bg-sunk); border: 3px solid var(--rule);
+  box-shadow: inset 0 0 0 2px var(--bg-sunk), inset 0 0 0 4px var(--inner-highlight);
+}
+.sc10-die {
+  width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace; font-size: 22px; color: var(--bg-strong);
+  border: 3px solid var(--rule); box-shadow: 3px 3px 0 var(--rule);
+}
+.sc10-die-green { background: var(--arrival); }
+.sc10-die-red { background: var(--blown); }
+
+.sc10-glyph-scale { gap: 18px; }
+.sc10-scale-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.sc10-mini-grid { display: grid; gap: 1px; }
+.sc10-grid-small { grid-template-columns: repeat(5, 9px); }
+.sc10-grid-small .sc10-cell { width: 9px; height: 9px; }
+.sc10-grid-big { grid-template-columns: repeat(24, 3px); }
+.sc10-grid-big .sc10-cell { width: 3px; height: 3px; }
+.sc10-cell { background: var(--bg); border: 1px solid var(--rule-soft); }
+.sc10-cell.on { background: var(--send-tint); border-color: var(--send); }
+.sc10-scale-cap { font-family: 'Press Start 2P', monospace; font-size: 7px; text-align: center; line-height: 1.6; color: var(--ink-secondary); }
+.sc10-scale-cap b { font-size: 11px; color: var(--ink-on-box); }
+.sc10-arrow { font-family: 'Press Start 2P', monospace; font-size: 16px; color: var(--ink-secondary); }
+.sc10-framing { margin-top: 10px; font-size: 10px; }
+
+@media (max-width: 720px) {
+  .sc10-cards { gap: 14px; }
+  .sc10-glyph-scale { flex-wrap: wrap; }
+}

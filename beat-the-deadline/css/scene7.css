@@ -1,0 +1,33 @@
+/* scene7.css -- optimal action-value Q* (the two-column table). */
+.sc7-tex { text-align: center; overflow-x: auto; }
+.sc7-row { gap: 28px; align-items: flex-start; }
+.sc7-left { display: flex; flex-direction: column; gap: 8px; align-items: center; flex: 0 0 auto; }
+.sc7-at { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--ink); letter-spacing: 0.04em; }
+.sc7-table-col { display: flex; flex-direction: column; gap: 12px; flex: 1 1 340px; min-width: 0; }
+.sc7-table {
+  border-collapse: separate; border-spacing: 0;
+  border: 3px solid var(--rule); background: var(--bg-strong); width: 100%;
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+.sc7-table th {
+  background: var(--bg-sunk); text-align: left; padding: 9px 12px;
+  font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--ink-secondary); border-bottom: 3px solid var(--rule);
+}
+.sc7-table td { padding: 11px 12px; border-bottom: 2px solid var(--rule-soft); font-family: 'Press Start 2P', monospace; }
+.sc7-tr:last-child td { border-bottom: none; }
+.sc7-tr.is-best td { background: rgba(248, 208, 40, 0.22); }
+.sc7-tr.clamped td { opacity: 0.5; }
+.sc7-q { font-variant-numeric: tabular-nums; font-size: 11px; }
+.sc7-qval { font-size: 14px; color: var(--ink-on-box); }
+.sc7-star { color: var(--qstar, #c8902c); font-size: 14px; margin-left: 6px; }
+.sc7-besttag {
+  display: inline-block; margin-left: 8px; font-size: 7px; letter-spacing: 0.04em;
+  color: #181818; background: var(--highlight); border: 2px solid var(--rule); padding: 1px 6px;
+}
+.sc7-q.muted { color: var(--ink-faint); }
+.sc7-read { min-height: 64px; font-size: 9px; }
+.sc7-toggle { gap: 10px; }
+.sc7-framing { font-size: 10px; }
+
+@media (max-width: 720px) { .sc7-row { gap: 16px; } }

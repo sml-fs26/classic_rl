@@ -1,0 +1,51 @@
+/* scene12.css -- recap (six dock-themed cards). */
+.sc12-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 12px 0; }
+.sc12-card { display: flex; flex-direction: column; gap: 10px; }
+.sc12-card-head { display: flex; align-items: center; gap: 9px; }
+.sc12-badge {
+  font-family: 'Press Start 2P', monospace; font-size: 9px; letter-spacing: 0.03em;
+  color: #fff; border: 2px solid var(--rule); padding: 3px 7px;
+}
+.sc12-badge.mdp    { background: var(--hue-mdp); }
+.sc12-badge.policy { background: var(--hue-policy); }
+.sc12-badge.return { background: var(--hue-return); }
+.sc12-badge.qstar  { background: var(--hue-qstar); color: #181818; }
+.sc12-badge.dp     { background: var(--hue-dp); }
+.sc12-badge.sarsa  { background: var(--hue-sarsa); }
+.sc12-card-title { font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 0.02em; color: var(--ink); line-height: 1.5; }
+.sc12-glyph { height: 56px; display: flex; align-items: center; justify-content: center; }
+.sc12-blurb { font-family: 'Press Start 2P', monospace; font-size: 8px; line-height: 1.75; color: var(--ink-secondary); margin: 0; flex: 1 1 auto; }
+.sc12-f { margin: 0; font-size: 0.78em; }
+.sc12-close {
+  font-family: 'Press Start 2P', monospace; font-size: 12px; line-height: 1.7; text-align: center;
+  color: var(--accent); margin: 16px auto 8px; max-width: 70ch;
+}
+.sc12-replay-row { justify-content: center; }
+
+/* ---- glyphs ---- */
+.sc12-tuple { display: flex; gap: 4px; }
+.sc12-tuple span {
+  width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--ink-on-box);
+  border: 2px solid var(--rule); background: var(--bg-strong);
+}
+.sc12-mini-board, .sc12-frontier { display: grid; gap: 2px; }
+.sc12-mini-board { grid-template-columns: repeat(3, 14px); }
+.sc12-mb-cell { width: 14px; height: 14px; border: 1px solid var(--rule); }
+.sc12-frontier { grid-template-columns: repeat(4, 11px); }
+.sc12-fr-cell { width: 11px; height: 11px; border: 1px solid var(--rule); }
+.tint-send { background: var(--send-tint); }
+.tint-wait { background: var(--wait-tint); }
+.sc12-tape { display: flex; align-items: center; gap: 8px; font-family: 'Press Start 2P', monospace; }
+.sc12-tape .sc12-r-neg { color: var(--neg); font-size: 13px; }
+.sc12-tape .sc12-r-pos { color: var(--pos); font-size: 13px; }
+.sc12-tape .sc12-or { font-size: 8px; color: var(--ink-secondary); }
+.sc12-sweep { display: grid; grid-template-columns: repeat(3, 12px); gap: 2px; }
+.sc12-sw-cell { width: 12px; height: 12px; background: var(--send-tint); border: 1px solid var(--send); }
+.sc12-dice-mini { display: flex; gap: 8px; }
+.sc12-dm { width: 22px; height: 22px; border: 2px solid var(--rule); box-shadow: 2px 2px 0 var(--rule); }
+.sc12-dm.green { background: var(--arrival); }
+.sc12-dm.red { background: var(--blown); }
+
+@media (max-width: 860px) { .sc12-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .sc12-grid { grid-template-columns: 1fr; } }
