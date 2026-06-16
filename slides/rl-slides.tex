@@ -731,6 +731,26 @@
   \end{tikzpicture}
 \end{frame}
 
+% --- SARSA's cousin: Q-learning, in words only (no max symbol, manager rule) ---
+\begin{frame}{SARSA's cousin: Q-learning}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.0) rectangle (12.6,2.6);
+    \node[nodebox, align=center, minimum height=1.1cm] (here) at (1.6,0.1) {where you\\ stand};
+    \only<1->{%
+      \node[nodebox, good fill, align=center] (walk) at (7.2,1.5) {the call you \emph{actually} take next};
+      \draw[edge, good, line width=1.1pt] (here.east) to[out=45, in=180] (walk.west);
+      \node[below=2mm of walk, text=muted, font=\footnotesize] {\textbf{SARSA}: learn the road you walk (on-policy)};}%
+    \only<2->{%
+      \node[nodebox, acc fill, align=center] (best) at (7.2,-1.4) {the \emph{best} call you could take next};
+      \draw[edge, accent, line width=1.1pt, densely dashed] (here.east) to[out=-45, in=180] (best.west);
+      \node[below=2mm of best, text=muted, font=\footnotesize] {\textbf{Q-learning}: learn the ideal road (off-policy)};}%
+  \end{tikzpicture}
+  \formulaslot{1.0cm}{%
+    \uncover<3->{{\color{muted}\footnotesize Same nudge, one word changed: SARSA aims at the call it will really make next; Q-learning aims at the best call on offer, even while it wanders elsewhere.}}}
+  \takeaway{\uncover<4->{the road you walk, or the best road you can see}}
+\end{frame}
+
 % ===================== Closing =====================
 
 \begin{frame}{The whole story}
