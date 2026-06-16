@@ -1,7 +1,7 @@
 % Reinforcement Learning: animated deck distilled from
 % lecture_notes/reinforcement_learning.tex (same section order, same numbers).
-% Engine: LuaLaTeX ONLY. Compile from this directory, twice:
-%   lualatex rl-slides.tex && lualatex rl-slides.tex
+% Engine: pdflatex (lualatex also works). Compile from this directory, twice:
+%   pdflatex rl-slides.tex && pdflatex rl-slides.tex
 \documentclass[aspectratio=169]{beamer}
 \input{beamer-preamble}
 \usepackage{mathtools} % \mathclap: zero-width underbrace captions (after amsmath in the preamble)
@@ -22,6 +22,117 @@
 
 \begin{frame}[plain]
   \titlepage
+\end{frame}
+
+% ===================== The Faust overture (recap -> acting) =====================
+% A wordless recap of the trilogy of faculties, landing on ACTION and opening the
+% door to MDPs. No formula, no argmax, no probability symbol anywhere here: the
+% first symbol arrives on the existing MDP frames. Restraint, week-2 register.
+
+% --- Overture 1: the recap spine, Observe / Think / Act ---
+\begin{frame}[plain]{Where we stand}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.0) rectangle (12.6,2.6);
+    % three rungs of the workshop, revealed one per click; only ACT in accent
+    \only<1->{%
+      \node[nodebox, align=center, minimum width=3.0cm, minimum height=1.5cm] (obs) at (1.6,0.7)
+        {\large to observe};
+      \node[below=2mm of obs, text=muted, align=center]
+        {{\itshape das Wort} (the Word)\\ week one: language};}%
+    \only<2->{%
+      \node[nodebox, align=center, minimum width=3.0cm, minimum height=1.5cm] (thi) at (6.0,0.7)
+        {\large to think};
+      \node[below=2mm of thi, text=muted, align=center]
+        {{\itshape der Sinn} (the Thought)\\ week two: compress, abstract};}%
+    \only<4->{%
+      \node[accentbox, align=center, minimum width=3.0cm, minimum height=1.5cm, text=accent] (act) at (10.4,0.7)
+        {\large to act};
+      \node[below=2mm of act, text=muted, align=center]
+        {{\itshape die Tat} (the Deed)\\ week three: today};}%
+    % the false summit, struck through, on its own click; the strike is scoped
+    % to the words "die Kraft" only (split into two sibling nodes, like Frame 2)
+    \only<3->{%
+      \node[anchor=east, text=muted, font=\footnotesize] (kraft) at (5.6,1.9)
+        {{\itshape die Kraft}\ };
+      \node[anchor=west, text=muted, font=\footnotesize] at (5.6,1.9)
+        {(the Force): raw compute, just make it bigger};
+      \draw[bad, line width=1pt] (kraft.west) -- (kraft.east);}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{to observe, then to think, is at last to act}}
+\end{frame}
+
+% --- Overture 2: the Faust epigraph, held ---
+\begin{frame}[plain]{From the Word to the Deed}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-2.6) rectangle (12.6,2.6);
+    % "Im Anfang war das Wort", split so only "das Wort" can be struck
+    \only<1->{%
+      \node[anchor=east, font=\LARGE] (anf1) at (6.0,1.3) {Im Anfang war\ };
+      \node[anchor=west, font=\LARGE] (wort) at (6.0,1.3) {das Wort};
+      \node[right=4mm of wort, text=muted, font=\footnotesize] {that was week one};}%
+    \only<2->{\draw[bad, line width=1.1pt] (wort.west) -- (wort.east);}%
+    % "Im Anfang war die Tat", written beneath
+    \only<3->{%
+      \node[font=\LARGE, text=accent] (tat) at (6.0,-0.3) {Im Anfang war die Tat};
+      \node[below=5mm of tat, text=muted, align=center, font=\footnotesize]
+        {In the beginning was the Act.\\ Goethe, Faust I (1808), trans. Bayard Taylor};}%
+  \end{tikzpicture}
+\end{frame}
+
+% --- Overture 3: last week's bandit, one dial turned ---
+\begin{frame}[plain]{Last week, the bandit}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.0) rectangle (12.6,2.4);
+    % LEFT: the bandit of week two
+    \only<1->{%
+      \node[text=muted] at (3.0,2.0) {last week};
+      \node[nodebox, align=center, minimum width=3.4cm, minimum height=1.5cm] (b) at (3.0,0.6)
+        {one pull,\\ one payoff};
+      \node[below=3mm of b, text=muted, align=center]
+        {then the world forgets:\\ the next pull starts fresh};}%
+    % RIGHT: turn exactly one dial
+    \only<2->{%
+      \node[text=accent] at (9.4,2.0) {this week};
+      \node[accentbox, align=center, minimum width=3.4cm, minimum height=1.5cm] (v) at (9.4,0.6)
+        {run a van today};
+      \node[below=3mm of v, text=muted, align=center]
+        {a more worn van\\ waits next week};}%
+    \only<2->{\draw[edge] (b.east) -- (v.west)
+        node[midway, above, text=muted, font=\scriptsize] {turn one dial};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<3->{the one change: the consequence of an act outlives the act}}
+\end{frame}
+
+% --- Overture 4: a world that answers back -> name it ---
+% No formula, no symbol: the loop is told in plain words and TikZ arrows; the
+% first symbol still arrives on "The model: four ingredients".
+\begin{frame}[plain]{A world that answers back}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.0) rectangle (12.6,2.4);
+    % the loop, built one word-box per click
+    \only<1->{\node[nodebox, minimum height=1.0cm] (act) at (1.4,1.0) {act};}%
+    \only<1->{\node[nodebox, good fill, minimum height=1.0cm] (rew) at (4.6,1.0) {reward};
+      \draw[edge] (act.east) -- (rew.west);}%
+    \only<2->{\node[nodebox, acc fill, align=center, minimum height=1.0cm] (chg) at (8.6,1.0)
+        {a changed world};
+      \draw[edge] (rew.east) -- (chg.west)
+        node[midway, above, text=muted, font=\scriptsize] {and};}%
+    \only<3->{\node[nodebox, align=center, minimum height=1.0cm] (nxt) at (10.6,-0.9) {the next act};
+      \draw[edge] (chg.south) to[out=-90, in=120] (nxt.west);
+      \node[text=muted, font=\scriptsize, align=center, anchor=east] at (7.9,-0.9)
+        {so the next act\\ differs, and round again};}%
+    % name it, in plain words: no "=", the word "is" carries the naming
+    \only<4->{%
+      \node[align=center, font=\large] (name) at (4.6,-1.9)
+        {a world that answers back};
+      \node[below=2mm of name, text=accent]
+        {is a Markov decision process};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{a one van fleet, one call a week, in a world that answers back}}
 \end{frame}
 
 % the course roadmap, overview: the whole arcade, every ride lit
@@ -314,18 +425,40 @@
 \section{SARSA: learning from the logbook}
 \roadmapsarsa
 
+% --- Machado epigraph: there is no printed map; the path is made by walking ---
+\begin{frame}[plain]{No map, only the walking}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.0) rectangle (12.6,2.8);
+    % the couplet, held; English gloss and credit small and grey
+    \only<1->{%
+      \node[font=\LARGE, align=center] (cant) at (6.0,1.7)
+        {Caminante, no hay camino,\\ se hace camino al andar.};
+      \node[below=5mm of cant, text=muted, align=center, font=\footnotesize]
+        {(trans.) Wanderer, there is no road; the road is made by walking.\\
+         Antonio Machado, Proverbios y cantares (1912)};}%
+    % tie it to the section, in plain words (one epigraph, week-2 restraint:
+    % the trajectory-coda idea lives as a quiet caption on the trajectory frame)
+    \only<2->{%
+      \node[align=center, text=accent] at (6.0,-1.0)
+        {nobody prints the odds, so there is no map;\\
+         a good policy is a road that exists only once we walk it.};}%
+  \end{tikzpicture}
+\end{frame}
+
 \begin{frame}{Three bookkeepers, one bad week}
   \centering
   \begin{tikzpicture}
-    \useasboundingbox (0.3,-1.78) rectangle (12.9,2.30);
-    \node[text=muted] at (6.55,2.05) {nobody prints the odds for your van: fill the (WORN, RUN) card from lived weeks};
+    \useasboundingbox (0.3,-2.15) rectangle (12.9,2.30);
+    \node[text=muted] at (6.55,2.05) {the odds are still hidden, so fill the (WORN, RUN) card from lived weeks};
     \node[anchor=east, text=muted, font=\scriptsize] at (3.0,1.35) {(WORN, RUN) pays};
     \node[anchor=east, align=right] at (3.0,0.45)
       {Overwriter\\ {\scriptsize\color{muted}card $=$ last week}};
     \node[anchor=east, align=right] at (3.0,-0.5)
       {Filing cabinet\\ {\scriptsize\color{muted}true average of every week}};
     \node[anchor=east, align=right] at (3.0,-1.45)
-      {Nudger\\ {\scriptsize\color{muted}move $15\%$ toward the week}};
+      {Nudger\\ {\scriptsize\color{muted}move $15\%$ toward the week,}\\
+       {\scriptsize\color{muted}a footstep correcting the road}};
     % week 1
     \only<1->{%
       \node[nodebox, good fill, font=\scriptsize, minimum width=1.15cm] at (3.7,1.35) {$+72$};
@@ -592,7 +725,7 @@
       \draw[draw=good, line width=1.4pt, rounded corners=3pt] (9.42,-2.75) rectangle (10.98,-2.12);
       \draw[draw=good, line width=1.4pt, rounded corners=3pt] (9.42,-3.50) rectangle (10.98,-2.87);
       \node[text=good, font=\scriptsize] at (2.5,-2.64) {a few hundred weeks later:};
-      \node[text=good, font=\scriptsize] at (2.5,-3.14) {the three bands emerge};}%
+      \node[text=good, font=\scriptsize, align=center] at (2.5,-3.14) {the three bands emerge,\\ the road underfoot};}%
     \only<7->{\node[text=accent] at (5.5,-3.85)
       {the cells settle below $Q^\star$ and keep jittering, but each row keeps the right call};}%
   \end{tikzpicture}
