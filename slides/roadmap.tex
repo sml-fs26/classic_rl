@@ -4,8 +4,8 @@
 %   * arrows + why-ladder bubbles redrawn natively in TikZ + Libertinus
 %   * a "you are here" spotlight: current ride lit, the rest dimmed
 %
-% Layout follows the DECK's order, so the spotlight marches left-to-right as
-% the lecture advances:  MDP -> Bellman -> SARSA -> Bandit -> Darts.
+% Layout follows the DECK's order, so the spotlight marches along the U-path as
+% the lecture advances:  MDP -> Bandit -> Bellman -> Darts -> SARSA.
 %
 %   \roadmap            overview: every ride lit, the full why-ladder
 %   \roadmapmdp \roadmapbellman \roadmapsarsa \roadmapbandit \roadmapdarts
@@ -36,27 +36,34 @@
 % layout: cards on a U-path in deck order, why-ladder on the right
 \newcommand{\rmscene}[1]{% #1 = current key (or "all")
   \begin{frame}[plain]
-  \centering
+  % The 16cm bounding box is wider than a plain frame's \textwidth (398.34pt);
+  % center it on the paper via \makebox so the layout is fixed and no overfull
+  % \hbox is reported (a bare \centering would overflow by 56.9pt).
+  \noindent\makebox[\textwidth][c]{%
   \begin{tikzpicture}
     \useasboundingbox (0,0) rectangle (16,9);
     \node[opacity=0.16, inner sep=0pt] at (5.6,4.5) {\includegraphics[height=9.2cm]{img/roadmap/park}};
-    % path arrows (deck order: MDP -> Bellman -> SARSA -> Bandit -> Darts)
-    \begin{scope}[draw=accent!75, line width=3pt, -{Stealth[length=4mm]}, opacity=0.9]
-      \draw (3.55,6.2) -- (4.25,6.2);   % MDP -> Bellman
-      \draw (6.55,6.2) -- (7.25,6.2);   % Bellman -> SARSA
-      \draw (8.4,4.55) -- (8.4,4.15);   % SARSA -> Bandit (down)
-      \draw (7.30,2.5) -- (6.85,2.5);   % Bandit -> Darts (left)
-    \end{scope}
     \def\cur{#1}
     \rmcard{mdp-maze}{2.4}{6.2}{\ifx\cur\rmmdp 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    \rmcard{bellman-house}{5.4}{6.2}{\ifx\cur\rmbel 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    \rmcard{sarsa-maze}{8.4}{6.2}{\ifx\cur\rmsar 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    \rmcard{bandit-arcade}{8.4}{2.5}{\ifx\cur\rmban 1\else\ifx\cur\rmall 1\else0\fi\fi}
-    \rmcard{darts-dark}{5.2}{2.5}{\ifx\cur\rmdar 1\else\ifx\cur\rmall 1\else0\fi\fi}
+    \rmcard{bandit-arcade}{5.4}{6.2}{\ifx\cur\rmban 1\else\ifx\cur\rmall 1\else0\fi\fi}
+    \rmcard{bellman-house}{8.4}{6.2}{\ifx\cur\rmbel 1\else\ifx\cur\rmall 1\else0\fi\fi}
+    \rmcard{darts-dark}{8.4}{2.5}{\ifx\cur\rmdar 1\else\ifx\cur\rmall 1\else0\fi\fi}
+    \rmcard{sarsa-maze}{5.2}{2.5}{\ifx\cur\rmsar 1\else\ifx\cur\rmall 1\else0\fi\fi}
+    % path arrows (deck order: MDP -> Bandit -> Bellman -> Darts -> SARSA).
+    % Drawn AFTER the cards so they sit on top. darts-dark.png is square (1024x1024)
+    % vs the 2:3 cards, so the lit Darts card is ~3.15cm wide; the two bottom-leg
+    % arrows are routed into the real gaps it leaves (down-leg shifted off the
+    % "Bellman's house" label, left-leg into the SARSA<->Darts gap).
+    \begin{scope}[draw=accent!75, line width=3pt, -{Stealth[length=4mm]}, opacity=0.9]
+      \draw (3.55,6.2) -- (4.25,6.2);   % MDP -> Bandit
+      \draw (6.55,6.2) -- (7.25,6.2);   % Bandit -> Bellman
+      \draw (7.65,4.55) -- (7.65,4.18); % Bellman -> Darts (down, clear of the label)
+      \draw (6.78,2.5) -- (6.42,2.5);   % Darts -> SARSA (left, in the real gap)
+    \end{scope}
     \begin{scope}[font=\scriptsize\bfseries, text=black!70]
-      \node at (2.4,4.35) {MDP maze}; \node at (5.4,4.35) {Bellman's house};
-      \node at (8.4,4.35) {SARSA maze}; \node at (8.4,0.6) {bandit arcade};
-      \node at (5.2,0.6) {darts in the dark};
+      \node at (2.4,4.35) {MDP maze}; \node at (5.4,4.35) {bandit arcade};
+      \node at (8.4,4.35) {Bellman's house}; \node at (8.4,0.6) {darts in the dark};
+      \node at (5.2,0.6) {SARSA maze};
     \end{scope}
     \ifx\cur\rmall
       \node[font=\large\bfseries, text=accent] at (12.5,8.55) {The plan};
@@ -71,7 +78,7 @@
       \rmbubble{12.5}{6.6}{4.4}{accent}{white}{\rmq}
       \rmbubble{12.5}{4.7}{4.2}{good!18!white}{black!80}{\rma}
     \fi
-  \end{tikzpicture}
+  \end{tikzpicture}}
   \end{frame}
 }
 

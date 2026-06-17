@@ -6,6 +6,13 @@
 \documentclass[aspectratio=169]{beamer}
 \input{beamer-preamble}
 \usepackage{mathtools} % \mathclap: zero-width underbrace captions (after amsmath in the preamble)
+% Under lualatex, \usepackage{libertinus} pulls in unicode-math, which remaps
+% \underbrace/\overbrace onto the Unicode extensible-bracket glyphs U+23DE/U+23DF.
+% LibertinusMath's extensible recipe for exactly those two glyphs is broken under
+% luaotfload, so every brace renders as garbage ("|{z}" + black tofu boxes).
+% Surgical fix: source ONLY those two codepoints from Latin Modern Math (whose
+% recipe is sound); all other math keeps the deck's Libertinus voice.
+\setmathfont{Latin Modern Math}[range={"23DE,"23DF},Scale=MatchUppercase]
 
 \newcommand{\E}{\mathbb{E}}
 % fixed-height centered slot for a formula built with an \only chain,
@@ -289,7 +296,52 @@
   \takeaway{\uncover<4->{the goal: find the policy $\pi$ that maximizes $\E[G_1]$}}
 \end{frame}
 
-% ===================== 5. The Q-function and the Bellman equation =====================
+% ===================== 6. Exploration and exploitation =====================
+% A brief recap: the bandit was met in week 2. Two short frames, then on to Bellman.
+\section{Exploration and exploitation}
+\roadmapbandit
+
+\begin{frame}{Explore or exploit?}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.0) rectangle (12.6,2.5);
+    \only<1->{\node[align=center, text width=11.5cm] at (6.0,2.2)
+      {to pile up reward you must keep choosing a call, week after week, but which?};}%
+    \only<2->{%
+      \node[nodebox, good fill, align=center, minimum width=2.6cm] (exploit) at (2.6,0.7) {EXPLOIT};
+      \node[anchor=west, align=left, text width=7.6cm, font=\footnotesize] at (4.2,0.7)
+        {take the call you currently believe is best};}%
+    \only<3->{%
+      \node[nodebox, acc fill, align=center, minimum width=2.6cm] (explore) at (2.6,-0.8) {EXPLORE};
+      \node[anchor=west, align=left, text width=7.6cm, font=\footnotesize] at (4.2,-0.8)
+        {try another, to learn what it is worth};}%
+    \only<4->{\node[align=center, text width=11.5cm, text=accent] at (6.0,-2.2)
+      {the tension: you cannot pile up reward on what you have never measured};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{always RUN the van (best now), or now and then SERVICE or REPLACE just to learn}}
+\end{frame}
+
+\begin{frame}{The $\varepsilon$-greedy rule}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.0) rectangle (12.6,2.5);
+    \only<1->{\node[align=center, text width=11.5cm] at (6.0,2.2)
+      {one simple knob, here set to $\varepsilon = 0.15$};}%
+    \only<2->{%
+      \node[nodebox, good fill, align=center, minimum width=3.4cm, minimum height=1.2cm] (most) at (2.9,0.6) {most weeks};
+      \node[anchor=west, align=left, text width=7.0cm, font=\footnotesize] at (4.9,0.6)
+        {a share $1 - \varepsilon = 0.85$: take the best-known call {\color{muted}(exploit)}};}%
+    \only<3->{%
+      \node[nodebox, acc fill, align=center, minimum width=3.4cm, minimum height=1.2cm] (rare) at (2.9,-0.9) {now and then};
+      \node[anchor=west, align=left, text width=7.0cm, font=\footnotesize] at (4.9,-0.9)
+        {a small chance $\varepsilon = 0.15$: take a random call instead {\color{muted}(explore)}};}%
+    \only<4->{\node[align=center, text width=11.5cm, text=accent] at (6.0,-2.2)
+      {a call never tried is never learned: you cannot learn the value of servicing if you never service};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{$\varepsilon$ is the dial that balances explore against exploit}}
+\end{frame}
+
+% ===================== 7. The Q-function and the Bellman equation =====================
 \section{The $Q$-function and the Bellman equation}
 \roadmapbellman
 
@@ -361,7 +413,37 @@
   \takeaway{\uncover<4->{one equation per cell: twelve equations pin down the table}}
 \end{frame}
 
-% ===================== 6. SARSA: learning from the logbook =====================
+% ===================== 8. Learning a number in the dark: Robbins-Monro =====================
+% Moved here (from the Appendix), with a one-line lead: the nudge SARSA will use next.
+\section{Learning a number in the dark: Robbins-Monro}
+\roadmapdarts
+
+\begin{frame}{The Robbins-Monro iteration}
+  \formulaslot{1.3cm}{%
+    {\color{muted}\footnotesize to value a call we must average noisy weekly evidence, but the average is\\
+     never handed to us; it arrives one week at a time. Robbins and Monro (1951)\\
+     gave the recipe, and the game ``darts in the dark'' is its picture.}%
+  }
+  \formulaslot{0.8cm}{%
+    {\color{muted}find the number $x^\star$ that equals the average of noisy samples, one at a time}%
+  }
+  \formulaslot{1.9cm}{%
+    \only<2>{\Large $x \leftarrow x + \alpha_n \, (\text{sample} - x)$}%
+    \only<3->{\Large $x \leftarrow x + \underbrace{\alpha_n}_{\text{step } n} \, \underbrace{(\text{sample} - x)}_{\text{the miss}}$}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<4->{$\alpha_1 + \alpha_2 + \alpha_3 + \cdots$ unbounded \quad {\color{muted}(can travel from any start)}}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<5->{$\alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \cdots$ finite \quad {\color{muted}(the noise eventually cancels)}}%
+  }
+  \formulaslot{0.7cm}{%
+    \uncover<6->{$\alpha_n = 1/n$ satisfies both demands}%
+  }
+  \takeaway{\uncover<7->{this is exactly the nudge SARSA will use next, cell by cell}}
+\end{frame}
+
+% ===================== 9. SARSA: learning from the logbook =====================
 \section{SARSA: learning from the logbook}
 \roadmapsarsa
 
@@ -642,7 +724,6 @@
   \takeaway{\uncover<5->{Bellman, with the expectation replaced by an arriving average}}
 \end{frame}
 
-\roadmapbandit
 \begin{frame}{One week, one nudge}
   \centering
   \begin{tikzpicture}
@@ -681,6 +762,37 @@
       \node[text=good, font=\scriptsize, align=center] at (2.5,-3.14) {the three bands emerge,\\ the road underfoot};}%
     \only<7->{\node[text=accent] at (5.5,-3.85)
       {the cells settle below $Q^\star$ and keep jittering, but each row keeps the right call};}%
+  \end{tikzpicture}
+\end{frame}
+
+% ===================== Conclusion =====================
+% The whole loop in plain steps, then the SARSA-vs-Q-learning cousin, then the recap.
+\begin{frame}{SARSA, all together}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-3.55) rectangle (12.6,3.05);
+    \only<1->{%
+      \node[nodebox, acc fill, font=\scriptsize, anchor=north, minimum width=0.7cm] (n1) at (-0.1,2.8) {1};
+      \node[anchor=west, align=left, text width=11.4cm, font=\footnotesize] at (0.5,2.6)
+        {you are in a state {\color{muted}(the van's wear level)};};}%
+    \only<2->{%
+      \node[nodebox, acc fill, font=\scriptsize, anchor=north, minimum width=0.7cm] (n2) at (-0.1,1.85) {2};
+      \node[anchor=west, align=left, text width=11.4cm, font=\footnotesize] at (0.5,1.65)
+        {choose a call: usually the best you know {\color{muted}(exploit)}, sometimes a random one {\color{muted}(explore)}: $\varepsilon$-greedy;};}%
+    \only<3->{%
+      \node[nodebox, acc fill, font=\scriptsize, anchor=north, minimum width=0.7cm] (n3) at (-0.1,0.9) {3};
+      \node[anchor=west, align=left, text width=11.4cm, font=\footnotesize] at (0.5,0.7)
+        {act; collect the week's reward; the van lands in a new state;};}%
+    \only<4->{%
+      \node[nodebox, good fill, font=\scriptsize, anchor=north, minimum width=0.7cm] (n4) at (-0.1,-0.05) {4};
+      \node[anchor=west, align=left, text width=11.4cm, font=\footnotesize] at (0.5,-0.25)
+        {nudge your estimate of that call a little toward {\color{muted}(this week's reward $+\ \gamma\ \times$ your estimate of the next call)}: the Robbins-Monro nudge toward the Bellman target;};}%
+    \only<5->{%
+      \node[nodebox, acc fill, font=\scriptsize, anchor=north, minimum width=0.7cm] (n5) at (-0.1,-1.45) {5};
+      \node[anchor=west, align=left, text width=11.4cm, font=\footnotesize] at (0.5,-1.65)
+        {repeat, week after week; the estimates settle and the best call per state emerges.};}%
+    \only<6->{\node[align=center, text width=11.8cm, text=accent] at (6.0,-2.85)
+      {this brings together the MDP {\color{muted}(states, calls)}, explore/exploit {\color{muted}(step 2)}, Bellman {\color{muted}(the target in step 4)}, and Robbins-Monro {\color{muted}(the nudge in step 4)}};}%
   \end{tikzpicture}
 \end{frame}
 
@@ -737,28 +849,8 @@
 \end{frame}
 
 % ===================== Appendix =====================
+% (The Robbins-Monro iteration moved up to section 8; the appendix keeps the running average.)
 \section{Appendix: why the nudge works}
-\roadmapdarts
-
-\begin{frame}{The Robbins-Monro iteration}
-  \formulaslot{0.8cm}{%
-    {\color{muted}find the number $x^\star$ that equals the average of noisy samples, one at a time}%
-  }
-  \formulaslot{1.9cm}{%
-    \only<2>{\Large $x \leftarrow x + \alpha_n \, (\text{sample} - x)$}%
-    \only<3->{\Large $x \leftarrow x + \underbrace{\alpha_n}_{\text{step } n} \, \underbrace{(\text{sample} - x)}_{\text{the miss}}$}%
-  }
-  \formulaslot{0.7cm}{%
-    \uncover<4->{$\alpha_1 + \alpha_2 + \alpha_3 + \cdots$ unbounded \quad {\color{muted}(can travel from any start)}}%
-  }
-  \formulaslot{0.7cm}{%
-    \uncover<5->{$\alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \cdots$ finite \quad {\color{muted}(the noise eventually cancels)}}%
-  }
-  \formulaslot{0.7cm}{%
-    \uncover<6->{$\alpha_n = 1/n$ satisfies both demands}%
-  }
-  \takeaway{\uncover<7->{SARSA is Robbins-Monro on the Bellman equation, cell by cell}}
-\end{frame}
 
 \begin{frame}{The running average}
   \formulaslot{0.8cm}{%
