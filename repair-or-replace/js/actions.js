@@ -43,25 +43,31 @@
     return a ? ('lever-' + a.id) : '';
   }
 
-  /* Inline-SVG glyph per action: cheap pixel-art, no extra asset.
-     RUN = a road with a forward arrow, SERVICE = a wrench,
-     REPLACE = a price-tagged sparkle (new purchase).
-     currentColor so the glyph inherits the action's token colour. */
+  /* Inline-SVG glyph per action: clean line-art, no extra asset.
+     RUN = a steering wheel (operate / drive it this week),
+     SERVICE = a wrench (a week in the shop),
+     REPLACE = a sparkle (a brand-new van).
+     currentColor so the glyph inherits the action's token colour. The same
+     three shapes are baked (in identity colours) into slides/img/action/*.pdf
+     for the lecture deck, so viz and slides share one visual vocabulary. */
   function leverIconSvg(id) {
     if (id === 'run') {
-      return '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">' +
-        '<line x1="1" y1="13" x2="15" y2="13" stroke="currentColor" stroke-width="1.6"/>' +
-        '<line x1="3" y1="13" x2="6" y2="13" stroke="currentColor" stroke-width="3" stroke-dasharray="2 2"/>' +
-        '<path d="M3 7 L10 7 M10 7 L7 4 M10 7 L7 10" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+      return '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">' +
+        '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.1"/>' +
+        '<circle cx="12" cy="12" r="2.5" fill="currentColor"/>' +
+        '<g stroke="currentColor" stroke-width="2.1" stroke-linecap="round">' +
+        '<line x1="12" y1="9.5" x2="12" y2="3.4"/>' +
+        '<line x1="14.1" y1="13.2" x2="18.9" y2="16.1"/>' +
+        '<line x1="9.9" y1="13.2" x2="5.1" y2="16.1"/></g></svg>';
     }
     if (id === 'service') {
-      return '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">' +
-        '<path d="M10.5 2.5 a4 4 0 0 0 -4.6 5.6 L2.5 11.5 l2 2 L7.9 10.1 a4 4 0 0 0 5.6 -4.6 L11 8 9 6 Z"' +
-        ' fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+      return '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">' +
+        '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"' +
+        ' fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
     }
     if (id === 'replace') {
-      return '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">' +
-        '<path d="M8 1.5 L9.4 6 L14 6.4 L10.4 9.2 L11.6 14 L8 11.2 L4.4 14 L5.6 9.2 L2 6.4 L6.6 6 Z"' +
+      return '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">' +
+        '<path d="M12 2.6l1.95 5.95a2 2 0 0 0 1.3 1.3L21.4 12l-5.95 1.95a2 2 0 0 0-1.3 1.3L12 21.4l-1.95-5.95a2 2 0 0 0-1.3-1.3L2.6 12l5.95-1.95a2 2 0 0 0 1.3-1.3z"' +
         ' fill="currentColor"/></svg>';
     }
     return '';

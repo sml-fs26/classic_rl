@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- RUN = steering wheel: operate / drive the van this week. calm-blue identity. -->
+  <circle cx="12" cy="12" r="9" fill="none" stroke="#0369A1" stroke-width="2.1"/>
+  <circle cx="12" cy="12" r="2.5" fill="#0369A1"/>
+  <g stroke="#0369A1" stroke-width="2.1" stroke-linecap="round">
+    <line x1="12" y1="9.5" x2="12" y2="3.4"/>
+    <line x1="14.1" y1="13.2" x2="18.9" y2="16.1"/>
+    <line x1="9.9" y1="13.2" x2="5.1" y2="16.1"/>
+  </g>
+</svg>

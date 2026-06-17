@@ -29,6 +29,13 @@
 % standalone diagram cells where there is more room.
 \newcommand{\van}[2][0.62cm]{\mbox{\raisebox{-0.30\height}{\includegraphics[height=#1]{img/van/#2}}}}
 
+% Action icons (img/action/{run,service,replace}), same idea as \van but square,
+% so the raise is smaller. The three calls on the van: \act{run} = steering wheel
+% (drive it), \act{service} = wrench (a week in the shop), \act{replace} = sparkle
+% (a brand-new van). Colours are the action identities (blue / amber / red); the
+% name appears once as a legend, icon-only thereafter.
+\newcommand{\act}[2][0.46cm]{\mbox{\raisebox{-0.18\height}{\includegraphics[height=#1]{img/action/#2}}}}
+
 \input{roadmap} % the arcade roadmap (hybrid of last semester's map + native spotlight)
 
 \title{Reinforcement Learning}
@@ -105,15 +112,15 @@
     \node[accentbox, minimum width=2.2cm, minimum height=1.2cm] (van) at (0,0) {the van};
     \node[below=2mm of van, text=muted] {every week: exactly one call};
     \only<2->{%
-      \node[nodebox, good fill] (run) at (6.0,1.7) {RUN};
+      \node[nodebox, good fill] (run) at (6.0,1.7) {\act{run}\,RUN};
       \node[right=3mm of run, text=muted, align=left] {collect the week's profit\\ risk: breakdown, wear};
       \draw[edge] (van.east) -- (run.west);}%
     \only<3->{%
-      \node[nodebox] (svc) at (6.0,0) {SERVICE};
+      \node[nodebox] (svc) at (6.0,0) {\act{service}\,SERVICE};
       \node[right=3mm of svc, text=muted, align=left] {a week in the shop\\ fails less often afterwards};
       \draw[edge] (van.east) -- (svc.west);}%
     \only<4->{%
-      \node[nodebox, bad fill] (rep) at (6.0,-1.7) {REPLACE};
+      \node[nodebox, bad fill] (rep) at (6.0,-1.7) {\act{replace}\,REPLACE};
       \node[right=3mm of rep, text=muted, align=left] {a large expense\\ a fresh start};
       \draw[edge] (van.east) -- (rep.west);}%
   \end{tikzpicture}
@@ -151,7 +158,7 @@
   \centering
   \begin{tikzpicture}
     \useasboundingbox (-1.0,-2.4) rectangle (12.2,2.4);
-    \node[nodebox] (in) at (0.9,0) {(\van{worn}, RUN)};
+    \node[nodebox] (in) at (0.9,0) {(\van{worn}, \act{run})};
     \node[accentbox, minimum size=1.5cm, font=\large] (T) at (4.8,0) {$T$};
     \draw[edge] (in.east) -- (T.west);
     \only<2->{%
@@ -171,7 +178,7 @@
   \begin{tikzpicture}
     \useasboundingbox (-2.9,-3.2) rectangle (11.1,2.6);
     % legend for the two caption rows (under RUN)
-    \only<1->{\node[text=muted, anchor=east] at (-1.1,-0.85) {RUN profit};
+    \only<1->{\node[text=muted, anchor=east] at (-1.1,-0.85) {\act{run}\ profit};
       \node[text=muted, anchor=east] at (-1.1,-1.4) {breakdown};}%
     \only<1->{\node[nodebox, good fill, minimum width=1.9cm] (h) at (0,0) {\van{healthy}\,HEALTHY};
       \node at (0,-0.85) {$+95$};
@@ -190,12 +197,12 @@
       \node[text=muted] at (9.9,-1.4) {$55\%$};
       \draw[dimedge] (s.east) -- (f.west);}%
     \only<5->{\node[align=center, text=bad] (bd) at (3.6,1.9)
-        {breakdown under RUN: one net reward, profit minus $280$\\
+        {breakdown under \act{run}: one net reward, profit minus $280$\\
          {\color{muted}from \van{healthy}: $95 - 280 = -185$}};
       \draw[->, draw=bad, thick, dashed] (bd.east) to[out=-10, in=120] (f.north);}%
-    \only<6->{\node at (4.1,-2.3) {\textcolor{accent}{SERVICE}: $-50$, a week in the shop
+    \only<6->{\node at (4.1,-2.3) {\act{service}: $-50$, a week in the shop
         \ {\color{muted}(\van{worn} back to \van{healthy} $95\%$ of the time)}};}%
-    \only<7->{\node at (4.1,-2.95) {\textcolor{accent}{REPLACE}: $-130$, a brand-new \van{healthy} next week};}%
+    \only<7->{\node at (4.1,-2.95) {\act{replace}: $-130$, a brand-new \van{healthy} next week};}%
   \end{tikzpicture}
 \end{frame}
 
@@ -208,22 +215,22 @@
     \useasboundingbox (-0.6,-3.0) rectangle (13.4,2.6);
     \only<1->{\node at (6.4,2.3) {a policy (the playbook): \ $\pi : S \to A$, \ one call per state};}%
     \only<2->{%
-      \node[nodebox, font=\scriptsize, inner sep=3pt] at (1.3,1.45) {\van{healthy} $\to$ RUN};
-      \node[nodebox, font=\scriptsize, inner sep=3pt] at (4.6,1.45) {\van{worn} $\to$ SERVICE};
-      \node[nodebox, font=\scriptsize, inner sep=3pt] at (7.95,1.45) {\van{shaky} $\to$ REPLACE};
-      \node[nodebox, font=\scriptsize, inner sep=3pt] at (11.5,1.45) {\van{failing} $\to$ REPLACE};
+      \node[nodebox, font=\scriptsize, inner sep=3pt] at (1.3,1.45) {\van{healthy} $\to$ \act{run}};
+      \node[nodebox, font=\scriptsize, inner sep=3pt] at (4.6,1.45) {\van{worn} $\to$ \act{service}};
+      \node[nodebox, font=\scriptsize, inner sep=3pt] at (7.95,1.45) {\van{shaky} $\to$ \act{replace}};
+      \node[nodebox, font=\scriptsize, inner sep=3pt] at (11.5,1.45) {\van{failing} $\to$ \act{replace}};
       \node[text=muted, font=\scriptsize] at (6.4,0.75)
         {each week: $a_i = \pi(s_i)$, then $(s_{i+1}, r_i) = T(s_i, a_i)$};}%
     \only<3->{\node[nodebox, align=center, font=\scriptsize] (c1) at (1.2,-0.6)
-        {wk 1\\ \van{healthy}, RUN\\ \textcolor{good}{$+95$}};}%
+        {wk 1\\ \van{healthy}, \act{run}\\ \textcolor{good}{$+95$}};}%
     \only<4->{\node[nodebox, align=center, font=\scriptsize] (c2) at (4.2,-0.6)
-        {wk 2\\ \van{worn}, SERVICE\\ \textcolor{bad}{$-50$}};
+        {wk 2\\ \van{worn}, \act{service}\\ \textcolor{bad}{$-50$}};
       \draw[edge] (c1.east) -- (c2.west);}%
     \only<5->{\node[nodebox, align=center, font=\scriptsize] (c3) at (7.2,-0.6)
-        {wk 3\\ \van{healthy}, RUN\\ \textcolor{good}{$+95$}};
+        {wk 3\\ \van{healthy}, \act{run}\\ \textcolor{good}{$+95$}};
       \draw[edge] (c2.east) -- (c3.west);}%
     \only<6->{\node[nodebox, align=center, font=\scriptsize] (c4) at (10.2,-0.6)
-        {wk 4\\ \van{healthy}, RUN\\ \textcolor{good}{$+95$}};
+        {wk 4\\ \van{healthy}, \act{run}\\ \textcolor{good}{$+95$}};
       \draw[edge] (c3.east) -- (c4.west);}%
     \only<7->{\node[nodebox, align=center, font=\scriptsize, draw=muted] (c5) at (12.5,-0.6)
         {wk 5\\ \van{worn}};
@@ -232,7 +239,7 @@
         {the trajectory: $s_1, a_1, r_1,\ s_2, a_2, r_2,\ \dots$ \ one week per step, forever};}%
     \only<8->{\node[font=\scriptsize] at (6.4,-2.6)
         {{\color{muted}the tape is random; another run, same start:} \
-         (\van{healthy}, RUN, \textcolor{bad}{$-185$}) $\to$ \van{failing}};}%
+         (\van{healthy}, \act{run}, \textcolor{bad}{$-185$}) $\to$ \van{failing}};}%
   \end{tikzpicture}
 \end{frame}
 
@@ -356,7 +363,7 @@
     \only<4->{\node[align=center, text width=11.5cm, text=accent] at (6.0,-2.2)
       {the tension: you cannot pile up reward on what you have never measured};}%
   \end{tikzpicture}
-  \takeaway{\uncover<5->{always RUN the van (best now), or now and then SERVICE or REPLACE just to learn}}
+  \takeaway{\uncover<5->{always \act{run} the van (best now), or now and then \act{service} or \act{replace} just to learn}}
 \end{frame}
 
 \begin{frame}{The $\varepsilon$-greedy rule}
@@ -395,9 +402,9 @@
   \begin{tikzpicture}
     \useasboundingbox (-0.1,-3.9) rectangle (10.4,0.4);
     \only<3->{%
-      \node[text=muted] at (2.51,0) {RUN};
-      \node[text=muted] at (4.13,0) {SERVICE};
-      \node[text=muted] at (5.75,0) {REPLACE};
+      \node[text=muted] at (2.51,0) {\act{run}};
+      \node[text=muted] at (4.13,0) {\act{service}};
+      \node[text=muted] at (5.75,0) {\act{replace}};
       \node[anchor=east, font=\scriptsize] at (1.66,-0.72) {\van[0.66cm]{healthy}};
       \node[gridcell, good fill, minimum width=1.62cm, minimum height=0.72cm] at (2.51,-0.72) {$311.0$};
       \node[gridcell, minimum width=1.62cm, minimum height=0.72cm] at (4.13,-0.72) {$229.9$};
@@ -510,8 +517,8 @@
   \centering
   \begin{tikzpicture}
     \useasboundingbox (0.3,-2.40) rectangle (12.9,2.30);
-    \node[text=muted] at (6.55,2.05) {the odds are still hidden, so fill the (\van{worn}, RUN) card from lived weeks};
-    \node[anchor=east, text=muted, font=\scriptsize] at (3.0,1.35) {(\van{worn}, RUN) pays};
+    \node[text=muted] at (6.55,2.05) {the odds are still hidden, so fill the (\van{worn}, \act{run}) card from lived weeks};
+    \node[anchor=east, text=muted, font=\scriptsize] at (3.0,1.35) {(\van{worn}, \act{run}) pays};
     \node[anchor=east, align=right] at (3.0,0.45)
       {Overwriter\\ {\scriptsize\color{muted}card $=$ last week}};
     \node[anchor=east, align=right] at (3.0,-0.5)
@@ -634,10 +641,10 @@
     \only<1->{\node[align=center, text width=11.5cm] at (6.1,2.3)
       {the nudger judged each call by one thing: the money it pays \emph{this week}};}%
     \only<2->{\node[text=accent2] at (3.0,1.4) {by cash alone};
-      \node[nodebox, bad fill, font=\scriptsize, align=center] at (3.0,0.5) {REPLACE: pay $130$\\ SERVICE: pay $50$};
+      \node[nodebox, bad fill, font=\scriptsize, align=center] at (3.0,0.5) {\act{replace}: pay $130$\\ \act{service}: pay $50$};
       \node[text=muted, font=\scriptsize, align=center] at (3.0,-0.5) {the two \emph{worst}\\ calls on the sheet};}%
     \only<3->{\node[text=good] at (9.2,1.4) {yet $Q^\star$ crowned them};
-      \node[nodebox, good fill, font=\scriptsize, align=center] at (9.2,0.5) {REPLACE: best at \van{shaky}, \van{failing} ($149.9$)\\ SERVICE: best at \van{worn} ($226.1$)};
+      \node[nodebox, good fill, font=\scriptsize, align=center] at (9.2,0.5) {\act{replace}: best at \van{shaky}, \van{failing} ($149.9$)\\ \act{service}: best at \van{worn} ($226.1$)};
       \node[text=muted, font=\scriptsize, align=center] at (9.2,-0.5) {the two \emph{best} calls};}%
     \only<4->{\draw[edge, accent, line width=1.2pt] (4.7,0.5) -- (6.9,0.5)
         node[midway, above, font=\scriptsize, text=muted] {same calls};}%
@@ -652,14 +659,14 @@
     \useasboundingbox (-0.4,-3.0) rectangle (12.6,2.7);
     \only<1->{\node[align=center, text width=11.5cm] at (6.1,2.2)
       {a call does \emph{two} things: it pays cash \emph{now}, and it leaves you a \emph{van} for next week};}%
-    \only<2->{\node[nodebox, good fill, font=\scriptsize] (run) at (1.7,0.7) {RUN};
+    \only<2->{\node[nodebox, good fill, font=\scriptsize] (run) at (1.7,0.7) {\act{run}};
       \node[anchor=west, align=left, text width=9.3cm, font=\footnotesize] at (2.7,0.7)
         {earn $+95$ now {\color{muted}, but the van ends a week more worn, a thinner future (and a breakdown leaves \van{failing})}};}%
-    \only<3->{\node[nodebox, bad fill, font=\scriptsize] (rep) at (1.7,-0.9) {REPLACE};
+    \only<3->{\node[nodebox, bad fill, font=\scriptsize] (rep) at (1.7,-0.9) {\act{replace}};
       \node[anchor=west, align=left, text width=9.3cm, font=\footnotesize] at (2.7,-0.9)
         {pay $-130$ now {\color{muted}, but next Monday a brand-new \van{healthy}, a future full of profit}};}%
     \only<4->{\node[align=center, text width=11.5cm, text=accent] at (6.1,-2.2)
-      {REPLACE loses cash, yet the \van{healthy} it leaves is worth far more than $130$ down the road: that is why it is crowned};}%
+      {\act{replace} loses cash, yet the \van{healthy} it leaves is worth far more than $130$ down the road: that is why it is crowned};}%
   \end{tikzpicture}
   \takeaway{\uncover<5->{a call's worth: its cash, plus the van it leaves you}}
 \end{frame}
@@ -766,16 +773,16 @@
   \centering
   \begin{tikzpicture}
     \useasboundingbox (-0.6,-4.0) rectangle (12.4,2.2);
-    \only<2->{\node at (5.5,1.9) {week one in the logbook: \ (\van{healthy}, RUN, $+95$, \van{worn}, SERVICE)};}%
-    \only<3->{\node at (5.5,1.2) {evidence $= r_i + \gamma\, q(\van{worn}, \text{SERVICE}) = 95 + 0.9 \times 0 = 95$};}%
+    \only<2->{\node at (5.5,1.9) {week one in the logbook: \ (\van{healthy}, \act{run}, $+95$, \van{worn}, \act{service})};}%
+    \only<3->{\node at (5.5,1.2) {evidence $= r_i + \gamma\, q(\van{worn}, \act{service}) = 95 + 0.9 \times 0 = 95$};}%
     \only<4->{\node (sur) at (5.5,0.5) {surprise $= 95 - 0 = 95$};
       \draw[->, draw=accent2, thick] (sur.south) to[out=-70, in=100]
         node[pos=0.35, anchor=east, xshift=-2mm, text=accent2, font=\scriptsize] {nudge: $+\,0.15 \times 95$} (6.6,-0.8);}%
     % the q-table: col headers and row labels as plain text, 12 gridcells
     \only<1->{%
-      \node[text=muted] at (7.0,-0.55) {RUN};
-      \node[text=muted] at (8.6,-0.55) {SERVICE};
-      \node[text=muted] at (10.2,-0.55) {REPLACE};
+      \node[text=muted] at (7.0,-0.55) {\act{run}};
+      \node[text=muted] at (8.6,-0.55) {\act{service}};
+      \node[text=muted] at (10.2,-0.55) {\act{replace}};
       \node[anchor=east, font=\scriptsize] at (6.15,-1.16) {\van[0.6cm]{healthy}};
       \node[anchor=east, font=\scriptsize] at (6.15,-1.82) {\van[0.6cm]{worn}};
       \node[anchor=east, font=\scriptsize] at (6.15,-2.48) {\van[0.6cm]{shaky}};
