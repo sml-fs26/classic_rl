@@ -144,6 +144,28 @@
   }
 \end{frame}
 
+% T is a RANDOM function: the same (state, action) can pay out differently each
+% week. Placed right after the four ingredients to make "T: dynamics" concrete,
+% before the fleet sheet pins down the numbers.
+\begin{frame}{Same pair in, different output}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-1.0,-2.4) rectangle (12.2,2.4);
+    \node[nodebox] (in) at (0.9,0) {(\van{worn}, RUN)};
+    \node[accentbox, minimum size=1.5cm, font=\large] (T) at (4.8,0) {$T$};
+    \draw[edge] (in.east) -- (T.west);
+    \only<2->{%
+      \node[nodebox, good fill] (o1) at (8.7,1.3) {(\van{shaky}, $+72$)};
+      \node[right=3mm of o1, text=muted] {one week};
+      \draw[edge] (T.north east) -- (o1.west);}%
+    \only<3->{%
+      \node[nodebox, bad fill] (o2) at (8.7,-1.3) {(\van{failing}, $-208$)};
+      \node[right=3mm of o2, text=muted] {another week};
+      \draw[edge] (T.south east) -- (o2.west);}%
+  \end{tikzpicture}
+  \takeaway{\uncover<4->{same input, different output: the dynamics $T$ is random}}
+\end{frame}
+
 \begin{frame}{The fleet sheet}
   \centering
   \begin{tikzpicture}
@@ -175,25 +197,6 @@
         \ {\color{muted}(\van{worn} back to \van{healthy} $95\%$ of the time)}};}%
     \only<7->{\node at (4.1,-2.95) {\textcolor{accent}{REPLACE}: $-130$, a brand-new \van{healthy} next week};}%
   \end{tikzpicture}
-\end{frame}
-
-\begin{frame}{Same pair in, different week out}
-  \centering
-  \begin{tikzpicture}
-    \useasboundingbox (-1.0,-2.4) rectangle (12.2,2.4);
-    \node[nodebox] (in) at (0.9,0) {(\van{worn}, RUN)};
-    \node[accentbox, minimum size=1.5cm, font=\large] (T) at (4.8,0) {$T$};
-    \draw[edge] (in.east) -- (T.west);
-    \only<2->{%
-      \node[nodebox, good fill] (o1) at (8.7,1.3) {(\van{shaky}, $+72$)};
-      \node[right=3mm of o1, text=muted] {one week};
-      \draw[edge] (T.north east) -- (o1.west);}%
-    \only<3->{%
-      \node[nodebox, bad fill] (o2) at (8.7,-1.3) {(\van{failing}, $-208$)};
-      \node[right=3mm of o2, text=muted] {another week};
-      \draw[edge] (T.south east) -- (o2.west);}%
-  \end{tikzpicture}
-  \takeaway{\uncover<4->{same input, different output: the dynamics $T$ is random}}
 \end{frame}
 
 % ===================== 3. Policies and trajectories =====================
@@ -284,6 +287,31 @@
   \takeaway{\uncover<4->{this week's reward $+\ \gamma\,\times$ all the rest}}
 \end{frame}
 
+% G_1 is RANDOM: same policy, same start, a different tape (and a different G_1)
+% every run. So a policy's quality cannot be one tape's G_1; it is the AVERAGE of
+% G_1 over many runs. This frame poses the question; "Maximize the average" then
+% states the goal.
+\begin{frame}{The return is random}
+  \centering
+  \only<1->{\textcolor{muted}{same policy $\pi$, same start \van{healthy}: run the weeks again and again}}
+
+  \medskip
+  \begin{tikzpicture}
+    \useasboundingbox (-0.6,-1.7) rectangle (11.2,1.7);
+    \only<1->{\draw[draw=muted, ->] (-0.3,0) -- (10.6,0);
+      \node[text=muted, font=\scriptsize, anchor=west] at (10.6,0) {$G_1$};
+      \foreach \x in {1.8, 3.1, 3.7, 5.2, 6.0, 6.8, 8.6} {\fill[good] (\x,0) circle (2.4pt);}
+      \node[text=muted, font=\scriptsize] at (2.2,-0.55) {a thin run};
+      \node[text=muted, font=\scriptsize] at (8.2,-0.55) {a lucky run};}%
+    \only<3->{\draw[draw=accent, line width=1.3pt] (5.03,-1.05) -- (5.03,1.05);
+      \node[text=accent, font=\bfseries, anchor=south] at (5.03,1.05) {$\E[G_1]$};
+      \node[text=accent, font=\scriptsize, anchor=north] at (5.03,-1.05) {the average};}%
+  \end{tikzpicture}
+
+  \only<2->{\alert{which $G_1$ is the policy's quality, if it changes every run?}}
+  \only<4->{\takeaway{average $G_1$ over many runs: one honest number, $\E[G_1]$}}
+\end{frame}
+
 \begin{frame}{Maximize the average}
   \centering
   \begin{tikzpicture}
@@ -296,7 +324,7 @@
         \draw[dimedge] (2.4,\y) -- (3.1,\y);
         \node[anchor=west] at (3.15,\y) {$G_1^{(\k)}$};
       }
-      \node[text=muted] at (1.95,-1.35) {same playbook, same start: a different $G_1$ every run};}%
+      \node[text=muted] at (1.95,-1.35) {each run gives its own $G_1$};}%
     \only<2->{%
       \node[nodebox, acc fill, align=center, minimum width=2.9cm] (avg) at (8.3,0.6) {$\E[G_1]$\\ the average};
       \foreach \y in {1.5, 0.6, -0.3} {\draw[edge] (4.3,\y) -- (avg.west);}
