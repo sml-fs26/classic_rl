@@ -1,7 +1,8 @@
 % Reinforcement Learning: animated deck distilled from
 % lecture_notes/reinforcement_learning.tex (same section order, same numbers).
-% Engine: pdflatex (lualatex also works). Compile from this directory, twice:
-%   pdflatex rl-slides.tex && pdflatex rl-slides.tex
+% Engine: lualatex (required: the opening shows a line of polytonic Greek that
+% Libertinus renders only under lualatex). Compile from this directory, twice:
+%   lualatex rl-slides.tex && lualatex rl-slides.tex
 \documentclass[aspectratio=169]{beamer}
 \input{beamer-preamble}
 \usepackage{mathtools} % \mathclap: zero-width underbrace captions (after amsmath in the preamble)
@@ -24,7 +25,19 @@
   \titlepage
 \end{frame}
 
-% ===================== Faust: the excerpt and the mapping (two opening slides) =====================
+% ===================== Faust: the Greek source, the excerpt, and the mapping (opening) =====================
+
+% --- Faust 0: the Greek line he is translating, and why he wavers ---
+\begin{frame}[plain]
+  \vfill
+  \centering
+  {\normalsize Faust, alone in his study, is translating the opening\\ of the Gospel of John, from the Greek:}\\[14pt]
+  {\Large Ἐν ἀρχῇ ἦν ὁ λόγος}\\[4pt]
+  {\color{muted}``In the beginning was the \emph{logos}.''}\\[16pt]
+  {\normalsize One Greek word, \emph{logos}, with no single match:\\ it can mean \alert{Word}, and also \alert{Thought}, Reason, Power, the \alert{Deed}.}\\[12pt]
+  {\normalsize So he writes a rendering, strikes it out, and tries again:}
+  \vfill
+\end{frame}
 
 \begin{frame}[plain]
   \vfill
@@ -493,29 +506,42 @@
   \takeaway{\uncover<8->{SARSA forecasts the value of a call the way a planner forecasts sales}}
 \end{frame}
 
+% Step 1: the contradiction. Cash-only calls REPLACE/SERVICE the worst, yet Q* crowns them.
 \begin{frame}{The cash-only ledger lies}
   \centering
   \begin{tikzpicture}
-    \useasboundingbox (-0.4,-2.68) rectangle (12.6,2.62);
-    \only<1->{\node[text=accent2] at (2.9,2.45) {the cash-only ledger};
-      \node[nodebox, bad fill, font=\scriptsize] at (2.9,1.75) {REPLACE: $-130$, every single week};
-      \node[text=muted, font=\scriptsize] at (2.9,1.15) {worst call on the sheet};}%
-    \only<2->{\node[nodebox, font=\scriptsize] at (2.9,0.5) {SERVICE: $-50$};}%
-    \only<3->{\node[text=accent2] at (9.3,2.45) {the scorecard $Q^\star$ you saw};
-      \node[nodebox, good fill, font=\scriptsize] at (9.3,1.75) {REPLACE crowned at SHAKY and FAILING: $149.9$};}%
-    \only<4->{\node[nodebox, good fill, font=\scriptsize] at (9.3,1.0) {SERVICE crowned at WORN: $226.1$};}%
-    \only<5->{\node at (6.25,-0.15) {what does the cash-only ledger miss?};}%
-    \only<6->{%
-      \node[nodebox] (wk) at (2.2,-1.7) {one week};
-      \node[nodebox, good fill, font=\scriptsize] (vA) at (8.3,-1.0) {a HEALTHY van left in the lot};
-      \draw[edge] (wk.east) -- (vA.west)
-        node[midway, above=2pt, draw=fg, rounded corners=2pt, inner sep=2.5pt, font=\scriptsize, fill=panel] {the same cash};}%
-    \only<7->{%
-      \node[nodebox, bad fill, font=\scriptsize] (vB) at (8.3,-2.4) {a FAILING van left in the lot};
-      \draw[edge] (wk.east) -- (vB.west)
-        node[midway, below=2pt, draw=fg, rounded corners=2pt, inner sep=2.5pt, font=\scriptsize, fill=panel] {the same cash};}%
+    \useasboundingbox (-0.4,-3.0) rectangle (12.6,2.7);
+    \only<1->{\node[align=center, text width=11.5cm] at (6.1,2.3)
+      {the nudger judged each call by one thing: the money it pays \emph{this week}};}%
+    \only<2->{\node[text=accent2] at (3.0,1.4) {by cash alone};
+      \node[nodebox, bad fill, font=\scriptsize, align=center] at (3.0,0.5) {REPLACE: pay $130$\\ SERVICE: pay $50$};
+      \node[text=muted, font=\scriptsize, align=center] at (3.0,-0.5) {the two \emph{worst}\\ calls on the sheet};}%
+    \only<3->{\node[text=good] at (9.2,1.4) {yet $Q^\star$ crowned them};
+      \node[nodebox, good fill, font=\scriptsize, align=center] at (9.2,0.5) {REPLACE: best at SHAKY, FAILING ($149.9$)\\ SERVICE: best at WORN ($226.1$)};
+      \node[text=muted, font=\scriptsize, align=center] at (9.2,-0.5) {the two \emph{best} calls};}%
+    \only<4->{\draw[edge, accent, line width=1.2pt] (4.7,0.5) -- (6.9,0.5)
+        node[midway, above, font=\scriptsize, text=muted] {same calls};}%
   \end{tikzpicture}
-  \takeaway{\uncover<8->{same cash, different futures: so what is the leftover van worth?}}
+  \takeaway{\uncover<5->{the worst-paying calls are the best calls, so cash cannot be the whole story}}
+\end{frame}
+
+% Step 2: the resolution. A call pays cash AND leaves you a van (a state); that van has worth.
+\begin{frame}{Why? A call also leaves you a van}
+  \centering
+  \begin{tikzpicture}
+    \useasboundingbox (-0.4,-3.0) rectangle (12.6,2.7);
+    \only<1->{\node[align=center, text width=11.5cm] at (6.1,2.2)
+      {a call does \emph{two} things: it pays cash \emph{now}, and it leaves you a \emph{van} for next week};}%
+    \only<2->{\node[nodebox, good fill, font=\scriptsize] (run) at (1.7,0.7) {RUN};
+      \node[anchor=west, align=left, text width=9.3cm, font=\footnotesize] at (2.7,0.7)
+        {earn $+95$ now {\color{muted}, but the van ends a week more worn, a thinner future (and a breakdown leaves a FAILING van)}};}%
+    \only<3->{\node[nodebox, bad fill, font=\scriptsize] (rep) at (1.7,-0.9) {REPLACE};
+      \node[anchor=west, align=left, text width=9.3cm, font=\footnotesize] at (2.7,-0.9)
+        {pay $-130$ now {\color{muted}, but next Monday a brand-new HEALTHY van, a future full of profit}};}%
+    \only<4->{\node[align=center, text width=11.5cm, text=accent] at (6.1,-2.2)
+      {REPLACE loses cash, yet the HEALTHY van it leaves is worth far more than $130$ down the road: that is why it is crowned};}%
+  \end{tikzpicture}
+  \takeaway{\uncover<5->{a call's worth: its cash, plus the van it leaves you}}
 \end{frame}
 
 \begin{frame}{Grade the week like a trade-in}
